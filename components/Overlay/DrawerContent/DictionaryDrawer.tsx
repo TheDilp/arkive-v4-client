@@ -47,13 +47,13 @@ export function DictionaryDrawer({ data, exceptions }: Props) {
   } = useGetEntity<DictionaryType>(
     data?.id,
     "dictionaries",
-    { data, fields: ["id", "title", "icon", "is_public", "is_folder", "parent_id"], permissions: true },
-    { enabled: !!data?.id },
+    { data, fields: ["id", "title", "owner_id", "icon", "is_public", "is_folder", "parent_id"], permissions: true },
+    { enabled: !!data?.id }
   );
   const { mutateAsync: createDictionary, isLoading: isCreating } = useCreateEntity<InsertDictionaryType>("dictionaries");
   const { mutateAsync: updateDictionary, isLoading: isUpdating } = useUpdateEntity<UpdateDictionaryType>(
     "dictionaries",
-    project_id as string,
+    project_id as string
   );
   const [dictionary, setDictionary] = useState<DictionaryStateType>({
     id: data?.id,
@@ -63,7 +63,7 @@ export function DictionaryDrawer({ data, exceptions }: Props) {
   const [selectedTab, setSelectedTab] = useState(0);
   const permissions = useHasPermissions(
     ["read_dictionaries", "create_dictionaries", "update_dictionaries", "read_tags", "read_character_fields_templates"],
-    dictionary?.owner_id,
+    dictionary?.owner_id
   );
   const tabs = getTabs(permissions, data?.id);
 
@@ -125,6 +125,7 @@ export function DictionaryDrawer({ data, exceptions }: Props) {
       {tabs[selectedTab].id === "2" && (permissions?.is_owner || !data?.id) ? (
         <EntityPermission
           handleChange={handleChange}
+          owner_id={dictionary?.owner_id}
           permissions={dictionary?.permissions || []}
           related_id={dictionary?.id || null}
           selectablePermissions={["read_dictionaries", "update_dictionaries", "delete_dictionaries"]}
