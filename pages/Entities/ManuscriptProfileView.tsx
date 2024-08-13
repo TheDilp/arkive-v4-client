@@ -92,11 +92,15 @@ export function ManuscriptProfileView() {
         setType(manuscriptTree[idx].type);
         setSelectedTab(idx);
       }
+    } else if (manuscriptTree.length && manuscriptTree?.[0]) {
+      setType(manuscriptTree[0].type);
+      setSelectedTab(0);
+      navigate(`/projects/${project_id}/manuscripts/${existingManuscript?.data?.id}/${manuscriptTree[0].related_id}`);
     }
   }, [subitem_id, manuscriptTree]);
 
   return (
-    <div className={"flex h-full flex-col gap-y-2 lg:flex-row lg:gap-y-0"}>
+    <div className={"flex h-full flex-col gap-y-2 lg:gap-y-0"}>
       {item_id && !IS_PUBLIC ? (
         <div className="flex h-12 min-h-[3rem] items-center justify-between">
           <Breadcrumbs />
@@ -135,7 +139,6 @@ export function ManuscriptProfileView() {
           hasArrowNav
           onChange={(tab) => {
             const related_id = tab.id.split("___");
-            console.log(related_id);
             if (related_id?.[1])
               navigate(`${IS_PUBLIC ? "" : "/projects"}/${project_id}/manuscripts/${item_id}/${related_id[1]}`);
           }}
