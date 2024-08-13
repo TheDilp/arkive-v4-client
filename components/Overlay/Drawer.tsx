@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { FolderDrawer, GraphDrawer } from "..";
 import { dialogAtom, drawerAtom, hasChangedDataAtom, IconEnum } from "../../utils";
+import { FolderDrawer, GraphDrawer } from "..";
 import { Button } from "../Form";
 import {
   AutomentionDrawer,
@@ -193,7 +193,7 @@ export function Drawer() {
             ) : (
               <>
                 {drawer.type === "project" ? <ProjectDrawer /> : null}
-                {drawer.type === "characters" ? <CharacterDrawer data={drawer.data} /> : null}
+                {drawer.type === "characters" ? <CharacterDrawer data={drawer.data} exceptions={drawer?.exceptions} /> : null}
                 {drawer.type === "character_fields_templates" ? <FieldTemplateDrawer data={drawer?.data} /> : null}
                 {drawer.type === "folder" ? <FolderDrawer data={drawer.data} /> : null}
                 {drawer.type === "documents" ? <DocumentDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
