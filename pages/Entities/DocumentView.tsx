@@ -1,11 +1,11 @@
 import "remirror/styles/all.css";
 import "../../Editor.css";
 
-import { EditorComponent, Remirror, useRemirror } from "@remirror/react";
+import { EditorComponent, Remirror, useRemirror, useRemirrorContext } from "@remirror/react";
 import { QueryClient, UseMutateFunction, useQueryClient } from "@tanstack/react-query";
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
-import { MouseEvent, useCallback, useEffect, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import { Navigate, useBlocker, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
@@ -165,65 +165,23 @@ export function DocumentView({ editable }: { editable: boolean }) {
   return null;
 }
 
-function DocumentViewEditor({
-  id,
-  title,
-  icon,
-  can_update,
-  content,
-  is_template,
-  refetch,
-}: {
-  id: string;
-  title: string;
-  icon: AvailableIcons | undefined | null;
-  can_update: boolean;
-  is_template: boolean | null;
-  content: RemirrorJSON | undefined;
-  refetch: () => void;
-}) {
-  const { project_id, item_id } = useParams();
-  const queryClient = useQueryClient();
+function DocumentContent({ can_update }: { can_update: boolean }) {
   const createNotification = useNotifications();
-  const drawer = useAtomValue(drawerAtom);
-  const user = useAtomValue(userAtom);
-  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
-  const mentionPosition = useAtomValue(mentionPositionAtom);
+
   const setContextMenu = useSetAtom(contextMenuAtom);
   const setDrawer = useSetAtom(drawerAtom);
+  const user = useAtomValue(userAtom);
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
+  const getContext = useRemirrorContext();
+
   const { data: webhooks } = useGetEntities<WebhookType>({ data: { user_id: user?.id }, fields: ["id", "title"] }, "webhooks", {
     enabled: !!user?.id && isProjectOwner,
     staleTime: Infinity,
   });
-  const { mutate: updateDocument, isLoading: isMutating } = useUpdateEntity<{
-    data: { id: string; content: string | undefined };
-  }>("documents", project_id as string, {
-    mutationKey: ["document_view", "update"],
-  });
-
-  const [uiOptions, setUIOptions] = useState({ outline: false, comments: false });
-
-  const [editorData, setEditorData] = useState<RemirrorJSON>({ content: content as RemirrorJSON[] | undefined, type: "doc" });
-  const { manager, state, getContext } = useRemirror({
-    extensions: () => DefaultEditorExtensions(createNotification),
-    selection: "start",
-    onError,
-    content,
-  });
-
-  const headings: { id: string; title: string; level: number }[] = [];
-  state.doc.forEach((n) => {
-    if (n.type.name === "heading" && n.textContent) {
-      headings.push({ id: n.attrs.id, title: n.textContent, level: n.attrs.level });
-    }
-  });
-
-  const { changedData, resetChanges, handleChange } = useHandleChange({ data: editorData, setData: setEditorData });
-
-  const getContextActions = useCallback((e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
+  function getContextActions(e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) {
     e.preventDefault();
 
-    const slice = getContext()?.getState().selection.content();
+    const slice = getContext?.getState().selection.content();
     let title = "";
     if (slice) {
       slice.content.descendants((node) => {
@@ -237,6 +195,8 @@ function DocumentViewEditor({
         return;
       }
     }
+
+    const { from, to } = getContext?.getState().selection || {};
     setContextMenu({
       // @ts-ignore
       event: e,
@@ -250,11 +210,19 @@ function DocumentViewEditor({
               id: "3a",
               title: "Character",
               icon: IconEnum.character,
+
               onClick: () =>
                 setDrawer((prev) => ({
                   ...prev,
+                  exceptions: { mention: true },
                   title: "Create character",
-                  data: { preselectedTab: 0, id: undefined, title },
+                  data: {
+                    preselectedTab: 0,
+                    id: undefined,
+                    title,
+                    getContext: getContext || undefined,
+                    range: { from, to },
+                  },
                   type: "characters",
                   size: "xl",
                 })),
@@ -266,8 +234,9 @@ function DocumentViewEditor({
               onClick: () =>
                 setDrawer((prev) => ({
                   ...prev,
+                  exceptions: { mention: true },
                   title: "Create blueprint instance",
-                  data: { title },
+                  data: { title, getContext: getContext || undefined, range: { from, to } },
                   type: "blueprint_instances",
                 })),
             },
@@ -278,8 +247,9 @@ function DocumentViewEditor({
               onClick: () =>
                 setDrawer((prev) => ({
                   ...prev,
+                  exceptions: { mention: true },
                   title: "Create document",
-                  data: { preselectedTab: 0, id: undefined, title },
+                  data: { preselectedTab: 0, id: undefined, title, getContext: getContext || undefined, range: { from, to } },
                   type: "documents",
                 })),
             },
@@ -290,8 +260,9 @@ function DocumentViewEditor({
               onClick: () =>
                 setDrawer((prev) => ({
                   ...prev,
+                  exceptions: { mention: true },
                   title: "Create map",
-                  data: { preselectedTab: 0, id: undefined, title },
+                  data: { preselectedTab: 0, id: undefined, title, getContext: getContext || undefined, range: { from, to } },
                   type: "maps",
                 })),
             },
@@ -303,7 +274,8 @@ function DocumentViewEditor({
                 setDrawer((prev) => ({
                   ...prev,
                   title: "Create graph",
-                  data: { preselectedTab: 0, id: undefined, title },
+                  exceptions: { mention: true },
+                  data: { preselectedTab: 0, id: undefined, title, getContext: getContext || undefined, range: { from, to } },
                   type: "graphs",
                 })),
             },
@@ -315,7 +287,8 @@ function DocumentViewEditor({
                 setDrawer((prev) => ({
                   ...prev,
                   title: "Create word",
-                  data: { title },
+                  exceptions: { mention: true },
+                  data: { title, getContext: getContext || undefined, range: { from, to } },
                   type: "words",
                 })),
             },
@@ -350,7 +323,79 @@ function DocumentViewEditor({
         },
       ],
     });
-  }, []);
+  }
+
+  return (
+    <div
+      className="relative flex h-full w-full max-w-full flex-col content-start focus-visible:outline-none"
+      onContextMenu={can_update ? (e) => getContextActions(e) : undefined}
+      onDrop={
+        can_update
+          ? (e) => {
+              const stringData = e.dataTransfer.getData("Text");
+              if (!stringData) return;
+              if (stringData) {
+                const data: { index: number; title: string; description?: string } = JSON.parse(e.dataTransfer.getData("Text"));
+                if (!data) return;
+                getContext?.commands.insertText(`${data.title}: ${data?.description}`);
+              }
+            }
+          : undefined
+      }>
+      <EditorComponent />
+      <MentionDropdownComponent />
+    </div>
+  );
+}
+
+function DocumentViewEditor({
+  id,
+  title,
+  icon,
+  can_update,
+  content,
+  is_template,
+  refetch,
+}: {
+  id: string;
+  title: string;
+  icon: AvailableIcons | undefined | null;
+  can_update: boolean;
+  is_template: boolean | null;
+  content: RemirrorJSON | undefined;
+  refetch: () => void;
+}) {
+  const { project_id, item_id } = useParams();
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+  const drawer = useAtomValue(drawerAtom);
+
+  const mentionPosition = useAtomValue(mentionPositionAtom);
+
+  const { mutate: updateDocument, isLoading: isMutating } = useUpdateEntity<{
+    data: { id: string; content: string | undefined };
+  }>("documents", project_id as string, {
+    mutationKey: ["document_view", "update"],
+  });
+
+  const [uiOptions, setUIOptions] = useState({ outline: false, comments: false });
+
+  const [editorData, setEditorData] = useState<RemirrorJSON>({ content: content as RemirrorJSON[] | undefined, type: "doc" });
+  const { manager, state, getContext } = useRemirror({
+    extensions: () => DefaultEditorExtensions(createNotification),
+    selection: "start",
+    onError,
+    content,
+  });
+
+  const headings: { id: string; title: string; level: number }[] = [];
+  state.doc.forEach((n) => {
+    if (n.type.name === "heading" && n.textContent) {
+      headings.push({ id: n.attrs.id, title: n.textContent, level: n.attrs.level });
+    }
+  });
+
+  const { changedData, resetChanges, handleChange } = useHandleChange({ data: editorData, setData: setEditorData });
 
   useBlocker(() => {
     if (changedData) {
@@ -461,27 +506,7 @@ function DocumentViewEditor({
                   title={title || ""}
                 />
               ) : null}
-              <div
-                className="relative flex h-full w-full max-w-full flex-col content-start focus-visible:outline-none"
-                onContextMenu={can_update ? (e) => getContextActions(e) : undefined}
-                onDrop={
-                  can_update
-                    ? (e) => {
-                        const stringData = e.dataTransfer.getData("Text");
-                        if (!stringData) return;
-                        if (stringData) {
-                          const data: { index: number; title: string; description?: string } = JSON.parse(
-                            e.dataTransfer.getData("Text")
-                          );
-                          if (!data) return;
-                          getContext()?.commands.insertText(`${data.title}: ${data?.description}`);
-                        }
-                      }
-                    : undefined
-                }>
-                <EditorComponent />
-                <MentionDropdownComponent />
-              </div>
+              <DocumentContent can_update={can_update} />
             </div>
           </Remirror>
         </div>
