@@ -1,4 +1,6 @@
 import type { CommandFunction, KeyBindingProps, PrimitiveSelection } from "@remirror/core";
+import { InputRule } from "@remirror/pm/inputrules";
+import { MarkPasteRule } from "@remirror/pm/paste-rules";
 import {
   ApplySchemaAttributes,
   command,
@@ -8,6 +10,7 @@ import {
   keyBinding,
   MarkExtension,
   MarkExtensionSpec,
+  markInputRule,
   MarkSpecOverride,
   ProsemirrorNode,
   toggleMark,
@@ -44,6 +47,22 @@ export class SpoilerExtension extends MarkExtension<SpoilerOptions> {
         return ["span", { ...extra.dom(node), class: "spoiler", spellcheck: "false" }, 0];
       },
     };
+  }
+
+  createInputRules(): InputRule[] {
+    return [
+      markInputRule({
+        regexp: /(?:^|[^|])\|\|([^|]+)\|\|$/,
+        type: this.type,
+        ignoreWhitespace: true,
+        updateCaptured: ({ fullMatch, start }) =>
+          !fullMatch.startsWith("||") ? { fullMatch: fullMatch.slice(1), start: start + 1 } : {},
+      }),
+    ];
+  }
+
+  createPasteRules(): MarkPasteRule {
+    return { type: "mark", markType: this.type, regexp: /(?:^|[^|])\|\|([^|]+)\|\|$/g, transformMatch: () => false };
   }
 
   @command()
