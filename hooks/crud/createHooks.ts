@@ -159,11 +159,18 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
 
         return { old: {} };
       },
-      onError: (_, vars, context) => {
+      onError: (error: { message: string }, vars, context) => {
         const parentEntityType = getParentEntityType(type);
         if (parentEntityType === "graphs") {
           queryClient.setQueryData([parentEntityType, vars.data.parent_id], context?.old);
         }
+        createNotification({
+          title: error?.message || "There was an error creating this entity.",
+          variant: "error",
+          icon: IconEnum.error,
+          timer: 5,
+          position: "top-right",
+        });
       },
       onSuccess: (data, vars) => {
         const parentEntityType = getParentEntityType(type);
