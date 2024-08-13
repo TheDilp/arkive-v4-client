@@ -20,7 +20,7 @@ const AvatarClasses = tv({
         base: "w-3 h-3 min-w-[0.75rem] min-h-[0.75rem]",
       },
       "3xs": {
-        base: "w-3 h-3 min-w-[0.75rem] min-h-[0.75rem]",
+        base: "w-[14px] h-[14px] min-w-[14px] min-h-[14px]",
       },
       "2xs": {
         base: "w-4 h-4 min-w-[1rem] min-h-[1rem]",
