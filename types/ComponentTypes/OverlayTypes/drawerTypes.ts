@@ -38,6 +38,7 @@ type DrawerExceptions = {
   isReadOnly?: boolean;
   globalCreate?: boolean;
   gatewayConfiguration?: boolean;
+  mention?: boolean;
 };
 
 export type DrawerAtomType = {
@@ -62,7 +63,14 @@ export type DrawerAtomType = {
         | "character_relationship_types"
         | "map_pin_types"
         | "manuscripts";
-      data: { id?: string; project_id?: string; preselectedTab?: number; title?: string };
+      data: {
+        id?: string;
+        project_id?: string;
+        preselectedTab?: number;
+        title?: string;
+        getContext?: ReactFrameworkOutput<Remirror.Extensions> | undefined;
+        range?: { from: number | undefined; to: number | undefined };
+      };
     }
   | { type: "document_template" | "games"; data: { id?: string } }
   | { type: "from_template"; data: { id: string; title: string; getContext: ReactFrameworkOutput<Remirror.Extensions> } }
