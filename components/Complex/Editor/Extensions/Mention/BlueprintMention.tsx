@@ -67,7 +67,7 @@ export function BlueprintMention({ id, project_id, title, label, icon, parent_id
       );
     return (
       <Link
-        className="font-lato inline-flex items-center font-bold underline transition-colors hover:text-sky-400"
+        className="inline-flex items-center font-lato font-bold underline transition-colors hover:text-sky-400"
         to={getMentionLink(
           id as string,
           "blueprint_instances",
@@ -76,15 +76,12 @@ export function BlueprintMention({ id, project_id, title, label, icon, parent_id
           parent_id || data?.data?.parent_id
         )}>
         <div className="flex items-start" ref={mentionRef}>
-          {icon ? (
-            <span className="relative top-[2px]">
-              <Icon fontSize={14} icon={icon ?? IconEnum.blueprint} />
-            </span>
-          ) : null}
+          <span className="relative top-[2px]">
+            <Icon fontSize={14} icon={data?.data?.blueprint?.icon ?? icon ?? IconEnum.blueprint} />
+          </span>
           <span className="text-base leading-4 underline">{title || label}</span>
         </div>
       </Link>
     );
   }
 }
-

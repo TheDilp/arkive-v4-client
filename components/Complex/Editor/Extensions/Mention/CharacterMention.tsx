@@ -73,7 +73,6 @@ export function CharacterMention({ id, project_id, title, label }: Props) {
       }
     };
   }, []);
-
   if (id) {
     if (!data?.data?.is_public && IS_PUBLIC) return <span ref={mentionRef}>{label}</span>;
     if (!data?.data && !isPaused && isFetched)
@@ -101,7 +100,7 @@ export function CharacterMention({ id, project_id, title, label }: Props) {
           <div className="flex items-start" ref={mentionRef}>
             {data?.data?.portrait_id && project_id ? (
               <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
-                <Avatar hasShowImage image={getImageURL(project_id as string, "images", data?.data?.portrait_id)} size="2xs" />
+                <Avatar hasShowImage image={getImageURL(project_id as string, "images", data?.data?.portrait_id)} size="3xs" />
               </span>
             ) : (
               <Icon fontSize={14} icon={IconEnum.character} />
