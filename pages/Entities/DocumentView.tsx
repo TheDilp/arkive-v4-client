@@ -217,8 +217,6 @@ function DocumentContent({ can_update }: { can_update: boolean }) {
                   exceptions: { mention: true },
                   title: "Create character",
                   data: {
-                    preselectedTab: 0,
-                    id: undefined,
                     title,
                     getContext: getContext || undefined,
                     range: { from, to },
@@ -247,9 +245,9 @@ function DocumentContent({ can_update }: { can_update: boolean }) {
               onClick: () =>
                 setDrawer((prev) => ({
                   ...prev,
-                  exceptions: { mention: true },
+                  exceptions: { mention: true, globalCreate: true },
                   title: "Create document",
-                  data: { preselectedTab: 0, id: undefined, title, getContext: getContext || undefined, range: { from, to } },
+                  data: { title, getContext: getContext || undefined, range: { from, to } },
                   type: "documents",
                 })),
             },
@@ -260,9 +258,9 @@ function DocumentContent({ can_update }: { can_update: boolean }) {
               onClick: () =>
                 setDrawer((prev) => ({
                   ...prev,
-                  exceptions: { mention: true },
+                  exceptions: { mention: true, globalCreate: true },
                   title: "Create map",
-                  data: { preselectedTab: 0, id: undefined, title, getContext: getContext || undefined, range: { from, to } },
+                  data: { title, getContext: getContext || undefined, range: { from, to } },
                   type: "maps",
                 })),
             },
@@ -274,8 +272,8 @@ function DocumentContent({ can_update }: { can_update: boolean }) {
                 setDrawer((prev) => ({
                   ...prev,
                   title: "Create graph",
-                  exceptions: { mention: true },
-                  data: { preselectedTab: 0, id: undefined, title, getContext: getContext || undefined, range: { from, to } },
+                  exceptions: { mention: true, globalCreate: true },
+                  data: { title, getContext: getContext || undefined, range: { from, to } },
                   type: "graphs",
                 })),
             },
@@ -287,7 +285,7 @@ function DocumentContent({ can_update }: { can_update: boolean }) {
                 setDrawer((prev) => ({
                   ...prev,
                   title: "Create word",
-                  exceptions: { mention: true },
+                  exceptions: { mention: true, globalCreate: true },
                   data: { title, getContext: getContext || undefined, range: { from, to } },
                   type: "words",
                 })),

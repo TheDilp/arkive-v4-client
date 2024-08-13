@@ -1,3 +1,4 @@
+import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -54,7 +55,13 @@ import { DrawerLayout, Tabs } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 
 type Props = {
-  data: { id?: string; parent_id?: string; title?: string };
+  data: {
+    id?: string;
+    parent_id?: string;
+    title?: string;
+    getContext?: ReactFrameworkOutput<Remirror.Extensions>;
+    range?: { from: number | undefined; to: number | undefined };
+  };
   exceptions: DrawerAtomType["exceptions"];
 };
 
@@ -433,17 +440,19 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
   const resetDrawerAtom = useToggledResetAtom();
   const [instance, setInstance] = useState<Omit<BlueprintInstanceType, "deleted_at"> | null>(null);
   const [selectedTab, setSelectedTab] = useState(0);
+  const [createMention, setCreateMention] = useState(true);
+
   const { handleChange, resetChanges, changedData } = useHandleChange({ data: instance, setData: setInstance });
   const {
     data: blueprint,
     isInitialLoading: isInitialLoadingBlueprint,
     isFetching: isFetchingBlueprint,
   } = useGetEntity<BlueprintType>(
-    data?.title || exceptions?.globalCreate ? instance?.parent_id : data?.parent_id ?? item_id,
+    data?.title || exceptions?.globalCreate ? instance?.parent_id : (data?.parent_id ?? item_id),
     "blueprints",
     {
       data: {
-        id: data?.title ? instance?.parent_id : data?.parent_id ?? item_id,
+        id: data?.title ? instance?.parent_id : (data?.parent_id ?? item_id),
       },
       fields: ["id", "title", "title_name", "icon"],
       relations: {
@@ -560,6 +569,17 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
                   value={instance?.is_public ?? false}
                 />
               </div>
+              {exceptions?.mention ? (
+                <li className="flex w-full items-center justify-between">
+                  <span>Create mention:</span>
+                  <Checkbox
+                    isDisabled={!canCreateOrEdit}
+                    name="create_mention"
+                    onChange={(e) => setCreateMention(e.value)}
+                    value={createMention}
+                  />
+                </li>
+              ) : null}
             </>
           ) : null}
         </div>
@@ -616,7 +636,7 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
                     id: instance.id,
                     title: instance.title,
                     is_public: instance?.is_public,
-                    parent_id: data?.title ? instance?.parent_id : data?.parent_id ?? item_id,
+                    parent_id: data?.title ? instance?.parent_id : (data?.parent_id ?? item_id),
                   },
                   relations: {
                     tags: instance?.tags?.map((t) => ({ id: t.id })),
@@ -635,7 +655,7 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
                   data: {
                     title: instance.title,
                     is_public: instance?.is_public,
-                    parent_id: data?.title ? instance?.parent_id : data?.parent_id ?? item_id,
+                    parent_id: data?.title ? instance?.parent_id : (data?.parent_id ?? item_id),
                   },
                   relations: {
                     tags: instance?.tags?.map((t) => ({ id: t.id })),
@@ -647,7 +667,37 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
 
                 await create(parsedData, {
                   onSuccess: (res) => {
-                    if (res?.ok) {
+                    if (res?.ok && createMention) {
+                      if (
+                        exceptions?.mention &&
+                        data?.getContext &&
+                        typeof data.range?.from === "number" &&
+                        typeof data.range?.to === "number" &&
+                        res?.data?.id
+                      ) {
+                        data.getContext.chain
+                          .delete({ from: Number(data.range.from), to: Number(data.range.to) })
+                          .createMentionAtom(
+                            {
+                              name: "blueprint_instances",
+                              range: {
+                                from: data.range.from,
+                                cursor: data.range.to,
+                                to: data.range.to,
+                              },
+                            },
+                            {
+                              id: res?.data?.id,
+                              label: data?.title || "",
+                              name: "blueprint_instances",
+                              icon: undefined,
+                              projectId: project_id,
+                              parent_id: undefined,
+                            }
+                          )
+                          .run();
+                      }
+
                       resetDrawerAtom();
 
                       setInstance({

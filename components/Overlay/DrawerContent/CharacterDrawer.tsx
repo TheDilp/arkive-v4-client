@@ -1,3 +1,4 @@
+import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useQueryClient } from "@tanstack/react-query";
 import groupBy from "lodash.groupby";
 import omit from "lodash.omit";
@@ -474,10 +475,22 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
   return tabs;
 }
 
-export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?: number; title?: string } }) {
+export function CharacterDrawer({
+  exceptions,
+  data,
+}: {
+  exceptions?: { mention?: boolean };
+  data: {
+    id?: string;
+    preselectedTab?: number;
+    title?: string;
+    getContext?: ReactFrameworkOutput<Remirror.Extensions>;
+    range?: { from: number | undefined; to: number | undefined };
+  };
+}) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(data?.preselectedTab ?? 0);
-
+  const [createMention, setCreateMention] = useState(true);
   const resetDrawerAtom = useToggledResetAtom();
   const createNotification = useNotifications();
   const queryClient = useQueryClient();
@@ -518,7 +531,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     "characters",
     project_id as string
   );
-  const hasCreateOrEdit = createOrEditPermission(
+  const canCreateOrEdit = createOrEditPermission(
     permissions?.create_characters,
     permissions?.update_characters,
     permissions?.is_owner,
@@ -548,9 +561,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     },
     "character_fields_templates",
     {
-      enabled:
-        // tabs[selectedTab].id === "5" &&
-        !!character?.tags?.length && permissions?.read_character_fields_templates && permissions?.read_tags,
+      enabled: !!character?.tags?.length && permissions?.read_character_fields_templates && permissions?.read_tags,
       staleTime: 5 * 60 * 1000,
     }
   );
@@ -607,7 +618,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             <div className="w-full lg:w-1/2">
               <Input
                 isAutofocused
-                isDisabled={!hasCreateOrEdit}
+                isDisabled={!canCreateOrEdit}
                 label="First name (required)"
                 name="first_name"
                 onChange={handleChange}
@@ -617,7 +628,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             </div>
             <div className="w-full lg:w-1/2">
               <Input
-                isDisabled={!hasCreateOrEdit}
+                isDisabled={!canCreateOrEdit}
                 label="Nickname (optional)"
                 name="nickname"
                 onChange={handleChange}
@@ -626,7 +637,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             </div>
             <div className="w-full lg:w-1/2">
               <Input
-                isDisabled={!hasCreateOrEdit}
+                isDisabled={!canCreateOrEdit}
                 label="Last name (optional)"
                 name="last_name"
                 onChange={handleChange}
@@ -638,7 +649,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             <span className="text-sm text-zinc-300">Character image (optional)</span>
             {!character?.portrait?.id ? (
               <ImageSelect
-                isDisabled={!hasCreateOrEdit}
+                isDisabled={!canCreateOrEdit}
                 isIconOnly
                 name="portrait"
                 onChange={({ name, label, value }) => {
@@ -665,7 +676,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             )}
           </div>
           <Input
-            isDisabled={!hasCreateOrEdit}
+            isDisabled={!canCreateOrEdit}
             label="Age (optional)"
             name="age"
             onChange={handleChange}
@@ -677,28 +688,39 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             <li className="flex items-center justify-between">
               <span>Favorite:</span>
               <Checkbox
-                isDisabled={!hasCreateOrEdit}
+                isDisabled={!canCreateOrEdit}
                 name="is_favorite"
                 onChange={handleChange}
                 value={character?.is_favorite ?? false}
               />
             </li>
-            <div className="flex w-full items-center justify-between">
+            <li className="flex w-full items-center justify-between">
               <span>Is public:</span>
               <Checkbox
-                isDisabled={!hasCreateOrEdit}
+                isDisabled={!canCreateOrEdit}
                 name="is_public"
                 onChange={handleChange}
                 value={character?.is_public ?? false}
               />
-            </div>
+            </li>
+            {exceptions?.mention ? (
+              <li className="flex w-full items-center justify-between">
+                <span>Create mention:</span>
+                <Checkbox
+                  isDisabled={!canCreateOrEdit}
+                  name="create_mention"
+                  onChange={(e) => setCreateMention(e.value)}
+                  value={createMention}
+                />
+              </li>
+            ) : null}
           </ul>
         </>
       ) : null}
       {tabs[selectedTab].id === "2" ? (
         <Editor
           initialContent={character?.biography || undefined}
-          isDisabled={!hasCreateOrEdit}
+          isDisabled={!canCreateOrEdit}
           isFullHeight
           name="biography"
           onChange={handleChange}
@@ -706,7 +728,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       ) : null}
       {tabs[selectedTab].id === "3" ? (
         <div className="flex flex-col gap-y-2 p-2">
-          {hasCreateOrEdit ? (
+          {canCreateOrEdit ? (
             <div className="flex flex-nowrap items-center justify-between">
               <span>Insert new type:</span>
               <Dropdown
@@ -739,7 +761,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                     {isOther ? (
                       <div className="flex flex-col gap-y-2 p-2">
                         <Search
-                          isDisabled={!hasCreateOrEdit}
+                          isDisabled={!canCreateOrEdit}
                           name="related_other"
                           onChange={({ label, value, image }) => {
                             if (character?.id && character.id === value) {
@@ -782,7 +804,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                             <RelationshipRow
                               character_name={char.full_name}
                               handleRemove={
-                                hasCreateOrEdit
+                                canCreateOrEdit
                                   ? (character_b_id: string) =>
                                       handleChange({
                                         name: "related_other",
@@ -799,7 +821,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                     ) : (
                       <div className="flex flex-col gap-y-2 p-2">
                         <Search
-                          isDisabled={!hasCreateOrEdit}
+                          isDisabled={!canCreateOrEdit}
                           label="Ascendants"
                           name="related_to"
                           onChange={({ value, image, label }) => {
@@ -845,7 +867,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                               <RelationshipRow
                                 character_name={char.full_name}
                                 handleRemove={
-                                  hasCreateOrEdit
+                                  canCreateOrEdit
                                     ? (character_b_id: string) =>
                                         handleChange({
                                           name: "related_to",
@@ -859,7 +881,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                             ))}
                         </div>
                         <Search
-                          isDisabled={!hasCreateOrEdit}
+                          isDisabled={!canCreateOrEdit}
                           label="Descendants"
                           name="related_from"
                           onChange={({ label, value, image }) => {
@@ -904,7 +926,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                               <RelationshipRow
                                 character_name={char.full_name}
                                 handleRemove={
-                                  hasCreateOrEdit
+                                  canCreateOrEdit
                                     ? (character_b_id: string) =>
                                         handleChange({
                                           name: "related_from",
@@ -931,7 +953,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           <TagInput
             handleChange={handleChange}
             isAutofocused
-            isDisabled={!hasCreateOrEdit}
+            isDisabled={!canCreateOrEdit}
             isMultiple
             tags={character?.tags || []}
           />
@@ -941,7 +963,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
         <AdditionalFieldsTab
           character_fields={character?.character_fields || []}
           handleChange={handleChange}
-          hasCreateOrEdit={hasCreateOrEdit && permissions?.read_character_fields_templates}
+          hasCreateOrEdit={canCreateOrEdit && permissions?.read_character_fields_templates}
           isLoading={isFetching || isFetchingTemplates}
           tags={character?.tags}
           templates={templates?.data || []}
@@ -959,7 +981,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       <div>
         <Button
           icon={character?.id ? IconEnum.save : IconEnum.add}
-          isDisabled={isSaveDisabled(character) || !hasCreateOrEdit || isFetching || isCreating || isUpdating}
+          isDisabled={isSaveDisabled(character) || !canCreateOrEdit || isFetching || isCreating || isUpdating}
           isLoading={isCreating || isUpdating}
           label={character?.id ? "Update" : "Create"}
           onClick={async () => {
@@ -1008,9 +1030,39 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                 }
 
                 const parsedData = InsertCharacterSchema.parse(dataToParse);
+
                 await create(parsedData, {
                   onSuccess: (res) => {
-                    if (res?.ok) {
+                    if (res?.ok && createMention) {
+                      if (
+                        exceptions?.mention &&
+                        data?.getContext &&
+                        typeof data.range?.from === "number" &&
+                        typeof data.range?.to === "number" &&
+                        res?.data?.id
+                      ) {
+                        data.getContext.chain
+                          .delete({ from: Number(data.range.from), to: Number(data.range.to) })
+                          .createMentionAtom(
+                            {
+                              name: "characters",
+                              range: {
+                                from: data.range.from,
+                                cursor: data.range.to,
+                                to: data.range.to,
+                              },
+                            },
+                            {
+                              id: res?.data?.id,
+                              label: data?.title || "",
+                              name: "characters",
+                              icon: undefined,
+                              projectId: project_id,
+                              parent_id: undefined,
+                            }
+                          )
+                          .run();
+                      }
                       resetDrawerAtom();
                       setSelectedTab(0);
                       setCharacter({ project_id });

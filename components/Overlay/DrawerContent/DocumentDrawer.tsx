@@ -1,4 +1,5 @@
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
+import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useAtomValue } from "jotai";
 import set from "lodash.set";
 import { useLayoutEffect, useState } from "react";
@@ -72,6 +73,8 @@ type Props = {
     id?: string;
     title?: string;
     preselectedTab?: number;
+    getContext?: ReactFrameworkOutput<Remirror.Extensions>;
+    range?: { from: number | undefined; to: number | undefined };
   };
   exceptions: DrawerAtomType["exceptions"];
 };
@@ -99,6 +102,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
   const [selectedTab, setSelectedTab] = useState(data?.preselectedTab || 0);
+  const [createMention, setCreateMention] = useState(true);
   const user = useAtomValue(userAtom);
   const resetDrawerAtom = useToggledResetAtom();
 
@@ -283,6 +287,17 @@ export function DocumentDrawer({ data, exceptions }: Props) {
               />
             </div>
           )}
+          {exceptions?.mention ? (
+            <li className="flex w-full items-center justify-between">
+              <span>Create mention:</span>
+              <Checkbox
+                isDisabled={!canCreateOrEdit}
+                name="create_mention"
+                onChange={(e) => setCreateMention(e.value)}
+                value={createMention}
+              />
+            </li>
+          ) : null}
         </div>
       ) : null}
 
@@ -422,7 +437,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
           isLoading={isCreating || isUpdating}
           label={document?.id ? "Update" : "Create"}
           onClick={async () => {
-            if (changedData) {
+            if (changedData || data?.title) {
               if (document?.id) {
                 const documentToUpdate = {
                   ...(changedData || {}),
@@ -492,7 +507,40 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                     },
                   },
                   {
-                    onSuccess: resetDrawerAtom,
+                    onSuccess: (res) => {
+                      if (res?.ok && createMention) {
+                        if (
+                          exceptions?.mention &&
+                          data?.getContext &&
+                          typeof data.range?.from === "number" &&
+                          typeof data.range?.to === "number" &&
+                          res?.data?.id
+                        ) {
+                          data.getContext.chain
+                            .delete({ from: Number(data.range.from), to: Number(data.range.to) })
+                            .createMentionAtom(
+                              {
+                                name: "documents",
+                                range: {
+                                  from: data.range.from,
+                                  cursor: data.range.to,
+                                  to: data.range.to,
+                                },
+                              },
+                              {
+                                id: res?.data?.id,
+                                label: data?.title || "",
+                                name: "documents",
+                                icon: undefined,
+                                projectId: project_id,
+                                parent_id: undefined,
+                              }
+                            )
+                            .run();
+                        }
+                      }
+                      resetDrawerAtom();
+                    },
                   }
                 );
               }

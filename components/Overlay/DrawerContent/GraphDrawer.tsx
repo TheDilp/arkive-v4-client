@@ -1,3 +1,4 @@
+import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import omit from "lodash.omit";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -11,7 +12,7 @@ import {
   useUpdateEntity,
 } from "../../../hooks";
 import { DrawerAtomType, EntityPermissionType, GraphType, TabType, UserHasPermissionsType } from "../../../types";
-import { DefaultBoardColor, IconEnum, NodeShapesEnum } from "../../../utils";
+import { createOrEditPermission, DefaultBoardColor, IconEnum, NodeShapesEnum } from "../../../utils";
 import {
   Alert,
   Button,
@@ -55,11 +56,17 @@ export function GraphDrawer({
   data,
   exceptions,
 }: {
-  data: { id?: string; title?: string };
+  data: {
+    id?: string;
+    title?: string;
+    getContext?: ReactFrameworkOutput<Remirror.Extensions>;
+    range?: { from: number | undefined; to: number | undefined };
+  };
   exceptions: DrawerAtomType["exceptions"];
 }) {
   const { project_id, item_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
+  const [createMention, setCreateMention] = useState(true);
   const resetDrawerAtom = useToggledResetAtom();
   const {
     data: existingGraph,
@@ -87,13 +94,21 @@ export function GraphDrawer({
         "is_public",
       ],
     },
-    { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
+    { enabled: !!data?.id, queryKeyConcat: ["drawer"] }
   );
   const permissions = useHasPermissions(
     ["read_graphs", "update_graphs", "delete_graphs", "read_tags"],
 
-    existingGraph?.data?.owner_id,
+    existingGraph?.data?.owner_id
   );
+
+  const canCreateOrEdit = createOrEditPermission(
+    permissions?.create_graphs,
+    permissions?.update_graphs,
+    permissions?.is_owner,
+    data?.id
+  );
+
   const tabs = getTabs(permissions, existingGraph?.data?.id);
 
   const [graph, setGraph] = useState<Partial<GraphType> & { project_id: string }>(
@@ -102,7 +117,7 @@ export function GraphDrawer({
       project_id: project_id as string,
       parent_id: exceptions?.globalCreate ? null : item_id,
       default_node_shape: "rectangle",
-    },
+    }
   );
   const { handleChange } = useHandleChange({ data: graph, setData: setGraph });
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{
@@ -177,6 +192,18 @@ export function GraphDrawer({
               <span>Is public:</span>
               <Checkbox name="is_public" onChange={handleChange} value={graph?.is_public ?? false} />
             </div>
+
+            {exceptions?.mention ? (
+              <li className="flex w-full items-center justify-between">
+                <span>Create mention:</span>
+                <Checkbox
+                  isDisabled={!canCreateOrEdit}
+                  name="create_mention"
+                  onChange={(e) => setCreateMention(e.value)}
+                  value={createMention}
+                />
+              </li>
+            ) : null}
           </div>
         </>
       ) : null}
@@ -217,7 +244,7 @@ export function GraphDrawer({
                     onSettled: (res) => {
                       if (res?.ok) resetDrawerAtom();
                     },
-                  },
+                  }
                 );
               } else
                 await create(
@@ -232,10 +259,42 @@ export function GraphDrawer({
                     onSettled: (res) => {
                       if (res?.ok) resetDrawerAtom();
                     },
-                    onSuccess: () => {
+                    onSuccess: (res) => {
+                      if (res?.ok && createMention) {
+                        if (
+                          exceptions?.mention &&
+                          data?.getContext &&
+                          typeof data.range?.from === "number" &&
+                          typeof data.range?.to === "number" &&
+                          res?.data?.id
+                        ) {
+                          data.getContext.chain
+                            .delete({ from: Number(data.range.from), to: Number(data.range.to) })
+                            .createMentionAtom(
+                              {
+                                name: "graphs",
+                                range: {
+                                  from: data.range.from,
+                                  cursor: data.range.to,
+                                  to: data.range.to,
+                                },
+                              },
+                              {
+                                id: res?.data?.id,
+                                label: data?.title || "",
+                                name: "graphs",
+                                icon: undefined,
+                                projectId: project_id,
+                                parent_id: undefined,
+                              }
+                            )
+                            .run();
+                        }
+                      }
+
                       setGraph({ project_id: project_id as string });
                     },
-                  },
+                  }
                 );
             }
           }}

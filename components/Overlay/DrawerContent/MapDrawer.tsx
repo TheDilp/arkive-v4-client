@@ -1,4 +1,5 @@
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
+import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -48,10 +49,16 @@ export function MapDrawer({
   data,
   exceptions,
 }: {
-  data: { id?: string; title?: string };
+  data: {
+    id?: string;
+    title?: string;
+    getContext?: ReactFrameworkOutput<Remirror.Extensions>;
+    range?: { from: number | undefined; to: number | undefined };
+  };
   exceptions: DrawerAtomType["exceptions"];
 }) {
   const { project_id, item_id } = useParams();
+  const [createMention, setCreateMention] = useState(true);
 
   const {
     data: existingMap,
@@ -65,7 +72,7 @@ export function MapDrawer({
       relations: { map_pins: true, map_layers: true },
       permissions: true,
     },
-    { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
+    { enabled: !!data?.id, queryKeyConcat: ["drawer"] }
   );
 
   const permissions = useHasPermissions(["read_maps", "create_maps", "update_maps", "read_tags"], existingMap?.data?.owner_id);
@@ -74,7 +81,7 @@ export function MapDrawer({
     permissions?.create_maps,
     permissions?.update_maps,
     permissions?.is_owner,
-    data?.id,
+    data?.id
   );
 
   const tabs = getTabs(permissions, data?.id);
@@ -84,7 +91,7 @@ export function MapDrawer({
       title: data?.title,
       parent_id: exceptions?.globalCreate ? null : item_id,
       project_id: project_id as string,
-    },
+    }
   );
   const [selectedTab, setSelectedTab] = useState(0);
   const resetDrawerAtom = useToggledResetAtom();
@@ -141,6 +148,17 @@ export function MapDrawer({
             <span>Is public:</span>
             <Checkbox isDisabled={!canCreateOrEdit} name="is_public" onChange={handleChange} value={map?.is_public ?? false} />
           </div>
+          {exceptions?.mention ? (
+            <li className="flex w-full items-center justify-between">
+              <span>Create mention:</span>
+              <Checkbox
+                isDisabled={!canCreateOrEdit}
+                name="create_mention"
+                onChange={(e) => setCreateMention(e.value)}
+                value={createMention}
+              />
+            </li>
+          ) : null}
         </>
       ) : null}
       {tabs[selectedTab].id === "2" && canCreateOrEdit ? (
@@ -173,7 +191,7 @@ export function MapDrawer({
               canCreateOrEdit
                 ? (result) =>
                     onDragEnd(result, map?.map_layers || [], (newLayers) =>
-                      handleChange({ name: "map_layers", value: newLayers }),
+                      handleChange({ name: "map_layers", value: newLayers })
                     )
                 : () => {}
             }>
@@ -300,7 +318,39 @@ export function MapDrawer({
               permissions: rest.permissions,
             });
             await create(parsedData, {
-              onSuccess: () => {
+              onSuccess: (res) => {
+                if (res?.ok && createMention) {
+                  if (
+                    exceptions?.mention &&
+                    data?.getContext &&
+                    typeof data.range?.from === "number" &&
+                    typeof data.range?.to === "number" &&
+                    res?.data?.id
+                  ) {
+                    data.getContext.chain
+                      .delete({ from: Number(data.range.from), to: Number(data.range.to) })
+                      .createMentionAtom(
+                        {
+                          name: "maps",
+                          range: {
+                            from: data.range.from,
+                            cursor: data.range.to,
+                            to: data.range.to,
+                          },
+                        },
+                        {
+                          id: res?.data?.id,
+                          label: data?.title || "",
+                          name: "maps",
+                          icon: undefined,
+                          projectId: project_id,
+                          parent_id: undefined,
+                        }
+                      )
+                      .run();
+                  }
+                }
+
                 setMap({ project_id: project_id as string });
               },
             });
