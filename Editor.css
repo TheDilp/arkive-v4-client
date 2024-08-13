@@ -396,6 +396,9 @@
       }
     }
   }
+  div:has(> .characterMentionImage) span {
+    @apply flex h-[14px];
+  }
 }
 
 .commandMenu {
