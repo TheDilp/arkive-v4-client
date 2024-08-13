@@ -4,7 +4,7 @@ import { useAtomValue } from "jotai";
 import { Dispatch, SetStateAction, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { SendJsonMessage } from "react-use-websocket/dist/lib/types";
-import { AnyExtension, EditorState, InvalidContentHandlerProps } from "remirror";
+import { AnyExtension, EditorState, ExtensionPriority, InvalidContentHandlerProps } from "remirror";
 import {
   Annotation,
   AnnotationExtension,
@@ -21,6 +21,7 @@ import {
   MarkdownExtension,
   NodeFormattingExtension,
   OrderedListExtension,
+  ParagraphExtension,
   TaskListExtension,
   UnderlineExtension,
 } from "remirror/extensions";
@@ -106,7 +107,6 @@ export function DefaultEditorExtensions(
     autoLinkRegex: DiceRollRegex,
     autoLink: true,
     selectTextOnClick: false,
-    priority: 10,
   });
 
   // @ts-ignore
@@ -136,6 +136,9 @@ export function DefaultEditorExtensions(
     return true;
   });
   return [
+    new ParagraphExtension({
+      priority: ExtensionPriority.Highest,
+    }),
     new MarkdownExtension({}),
     new AnnotationExtension<CustomAnnotation>({}),
     new SecretExtension({
@@ -146,7 +149,7 @@ export function DefaultEditorExtensions(
     }),
     // @ts-ignore
     CME,
-    new SpoilerExtension({}),
+    new SpoilerExtension({ priority: ExtensionPriority.Lowest }),
     new CustomCalloutExtension({
       type: "info",
     }),
@@ -189,6 +192,7 @@ export function DefaultEditorExtensions(
     new GapCursorExtension({}),
     new DropCursorExtension({}),
     new TableOfContentsExtension({}),
+
     new CustomTableExtension({
       tabKeyboardShortcuts: true,
       priority: 0,
