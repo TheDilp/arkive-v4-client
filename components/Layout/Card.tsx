@@ -1,7 +1,7 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { BaseCardType, CharacterType, ProjectGameCardType } from "../../types";
-import { getAssetURL, IconEnum, projectCardNavItems } from "../../utils";
+import { getAssetURL, getImageURL, IconEnum, projectCardNavItems } from "../../utils";
 import { Avatar, Icon } from "../Misc";
 import { Tooltip } from "../Overlay/Tooltip";
 
@@ -47,7 +47,7 @@ export function ProjectGameCard({ id, title, image, feature_flags, module }: Pro
       <div
         className="absolute z-0 flex h-full w-full flex-col items-center justify-end bg-cover bg-center bg-no-repeat transition-all group-hover:brightness-75"
         style={{
-          backgroundImage: `url(${image})`,
+          backgroundImage: image ? `url(${getImageURL(image)})` : "",
         }}
       />
     </Link>

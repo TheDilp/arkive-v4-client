@@ -21,8 +21,8 @@ import { useBreakpoint, useGetAllProjects, useGetUser, useNavbarTitle, useTable 
 import { ProjectType } from "../../types";
 import {
   drawerAtom,
-  getAvatarInitials,
   getAssetURL,
+  getAvatarInitials,
   getProjectsViewNavItems,
   IconEnum,
   projectAtom,
