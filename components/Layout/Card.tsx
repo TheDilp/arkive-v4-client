@@ -1,7 +1,7 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { BaseCardType, CharacterType, ProjectGameCardType } from "../../types";
-import { getImageURL, IconEnum, projectCardNavItems } from "../../utils";
+import { getAssetURL, IconEnum, projectCardNavItems } from "../../utils";
 import { Avatar, Icon } from "../Misc";
 import { Tooltip } from "../Overlay/Tooltip";
 
@@ -15,7 +15,7 @@ export function ProjectGameCard({ id, title, image, feature_flags, module }: Pro
     <Link
       className="animate-in fade-in group relative col-span-1 flex h-[28rem] flex-col items-center justify-center rounded bg-zinc-950 bg-cover bg-center bg-no-repeat shadow transition-all duration-500"
       to={`/${baseUrl}/${id}`}>
-      <h2 className="font-merriweather absolute top-[20%] z-10 max-w-full select-none truncate px-4 text-center text-4xl font-semibold text-white drop-shadow transition-all">
+      <h2 className="absolute top-[20%] z-10 max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow transition-all">
         {title}
       </h2>
       {module === "arkive" ? (
@@ -70,13 +70,13 @@ export function CharacterCard({
           <Icon fontSize={36} icon={IconEnum.star} thickness="fill" />
         </div>
       ) : null}
-      <h2 className="font-merriweather absolute top-[20%] z-10 max-w-full select-none truncate px-4 text-center text-4xl font-semibold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] transition-all">
+      <h2 className="absolute top-[20%] z-10 max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] transition-all">
         {full_name}
       </h2>
       <div
         className="absolute z-0 flex h-full w-full flex-col items-center justify-end bg-zinc-950 bg-cover bg-top transition-all duration-300 group-hover:scale-125 group-hover:brightness-75 lg:bg-center"
         style={{
-          backgroundImage: portrait_id ? `url(${getImageURL(project_id as string, "images", portrait_id)})` : "",
+          backgroundImage: portrait_id ? `url(${getAssetURL(project_id as string, "images", portrait_id)})` : "",
         }}
       />
     </Link>

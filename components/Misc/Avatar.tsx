@@ -2,7 +2,7 @@ import { useSetAtom } from "jotai";
 import { tv } from "tailwind-variants";
 
 import { AvatarType } from "../../types";
-import { dialogAtom, getFirstLetters, getThumbnailUrl } from "../../utils";
+import { dialogAtom, getFirstLetters, getImageURL } from "../../utils";
 import { getAvatarThumbnailDimensions } from "../../utils/ui/avatarUtils";
 import { Tooltip } from "../Overlay/Tooltip";
 import { Spinner } from "./Spinner";
@@ -111,9 +111,15 @@ export function Avatar({
             className={imageClasses()}
             loading={imageLoading}
             onClick={() => {
-              if (hasShowImage) setDialog((prev) => ({ ...prev, data: { image }, type: "image_view", title: "Image view" }));
+              if (hasShowImage)
+                setDialog((prev) => ({
+                  ...prev,
+                  data: { image: getImageURL(image) },
+                  type: "image_view",
+                  title: "Image view",
+                }));
             }}
-            src={isPreview ? image : getThumbnailUrl(image, getAvatarThumbnailDimensions(size))}
+            src={isPreview ? image : getImageURL(image, getAvatarThumbnailDimensions(size))}
           />
         ) : (
           <span className={text()}>{initials || getFirstLetters(label || "")}</span>

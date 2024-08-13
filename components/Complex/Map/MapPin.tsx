@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 
 import { useUpdateMapSubEntity } from "../../../hooks";
 import { DropdownItemType, MapPinType } from "../../../types";
-import { contextMenuAtom, dialogAtom, drawerAtom, getImageURL, IconEnum } from "../../../utils";
+import { contextMenuAtom, dialogAtom, drawerAtom, getAssetURL, IconEnum } from "../../../utils";
 
 export function MapPin({
   map_id,
@@ -189,7 +189,7 @@ export function MapPin({
               background: image_id ? "" : background,
               backgroundImage:
                 image_id || (isCharacterPin && character?.portrait_id)
-                  ? `url(${getImageURL(project_id as string, "images", image_id || character?.portrait_id)})`
+                  ? `url(${getAssetURL(project_id as string, "images", image_id || character?.portrait_id)})`
                   : "",
               backgroundColor: show_background ? background_color || "" : "",
               backgroundPosition: "center",

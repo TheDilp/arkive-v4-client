@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 import { useGetImages } from "../../../hooks";
 import { ImageType } from "../../../types";
-import { getImageURL, IconEnum } from "../../../utils";
+import { getAssetURL, IconEnum } from "../../../utils";
 import { ImagePreview } from "../../DataDisplay";
 import { Button, Search, Select, Title } from "../../Form";
 
@@ -50,7 +50,7 @@ export function InsertEditorImageDialog({ data }: Props) {
             label: image.title,
             value: image.id,
             project_id: image.project_id,
-            image: { id: image.id, link: getImageURL(image.project_id, "images", image.id), shape: "circle" },
+            image: { id: image.id, link: getAssetURL(image.project_id, "images", image.id), shape: "circle" },
           }))}
           value={selectedImages.map((img) => img.value)}
         />
@@ -90,7 +90,7 @@ export function InsertEditorImageDialog({ data }: Props) {
             const image = selectedImages[index];
             data?.getContext?.chain
               ?.insertImage({
-                src: getImageURL((image.project_id || project_id) as string, "images", image.value),
+                src: getAssetURL((image.project_id || project_id) as string, "images", image.value),
                 alt: image.label,
                 title: image.label,
                 align: "right",

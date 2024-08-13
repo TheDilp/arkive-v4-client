@@ -22,7 +22,7 @@ import { ProjectType } from "../../types";
 import {
   drawerAtom,
   getAvatarInitials,
-  getImageURL,
+  getAssetURL,
   getProjectsViewNavItems,
   IconEnum,
   projectAtom,
@@ -43,7 +43,7 @@ function createColumns(navigate: NavigateFunction) {
         <div className="flex w-full items-center justify-center">
           <Avatar
             hasShowImage
-            image={getImageURL(row.original.id, "images", row.original.image_id)}
+            image={getAssetURL(row.original.id, "images", row.original.image_id)}
             initials={getAvatarInitials(row.original.title)}
             isBordered
             isTooltipDisabled
@@ -200,7 +200,7 @@ export function ProjectsView() {
                 <ProjectGameCard
                   feature_flags={project.feature_flags}
                   id={project.id}
-                  image={getImageURL(project.id, "images", project.image_id)}
+                  image={getAssetURL(project.id, "images", project.image_id)}
                   key={project.id}
                   module="arkive"
                   title={project.title}

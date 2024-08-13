@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { ImagePreviewType } from "../../types";
-import { getImageURL, IconEnum } from "../../utils";
+import { getAssetURL, IconEnum } from "../../utils";
 import { Avatar } from "..";
 import { Button } from "../Form/Button";
 
@@ -28,7 +28,7 @@ export function ImagePreview({ id, title, manual_project_id, label, url, hasShow
       <span className={base()}>
         <Avatar
           hasShowImage={hasShowImage}
-          image={url || getImageURL(manual_project_id || (project_id as string), "images", id) || ""}
+          image={url || getAssetURL(manual_project_id || (project_id as string), "images", id) || ""}
           isPreview
           label={title}
           size="sm"

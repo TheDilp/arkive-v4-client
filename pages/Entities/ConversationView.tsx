@@ -12,7 +12,7 @@ import {
   AvailableIcons,
   drawerAtom,
   getAvatarInitials,
-  getImageURL,
+  getAssetURL,
   IconEnum,
   messageEditorHooks,
   MessageTypeOptions,
@@ -119,7 +119,7 @@ function PlaceMessage({
             <hr className="absolute top-1/2 z-0 w-full" />
 
             {content?.image_id ? (
-              <Avatar image={getImageURL(project_id, "map_images", content?.image_id)} initials="AB" size="2xl" />
+              <Avatar image={getAssetURL(project_id, "map_images", content?.image_id)} initials="AB" size="2xl" />
             ) : null}
             {content?.icon ? (
               <div className="z-10 h-16 w-16 rounded-full border bg-zinc-700 p-1">
@@ -294,7 +294,7 @@ export function ConversationView({ id }: { id: string }) {
                     {char ? (
                       <div className="flex flex-col items-end gap-x-1 self-end px-1">
                         <Avatar
-                          image={getImageURL(project_id as string, "images", char?.portrait_id)}
+                          image={getAssetURL(project_id as string, "images", char?.portrait_id)}
                           initials={getAvatarInitials(char?.full_name || "") || ""}
                           label={char?.full_name || ""}
                           size="2xs"
@@ -360,7 +360,7 @@ export function ConversationView({ id }: { id: string }) {
               options={(existingConversation?.data?.characters || []).map((char) => ({
                 image: {
                   id: char.portrait_id || undefined,
-                  link: getImageURL(project_id as string, "images", char.portrait_id),
+                  link: getAssetURL(project_id as string, "images", char.portrait_id),
                   shape: "circle",
                 },
                 label: char?.full_name || "",

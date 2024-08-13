@@ -15,7 +15,7 @@ import {
   FavoritesFilters,
   getAvatarInitials,
   getDeletedAtParams,
-  getImageURL,
+  getAssetURL,
   IconEnum,
   projectFeatureFlagsAtom,
   sortTags,
@@ -267,7 +267,7 @@ export function CharacterColumn({
         {characters?.slice(0, isMultiple ? 5 : 1)?.map((char) => {
           return (
             <Avatar
-              image={getImageURL(
+              image={getAssetURL(
                 char?.character?.project_id || (project_id as string),
                 "images",
                 char?.character?.portrait_id || ""

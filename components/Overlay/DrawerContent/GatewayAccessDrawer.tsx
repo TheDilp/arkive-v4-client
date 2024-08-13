@@ -19,7 +19,7 @@ import {
   AllEntities,
   AvailableIcons,
   getAvatarInitials,
-  getImageURL,
+  getAssetURL,
   getParentEntityType,
   IconEnum,
   TextFilters,
@@ -110,7 +110,7 @@ function getColumns(
           <div className="flex w-full items-center justify-center">
             <Avatar
               hasShowImage
-              image={getImageURL(project_id, "images", row.original?.portrait_id || "")}
+              image={getAssetURL(project_id, "images", row.original?.portrait_id || "")}
               initials={getAvatarInitials(row.original.full_name)}
               isBordered
               isTooltipDisabled
@@ -139,7 +139,7 @@ function getColumns(
           <div className="flex w-full items-center justify-center">
             <Avatar
               hasShowImage
-              image={getImageURL(project_id, "images", row.original?.id || "")}
+              image={getAssetURL(project_id, "images", row.original?.id || "")}
               isBordered
               isTooltipDisabled
               size="sm"

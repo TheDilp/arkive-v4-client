@@ -60,7 +60,7 @@ import {
   getDefaultEntityIcon,
   getEntityLink,
   getFirstLetters,
-  getImageURL,
+  getAssetURL,
   getSentenceCase,
   hasActionPermission,
   IconEnum,
@@ -124,7 +124,7 @@ function relationshipTableColumns(
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center">
           <Avatar
-            image={getImageURL(project_id, "images", row.original?.portrait?.id || "")}
+            image={getAssetURL(project_id, "images", row.original?.portrait?.id || "")}
             initials={getAvatarInitials(row.original.full_name || "")}
             isBordered
             isTooltipDisabled
@@ -261,7 +261,7 @@ function documentsTableColumns(
       cell: ({ row }) =>
         "image_id" in row.original && row.original?.image_id ? (
           <Avatar
-            image={getImageURL(project_id, "images", (row.original?.image_id as string) || "")}
+            image={getAssetURL(project_id, "images", (row.original?.image_id as string) || "")}
             isBordered
             isTooltipDisabled
             size="sm"
@@ -381,7 +381,7 @@ function eventsTableColumns(
       cell: ({ row }) =>
         "image_id" in row.original && row.original?.image_id ? (
           <Avatar
-            image={getImageURL(project_id, "images", (row.original?.image_id as string) || "")}
+            image={getAssetURL(project_id, "images", (row.original?.image_id as string) || "")}
             isBordered
             isTooltipDisabled
             size="sm"
@@ -476,7 +476,7 @@ function locationsTableColumns(project_id: string) {
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center">
           <Avatar
-            image={getImageURL(project_id, "map_images", row.original.image_id)}
+            image={getAssetURL(project_id, "map_images", row.original.image_id)}
             isTooltipDisabled
             label={row.original.title}
             size="sm"
@@ -547,7 +547,7 @@ function assetTableColumns(
         <div className="flex w-full items-center justify-center">
           <Avatar
             hasShowImage
-            image={getImageURL(project_id as string, "images", row.original?.id || "")}
+            image={getAssetURL(project_id as string, "images", row.original?.id || "")}
             isBordered
             isTooltipDisabled
             label={getAvatarInitials(row.original.title)}
@@ -669,7 +669,7 @@ function conversationTableColumns(
           {row.original.characters.map((char) => (
             <div className="-ml-4 first:ml-0" key={char.id}>
               <Avatar
-                image={getImageURL(project_id, "images", char?.portrait_id || "")}
+                image={getAssetURL(project_id, "images", char?.portrait_id || "")}
                 initials={getAvatarInitials(char?.full_name || "")}
                 isBordered
                 isTooltipDisabled
@@ -999,7 +999,7 @@ export function CharacterProfileView({
                 hasShowImage
                 image={
                   existingCharacter?.data?.portrait
-                    ? getImageURL(project_id as string, "images", existingCharacter?.data?.portrait?.id)
+                    ? getAssetURL(project_id as string, "images", existingCharacter?.data?.portrait?.id)
                     : undefined
                 }
                 initials={getFirstLetters(existingCharacter?.data?.full_name || "") || ""}

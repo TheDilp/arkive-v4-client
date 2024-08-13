@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 
 import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
 import { GatewayConfigOptionType } from "../../../types/EntityTypes/gatewayTypes";
-import { getEntityLink, getImageURL } from "../../../utils";
+import { getEntityLink, getAssetURL } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search, Select } from "../../Form";
 import { TemplateFieldContainer } from ".";
@@ -161,7 +161,7 @@ export function TemplateLocationsField({
               ...opt,
               image:
                 projectId && opt.image
-                  ? { id: opt.image, shape: "circle", link: getImageURL(projectId, "images", opt.image) }
+                  ? { id: opt.image, shape: "circle", link: getAssetURL(projectId, "images", opt.image) }
                   : undefined,
             }))}
             value={(currentValue || []).map((c) => c.related_id)}

@@ -4,7 +4,7 @@ export const baseURLS = {
   }/api/v1`,
   basePublicServer: import.meta.env.VITE_ARKIVE_WIKI_SERVER,
   baseAuthServer: import.meta.env.VITE_ARKIVE_AUTH_SERVER,
-  baseThumbnailServer: "https://arkive-v4-thumbnail-service.up.railway.app",
+  baseThumbnailServer: import.meta.env.VITE_ARKIVE_THUMBNAIL_SERVICE,
   baseWebsocketServer: `${
     import.meta.env.DEV
       ? `ws://localhost:${import.meta.env.VITE_SERVER_PORT}`

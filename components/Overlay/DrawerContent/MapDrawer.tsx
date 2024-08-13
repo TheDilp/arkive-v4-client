@@ -12,7 +12,7 @@ import {
   useUpdateEntity,
 } from "../../../hooks";
 import { DrawerAtomType, MapType, TabType, UserHasPermissionsType } from "../../../types";
-import { createOrEditPermission, getImageURL, IconEnum, onDragEnd } from "../../../utils";
+import { createOrEditPermission, getAssetURL, IconEnum, onDragEnd } from "../../../utils";
 import { InsertMapSchema, InsertMapType, UpdateMapSchema, UpdateMapType } from "../../../validation/maps/maps";
 import { FolderSelect, ImageSelect } from "../../Complex";
 import { EntityPermission } from "../../Complex/EntityPermission";
@@ -241,7 +241,7 @@ export function MapDrawer({
                                 }
                                 id={item?.image?.id}
                                 title={item.image.title}
-                                url={getImageURL(project_id as string, "map_images", item?.image?.id)}
+                                url={getAssetURL(project_id as string, "map_images", item?.image?.id)}
                               />
                             </div>
                           ) : (

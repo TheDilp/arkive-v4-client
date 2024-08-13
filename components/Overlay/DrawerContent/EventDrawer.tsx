@@ -29,7 +29,7 @@ import {
   drawerAtom,
   getDefaultEntityIcon,
   getEntityLink,
-  getImageURL,
+  getAssetURL,
   IconEnum,
 } from "../../../utils";
 import { InsertEventSchema, UpdateEventSchema } from "../../../validation/calendars/event";
@@ -487,7 +487,7 @@ export function EventDrawer({ data, exceptions }: Props) {
                       id={event.image.id}
                       label="Event image (optional)"
                       title={event.image.title}
-                      url={getImageURL(project_id as string, "images", event.image.id)}
+                      url={getAssetURL(project_id as string, "images", event.image.id)}
                     />
                   ) : (
                     <ImageSelect
@@ -664,4 +664,3 @@ export function EventDrawer({ data, exceptions }: Props) {
     </DrawerLayout>
   );
 }
-

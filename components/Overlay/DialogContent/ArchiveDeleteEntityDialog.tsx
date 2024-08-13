@@ -7,7 +7,7 @@ import {
   capitalizeFirstLetter,
   dialogAtom,
   getCharacterFullName,
-  getImageURL,
+  getAssetURL,
   getSingularEntityType,
   IconEnum,
   useNotifications,
@@ -26,10 +26,7 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
     project_id as string,
     action === "arkive"
   );
-  const { mutate: deleteSubEntity } = useDeleteSubEntity(
-    data?.entity_title as AvailableSubEntityType,
-    project_id as string
-  );
+  const { mutate: deleteSubEntity } = useDeleteSubEntity(data?.entity_title as AvailableSubEntityType, project_id as string);
   const { mutate: deleteAsset } = useDeleteAsset(project_id as string, data.asset_type);
   return (
     <div className="flex h-full flex-col justify-between">
@@ -62,7 +59,7 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
         {data?.image && data?.project_id ? (
           <>
             <Avatar
-              image={getImageURL(data?.project_id, "images", data?.image || "")}
+              image={getAssetURL(data?.project_id, "images", data?.image || "")}
               isBordered
               isTooltipDisabled
               label=""

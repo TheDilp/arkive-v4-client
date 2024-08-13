@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { DiceRollType, NotificationType } from "../../types";
-import { getImageURL, IconEnum, notificationsAtom, removeNotification } from "../../utils";
+import { getAssetURL, IconEnum, notificationsAtom, removeNotification } from "../../utils";
 import { getCritColor } from "../../utils/ui/diceRollerUtils";
 import { Button } from "../Form";
 import { Avatar, Icon } from "../Misc";
@@ -231,7 +231,7 @@ export function Notification({
             ) : null}
             {image_id ? (
               <div className={iconContainer()}>
-                <Avatar image={getImageURL(project_id as string, "images", image_id)} />
+                <Avatar image={getAssetURL(project_id as string, "images", image_id)} />
               </div>
             ) : null}
             {image_url ? (

@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { DialogAtomType, ImageComponentType } from "../../types";
-import { dialogAtom, getImageURL } from "../../utils";
+import { dialogAtom, getAssetURL } from "../../utils";
 
 const ImageClasses = tv({
   base: "h-full w-full rounded object-center",
@@ -25,7 +25,7 @@ function openImageView(setDialog: Dispatch<SetStateAction<DialogAtomType>>, imag
 
 export function Image({ image, isOpenable, hasTitle, isLazyLoading, url, type, objectFit = "cover" }: ImageComponentType) {
   const { project_id } = useParams();
-  const imageUrl = url || getImageURL(project_id as string, type, image?.id);
+  const imageUrl = url || getAssetURL(project_id as string, type, image?.id);
   const classes = ImageClasses({ isOpenable, objectFit });
   const setDialog = useSetAtom(dialogAtom);
 

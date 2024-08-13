@@ -62,7 +62,7 @@ import {
   FetchFunction,
   getDefaultEntityIcon,
   getEntityFields,
-  getImageURL,
+  getAssetURL,
   getNavbarEntityType,
   getPermissionsForTypeView,
   getPluralEntityType,
@@ -133,7 +133,7 @@ function getColumns(
       cell: ({ row }) =>
         "image" in row.original && (row.original.image as ImageType) && show_image ? (
           <Avatar
-            image={getImageURL(
+            image={getAssetURL(
               project_id,
               entityType === "maps" ? "map_images" : "images",
               (row.original.image as ImageType)?.id || ""
@@ -485,7 +485,7 @@ function EntityItem({
             <img
               alt={title}
               className="h-full w-full object-contain"
-              src={getImageURL(project_id as string, type === "maps" ? "map_images" : "images", image_id)}
+              src={getAssetURL(project_id as string, type === "maps" ? "map_images" : "images", image_id)}
             />
           ) : (
             <Icon fontSize={100} icon={is_folder ? IconEnum.folder : (icon as AvailableIcons) || getDefaultEntityIcon(type)} />

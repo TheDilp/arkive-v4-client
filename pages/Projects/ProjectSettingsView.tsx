@@ -49,7 +49,7 @@ import {
   drawerAtom,
   getDefaultEntityIcon,
   getFirstLetters,
-  getImageURL,
+  getAssetURL,
   getPluralEntityType,
   getSentenceCase,
   IconEnum,
@@ -599,7 +599,7 @@ export function ProjectSettingsView() {
           <div className="flex flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">
             <Avatar
               hasShowImage
-              image={getImageURL(projectData?.data?.id as string, "images", projectData?.data?.image_id)}
+              image={getAssetURL(projectData?.data?.id as string, "images", projectData?.data?.image_id)}
               initials={getFirstLetters(projectData?.data?.title as string)}
               isTooltipDisabled
               size="4xl"

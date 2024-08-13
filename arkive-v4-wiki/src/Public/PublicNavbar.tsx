@@ -5,7 +5,7 @@ import { capitalCase } from "remirror";
 import { Button, Search } from "../../../components";
 import { useGetEntity } from "../../../hooks";
 import { AllAvailableEntities, AvailableEntityType, ProjectType } from "../../../types";
-import { getDefaultEntityIcon, getEntityLink, getImageURL, getThumbnailUrl, IconEnum } from "../../../utils";
+import { getDefaultEntityIcon, getEntityLink, getAssetURL, getImageURL, IconEnum } from "../../../utils";
 
 const navItems = ["manuscripts", "characters", "blueprints", "documents", "maps", "graphs", "calendars", "dictionaries"];
 
@@ -34,7 +34,7 @@ export function PublicNavbar() {
       const tabIconEl = document.getElementById("wiki-icon") as HTMLLinkElement;
 
       if (tabIconEl && project?.data?.image_id)
-        tabIconEl.href = getThumbnailUrl(getImageURL(project_id as string, "images", project?.data?.image_id), {
+        tabIconEl.href = getImageURL(getAssetURL(project_id as string, "images", project?.data?.image_id), {
           width: 32,
           height: 32,
         });
@@ -54,7 +54,7 @@ export function PublicNavbar() {
             className="relative -left-1 aspect-square min-w-14 object-contain"
             src={
               project?.data?.image_id
-                ? getThumbnailUrl(getImageURL(project_id as string, "images", project?.data?.image_id), {
+                ? getImageURL(getAssetURL(project_id as string, "images", project?.data?.image_id), {
                     width: 256,
                     height: 256,
                   })

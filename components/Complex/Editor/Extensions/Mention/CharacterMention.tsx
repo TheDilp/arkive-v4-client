@@ -5,7 +5,7 @@ import { RemirrorJSON } from "remirror";
 
 import { useGetEntity } from "../../../../../hooks";
 import { CharacterType } from "../../../../../types";
-import { getImageURL, getMentionLink, IconEnum } from "../../../../../utils";
+import { getAssetURL, getMentionLink, IconEnum } from "../../../../../utils";
 import { Card } from "../../../../Layout";
 import { Avatar, Spinner } from "../../../../Misc";
 import { Tooltip } from "../../../../Overlay";
@@ -27,7 +27,7 @@ function CharacterMentionTooltip({ title, id }: Pick<Props, "id" | "title">) {
     { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention", "tooltip"] }
   );
   return (
-    <Card avatar={getImageURL(project_id as string, "images", data?.data.portrait_id)} title={title || ""}>
+    <Card avatar={getAssetURL(project_id as string, "images", data?.data.portrait_id)} title={title || ""}>
       <div className="h-96 min-h-[24rem] w-96 min-w-[24rem] overflow-y-auto overflow-x-hidden whitespace-pre-line">
         {data?.data?.biography && !isLoading ? <StaticRender content={data.data.biography as RemirrorJSON} /> : null}
         {isLoading ? (
@@ -100,7 +100,7 @@ export function CharacterMention({ id, project_id, title, label }: Props) {
           <div className="flex items-start" ref={mentionRef}>
             {data?.data?.portrait_id && project_id ? (
               <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
-                <Avatar hasShowImage image={getImageURL(project_id as string, "images", data?.data?.portrait_id)} size="3xs" />
+                <Avatar hasShowImage image={getAssetURL(project_id as string, "images", data?.data?.portrait_id)} size="3xs" />
               </span>
             ) : (
               <Icon fontSize={14} icon={IconEnum.character} />

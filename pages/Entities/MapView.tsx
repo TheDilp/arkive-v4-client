@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 import { MapImage, Select } from "../../components";
 import { useGetEntities, useGetEntity, useHasPermissions, useNavbarTitle } from "../../hooks";
 import { MapPinTypesType, MapType, onChangeValue } from "../../types";
-import { getImageURL, hasEntityUpdatePermissionForEntityView } from "../../utils";
+import { getAssetURL, hasEntityUpdatePermissionForEntityView } from "../../utils";
 
 type Props = {
   data?: MapType;
@@ -75,7 +75,7 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
     if (currentMap && currentMap?.image_id && !bounds) {
       setEntityUpdatePermission(currentMap?.permissions?.some((p) => p.code === "update_maps") || false);
       const img = new Image();
-      img.src = getImageURL(project_id as string, "map_images", currentMap?.image_id);
+      img.src = getAssetURL(project_id as string, "map_images", currentMap?.image_id);
       img.onload = () => {
         setBounds([
           [0, 0],
@@ -160,7 +160,7 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
               mapData={currentMap}
               mapPinFilters={mapPinFilters}
               permissions={permissions}
-              src={getImageURL(project_id as string, "map_images", currentMap?.image_id)}
+              src={getAssetURL(project_id as string, "map_images", currentMap?.image_id)}
             />
           </MapContainer>
         </div>
@@ -168,4 +168,3 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
     </div>
   );
 }
-

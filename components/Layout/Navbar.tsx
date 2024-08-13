@@ -22,7 +22,7 @@ import {
   getDefaultEntityIcon,
   getEntityLink,
   getEntityTypeFromNotificationType,
-  getImageURL,
+  getAssetURL,
   getSingularEntityType,
   historyAtom,
   IconEnum,
@@ -393,7 +393,7 @@ function NotificationList({
               }}>
               <div className="self-center">
                 {notif?.image_id ? (
-                  <Avatar hasShowImage image={getImageURL(project_id as string, "images", notif?.image_id)} size="xs" />
+                  <Avatar hasShowImage image={getAssetURL(project_id as string, "images", notif?.image_id)} size="xs" />
                 ) : (
                   <Icon fontSize={22} icon={getDefaultEntityIcon(notif?.entity_type)} />
                 )}

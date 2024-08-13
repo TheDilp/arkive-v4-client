@@ -4,7 +4,7 @@ import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { NodeType } from "../../../types";
-import { getImageURL, IconEnum, nodesAtom } from "../../../utils";
+import { getAssetURL, IconEnum, nodesAtom } from "../../../utils";
 import { EntityPreview, Image } from "../../DataDisplay";
 import { Input } from "../../Form";
 import { DrawerLayout } from "../../Layout";

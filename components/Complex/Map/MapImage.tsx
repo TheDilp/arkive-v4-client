@@ -6,7 +6,7 @@ import MarkerClusterGroup from "react-leaflet-cluster";
 import { useParams } from "react-router-dom";
 
 import { MapPinType, MapType, UserHasPermissionsType } from "../../../types";
-import { contextMenuAtom, drawerAtom, getImageURL, IconEnum } from "../../../utils";
+import { contextMenuAtom, drawerAtom, getAssetURL, IconEnum } from "../../../utils";
 import { MapPin } from "./MapPin";
 
 type Props = {
@@ -200,7 +200,7 @@ export function MapImage({
                     <ImageOverlay
                       bounds={bounds}
                       className="leafletImageOverlayLayer"
-                      url={getImageURL(project_id as string, "map_images", layer.image_id)}
+                      url={getAssetURL(project_id as string, "map_images", layer.image_id)}
                       zIndex={9999}
                     />
                   </LayersControl.Overlay>

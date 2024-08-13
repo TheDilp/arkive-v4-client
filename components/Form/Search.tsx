@@ -20,7 +20,7 @@ import { tv } from "tailwind-variants";
 import { useSearch } from "../../hooks";
 import { AllAvailableEntities } from "../../types";
 import { SearchType } from "../../types/ComponentTypes/FormTypes/searchTypes";
-import { AvailableIcons, getImageURL, IconEnum, userAtom } from "../../utils";
+import { AvailableIcons, getAssetURL, IconEnum, userAtom } from "../../utils";
 import { Avatar, Icon } from "..";
 import { Button } from ".";
 
@@ -334,7 +334,7 @@ export function Search({
         })}>
         {(searchEntity === "images" || searchEntity === "map_images") && value && !isMultiple ? (
           <Avatar
-            image={getImageURL((manual_project_id || project_id) as string, imageType || "images", value as string)}
+            image={getAssetURL((manual_project_id || project_id) as string, imageType || "images", value as string)}
             imageLoading="lazy"
             isTooltipDisabled
             label={label || ""}
@@ -513,7 +513,7 @@ export function Search({
                     searchEntity === "all") &&
                     item?.image) ? (
                     <Avatar
-                      image={getImageURL(
+                      image={getAssetURL(
                         item?.project_id || ((manual_project_id || project_id) as string),
                         imageType || "images",
                         searchEntity === "images" || searchEntity === "map_images" ? item?.value : item?.image

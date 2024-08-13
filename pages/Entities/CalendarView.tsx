@@ -40,7 +40,7 @@ import {
   getFillerDayNumber,
   getFilterTooltip,
   getIconUrlFromIconEnum,
-  getImageURL,
+  getAssetURL,
   getLeapDays,
   getStartingDayForMonth,
   hasActionPermission,
@@ -193,7 +193,7 @@ function CalendarRangeEvents({
                       <Avatar
                         image={
                           pin.image_id
-                            ? getImageURL(project_id as string, "images", pin.image_id)
+                            ? getAssetURL(project_id as string, "images", pin.image_id)
                             : getIconUrlFromIconEnum(pin.icon, pin.color || "#ffffff")
                         }
                         initials={getAvatarInitials(pin.title || "")}
@@ -221,7 +221,7 @@ function CalendarRangeEvents({
                     ?.slice(0, 5)
                     ?.map((char) => (
                       <Avatar
-                        image={getImageURL(project_id as string, "images", char.portrait_id)}
+                        image={getAssetURL(project_id as string, "images", char.portrait_id)}
                         initials={getAvatarInitials(char.full_name)}
                         key={char.id}
                         label={char.full_name}
@@ -355,7 +355,7 @@ export function CalendarView({
     end: undefined,
   });
   const [view, setView] = useState<"calendar" | "range" | "timeline">(
-    isCharacterCalendar ? "range" : ls.get(`calendar_or_timeline_view_${item_id}`) ?? "calendar"
+    isCharacterCalendar ? "range" : (ls.get(`calendar_or_timeline_view_${item_id}`) ?? "calendar")
   );
   const [filters, setFilters] = useState<CalendarFilters>({
     filters: { and: [], or: [] },
@@ -876,7 +876,7 @@ export function CalendarView({
                             <div
                               className="absolute h-full w-full bg-cover bg-center opacity-60"
                               style={{
-                                backgroundImage: `url(${getImageURL(project_id as string, "images", event.image_id)})`,
+                                backgroundImage: `url(${getAssetURL(project_id as string, "images", event.image_id)})`,
                               }}
                             />
                           </div>
@@ -1090,4 +1090,3 @@ export function CalendarView({
     </div>
   );
 }
-

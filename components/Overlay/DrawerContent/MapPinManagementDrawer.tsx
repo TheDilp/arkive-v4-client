@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { useGetEntities, useTable } from "../../../hooks";
 import { DialogAtomType, MapPinType } from "../../../types";
-import { dialogAtom, getImageURL, IconEnum } from "../../../utils";
+import { dialogAtom, getAssetURL, IconEnum } from "../../../utils";
 import { Table } from "../../DataDisplay";
 import { Button } from "../../Form";
 import { Avatar, Icon } from "../../Misc";
@@ -22,7 +22,7 @@ function getColumns(project_id: string, setDialog: Dispatch<SetStateAction<Dialo
         <div className="flex w-full items-center justify-center">
           {row?.original?.character ? (
             <Avatar
-              image={getImageURL(project_id, "images", row?.original?.character?.portrait_id)}
+              image={getAssetURL(project_id, "images", row?.original?.character?.portrait_id)}
               label={row?.original?.character?.full_name}
               size="sm"
             />
@@ -113,7 +113,7 @@ export function MapPinManagementDrawer({ data }: { data: { map_id: string } }) {
         character: true,
       },
     },
-    "map_pins",
+    "map_pins"
   );
   const [, dispatch] = useTable({});
   const setDialog = useSetAtom(dialogAtom);

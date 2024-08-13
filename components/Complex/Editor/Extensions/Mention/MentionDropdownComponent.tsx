@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { useDebouncedCallback } from "use-debounce";
 
 import { useMentionAtom } from "../../../../../hooks";
-import { FetchFunction, getImageURL, getServerUrl, mentionDropdownAtom } from "../../../../../utils";
+import { FetchFunction, getAssetURL, getServerUrl, mentionDropdownAtom } from "../../../../../utils";
 import { Avatar, Spinner } from "../../../../Misc";
 
 export function MentionDropdownComponent() {
@@ -132,7 +132,7 @@ export function MentionDropdownComponent() {
                 key={`${item.key}_${item.alterId || "NO_ALTER_ID"}`}>
                 {item?.portrait_id ? (
                   <Avatar
-                    image={getImageURL((project_id || item.projectId) as string, "images", item.portrait_id)}
+                    image={getAssetURL((project_id || item.projectId) as string, "images", item.portrait_id)}
                     label={item.label}
                     size="xs"
                   />

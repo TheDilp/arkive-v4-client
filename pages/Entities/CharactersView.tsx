@@ -48,7 +48,7 @@ import {
   FetchFunction,
   getAvatarInitials,
   getCharacterFullName,
-  getImageURL,
+  getAssetURL,
   hasActionPermission,
   IconEnum,
   isProjectOwnerAtom,
@@ -80,7 +80,7 @@ function createColumns(
         <div className="flex w-full items-center justify-center">
           <Avatar
             hasShowImage
-            image={getImageURL(project_id, "images", row.original?.portrait?.id || "")}
+            image={getAssetURL(project_id, "images", row.original?.portrait?.id || "")}
             initials={getAvatarInitials(`${row.original.first_name} ${row.original?.last_name || ""}`)}
             isBordered
             isTooltipDisabled
@@ -677,7 +677,6 @@ function CharacterViewHeader({
             },
             { id: "gateway", title: "Create gateway access", icon: IconEnum.gateway },
           ]}>
-          
           <Button
             icon={IconEnum.add}
             isDisabled={!permissions?.create_characters}

@@ -37,7 +37,7 @@ import {
   drawerAtom,
   FetchFunction,
   getAvatarInitials,
-  getImageURL,
+  getAssetURL,
   hasActionPermission,
   IconEnum,
   isProjectOwnerAtom,
@@ -86,7 +86,7 @@ function createColumns(
         <div className="flex w-full items-center justify-center">
           <Avatar
             hasShowImage
-            image={getImageURL(project_id, type, row.original?.id || "")}
+            image={getAssetURL(project_id, type, row.original?.id || "")}
             isBordered
             isTooltipDisabled
             label={getAvatarInitials(row.original.title)}

@@ -3,7 +3,7 @@ import cytoscape, { Core } from "cytoscape";
 import { saveAs } from "file-saver";
 
 import { CurveStyleType, EdgeType, NodeType } from "../../types/EntityTypes/graphTypes";
-import { AvailableIcons, getCharacterFullName, getIconUrlFromIconEnum, getImageURL, getThumbnailUrl, IconEnum } from "..";
+import { AvailableIcons, getCharacterFullName, getIconUrlFromIconEnum, getAssetURL, getImageURL, IconEnum } from "..";
 
 export function changeLockState(
   boardContext: cytoscape.Core,
@@ -125,16 +125,16 @@ export function getNodeLabel(node: NodeType): string {
 
 export function getNodeImage(node: NodeType, project_id: string, { width, height }: { width: number; height: number }) {
   if (node?.character?.portrait_id) {
-    return getThumbnailUrl(getImageURL(project_id as string, "images", node.character.portrait_id), { width, height });
+    return getImageURL(getAssetURL(project_id as string, "images", node.character.portrait_id), { width, height });
   }
   if (node?.document?.image) {
-    return getThumbnailUrl(getImageURL(project_id as string, "images", node.document.image_id), { width, height });
+    return getImageURL(getAssetURL(project_id as string, "images", node.document.image_id), { width, height });
   }
   if (node?.image) {
-    return getThumbnailUrl(getImageURL(project_id as string, "images", node.image?.id), { width, height });
+    return getImageURL(getAssetURL(project_id as string, "images", node.image?.id), { width, height });
   }
   if (node?.image_id) {
-    return getThumbnailUrl(getImageURL(project_id as string, "images", node?.image_id), { width, height });
+    return getImageURL(getAssetURL(project_id as string, "images", node?.image_id), { width, height });
   }
 
   if (node?.icon) {
@@ -246,4 +246,3 @@ export function getCurveStyleIcon(curve_style: CurveStyleType): AvailableIcons {
   if (curve_style === "unbundled-bezier") return IconEnum.unbundled_bezier_edges;
   return IconEnum.straight_edges;
 }
-

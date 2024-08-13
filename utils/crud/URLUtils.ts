@@ -16,11 +16,9 @@ export function getPreviewImageURLs(files: File[] | undefined): { name: string; 
   return [];
 }
 
-export function getImageURL(project_id: string, type: AssetType, image_id?: string | null): string {
+export function getAssetURL(project_id: string, type: AssetType, image_id?: string | null): string {
   if (!image_id) return "";
-  return `https://${import.meta.env.VITE_DO_SPACES_NAME}.${
-    import.meta.env.VITE_DO_SPACES_CDN_ENDPOINT
-  }/assets/${project_id}/${type}/${image_id}.webp`;
+  return `assets/${project_id}/${type}/${image_id}.webp`;
 }
 
 export function getSearchURL(type: SearchableEntities) {
@@ -29,9 +27,9 @@ export function getSearchURL(type: SearchableEntities) {
   return `${type}`;
 }
 
-export function getThumbnailUrl(url: string, dimensions?: { width: number; height: number }) {
-  const sizedUrl = `${dimensions?.width || 35}x${dimensions?.height || 35}/${url}`;
-  const hash = createHmac("sha1", import.meta.env.VITE_THUMBNAIL_SECRET)
+export function getImageURL(url: string, dimensions?: { width: number; height: number }) {
+  const sizedUrl = dimensions ? `${dimensions?.width || 35}x${dimensions?.height || 35}/${url}` : url;
+  const hash = createHmac("sha512", import.meta.env.VITE_THUMBNAIL_SECRET)
     .update(sizedUrl)
     .digest("base64")
     .replace(/\+/g, "-")

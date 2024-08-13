@@ -12,7 +12,7 @@ import {
   Dice,
   DiceRollParser,
   DocumentTemplateFieldRegex,
-  getImageURL,
+  getAssetURL,
   getMatchFieldVariant,
   getSentenceCase,
   IconEnum,
@@ -310,7 +310,7 @@ export function DocumentFromTemplate({ data }: Props) {
                                   content: previewContext?.getState()?.schema?.nodes.image.create({
                                     id: nodeField?.related?.[0],
                                     alt: nodeField?.additional_data?.title || "template",
-                                    src: getImageURL(project_id as string, "images", nodeField?.related?.[0]),
+                                    src: getAssetURL(project_id as string, "images", nodeField?.related?.[0]),
                                     crop: null,
                                     title: nodeField?.additional_data?.title,
                                     width: nodeField?.additional_data?.width || 250,

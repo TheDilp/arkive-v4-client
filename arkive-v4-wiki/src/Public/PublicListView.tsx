@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { Avatar, createColumnHelper, Icon, Input, Table } from "../../../components";
 import { useGetEntities, useTable } from "../../../hooks";
 import { AvailableEntityType, BaseEntityType, CharacterType } from "../../../types";
-import { getAvatarInitials, getDefaultEntityIcon, getEntityFields, getEntityLink, getImageURL, IconEnum } from "../../../utils";
+import { getAvatarInitials, getDefaultEntityIcon, getEntityFields, getEntityLink, getAssetURL, IconEnum } from "../../../utils";
 
 const characterColumnHelper = createColumnHelper<CharacterType>();
 const columnHelper = createColumnHelper<BaseEntityType>();
@@ -18,7 +18,7 @@ function characterColumns(project_id: string) {
         <div className="flex w-full items-center justify-center">
           <Avatar
             hasShowImage
-            image={getImageURL(project_id, "images", row.original?.portrait?.id || "")}
+            image={getAssetURL(project_id, "images", row.original?.portrait?.id || "")}
             initials={getAvatarInitials(row.original.full_name)}
             isBordered
             isTooltipDisabled
@@ -57,7 +57,7 @@ function columns(
       cell: ({ row }) =>
         "image_id" in row.original && row.original?.image_id ? (
           <Avatar
-            image={getImageURL(
+            image={getAssetURL(
               project_id,
               entityType === "maps" ? "map_images" : "images",
               (row.original?.image_id as string) || ""

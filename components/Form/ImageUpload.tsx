@@ -3,7 +3,7 @@ import { MutableRefObject, useRef } from "react";
 
 import { useUploadAvatar } from "../../hooks";
 import { ImageUploadType } from "../../types";
-import { changeImagesForUpload, getImageURL, IconEnum, useNotifications } from "../../utils";
+import { changeImagesForUpload, getAssetURL, IconEnum, useNotifications } from "../../utils";
 
 export function ImageUpload({ images, onChange, isDisabled, isMultiple = true }: ImageUploadType) {
   const createNotification = useNotifications();
@@ -122,7 +122,7 @@ export function AvatarUpload({
       id="dropzone-container"
       onDragOver={(e) => e.preventDefault()}
       style={{
-        backgroundImage: image_id ? `url(${getImageURL(project_id, "images", image_id)})` : `url(${image || ""})`,
+        backgroundImage: image_id ? `url(${getAssetURL(project_id, "images", image_id)})` : `url(${image || ""})`,
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
         backgroundSize: "cover",

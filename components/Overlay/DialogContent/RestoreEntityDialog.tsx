@@ -6,7 +6,7 @@ import { AvailableEntityType } from "../../../types";
 import {
   dialogAtom,
   getCharacterFullName,
-  getImageURL,
+  getAssetURL,
   getSingularEntityType,
   IconEnum,
   useNotifications,
@@ -38,7 +38,7 @@ export function RestoreEntityDialog({ data }: { data: { [key: string]: any } }) 
         {data?.image && data?.project_id ? (
           <>
             <Avatar
-              image={getImageURL(data?.project_id, "images", data?.image || "")}
+              image={getAssetURL(data?.project_id, "images", data?.image || "")}
               isBordered
               isTooltipDisabled
               label=""

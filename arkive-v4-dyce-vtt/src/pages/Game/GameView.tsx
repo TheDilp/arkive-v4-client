@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Avatar, Button, Input, Select, Tooltip } from "../../../../components";
 import { useGetEntities, useHandleChange } from "../../../../hooks";
 import { CharacterType } from "../../../../types";
-import { AvailableIcons, getAvatarInitials, getImageURL, IconEnum } from "../../../../utils";
+import { AvailableIcons, getAvatarInitials, getAssetURL, IconEnum } from "../../../../utils";
 import { DiceRollInput } from "./DiceRollInput";
 
 const sections: { tooltip: string; id: "roll_history" | "characters" | "journal" | "music"; icon: AvailableIcons }[] = [
@@ -234,7 +234,7 @@ function Characters() {
                 key={char.id}>
                 <div className="flex items-center gap-x-2">
                   <Avatar
-                    image={getImageURL(char.project_id, "images", char.portrait_id)}
+                    image={getAssetURL(char.project_id, "images", char.portrait_id)}
                     initials={getAvatarInitials(char.full_name)}
                     size="sm"
                   />
@@ -286,7 +286,7 @@ export function GameView() {
         {drawer === "roll_history" ? <RollHistory /> : null}
         {drawer === "characters" ? <Characters /> : null}
       </div>
-      <div className={`mt-auto ${drawer ? "w-[calc(100%-24rem)]" : "w-full"} transition-width p-4`}>
+      <div className={`mt-auto ${drawer ? "w-[calc(100%-24rem)]" : "w-full"} p-4 transition-width`}>
         <DiceRollInput />
       </div>
     </div>

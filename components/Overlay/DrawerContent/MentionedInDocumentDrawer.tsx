@@ -9,7 +9,7 @@ import {
   baseURLS,
   FetchFunction,
   getElementPosition,
-  getImageURL,
+  getAssetURL,
   getSingularEntityType,
   IconEnum,
   mentionPositionAtom,
@@ -100,7 +100,7 @@ export function MentionedInDocumentDrawer({ data }: Props) {
                   ]);
                 }}>
                 {matchedData?.image_id ? (
-                  <Avatar image={getImageURL(project_id as string, "images", matchedData.image_id)} size="sm" />
+                  <Avatar image={getAssetURL(project_id as string, "images", matchedData.image_id)} size="sm" />
                 ) : null}
                 {mention.label}
                 <span className="text-sm text-zinc-400">(Type: {getSingularEntityType(mention.type)})</span>
