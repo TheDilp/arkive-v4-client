@@ -298,6 +298,7 @@ function DocumentContent({ can_update }: { can_update: boolean }) {
           id: "send_to_discord",
           title: "Send text to Discord",
           icon: IconEnum.discord,
+          allowedPlacements: ["left", "right"],
           subItems: (webhooks?.data || []).map((webhook) => ({
             id: webhook.id,
             title: webhook.title,
