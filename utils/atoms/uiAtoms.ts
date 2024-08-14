@@ -18,6 +18,13 @@ export const hasChangedDataAtom = atomWithReset<boolean>(false);
 export const projectFeatureFlagsAtom = atom((get) => get(projectAtom)?.feature_flags);
 export const hasEntityUpdatePermissionForEntityView = atom<boolean>(false);
 export const historyAtom = atom<{ label: string; link: string }[]>([]);
+export const assetsUrlsAtom = atom<{ thumbnails: Record<string, string>; images: Record<string, string> }>({
+  thumbnails: {},
+  images: {},
+});
+
+export const thumbnailUrlsAtom = atom((get) => get(assetsUrlsAtom).images);
+export const imageUrlsAtom = atom((get) => get(assetsUrlsAtom).thumbnails);
 
 export const enabledEntitiesAtom = atom((get) => {
   const feature_flags = get(projectFeatureFlagsAtom);

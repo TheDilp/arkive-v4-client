@@ -46,15 +46,19 @@ export function Image({
           {image.title}
         </h2>
       ) : null}
-      <img
-        alt={image?.title || ""}
-        className={classes}
-        loading={isLazyLoading ? "lazy" : "eager"}
-        onClick={() => {
-          if (isOpenable) openImageView(setDialog, url || fetchedUrl, image?.title || "");
-        }}
-        src={url || fetchedUrl}
-      />
+      {url || fetchedUrl ? (
+        <img
+          alt={image?.title || ""}
+          className={classes}
+          loading={isLazyLoading ? "lazy" : "eager"}
+          onClick={() => {
+            if (isOpenable) openImageView(setDialog, url || fetchedUrl, image?.title || "");
+          }}
+          src={url || fetchedUrl}
+        />
+      ) : (
+        <div className={classes} />
+      )}
     </div>
   );
 }

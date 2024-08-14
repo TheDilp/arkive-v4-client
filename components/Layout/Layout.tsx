@@ -129,7 +129,6 @@ export function ProjectLayout() {
     if (parsedTitle === "undefined") return;
     setHistory([{ label: parsedTitle, link: pathname }, ...history].slice(0, 10));
   }, [title]);
-
   const { proceed, reset } = useBlocker(({ currentLocation, nextLocation }) => {
     if (hasChangedData && !!drawer?.title && currentLocation.pathname !== nextLocation.pathname) {
       if (proceed) {
