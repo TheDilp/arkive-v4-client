@@ -1,11 +1,11 @@
 import { Icon } from "@iconify/react";
 import { MutableRefObject, useEffect, useRef } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import { useGetEntity } from "../../../../../hooks";
 import { CharacterType } from "../../../../../types";
-import { getAssetURL, getMentionLink, IconEnum } from "../../../../../utils";
+import { getMentionLink, IconEnum } from "../../../../../utils";
 import { Card } from "../../../../Layout";
 import { Avatar, Spinner } from "../../../../Misc";
 import { Tooltip } from "../../../../Overlay";
@@ -19,7 +19,6 @@ type Props = {
 };
 
 function CharacterMentionTooltip({ title, id }: Pick<Props, "id" | "title">) {
-  const { project_id } = useParams();
   const { data, isLoading } = useGetEntity<CharacterType>(
     id as string,
     "characters",
@@ -27,7 +26,7 @@ function CharacterMentionTooltip({ title, id }: Pick<Props, "id" | "title">) {
     { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention", "tooltip"] }
   );
   return (
-    <Card avatar={getAssetURL(project_id as string, "images", data?.data.portrait_id)} title={title || ""}>
+    <Card avatar={data?.data.portrait_id} title={title || ""}>
       <div className="h-96 min-h-[24rem] w-96 min-w-[24rem] overflow-y-auto overflow-x-hidden whitespace-pre-line">
         {data?.data?.biography && !isLoading ? <StaticRender content={data.data.biography as RemirrorJSON} /> : null}
         {isLoading ? (

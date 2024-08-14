@@ -1,7 +1,8 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import { useImageURL } from "../../hooks/ui/useImageURLHook";
 import { BaseCardType, CharacterType, ProjectGameCardType } from "../../types";
-import { getAssetURL, getImageURL, IconEnum, projectCardNavItems } from "../../utils";
+import { getAssetURL, IconEnum, projectCardNavItems } from "../../utils";
 import { Avatar, Icon } from "../Misc";
 import { Tooltip } from "../Overlay/Tooltip";
 
@@ -10,7 +11,7 @@ const alwaysEnabledItems = ["/", "settings", "tags", "assets"];
 export function ProjectGameCard({ id, title, image, feature_flags, module }: ProjectGameCardType) {
   const baseUrl = module === "arkive" ? "projects" : "games";
   const navigate = useNavigate();
-
+  const url = useImageURL(image);
   return (
     <Link
       className="animate-in fade-in group relative col-span-1 flex h-[28rem] flex-col items-center justify-center rounded bg-zinc-950 bg-cover bg-center bg-no-repeat shadow transition-all duration-500"
@@ -47,7 +48,7 @@ export function ProjectGameCard({ id, title, image, feature_flags, module }: Pro
       <div
         className="absolute z-0 flex h-full w-full flex-col items-center justify-end bg-cover bg-center bg-no-repeat transition-all group-hover:brightness-75"
         style={{
-          backgroundImage: image ? `url(${getImageURL(image)})` : "",
+          backgroundImage: image ? `url(${url})` : "",
         }}
       />
     </Link>
@@ -89,7 +90,7 @@ export function Card({
   children,
   image,
   avatar,
-}: BaseCardType & { avatar?: string; children: JSX.Element | JSX.Element[] | null }) {
+}: BaseCardType & { avatar?: string | null | undefined; children: JSX.Element | JSX.Element[] | null }) {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden rounded-md border border-zinc-800 bg-zinc-700 p-4 shadow">
       {image ? (
