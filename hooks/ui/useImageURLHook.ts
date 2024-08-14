@@ -33,5 +33,6 @@ export function useImageURL(image: string | null | undefined, size?: Size) {
 
     fetchData().catch(console.error);
   }, [url, size]);
-  return image && urls?.[image] ? urls?.[image] : url;
+  const key = `${image}${size ? `_${size}` : ""}`;
+  return image && urls?.[key] ? urls?.[key] : url;
 }
