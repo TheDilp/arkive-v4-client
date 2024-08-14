@@ -438,7 +438,7 @@ export function Select({
           <div className="flex items-center gap-x-2 truncate">
             {!!value && !Array.isArray(value) && selectedItem?.image ? (
               <Avatar
-                image={selectedItem?.image?.link}
+                image_id={selectedItem?.image?.id}
                 label={selectedItem?.label}
                 shape={selectedItem?.image?.shape}
                 size="xs"
@@ -560,8 +560,8 @@ export function Select({
                     key={`${opt}-${i.toFixed()}`}>
                     {opt?.image ? (
                       <Avatar
-                        image={opt?.image?.link}
                         imageLoading="lazy"
+                        image_id={opt?.image?.id}
                         isPreview
                         isTooltipDisabled
                         label={label || ""}

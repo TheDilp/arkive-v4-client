@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Avatar, Button, Input, Select, Tooltip } from "../../../../components";
 import { useGetEntities, useHandleChange } from "../../../../hooks";
 import { CharacterType } from "../../../../types";
-import { AvailableIcons, getAvatarInitials, getAssetURL, IconEnum } from "../../../../utils";
+import { AvailableIcons, getAvatarInitials, IconEnum } from "../../../../utils";
 import { DiceRollInput } from "./DiceRollInput";
 
 const sections: { tooltip: string; id: "roll_history" | "characters" | "journal" | "music"; icon: AvailableIcons }[] = [
@@ -178,7 +178,7 @@ function RollHistory() {
         ).map((roll) => (
           <li className="flex flex-col justify-center border-b border-zinc-700 p-2 first:border-t" key={roll.id}>
             <div className="flex items-center gap-x-2">
-              <Avatar image={roll.character.image} size="xs" />
+              <Avatar image_id={roll.character.image} size="xs" />
               <h2 className="text-zinc-300">
                 {roll.character.title}: {roll.title}
               </h2>
@@ -233,11 +233,7 @@ function Characters() {
                 className="flex items-center justify-between border-b border-zinc-600 bg-zinc-700 p-2 first:border-t"
                 key={char.id}>
                 <div className="flex items-center gap-x-2">
-                  <Avatar
-                    image={getAssetURL(char.project_id, "images", char.portrait_id)}
-                    initials={getAvatarInitials(char.full_name)}
-                    size="sm"
-                  />
+                  <Avatar image_id={char.portrait_id} initials={getAvatarInitials(char.full_name)} size="sm" />
                   <span>{char.full_name}</span>
                 </div>
                 <div className="flex items-center gap-x-1">

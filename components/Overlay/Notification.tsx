@@ -1,10 +1,9 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { DiceRollType, NotificationType } from "../../types";
-import { getAssetURL, IconEnum, notificationsAtom, removeNotification } from "../../utils";
+import { IconEnum, notificationsAtom, removeNotification } from "../../utils";
 import { getCritColor } from "../../utils/ui/diceRollerUtils";
 import { Button } from "../Form";
 import { Avatar, Icon } from "../Misc";
@@ -175,7 +174,6 @@ export function Notification({
   type,
   data,
 }: NotificationType) {
-  const { project_id } = useParams();
   const setNotificationAtom = useSetAtom(notificationsAtom);
   const [timeRemaining, setTimeRemaining] = useState<boolean>(true);
   useEffect(() => {
@@ -231,12 +229,12 @@ export function Notification({
             ) : null}
             {image_id ? (
               <div className={iconContainer()}>
-                <Avatar image={getAssetURL(project_id as string, "images", image_id)} />
+                <Avatar image_id={image_id} />
               </div>
             ) : null}
             {image_url ? (
               <div className={userImage()}>
-                <Avatar image={image_url} size="xs" />
+                <Avatar image_url={image_url} size="xs" />
               </div>
             ) : null}
             <div className={titleClasses()}>{title}</div>

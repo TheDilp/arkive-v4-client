@@ -44,7 +44,6 @@ import {
   FetchFunction,
   getBlueprintInstanceColumnWidth,
   getDayOrdinal,
-  getAssetURL,
   hasActionPermission,
   IconEnum,
   isProjectOwnerAtom,
@@ -178,7 +177,7 @@ function createColumns(
                     <div className="-ml-4 flex items-center first:ml-0 hover:z-10">
                       <Avatar
                         hasShowImage
-                        image={getAssetURL(project_id as string, "images", image.related_id)}
+                        image_id={image.related_id}
                         label={image.image.title}
                         size="sm"
                         tooltipAllowedPlacements={["left", "right"]}

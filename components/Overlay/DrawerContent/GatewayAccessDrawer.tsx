@@ -15,15 +15,7 @@ import {
 } from "../../../hooks";
 import { CharacterType, DrawerAtomType, ImageType, RequestFilterType, RequestOrderByType, TabType } from "../../../types";
 import { GatewayConfigType } from "../../../types/EntityTypes/gatewayTypes";
-import {
-  AllEntities,
-  AvailableIcons,
-  getAvatarInitials,
-  getAssetURL,
-  getParentEntityType,
-  IconEnum,
-  TextFilters,
-} from "../../../utils";
+import { AllEntities, AvailableIcons, getAvatarInitials, getParentEntityType, IconEnum, TextFilters } from "../../../utils";
 import {
   InsertGatewayConfigurationSchema,
   InsertGatewayConfigurationType,
@@ -110,7 +102,7 @@ function getColumns(
           <div className="flex w-full items-center justify-center">
             <Avatar
               hasShowImage
-              image={getAssetURL(project_id, "images", row.original?.portrait_id || "")}
+              image_id={row.original?.portrait_id}
               initials={getAvatarInitials(row.original.full_name)}
               isBordered
               isTooltipDisabled
@@ -137,13 +129,7 @@ function getColumns(
         header: "",
         cell: ({ row }) => (
           <div className="flex w-full items-center justify-center">
-            <Avatar
-              hasShowImage
-              image={getAssetURL(project_id, "images", row.original?.id || "")}
-              isBordered
-              isTooltipDisabled
-              size="sm"
-            />
+            <Avatar hasShowImage image_id={row.original?.portrait_id} isBordered isTooltipDisabled size="sm" />
           </div>
         ),
         meta: {

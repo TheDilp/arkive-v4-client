@@ -1,8 +1,8 @@
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { ItemPreviewType } from "../../types/ComponentTypes/DataDisplayTypes/itemPreviewTypes";
-import { AvailableIcons, getAssetURL, getDefaultEntityIcon, IconEnum } from "../../utils";
+import { AvailableIcons, getDefaultEntityIcon, IconEnum } from "../../utils";
 import { Button } from "../Form";
 import { Avatar, Icon } from "../Misc";
 
@@ -82,7 +82,6 @@ export function EntityPreview({
   clearAction,
   otherAction,
 }: ItemPreviewType) {
-  const { project_id } = useParams();
   const {
     container,
     base,
@@ -99,13 +98,10 @@ export function EntityPreview({
         {image_id ? (
           <Avatar
             hasShowImage
-            image={getAssetURL(
-              (manual_project_id || project_id) as string,
-              type === "maps" ? "map_images" : "images",
-              image_id
-            )}
+            image_id={image_id}
             isTooltipDisabled
             label={title}
+            manual_project_id={manual_project_id}
             size={size === "md" ? "sm" : "xs"}
           />
         ) : null}

@@ -1,9 +1,10 @@
 import { useSetAtom } from "jotai";
+import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
+import { useImageURL } from "../../hooks/ui/useImageURLHook";
 import { AvatarType } from "../../types";
-import { dialogAtom, getFirstLetters, getImageURL } from "../../utils";
-import { getAvatarThumbnailDimensions } from "../../utils/ui/avatarUtils";
+import { dialogAtom, getAssetURL, getFirstLetters } from "../../utils";
 import { Tooltip } from "../Overlay/Tooltip";
 import { Spinner } from "./Spinner";
 
@@ -76,21 +77,24 @@ const AvatarClasses = tv({
 
 export function Avatar({
   label,
-  image,
-  imageLoading,
+  image_id,
+  image_url,
+  imageLoading = "eager",
   isTooltipDisabled,
   initials,
   isBordered,
   isLoading,
   hasShowImage = false,
+  imageType = "images",
   tooltipAllowedPlacements = [],
   shape = "circle",
   size = "md",
-  isPreview,
+  manual_project_id,
 }: AvatarType & { isPreview?: boolean }) {
+  const { project_id } = useParams();
   const setDialog = useSetAtom(dialogAtom);
   const { base, image: imageClasses, text, spinner } = AvatarClasses({ isBordered, size, hasShowImage, shape });
-
+  const url = useImageURL(image_id ? getAssetURL((manual_project_id || project_id) as string, imageType, image_id) : null);
   return (
     <Tooltip
       allowedPlacements={tooltipAllowedPlacements}
@@ -105,7 +109,7 @@ export function Avatar({
             <Spinner />
           </div>
         ) : null}
-        {image ? (
+        {image_url || url ? (
           <img
             alt={label}
             className={imageClasses()}
@@ -114,12 +118,12 @@ export function Avatar({
               if (hasShowImage)
                 setDialog((prev) => ({
                   ...prev,
-                  data: { image: getImageURL(image) },
+                  data: { image: image_url || url },
                   type: "image_view",
                   title: "Image view",
                 }));
             }}
-            src={isPreview ? image : getImageURL(image, getAvatarThumbnailDimensions(size))}
+            src={image_url || url}
           />
         ) : (
           <span className={text()}>{initials || getFirstLetters(label || "")}</span>

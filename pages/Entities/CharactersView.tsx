@@ -48,7 +48,6 @@ import {
   FetchFunction,
   getAvatarInitials,
   getCharacterFullName,
-  getAssetURL,
   hasActionPermission,
   IconEnum,
   isProjectOwnerAtom,
@@ -80,7 +79,7 @@ function createColumns(
         <div className="flex w-full items-center justify-center">
           <Avatar
             hasShowImage
-            image={getAssetURL(project_id, "images", row.original?.portrait?.id || "")}
+            image_id={row.original?.portrait?.id}
             initials={getAvatarInitials(`${row.original.first_name} ${row.original?.last_name || ""}`)}
             isBordered
             isTooltipDisabled

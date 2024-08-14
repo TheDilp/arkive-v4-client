@@ -17,7 +17,6 @@ import {
   drawerAtom,
   FetchFunction,
   getElementPosition,
-  getAssetURL,
   getRanges,
   IconEnum,
   mentionPositionAtom,
@@ -209,7 +208,7 @@ export function AutomentionDrawer({ data }: Props) {
                     value={selectedLinks.includes(idWithRange)}
                   />
                   {selectedEntity === "characters" && potentialMatch.image_id ? (
-                    <Avatar image={getAssetURL(project_id as string, "images", potentialMatch.image_id)} size="xs" />
+                    <Avatar image_id={potentialMatch.image_id} size="xs" />
                   ) : null}
                   <span
                     className="flex items-center justify-between gap-x-2 truncate"

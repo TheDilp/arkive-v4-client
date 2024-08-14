@@ -49,7 +49,6 @@ import {
   drawerAtom,
   getDefaultEntityIcon,
   getFirstLetters,
-  getAssetURL,
   getPluralEntityType,
   getSentenceCase,
   IconEnum,
@@ -263,7 +262,7 @@ function membersColumns(
     membersColumnHelper.display({
       id: "image",
       header: "Image",
-      cell: ({ row }) => (row.original?.image ? <Avatar image={row.original.image} size="sm" /> : null),
+      cell: ({ row }) => (row.original?.image ? <Avatar image_id={row.original.image} size="sm" /> : null),
       meta: {
         centered: true,
       },
@@ -599,7 +598,7 @@ export function ProjectSettingsView() {
           <div className="flex flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">
             <Avatar
               hasShowImage
-              image={getAssetURL(projectData?.data?.id as string, "images", projectData?.data?.image_id)}
+              image_id={projectData?.data?.image_id}
               initials={getFirstLetters(projectData?.data?.title as string)}
               isTooltipDisabled
               size="4xl"

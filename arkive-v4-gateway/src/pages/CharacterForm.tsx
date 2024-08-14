@@ -7,7 +7,6 @@ import { CharacterFieldTemplateType, CharacterFieldType, CharacterType, HandleCh
 import {
   getCharacterFullName,
   getDifferenceForCharacterFields,
-  getAssetURL,
   getSavingIcon,
   getSavingTooltip,
   IconEnum,
@@ -185,9 +184,7 @@ export function CharacterForm() {
           gridRow: "1 / 2",
         }}>
         <h1 className="flex items-center gap-x-4">
-          {character?.portrait_id ? (
-            <Avatar image={getAssetURL(character.project_id as string, "images", character?.portrait_id)} />
-          ) : null}
+          {character?.portrait_id ? <Avatar image_id={character?.portrait_id} /> : null}
           {getCharacterFullName(character?.first_name || "", null, character?.last_name)}
           <div className="ml-auto">
             <Button

@@ -15,7 +15,6 @@ import {
   FavoritesFilters,
   getAvatarInitials,
   getDeletedAtParams,
-  getAssetURL,
   IconEnum,
   projectFeatureFlagsAtom,
   sortTags,
@@ -260,18 +259,13 @@ export function CharacterColumn({
   isMultiple: boolean;
   characters: BlueprintInstanceBlueprintFieldType["characters"];
 }) {
-  const { project_id } = useParams();
   return (
     <div className="flex w-full items-center gap-x-2">
       <div className="z-0 flex w-full items-center justify-center -space-x-4">
         {characters?.slice(0, isMultiple ? 5 : 1)?.map((char) => {
           return (
             <Avatar
-              image={getAssetURL(
-                char?.character?.project_id || (project_id as string),
-                "images",
-                char?.character?.portrait_id || ""
-              )}
+              image_id={char?.character?.portrait_id}
               initials={getAvatarInitials(char?.character?.full_name || "")}
               isBordered
               key={char?.related_id}

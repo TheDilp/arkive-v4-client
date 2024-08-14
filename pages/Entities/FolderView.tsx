@@ -60,9 +60,9 @@ import {
   drawerAtom,
   EntitiesWithTags,
   FetchFunction,
+  getAssetURL,
   getDefaultEntityIcon,
   getEntityFields,
-  getAssetURL,
   getNavbarEntityType,
   getPermissionsForTypeView,
   getPluralEntityType,
@@ -132,16 +132,7 @@ function getColumns(
       header: "",
       cell: ({ row }) =>
         "image" in row.original && (row.original.image as ImageType) && show_image ? (
-          <Avatar
-            image={getAssetURL(
-              project_id,
-              entityType === "maps" ? "map_images" : "images",
-              (row.original.image as ImageType)?.id || ""
-            )}
-            isBordered
-            isTooltipDisabled
-            size="sm"
-          />
+          <Avatar image_id={(row.original.image as ImageType)?.id || ""} isBordered isTooltipDisabled size="sm" />
         ) : (
           <Icon
             fontSize={24}

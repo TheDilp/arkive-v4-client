@@ -4,68 +4,54 @@ import { useParams } from "react-router-dom";
 import { Avatar, createColumnHelper, Icon, Input, Table } from "../../../components";
 import { useGetEntities, useTable } from "../../../hooks";
 import { AvailableEntityType, BaseEntityType, CharacterType } from "../../../types";
-import { getAvatarInitials, getDefaultEntityIcon, getEntityFields, getEntityLink, getAssetURL, IconEnum } from "../../../utils";
+import { getAvatarInitials, getDefaultEntityIcon, getEntityFields, getEntityLink, IconEnum } from "../../../utils";
 
 const characterColumnHelper = createColumnHelper<CharacterType>();
 const columnHelper = createColumnHelper<BaseEntityType>();
 
-function characterColumns(project_id: string) {
-  return [
-    characterColumnHelper.display({
-      id: "portrait_id",
-      header: "Portrait",
-      cell: ({ row }) => (
-        <div className="flex w-full items-center justify-center">
-          <Avatar
-            hasShowImage
-            image={getAssetURL(project_id, "images", row.original?.portrait?.id || "")}
-            initials={getAvatarInitials(row.original.full_name)}
-            isBordered
-            isTooltipDisabled
-            label={row.original.full_name}
-            size="md"
-          />
-        </div>
-      ),
-      meta: {
-        pinned: true,
-        noLink: true,
-        centered: true,
-      },
-      minSize: 4.5,
-      maxSize: 4.5,
-    }),
-    characterColumnHelper.accessor("full_name", {
-      id: "full_name",
-      header: "Full name",
-      cell: (info) => info.getValue(),
-      meta: {
-        sortable: true,
-      },
-      minSize: 12,
-    }),
-  ];
-}
-function columns(
-  entityType: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints",
-  project_id: string
-) {
+const characterColumns = [
+  characterColumnHelper.display({
+    id: "portrait_id",
+    header: "Portrait",
+    cell: ({ row }) => (
+      <div className="flex w-full items-center justify-center">
+        <Avatar
+          hasShowImage
+          image_id={row.original?.portrait?.id}
+          initials={getAvatarInitials(row.original.full_name)}
+          isBordered
+          isTooltipDisabled
+          label={row.original.full_name}
+          size="md"
+        />
+      </div>
+    ),
+    meta: {
+      pinned: true,
+      noLink: true,
+      centered: true,
+    },
+    minSize: 4.5,
+    maxSize: 4.5,
+  }),
+  characterColumnHelper.accessor("full_name", {
+    id: "full_name",
+    header: "Full name",
+    cell: (info) => info.getValue(),
+    meta: {
+      sortable: true,
+    },
+    minSize: 12,
+  }),
+];
+function columns(entityType: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints") {
   return [
     columnHelper.display({
       id: "is_folder",
       header: "",
       cell: ({ row }) =>
         "image_id" in row.original && row.original?.image_id ? (
-          <Avatar
-            image={getAssetURL(
-              project_id,
-              entityType === "maps" ? "map_images" : "images",
-              (row.original?.image_id as string) || ""
-            )}
-            isBordered
-            isTooltipDisabled
-            size="sm"
-          />
+          <Avatar image_id={row.original?.image_id as string | null | undefined} isBordered isTooltipDisabled size="sm" />
         ) : (
           <Icon
             fontSize={24}
@@ -157,7 +143,7 @@ function PublicCharacterList() {
         />
       </div>
       <Table
-        columns={characterColumns(project_id as string)}
+        columns={characterColumns}
         config={{
           orderBy,
           filters,
@@ -242,10 +228,7 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
         />
       </div>
       <Table
-        columns={columns(
-          type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints",
-          project_id as string
-        )}
+        columns={columns(type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints")}
         config={{
           getLink: (rowData: any) => getEntityLink(project_id as string, type, rowData.id, null),
         }}

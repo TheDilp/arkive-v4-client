@@ -54,13 +54,13 @@ import {
   drawerAtom,
   enabledEntitiesAtom,
   FetchFunction,
+  getAssetURL,
   getAvatarInitials,
   getCharacterFullName,
   getCharacterProfileTabFromType,
   getDefaultEntityIcon,
   getEntityLink,
   getFirstLetters,
-  getAssetURL,
   getSentenceCase,
   hasActionPermission,
   IconEnum,
@@ -124,7 +124,7 @@ function relationshipTableColumns(
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center">
           <Avatar
-            image={getAssetURL(project_id, "images", row.original?.portrait?.id || "")}
+            image_id={row.original?.portrait?.id}
             initials={getAvatarInitials(row.original.full_name || "")}
             isBordered
             isTooltipDisabled
@@ -260,12 +260,7 @@ function documentsTableColumns(
       },
       cell: ({ row }) =>
         "image_id" in row.original && row.original?.image_id ? (
-          <Avatar
-            image={getAssetURL(project_id, "images", (row.original?.image_id as string) || "")}
-            isBordered
-            isTooltipDisabled
-            size="sm"
-          />
+          <Avatar image_id={row.original?.image_id} isBordered isTooltipDisabled size="sm" />
         ) : (
           <Icon fontSize={24} icon={row.original.is_folder ? IconEnum.folder : getDefaultEntityIcon("documents")} />
         ),
@@ -380,12 +375,7 @@ function eventsTableColumns(
       },
       cell: ({ row }) =>
         "image_id" in row.original && row.original?.image_id ? (
-          <Avatar
-            image={getAssetURL(project_id, "images", (row.original?.image_id as string) || "")}
-            isBordered
-            isTooltipDisabled
-            size="sm"
-          />
+          <Avatar image_id={row.original?.image_id} isBordered isTooltipDisabled size="sm" />
         ) : (
           <Icon fontSize={24} icon={getDefaultEntityIcon("events")} />
         ),
@@ -476,7 +466,7 @@ function locationsTableColumns(project_id: string) {
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center">
           <Avatar
-            image={getAssetURL(project_id, "map_images", row.original.image_id)}
+            image_id={getAssetURL(project_id, "map_images", row.original.image_id)}
             isTooltipDisabled
             label={row.original.title}
             size="sm"
@@ -547,7 +537,7 @@ function assetTableColumns(
         <div className="flex w-full items-center justify-center">
           <Avatar
             hasShowImage
-            image={getAssetURL(project_id as string, "images", row.original?.id || "")}
+            image_id={row.original?.id}
             isBordered
             isTooltipDisabled
             label={getAvatarInitials(row.original.title)}
@@ -669,7 +659,7 @@ function conversationTableColumns(
           {row.original.characters.map((char) => (
             <div className="-ml-4 first:ml-0" key={char.id}>
               <Avatar
-                image={getAssetURL(project_id, "images", char?.portrait_id || "")}
+                image_id={char?.portrait_id}
                 initials={getAvatarInitials(char?.full_name || "")}
                 isBordered
                 isTooltipDisabled
@@ -997,11 +987,7 @@ export function CharacterProfileView({
             <div className="col-span-6 flex h-fit flex-col items-center gap-y-0.5 border-r border-zinc-900 p-4 lg:col-span-1 lg:h-full lg:gap-y-2">
               <Avatar
                 hasShowImage
-                image={
-                  existingCharacter?.data?.portrait
-                    ? getAssetURL(project_id as string, "images", existingCharacter?.data?.portrait?.id)
-                    : undefined
-                }
+                image_id={existingCharacter?.data?.portrait?.id}
                 initials={getFirstLetters(existingCharacter?.data?.full_name || "") || ""}
                 isTooltipDisabled
                 size={isLg ? "4xl" : "xl"}

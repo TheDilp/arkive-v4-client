@@ -1,7 +1,5 @@
-import { createHmac } from "crypto";
-
 import { AssetType, SearchableEntities } from "../../types";
-import { baseURLS } from "../enums/ServerEnum";
+import { FetchFunction } from "./FetchFunction";
 
 export function getPreviewImageURLs(files: File[] | undefined): { name: string; url: string }[] {
   if (files) {
@@ -18,7 +16,7 @@ export function getPreviewImageURLs(files: File[] | undefined): { name: string; 
 
 export function getAssetURL(project_id: string, type: AssetType, image_id?: string | null): string {
   if (!image_id) return "";
-  return `assets/${project_id}/${type}/${image_id}.webp`;
+  return `${project_id}/${type}/${image_id}`;
 }
 
 export function getSearchURL(type: SearchableEntities) {
@@ -27,12 +25,11 @@ export function getSearchURL(type: SearchableEntities) {
   return `${type}`;
 }
 
-export function getImageURL(url: string, dimensions?: { width: number; height: number }) {
-  const sizedUrl = dimensions ? `${dimensions?.width || 35}x${dimensions?.height || 35}/${url}` : url;
-  const hash = createHmac("sha512", import.meta.env.VITE_THUMBNAIL_SECRET)
-    .update(sizedUrl)
-    .digest("base64")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
-  return `${baseURLS.baseThumbnailServer}/${hash}/${sizedUrl}`;
+export async function getImageURL(url: string, dimensions?: { width: number; height: number }) {
+  const formatted_url = dimensions ? `${url}?width=${dimensions.width}&height=${dimensions.height}` : url;
+  const link = await FetchFunction({ url: `${import.meta.env.VITE_ARKIVE_IMAGE_SERVICE}/${formatted_url}`, method: "GET" });
+
+  if (link) return link;
+
+  return "";
 }

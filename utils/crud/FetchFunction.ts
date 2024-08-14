@@ -31,11 +31,15 @@ export async function FetchFunction({
   if (IS_PUBLIC === false || IS_PUBLIC === undefined) {
     fetchParams.credentials = "include";
   }
-
   // @ts-ignore
   const res = await fetch(url, fetchParams);
   if (res.status === 401) {
     throw new Error("UNAUTHORIZED");
+  }
+  if (res.url.startsWith(import.meta.env.VITE_ARKIVE_IMAGE_SERVICE)) {
+    if (res.status === 200) {
+      return res.text();
+    }
   }
   if (res.url.endsWith("/generate/pdf")) {
     const disposition = res.headers

@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { useGetEntities, useTable } from "../../../hooks";
 import { DialogAtomType, MapPinType } from "../../../types";
-import { dialogAtom, getAssetURL, IconEnum } from "../../../utils";
+import { dialogAtom, IconEnum } from "../../../utils";
 import { Table } from "../../DataDisplay";
 import { Button } from "../../Form";
 import { Avatar, Icon } from "../../Misc";
@@ -21,11 +21,7 @@ function getColumns(project_id: string, setDialog: Dispatch<SetStateAction<Dialo
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center">
           {row?.original?.character ? (
-            <Avatar
-              image={getAssetURL(project_id, "images", row?.original?.character?.portrait_id)}
-              label={row?.original?.character?.full_name}
-              size="sm"
-            />
+            <Avatar image_id={row?.original?.character?.portrait_id} label={row?.original?.character?.full_name} size="sm" />
           ) : (
             <Icon fontSize={32} icon={row?.original?.icon} />
           )}

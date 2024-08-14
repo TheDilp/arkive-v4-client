@@ -7,7 +7,6 @@ import {
   capitalizeFirstLetter,
   dialogAtom,
   getCharacterFullName,
-  getAssetURL,
   getSingularEntityType,
   IconEnum,
   useNotifications,
@@ -58,13 +57,7 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
       <div className="mx-auto my-2 flex items-center gap-x-4">
         {data?.image && data?.project_id ? (
           <>
-            <Avatar
-              image={getAssetURL(data?.project_id, "images", data?.image || "")}
-              isBordered
-              isTooltipDisabled
-              label=""
-              size="2xl"
-            />
+            <Avatar image_id={data?.image} isBordered isTooltipDisabled label="" size="2xl" />
             <span className="text-lg">{getCharacterFullName(data?.first_name || "", data?.last_name || "")}</span>
           </>
         ) : null}

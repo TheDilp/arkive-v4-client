@@ -20,7 +20,7 @@ import { tv } from "tailwind-variants";
 import { useSearch } from "../../hooks";
 import { AllAvailableEntities } from "../../types";
 import { SearchType } from "../../types/ComponentTypes/FormTypes/searchTypes";
-import { AvailableIcons, getAssetURL, IconEnum, userAtom } from "../../utils";
+import { AvailableIcons, IconEnum, userAtom } from "../../utils";
 import { Avatar, Icon } from "..";
 import { Button } from ".";
 
@@ -333,13 +333,7 @@ export function Search({
           ref: refs.setReference,
         })}>
         {(searchEntity === "images" || searchEntity === "map_images") && value && !isMultiple ? (
-          <Avatar
-            image={getAssetURL((manual_project_id || project_id) as string, imageType || "images", value as string)}
-            imageLoading="lazy"
-            isTooltipDisabled
-            label={label || ""}
-            size="xs"
-          />
+          <Avatar imageLoading="lazy" image_id={value as string} isTooltipDisabled label={label || ""} size="xs" />
         ) : null}
         <input
           autoComplete="off"
@@ -513,12 +507,9 @@ export function Search({
                     searchEntity === "all") &&
                     item?.image) ? (
                     <Avatar
-                      image={getAssetURL(
-                        item?.project_id || ((manual_project_id || project_id) as string),
-                        imageType || "images",
-                        searchEntity === "images" || searchEntity === "map_images" ? item?.value : item?.image
-                      )}
                       imageLoading="lazy"
+                      imageType={imageType}
+                      image_id={searchEntity === "images" || searchEntity === "map_images" ? item?.value : item?.image}
                       isTooltipDisabled
                       label={label || ""}
                       size="xs"

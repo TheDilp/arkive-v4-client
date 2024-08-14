@@ -3,14 +3,7 @@ import { useParams } from "react-router-dom";
 
 import { useUpdateEntity } from "../../../hooks";
 import { AvailableEntityType } from "../../../types";
-import {
-  dialogAtom,
-  getCharacterFullName,
-  getAssetURL,
-  getSingularEntityType,
-  IconEnum,
-  useNotifications,
-} from "../../../utils";
+import { dialogAtom, getCharacterFullName, getSingularEntityType, IconEnum, useNotifications } from "../../../utils";
 import { Button } from "../../Form";
 import { Avatar } from "../../Misc";
 
@@ -37,13 +30,7 @@ export function RestoreEntityDialog({ data }: { data: { [key: string]: any } }) 
       <div className="mx-auto my-2 flex items-center gap-x-4">
         {data?.image && data?.project_id ? (
           <>
-            <Avatar
-              image={getAssetURL(data?.project_id, "images", data?.image || "")}
-              isBordered
-              isTooltipDisabled
-              label=""
-              size="2xl"
-            />
+            <Avatar image_url={data?.image} isBordered isTooltipDisabled label="" size="2xl" />
             <span className="text-lg">{getCharacterFullName(data?.first_name || "", data?.last_name || "")}</span>
           </>
         ) : null}

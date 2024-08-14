@@ -11,8 +11,8 @@ import { ConversationType, MessageKindType, MessageType, WebsocketEventType } fr
 import {
   AvailableIcons,
   drawerAtom,
-  getAvatarInitials,
   getAssetURL,
+  getAvatarInitials,
   IconEnum,
   messageEditorHooks,
   MessageTypeOptions,
@@ -83,13 +83,11 @@ function NarrationMessage({
 function PlaceMessage({
   id,
   content,
-  project_id,
   parent_id,
   handleEditMessageDrawer,
   deleteMessage,
 }: {
   id: string;
-  project_id: string;
   parent_id: string | undefined;
   content: { title?: string; image_id?: string; icon?: AvailableIcons };
   handleEditMessageDrawer: (message_id: string) => void;
@@ -118,9 +116,7 @@ function PlaceMessage({
           <div className="relative flex w-full justify-center">
             <hr className="absolute top-1/2 z-0 w-full" />
 
-            {content?.image_id ? (
-              <Avatar image={getAssetURL(project_id, "map_images", content?.image_id)} initials="AB" size="2xl" />
-            ) : null}
+            {content?.image_id ? <Avatar image_id={content?.image_id} initials="AB" size="2xl" /> : null}
             {content?.icon ? (
               <div className="z-10 h-16 w-16 rounded-full border bg-zinc-700 p-1">
                 <Icon fontSize={56} icon={content?.icon} />
@@ -280,7 +276,6 @@ export function ConversationView({ id }: { id: string }) {
                     handleEditMessageDrawer={handleEditMessageDrawer}
                     id={m.id}
                     parent_id={existingConversation?.data?.id}
-                    project_id={project_id as string}
                   />
                 );
               return (
@@ -294,7 +289,7 @@ export function ConversationView({ id }: { id: string }) {
                     {char ? (
                       <div className="flex flex-col items-end gap-x-1 self-end px-1">
                         <Avatar
-                          image={getAssetURL(project_id as string, "images", char?.portrait_id)}
+                          image_id={char?.portrait_id}
                           initials={getAvatarInitials(char?.full_name || "") || ""}
                           label={char?.full_name || ""}
                           size="2xs"

@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useGetEntity, useGetSubEntity } from "../../../../../hooks";
 import { MapView } from "../../../../../pages/Entities/MapView";
 import { MapPinType, MapType } from "../../../../../types";
-import { getAssetURL, getMentionLink, IconEnum } from "../../../../../utils";
+import { getMentionLink, IconEnum } from "../../../../../utils";
 import { Card } from "../../../../Layout";
 import { Avatar } from "../../../../Misc";
 import { Tooltip } from "../../../../Overlay";
@@ -99,7 +99,7 @@ export function MapPinMention({ title, id, label, project_id, parent_id }: Props
           <div className="flex items-start" ref={mentionRef}>
             {data?.data?.image_id ? (
               <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
-                <Avatar hasShowImage image={getAssetURL(project_id as string, "images", data?.data?.image_id)} size="3xs" />
+                <Avatar hasShowImage image_id={data?.data?.image_id} size="3xs" />
               </span>
             ) : (
               <Icon fontSize={14} icon={IconEnum.map_pin} />

@@ -43,7 +43,7 @@ function createColumns(navigate: NavigateFunction) {
         <div className="flex w-full items-center justify-center">
           <Avatar
             hasShowImage
-            image={getAssetURL(row.original.id, "images", row.original.image_id)}
+            image_id={row.original.image_id}
             initials={getAvatarInitials(row.original.title)}
             isBordered
             isTooltipDisabled

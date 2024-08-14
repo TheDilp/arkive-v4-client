@@ -2,14 +2,12 @@ import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useQuery } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import groupBy from "lodash.groupby";
-import { useParams } from "react-router-dom";
 import { findChildren, findElementAtPosition, ProsemirrorNode } from "remirror";
 
 import {
   baseURLS,
   FetchFunction,
   getElementPosition,
-  getAssetURL,
   getSingularEntityType,
   IconEnum,
   mentionPositionAtom,
@@ -32,7 +30,6 @@ type MatchedMentionItem = {
 };
 
 export function MentionedInDocumentDrawer({ data }: Props) {
-  const { project_id } = useParams();
   const { doc } = data.getContext.getState();
   const mentions = findChildren({
     node: doc as ProsemirrorNode,
@@ -99,9 +96,7 @@ export function MentionedInDocumentDrawer({ data }: Props) {
                     },
                   ]);
                 }}>
-                {matchedData?.image_id ? (
-                  <Avatar image={getAssetURL(project_id as string, "images", matchedData.image_id)} size="sm" />
-                ) : null}
+                {matchedData?.image_id ? <Avatar image_id={matchedData.image_id} size="sm" /> : null}
                 {mention.label}
                 <span className="text-sm text-zinc-400">(Type: {getSingularEntityType(mention.type)})</span>
                 <div className="ml-auto">

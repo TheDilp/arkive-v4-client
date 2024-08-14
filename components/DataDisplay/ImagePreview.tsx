@@ -1,8 +1,7 @@
-import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { ImagePreviewType } from "../../types";
-import { getAssetURL, IconEnum } from "../../utils";
+import { IconEnum } from "../../utils";
 import { Avatar } from "..";
 import { Button } from "../Form/Button";
 
@@ -20,7 +19,6 @@ const ImagePreviewClasses = tv({
 });
 
 export function ImagePreview({ id, title, manual_project_id, label, url, hasShowImage, clearAction }: ImagePreviewType) {
-  const { project_id } = useParams();
   const { container, action, title: titleClasses, label: labelClasses, base } = ImagePreviewClasses();
   return (
     <div className={container()}>
@@ -28,9 +26,11 @@ export function ImagePreview({ id, title, manual_project_id, label, url, hasShow
       <span className={base()}>
         <Avatar
           hasShowImage={hasShowImage}
-          image={url || getAssetURL(manual_project_id || (project_id as string), "images", id) || ""}
+          image_id={id}
+          image_url={url}
           isPreview
           label={title}
+          manual_project_id={manual_project_id}
           size="sm"
         />
         <div className={titleClasses()}>{title}</div>

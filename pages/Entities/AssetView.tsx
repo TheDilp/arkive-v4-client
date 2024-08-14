@@ -37,7 +37,6 @@ import {
   drawerAtom,
   FetchFunction,
   getAvatarInitials,
-  getAssetURL,
   hasActionPermission,
   IconEnum,
   isProjectOwnerAtom,
@@ -86,7 +85,7 @@ function createColumns(
         <div className="flex w-full items-center justify-center">
           <Avatar
             hasShowImage
-            image={getAssetURL(project_id, type, row.original?.id || "")}
+            image_id={row.original?.id}
             isBordered
             isTooltipDisabled
             label={getAvatarInitials(row.original.title)}
@@ -576,7 +575,13 @@ export function AssetView() {
               <div
                 className="animate-in fade-in relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500"
                 key={img.id}>
-                <Image hasTitle image={img} isLazyLoading isOpenable type={type} />
+                <Image
+                  hasTitle
+                  image={{ title: img.title, project_id: img.project_id, type: "images", id: img.id }}
+                  isLazyLoading
+                  isOpenable
+                  type={type}
+                />
               </div>
             ))
           )}

@@ -282,7 +282,7 @@ function DropdownItem({
       onKeyDown={() => {}}
       role="menuitem"
       tabIndex={0}>
-      {image && !subItems?.length ? <Avatar image={image} size="sm" /> : null}
+      {image && !subItems?.length ? <Avatar image_id={image} size="sm" /> : null}
       {label && !child ? <div className="select-none truncate px-2">{label}</div> : null}
       {child ?? null}
       <div className="ml-auto flex pr-2">

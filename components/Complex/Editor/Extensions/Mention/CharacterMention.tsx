@@ -100,7 +100,7 @@ export function CharacterMention({ id, project_id, title, label }: Props) {
           <div className="flex items-start" ref={mentionRef}>
             {data?.data?.portrait_id && project_id ? (
               <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
-                <Avatar hasShowImage image={getAssetURL(project_id as string, "images", data?.data?.portrait_id)} size="3xs" />
+                <Avatar hasShowImage image_id={data?.data?.portrait_id} size="3xs" />
               </span>
             ) : (
               <Icon fontSize={14} icon={IconEnum.character} />

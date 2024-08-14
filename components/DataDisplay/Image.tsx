@@ -3,6 +3,7 @@ import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
+import { useImageURL } from "../../hooks/ui/useImageURLHook";
 import { DialogAtomType, ImageComponentType } from "../../types";
 import { dialogAtom, getAssetURL } from "../../utils";
 
@@ -23,12 +24,21 @@ function openImageView(setDialog: Dispatch<SetStateAction<DialogAtomType>>, imag
   setDialog((prev) => ({ ...prev, data: { image, title }, type: "image_view", title: "Image view" }));
 }
 
-export function Image({ image, isOpenable, hasTitle, isLazyLoading, url, type, objectFit = "cover" }: ImageComponentType) {
+export function Image({
+  image,
+  isOpenable,
+  hasTitle,
+  isLazyLoading = true,
+  url,
+  type,
+  objectFit = "cover",
+}: ImageComponentType) {
   const { project_id } = useParams();
-  const imageUrl = url || getAssetURL(project_id as string, type, image?.id);
+
   const classes = ImageClasses({ isOpenable, objectFit });
   const setDialog = useSetAtom(dialogAtom);
 
+  const fetchedUrl = useImageURL(image?.id ? getAssetURL(project_id as string, type, image?.id) : null);
   return (
     <div className="group relative h-full w-full overflow-hidden rounded-md">
       {hasTitle && image?.title ? (
@@ -41,9 +51,9 @@ export function Image({ image, isOpenable, hasTitle, isLazyLoading, url, type, o
         className={classes}
         loading={isLazyLoading ? "lazy" : "eager"}
         onClick={() => {
-          if (isOpenable) openImageView(setDialog, imageUrl, image?.title || "");
+          if (isOpenable) openImageView(setDialog, url || fetchedUrl, image?.title || "");
         }}
-        src={imageUrl}
+        src={url || fetchedUrl}
       />
     </div>
   );

@@ -96,7 +96,7 @@ export function Card({
         <div className="mb-4 h-64 w-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${image})` }} />
       ) : null}
       <h2 className="pointer-events-none flex w-full items-center justify-center gap-x-2 text-center text-3xl text-white">
-        {avatar ? <Avatar image={avatar} size="md" /> : null}
+        {avatar ? <Avatar image_id={avatar} size="md" /> : null}
         <span>{title}</span>
       </h2>
       {subtitle ? <h2 className="w-full text-center text-lg text-zinc-400">{subtitle}</h2> : null}

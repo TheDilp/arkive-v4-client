@@ -32,6 +32,7 @@ import {
   DefaultTagColor,
   drawerAtom,
   formatDateToString,
+  getAssetURL,
   getAvatarInitials,
   getCalendarFilterBadges,
   getCalendarFilters,
@@ -40,7 +41,6 @@ import {
   getFillerDayNumber,
   getFilterTooltip,
   getIconUrlFromIconEnum,
-  getAssetURL,
   getLeapDays,
   getStartingDayForMonth,
   hasActionPermission,
@@ -191,11 +191,8 @@ function CalendarRangeEvents({
                     ?.slice(0, 5)
                     ?.map((pin) => (
                       <Avatar
-                        image={
-                          pin.image_id
-                            ? getAssetURL(project_id as string, "images", pin.image_id)
-                            : getIconUrlFromIconEnum(pin.icon, pin.color || "#ffffff")
-                        }
+                        image_id={pin.image_id}
+                        image_url={getIconUrlFromIconEnum(pin.icon, pin.color || "#ffffff")}
                         initials={getAvatarInitials(pin.title || "")}
                         isPreview
                         key={pin.id}
@@ -221,7 +218,7 @@ function CalendarRangeEvents({
                     ?.slice(0, 5)
                     ?.map((char) => (
                       <Avatar
-                        image={getAssetURL(project_id as string, "images", char.portrait_id)}
+                        image_id={char.portrait_id}
                         initials={getAvatarInitials(char.full_name)}
                         key={char.id}
                         label={char.full_name}
