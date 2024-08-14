@@ -188,7 +188,7 @@ export type DrawerAtomType = {
         entity_id?: string;
         configuration_id?: string;
         type: "characters" | "blueprint_instances";
-        gateway_type: "create" | "update";
+        gateway_type?: "create" | "update";
       };
     }
   | { type: "node_search"; data: { cy: Core } }

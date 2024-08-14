@@ -324,6 +324,7 @@ function createColumns(
                           data: {
                             entity_id: row.original.id,
                             type: "characters",
+                            gateway_type: "update",
                           },
                           type: "gateway_access",
                         })),
@@ -674,7 +675,22 @@ function CharacterViewHeader({
                   size: "2xl",
                 })),
             },
-            { id: "gateway", title: "Create gateway access", icon: IconEnum.gateway },
+            {
+              id: "gateway",
+              title: "Create gateway access",
+              icon: IconEnum.gateway,
+              onClick: () =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  size: "half",
+                  title: "Grant edit access",
+                  data: {
+                    type: "characters",
+                    gateway_type: "create",
+                  },
+                  type: "gateway_access",
+                })),
+            },
           ]}>
           <Button
             icon={IconEnum.add}

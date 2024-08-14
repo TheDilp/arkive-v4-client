@@ -384,7 +384,15 @@ export function useInviteUserToProject() {
 export function useGrantGatewayAccess() {
   const createNotification = useNotifications();
   return useMutation(
-    async (accessData: { data: { email: string; id: string; type: GatewayEntityType; config: Record<string, string[]> } }) =>
+    async (accessData: {
+      data: {
+        email: string;
+        id?: string;
+        gateway_type: "create" | "update";
+        type: GatewayEntityType;
+        config: Record<string, string[]>;
+      };
+    }) =>
       FetchFunction({
         url: `${baseURLS.baseServer}/users/gateway/invite`,
         method: "POST",

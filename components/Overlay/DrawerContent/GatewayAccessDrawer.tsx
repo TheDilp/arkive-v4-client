@@ -31,6 +31,7 @@ type Props = {
   data: {
     entity_id?: string;
     configuration_id?: string;
+    gateway_type: "create" | "update";
     type: "characters" | "blueprint_instances";
   };
   exceptions: DrawerAtomType["exceptions"];
@@ -53,12 +54,7 @@ const columnHelper = createColumnHelper<{
   blueprint?: { icon?: string };
 }>();
 
-function getColumns(
-  type: AvailableGatewayEntites,
-  project_id: string,
-  selection: string[] = [],
-  setSelection: (id: string | string[]) => void
-) {
+function getColumns(type: AvailableGatewayEntites, selection: string[] = [], setSelection: (id: string | string[]) => void) {
   const finalColumns = [];
 
   finalColumns.push(
@@ -223,7 +219,9 @@ function getSaveButtonLabel(config: Props) {
     if (config?.data?.configuration_id) return "Save";
     return "Create";
   }
-  return "Grant access";
+  if (config?.data?.gateway_type === "create") return "Grant create access";
+  if (config?.data?.gateway_type === "update") return "Grant edit access";
+  return "Save";
 }
 function getSaveButtonIcon(config: Props) {
   if (config.exceptions?.gatewayConfiguration) {
@@ -401,7 +399,6 @@ function EntitiesAccess({
       <Table
         columns={getColumns(
           entityType as AvailableGatewayEntites,
-          project_id as string,
           Object.values(selection[entityType]).flat(),
           (ids: string | string[]) => {
             if (Array.isArray(ids)) {
@@ -458,7 +455,7 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
   const { data: gatewayConfigurations } = useGetEntities<GatewayConfigType>(
     { data: { project_id }, fields: ["id", "title"], relations: { entities: true } },
     "gateway_configurations",
-    { enabled: !!data?.entity_id }
+    { enabled: data?.gateway_type === "create" || data?.gateway_type === "update" }
   );
   const { data: existingConfiguration, isInitialLoading } = useGetEntity<GatewayConfigType>(
     data?.configuration_id,
@@ -518,7 +515,7 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
     <DrawerLayout>
       <Input
         helperText={titleOrEmail && !isEmailValid && data?.entity_id ? "Email is not valid" : ""}
-        label={data?.entity_id ? "Grant access to (email, required)" : "Title (required)"}
+        label={exceptions?.gatewayConfiguration ? "Title (required)" : "Grant access to (email, required)"}
         name="titleOrEmail"
         onChange={({ value }) => setTitleOrEmail(value as string)}
         type={data?.entity_id ? "email" : "text"}
@@ -527,16 +524,14 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
       />
       <div className="flex flex-1 flex-col gap-y-2 overflow-hidden">
         <Title isDrawerTitle label="Grant access to" size="xl" />
-        {data?.entity_id && gatewayConfigurations?.data?.length ? (
-          <Select
-            isClearable
-            label="Select premade configuration (optional)"
-            name="config_id"
-            onChange={({ value }) => setConfigId(value as string)}
-            options={configOptions}
-            value={configId}
-          />
-        ) : null}
+        <Select
+          isClearable
+          label="Select premade configuration (optional)"
+          name="config_id"
+          onChange={({ value }) => setConfigId(value as string)}
+          options={configOptions}
+          value={configId}
+        />
 
         {(configId && selection) || !data?.entity_id ? (
           <EntitiesAccess configuration_id={data?.configuration_id} selection={selection} setSelection={setSelection} />
@@ -549,32 +544,44 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
           isLoading={isCreating || isUpdating}
           label={saveButtonLabel}
           onClick={() => {
-            if (saveButtonLabel === "Create") {
-              const parsed = InsertGatewayConfigurationSchema.parse({
-                data: {
-                  title: titleOrEmail,
-                  gateway_type: "characters",
-                  project_id,
-                },
-                relations: getRelationsForGatewayConfig(selection || {}),
-              });
-              create(parsed);
-            } else if (saveButtonLabel === "Save") {
-              const parsed = UpdateGatewayConfigurationSchema.parse({
-                data: {
-                  id: existingConfiguration?.data?.id,
-                  title: titleOrEmail,
-                },
-                relations: getRelationsForGatewayConfig(selection || {}),
-              });
-              update(parsed);
-            } else if (saveButtonLabel === "Grant access") {
-              if (data?.entity_id)
+            if (exceptions?.gatewayConfiguration) {
+              if (data?.configuration_id) {
+                const parsed = UpdateGatewayConfigurationSchema.parse({
+                  data: {
+                    id: existingConfiguration?.data?.id,
+                    title: titleOrEmail,
+                  },
+                  relations: getRelationsForGatewayConfig(selection || {}),
+                });
+                update(parsed);
+              } else {
+                const parsed = InsertGatewayConfigurationSchema.parse({
+                  data: {
+                    title: titleOrEmail,
+                    gateway_type: "characters",
+                    project_id,
+                  },
+                  relations: getRelationsForGatewayConfig(selection || {}),
+                });
+                create(parsed);
+              }
+            } else {
+              if (data?.gateway_type === "update")
                 grantAccess({
                   data: {
                     email: titleOrEmail,
                     type: data.type,
                     id: data?.entity_id,
+                    gateway_type: "update",
+                    config: getRelationsForGatewayConfig(selection || {}),
+                  },
+                });
+              else if (data?.gateway_type === "create")
+                grantAccess({
+                  data: {
+                    email: titleOrEmail,
+                    type: data.type,
+                    gateway_type: "create",
                     config: getRelationsForGatewayConfig(selection || {}),
                   },
                 });
