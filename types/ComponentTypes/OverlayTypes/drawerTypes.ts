@@ -184,7 +184,12 @@ export type DrawerAtomType = {
   | { type: "edit_tag"; data: { id: string } }
   | {
       type: "gateway_access";
-      data: { entity_id?: string; configuration_id?: string; type: "characters" | "blueprint_instances" };
+      data: {
+        entity_id?: string;
+        configuration_id?: string;
+        type: "characters" | "blueprint_instances";
+        gateway_type: "create" | "update";
+      };
     }
   | { type: "node_search"; data: { cy: Core } }
 );
