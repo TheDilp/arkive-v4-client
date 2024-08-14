@@ -2,6 +2,7 @@ import * as d3 from "d3";
 import { useAtomValue, useSetAtom } from "jotai";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { clamp } from "remirror";
 
 import { Alert, EntityPreview, Icon, Select } from "../../components";
 import { useBreakpoint, useGetProjectDashboard, useGetStats, useNavbarTitle } from "../../hooks";
@@ -59,7 +60,7 @@ function getBarColor(i: AllAvailableEntities) {
 }
 
 function createEntityStats(reff: MutableRefObject<HTMLDivElement>, data: Record<string, number>, mainEntities: string[] = []) {
-  const width = reff.current.clientWidth;
+  const width = reff.current.clientWidth + 500;
   const height = reff.current.clientHeight;
 
   // Create SVG container
@@ -77,7 +78,7 @@ function createEntityStats(reff: MutableRefObject<HTMLDivElement>, data: Record<
     .scaleLinear()
     .domain([0, Math.max(...entitiesToShow.map(([, count]) => count))])
     .nice()
-    .range([height - 0, 10]);
+    .range([height - 10, 10]);
 
   const yAxis = d3
     .axisRight(y)
@@ -111,7 +112,7 @@ function createEntityStats(reff: MutableRefObject<HTMLDivElement>, data: Record<
     .append("rect")
     .attr("class", (d) => getBarColor(d[0] as AllAvailableEntities))
     .attr("x", (d) => x(`${getSentenceCase(d[0])} (${d[1]})` || "") || "")
-    .attr("y", (d) => y(d[1]))
+    .attr("y", (d) => y(d[1]) - 10)
     .attr("width", x.bandwidth())
     .attr("height", (d) => height - y(d[1]));
 
@@ -133,7 +134,8 @@ function createTagEntityStats(
   data: Record<string, { color: string; count: number }>,
   isLg: boolean
 ) {
-  const width = reff.current.clientWidth;
+  const columnCount = Object.keys(data).length;
+  const width = clamp({ min: reff.current.clientWidth, value: columnCount * 50, max: 999999 });
   const height = reff.current.clientHeight - 20;
 
   // Create SVG container
@@ -332,7 +334,7 @@ export function Dashboard() {
                           title: "Preview",
                           data: {
                             id: r.id,
-                            parent_id: "parent_id" in r ? r?.parent_id ?? undefined : undefined,
+                            parent_id: "parent_id" in r ? (r?.parent_id ?? undefined) : undefined,
                             entity_type: d.name as AvailableEntityType,
                             isReadOnly: d.name === "events",
                           },
@@ -371,7 +373,7 @@ export function Dashboard() {
                   />
                 </div>
               </h3>
-              <div className="h-full max-h-full w-full max-w-full overflow-hidden p-2" ref={characterStatRef} />
+              <div className="h-full max-h-full w-full max-w-full overflow-auto p-2" ref={characterStatRef} />
             </div>
             <div className="col-span-1 flex h-[48rem] max-h-[48rem] flex-col items-center justify-start rounded bg-zinc-900 p-2 shadow-md md:col-span-2 lg:col-span-4">
               <h3 className="relative flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
