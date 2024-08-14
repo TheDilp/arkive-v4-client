@@ -1,6 +1,5 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv } from "vite";
-import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { compression } from "vite-plugin-compression2";
 // https://vitejs.dev/config/
 export default ({ mode }: { mode: any }) =>
@@ -14,7 +13,6 @@ export default ({ mode }: { mode: any }) =>
     },
 
     plugins: [
-      nodePolyfills(),
       react({
         babel: {
           parserOpts: {
