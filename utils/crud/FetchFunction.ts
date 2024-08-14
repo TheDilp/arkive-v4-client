@@ -36,7 +36,7 @@ export async function FetchFunction({
   if (res.status === 401) {
     throw new Error("UNAUTHORIZED");
   }
-  if (res.url.startsWith(import.meta.env.VITE_ARKIVE_IMAGE_SERVICE)) {
+  if (res.url.startsWith(import.meta.env.VITE_ARKIVE_ASSET_SERVICE)) {
     if (res.status === 200) {
       return res.text();
     }

@@ -27,7 +27,7 @@ export function getSearchURL(type: SearchableEntities) {
 
 export async function getImageURL(url: string, dimensions?: { width: number; height: number }) {
   const formatted_url = dimensions ? `${url}?width=${dimensions.width}&height=${dimensions.height}` : url;
-  const link = await FetchFunction({ url: `${import.meta.env.VITE_ARKIVE_IMAGE_SERVICE}/${formatted_url}`, method: "GET" });
+  const link = await FetchFunction({ url: `${import.meta.env.VITE_ARKIVE_ASSET_SERVICE}/${formatted_url}`, method: "GET" });
 
   if (link) return link;
 
