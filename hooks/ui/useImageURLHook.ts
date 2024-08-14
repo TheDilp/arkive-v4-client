@@ -25,8 +25,7 @@ export function useImageURL(image: string | null | undefined, size?: Size) {
           const image_url = await getImageURL(image);
           setUrl(image_url);
           setUrls((prev) => {
-            const temp = { ...prev.images };
-            temp[image] = image_url;
+            const temp = { ...prev.images, [image]: image_url };
             return { thumbnails: prev.thumbnails, images: temp };
           });
         }

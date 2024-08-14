@@ -94,7 +94,10 @@ export function Avatar({
   const { project_id } = useParams();
   const setDialog = useSetAtom(dialogAtom);
   const { base, image: imageClasses, text, spinner } = AvatarClasses({ isBordered, size, hasShowImage, shape });
-  const url = useImageURL(image_id ? getAssetURL((manual_project_id || project_id) as string, imageType, image_id) : null);
+  const url = useImageURL(
+    image_id ? getAssetURL((manual_project_id || project_id) as string, imageType, image_id) : null,
+    size
+  );
   return (
     <Tooltip
       allowedPlacements={tooltipAllowedPlacements}
