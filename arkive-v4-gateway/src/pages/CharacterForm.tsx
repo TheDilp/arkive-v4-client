@@ -332,17 +332,6 @@ export function CharacterForm() {
           );
         })}
         <div className="mt-auto flex flex-col gap-y-2">
-          {section_id === "other" ? (
-            <div>
-              <Button
-                icon={IconEnum.check_circle}
-                isDisabled={!character?.first_name}
-                label="Complete"
-                onClick={save}
-                variant="success"
-              />
-            </div>
-          ) : null}
           <div className="flex flex-nowrap content-end gap-x-2">
             <Button
               icon={IconEnum.chevron_left}
@@ -355,6 +344,13 @@ export function CharacterForm() {
                 );
               }}
               variant="info"
+            />
+            <Button
+              icon={entity_id ? IconEnum.check_circle : IconEnum.add}
+              isDisabled={!character?.first_name}
+              label={entity_id ? "Complete" : "Create"}
+              onClick={save}
+              variant="success"
             />
             <Button
               icon={IconEnum.chevron_right}
