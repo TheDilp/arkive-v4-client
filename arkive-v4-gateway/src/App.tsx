@@ -49,8 +49,9 @@ function CodeInput() {
   }, [code, codeState, isMutating]);
 
   useEffect(() => {
-    if (access && type && access_id && entity_id) {
-      if (type === "characters") navigate(`/${type}/${access_id}/${entity_id}/name`);
+    if (access && type && access_id) {
+      if (entity_id) navigate(`/${type}/${access_id}/update/${entity_id}/name`);
+      else navigate(`/${type}/${access_id}/create/name`);
     }
   }, [access]);
 
@@ -102,10 +103,11 @@ function App() {
         <AccessContextWrapper>
           <Routes>
             <Route element={<CodeInput />}>
-              <Route element={<GatewayForm />} path=":type/:access_id/:entity_id" />
-              <Route element={<GatewayForm />} path=":type/:access_id/:entity_id/:section_id" />
+              <Route element={<GatewayForm />} path=":type/:access_id/create" />
+              <Route element={<GatewayForm />} path=":type/:access_id/create/:section_id" />
+              <Route element={<GatewayForm />} path=":type/:access_id/update/:entity_id" />
+              <Route element={<GatewayForm />} path=":type/:access_id/update/:entity_id/:section_id" />
             </Route>
-            {/* <Route path="*" element={<Navigate to={"https://google.com"} />} /> */}
           </Routes>
         </AccessContextWrapper>
       </main>

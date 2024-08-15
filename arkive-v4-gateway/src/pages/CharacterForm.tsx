@@ -70,31 +70,58 @@ export function CharacterForm() {
   const [character, setCharacter] = useState<Partial<CharacterType>>();
   const { handleChange, changedData, resetChanges } = useHandleChange({ data: character, setData: setCharacter });
 
+  const { data } = useGetGatewayOptions(
+    { data: { entity_type: type as "characters", access_id: access_id as string } },
+    "characters"
+  );
+
+  const config_tags = (data?.data?.entities || []).filter((item) => item.entity_type === "tags");
+
   const navigate = useNavigate();
-  const { data: existingCharacter, isInitialLoading } = useGetEntity<CharacterType>(entity_id, type as "characters", {
-    fields: ["id", "project_id", "first_name", "nickname", "last_name", "portrait_id", "biography", "age"],
-    relations: {
-      character_fields: true,
-      tags: true,
+  const {
+    data: existingCharacter,
+    isInitialLoading,
+    isFetching,
+  } = useGetEntity<CharacterType>(
+    entity_id,
+    type as "characters",
+    {
+      fields: ["id", "project_id", "first_name", "nickname", "last_name", "portrait_id", "biography", "age"],
+      relations: {
+        character_fields: true,
+        tags: true,
+      },
     },
-  });
+    {
+      enabled: !!entity_id,
+    }
+  );
   const { data: templates, isFetching: isFetchingTemplates } = useGetEntities<CharacterFieldTemplateType>(
     {
-      data: { project_id: existingCharacter?.data?.project_id },
+      data: { project_id: data?.data?.project_id },
       fields: ["id", "title", "sort"],
       relations: {
         character_fields_sections: true,
         character_fields: true,
       },
       relationFilters: {
-        or: (character?.tags || [])?.map((t) => ({
-          operator: "in",
-          value: t.id,
-          id: t.id,
-          header_name: "tags",
-          relationalData: { blueprint_field_id: "tags" },
-          field: "tags",
-        })),
+        or: config_tags.length
+          ? config_tags.map((tag) => ({
+              operator: "in",
+              value: tag.value,
+              id: tag.value,
+              header_name: "tags",
+              relationalData: { blueprint_field_id: "tags" },
+              field: "tags",
+            }))
+          : (character?.tags || [])?.map((t) => ({
+              operator: "in",
+              value: t.id,
+              id: t.id,
+              header_name: "tags",
+              relationalData: { blueprint_field_id: "tags" },
+              field: "tags",
+            })),
       },
       orderBy: [
         {
@@ -105,7 +132,9 @@ export function CharacterForm() {
     },
     "character_fields_templates",
     {
-      enabled: !!existingCharacter?.data?.project_id && !!character?.tags?.length,
+      enabled:
+        ((!!existingCharacter?.data?.project_id && !!character?.tags?.length) || !!config_tags.length) &&
+        !!data?.data?.project_id,
       staleTime: 5 * 60 * 1000,
     }
   );
@@ -113,10 +142,7 @@ export function CharacterForm() {
   const { mutate: update, isLoading: isMutating } = useUpdateEntity("characters", existingCharacter?.data?.project_id, {
     successNotification: false,
   });
-  const { data } = useGetGatewayOptions(
-    { data: { entity_type: type as "characters", access_id: access_id as string } },
-    "characters"
-  );
+
   useLayoutEffect(() => {
     if (existingCharacter?.data) {
       setCharacter(existingCharacter?.data);
@@ -153,7 +179,7 @@ export function CharacterForm() {
     }
   }, [section_id]);
 
-  if (isInitialLoading || isFetchingTemplates)
+  if ((isInitialLoading && isFetching) || isFetchingTemplates)
     return (
       <div className="col-span-12">
         <Skeleton type="character_profile" />
@@ -248,7 +274,7 @@ export function CharacterForm() {
                   handleChange={handleChange}
                   hasCreateOrEdit={true}
                   isDrawer={false}
-                  options={data?.data || null}
+                  options={data?.data?.entities || null}
                 />
               ) : null}
 
@@ -259,7 +285,7 @@ export function CharacterForm() {
                   handleChange={handleChange}
                   hasCreateOrEdit={true}
                   isDrawer={false}
-                  options={data?.data || null}
+                  options={data?.data?.entities || null}
                 />
               ) : null}
             </div>

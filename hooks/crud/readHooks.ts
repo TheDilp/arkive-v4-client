@@ -491,7 +491,7 @@ export function useGetGatewayOptions(
   }
 ) {
   return useQuery<{
-    data: GatewayConfigOptionType[];
+    data: { project_id: string; entities: GatewayConfigOptionType[] };
   }>(["gateway", "options", type].concat(options?.queryKeyConcat || []), async () => {
     if (type) {
       return FetchFunction({
