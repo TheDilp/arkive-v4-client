@@ -2,7 +2,14 @@ import { ReactNode, useEffect, useLayoutEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { Avatar, AvatarUpload, Button, Editor, FieldTemplateRows, Input, Skeleton } from "../../../components";
-import { useGetEntities, useGetEntity, useGetGatewayOptions, useHandleChange, useUpdateEntity } from "../../../hooks";
+import {
+  useCreateEntity,
+  useGetEntities,
+  useGetEntity,
+  useGetGatewayOptions,
+  useHandleChange,
+  useUpdateEntity,
+} from "../../../hooks";
 import { CharacterFieldTemplateType, CharacterFieldType, CharacterType, HandleChangePropsType } from "../../../types";
 import { CreateConfigType, GatewayEntityType } from "../../../types/EntityTypes/gatewayTypes";
 import {
@@ -12,7 +19,7 @@ import {
   getSavingTooltip,
   IconEnum,
 } from "../../../utils";
-import { UpdateCharacterSchema } from "../../../validation";
+import { InsertCharacterSchema, UpdateCharacterSchema } from "../../../validation";
 
 const baseCharacterSections = [{ id: "name", title: "Basic info" }];
 
@@ -81,19 +88,22 @@ function geNextSection(sections: { id: string; title: string }[], section_id: st
   return idx;
 }
 
-function getInitialCreateData(create_config: CreateConfigType | undefined, entity_type: GatewayEntityType) {
+function getInitialCreateData(create_config: CreateConfigType | undefined, entity_type: GatewayEntityType, project_id: string) {
   if (!create_config) return {};
   if (create_config.is_locked) {
-    if ("first_name" in create_config) return { first_name: create_config.first_name, last_name: create_config.last_name };
-    else return { title: create_config.title };
+    if ("first_name" in create_config)
+      return { first_name: create_config.first_name, last_name: create_config.last_name, project_id };
+    else return { title: create_config.title, project_id };
   } else {
     if (entity_type === "characters")
       return {
         first_name: create_config.first_name || "",
         last_name: create_config.last_name || "",
+        project_id,
       };
     return {
       title: create_config.title || "",
+      project_id,
     };
   }
 }
@@ -108,7 +118,9 @@ export function CharacterForm() {
     "characters"
   );
   const [character, setCharacter] = useState<Partial<CharacterType>>(
-    data?.data?.create_config ? getInitialCreateData(data?.data?.create_config, type as GatewayEntityType) : {}
+    data?.data?.create_config
+      ? getInitialCreateData(data?.data?.create_config, type as GatewayEntityType, data?.data?.project_id)
+      : {}
   );
   const { handleChange, changedData, resetChanges } = useHandleChange({ data: character, setData: setCharacter });
 
@@ -176,16 +188,25 @@ export function CharacterForm() {
     }
   );
 
-  const { mutate: update, isLoading: isMutating } = useUpdateEntity("characters", existingCharacter?.data?.project_id, {
+  const { mutate: create, isLoading: isCreating } = useCreateEntity("characters", undefined, {
+    successNotification: false,
+  });
+  const { mutate: update, isLoading: isUpdating } = useUpdateEntity("characters", existingCharacter?.data?.project_id, {
     successNotification: false,
   });
 
   useLayoutEffect(() => {
     if (existingCharacter?.data) {
       setCharacter(existingCharacter?.data);
+    } else {
+      setCharacter(
+        data?.data?.create_config
+          ? getInitialCreateData(data?.data?.create_config, type as GatewayEntityType, data?.data?.project_id)
+          : { project_id: data?.data?.project_id }
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [existingCharacter]);
+  }, [existingCharacter, data?.data?.create_config]);
   useLayoutEffect(() => {
     const additionalSections: { id: string; title: string }[] = [];
     const tempFields: Record<string, CharacterFieldType[]> = { other: [] };
@@ -210,7 +231,7 @@ export function CharacterForm() {
   }, [templates]);
 
   useEffect(() => {
-    if (character?.first_name) {
+    if (character?.first_name && !!entity_id) {
       save();
       resetChanges();
     }
@@ -237,6 +258,20 @@ export function CharacterForm() {
       }
       const parsedData = UpdateCharacterSchema.parse(dataToParse);
       update(parsedData);
+    } else {
+      const dataToParse = {
+        data: character,
+        permissions: character?.permissions,
+        relations: {
+          tags: config_tags.map((t) => ({ id: t.value })),
+          character_fields: character?.character_fields || [],
+        },
+      };
+      if (dataToParse?.data?.portrait?.id) {
+        dataToParse.data.portrait_id = dataToParse.data.portrait.id;
+      }
+      const parsedData = InsertCharacterSchema.parse(dataToParse);
+      create(parsedData);
     }
   }
   return (
@@ -249,18 +284,20 @@ export function CharacterForm() {
         <h1 className="flex items-center gap-x-4">
           {character?.portrait_id ? <Avatar image_id={character?.portrait_id} /> : null}
           {getCharacterFullName(character?.first_name || "", null, character?.last_name)}
-          <div className="ml-auto">
-            <Button
-              hasNoBackground
-              icon={getSavingIcon(isMutating, changedData)}
-              iconSize={48}
-              isIconOnly
-              isLoading={changedData && isMutating}
-              onClick={undefined}
-              tooltip={getSavingTooltip(isMutating, changedData)}
-              variant={changedData ? "warning" : "success"}
-            />
-          </div>
+          {entity_id ? (
+            <div className="ml-auto">
+              <Button
+                hasNoBackground
+                icon={getSavingIcon(isUpdating, changedData)}
+                iconSize={48}
+                isIconOnly
+                isLoading={changedData && isUpdating}
+                onClick={undefined}
+                tooltip={getSavingTooltip(isUpdating, changedData)}
+                variant={changedData ? "warning" : "success"}
+              />
+            </div>
+          ) : null}
         </h1>
       </div>
       <div
@@ -336,7 +373,7 @@ export function CharacterForm() {
             <Button
               icon={IconEnum.chevron_left}
               iconPos="left"
-              isDisabled={sections[0].id === section_id}
+              isDisabled={sections[0].id === section_id || isCreating || isUpdating}
               label="Previous section"
               onClick={() => {
                 navigate(
@@ -347,14 +384,15 @@ export function CharacterForm() {
             />
             <Button
               icon={entity_id ? IconEnum.check_circle : IconEnum.add}
-              isDisabled={!character?.first_name}
+              isDisabled={!character?.first_name || isCreating || isUpdating}
+              isLoading={isCreating || isUpdating}
               label={entity_id ? "Complete" : "Create"}
               onClick={save}
               variant="success"
             />
             <Button
               icon={IconEnum.chevron_right}
-              isDisabled={sections?.at(-1)?.id === section_id}
+              isDisabled={sections?.at(-1)?.id === section_id || isCreating || isUpdating}
               label="Next section"
               onClick={() => {
                 navigate(

@@ -905,15 +905,9 @@ export function useAccessGateway() {
         if (ok) {
           ls.set("code", code, { encrypt: true });
         }
-        // createNotification({
-        //   title: "Gateway access granted.",
-        //   variant: "success",
-        //   timer: 3,
-        //   icon: IconEnum.send,
-        // });
       },
       onError: (error: { message: string }) => {
-        console.log(error.message);
+        console.error(error.message);
         createNotification({
           hasNoTruncate: true,
           title: error?.message || "There was an error.",

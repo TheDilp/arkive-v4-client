@@ -21,6 +21,7 @@ import {
   getEntityCRUDNotification,
   getParentEntityType,
   getPluralEntityType,
+  getServerUrl,
   IconEnum,
   nodesAtom,
   useNotifications,
@@ -63,14 +64,14 @@ export function useCreateProject<InsertType>() {
 
 export function useCreateEntity<
   InsertType extends { data: { parent_id?: string | null; project_id: string }; relations?: { [key: string]: any } },
->(type: AvailableEntityType | AvailableDyceEntityType, isTemplate?: boolean) {
+>(type: AvailableEntityType | AvailableDyceEntityType, isTemplate?: boolean, options?: { successNotification?: boolean }) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
   return useMutation(
     async (newItemValues: InsertType) => {
       const data = await FetchFunction({
-        url: `${baseURLS.baseServer}/${type}/create${isTemplate ? "/template" : ""}`,
+        url: `${getServerUrl()}/${type}/create${isTemplate ? "/template" : ""}`,
         body: JSON.stringify(newItemValues),
         method: "POST",
       });
@@ -96,13 +97,14 @@ export function useCreateEntity<
           } else {
             queryClient.invalidateQueries(["allEntities", vars.data.project_id, type]);
           }
-          createNotification({
-            title: data?.message || getEntityCRUDNotification(type, "create"),
-            variant: "success",
-            icon: IconEnum.check,
-            timer: 2,
-            position: "top-right",
-          });
+          if (options?.successNotification === undefined || options?.successNotification === true)
+            createNotification({
+              title: data?.message || getEntityCRUDNotification(type, "create"),
+              variant: "success",
+              icon: IconEnum.check,
+              timer: 2,
+              position: "top-right",
+            });
         }
       },
       onError: (error: { message?: string }) => {
