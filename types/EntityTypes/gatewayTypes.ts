@@ -14,6 +14,7 @@ export interface GatewayConfigType {
   events: { related_id: string }[];
   images: { related_id: string }[];
   random_tables: { related_id: string }[];
+  tags: { related_id: string }[];
 }
 
 export interface GatewayConfigOptionType {
@@ -23,5 +24,14 @@ export interface GatewayConfigOptionType {
   image: string | null;
   icon: AvailableIcons | undefined;
   project_id: string;
-  entity_type: "characters" | "blueprint_instances" | "documents" | "maps" | "map_pins" | "events" | "images" | "random_tables";
+  entity_type:
+    | "characters"
+    | "blueprint_instances"
+    | "documents"
+    | "maps"
+    | "map_pins"
+    | "events"
+    | "images"
+    | "random_tables"
+    | "tags";
 }

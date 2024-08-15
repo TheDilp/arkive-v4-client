@@ -13,7 +13,15 @@ import {
   useToggledResetAtom,
   useUpdateEntity,
 } from "../../../hooks";
-import { CharacterType, DrawerAtomType, ImageType, RequestFilterType, RequestOrderByType, TabType } from "../../../types";
+import {
+  CharacterType,
+  DrawerAtomType,
+  ImageType,
+  RequestFilterType,
+  RequestOrderByType,
+  TabType,
+  TagType,
+} from "../../../types";
 import { GatewayConfigType } from "../../../types/EntityTypes/gatewayTypes";
 import { AllEntities, AvailableIcons, getAvatarInitials, getParentEntityType, IconEnum, TextFilters } from "../../../utils";
 import {
@@ -23,7 +31,7 @@ import {
   UpdateGatewayConfigurationType,
 } from "../../../validation/gateway_configuration";
 import { Table } from "../../DataDisplay";
-import { Button, Checkbox, Input, Select, Title } from "../../Form";
+import { Button, Checkbox, Input, Select, TagInput, Title } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
 import { Avatar, Icon, Skeleton } from "../../Misc";
 
@@ -31,7 +39,7 @@ type Props = {
   data: {
     entity_id?: string;
     configuration_id?: string;
-    gateway_type: "create" | "update";
+    gateway_type?: "create" | "update";
     type: "characters" | "blueprint_instances";
   };
   exceptions: DrawerAtomType["exceptions"];
@@ -44,7 +52,8 @@ type AvailableGatewayEntites =
   | "map_pins"
   | "events"
   | "images"
-  | "random_tables";
+  | "random_tables"
+  | "tags";
 const characterColumnHelper = createColumnHelper<CharacterType>();
 const columnHelper = createColumnHelper<{
   id: string;
@@ -245,19 +254,26 @@ function getRelationsForGatewayConfig(relations: Record<string, string[]>) {
   return final;
 }
 function EntitiesAccess({
+  gateway_type,
   configuration_id,
   selection,
   setSelection,
 }: {
+  gateway_type?: "create" | "update";
   configuration_id?: string;
   selection: Record<AvailableGatewayEntites, string[]>;
   setSelection: Dispatch<SetStateAction<Record<AvailableGatewayEntites, string[]>>>;
 }) {
   const { project_id } = useParams();
+
+  const tabs: TabType[] =
+    gateway_type === "create" ? [{ id: "tags", label: "Tags", icon: IconEnum.tags }, ...entityTabs] : entityTabs;
+
   const [selectedTab, setSelectedTab] = useState(0);
-  const entityType = entityTabs[selectedTab].id as AvailableGatewayEntites;
+  const entityType = tabs[selectedTab].id as AvailableGatewayEntites;
   const [filter, setFilter] = useState("");
   const [parentId, setParentId] = useState("");
+  const [tags, setTags] = useState<Omit<TagType, "permissions" | "owner_id" | "deleted_at">[]>([]);
   const { data: parents, isFetching: isFetchingParent } = useGetEntities<{ id: string; title: string; icon: string }>(
     { data: { project_id }, fields: ["id", "title", "icon"], orderBy: [{ field: "title", sort: "asc" }] },
     getParentEntityType(entityType as "blueprint_instances" | "map_pins" | "events") as "blueprints" | "maps" | "calendars",
@@ -375,64 +391,79 @@ function EntitiesAccess({
 
   return (
     <div className="flex max-h-[90%] flex-1 flex-col gap-y-2 [&>div>ul>li>button]:bg-zinc-900">
-      <Tabs hasArrowNav onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={entityTabs} />
-      <div className="flex items-center gap-x-2">
-        <Input isClearable label="Filter" name="filter" onChange={({ value }) => setFilter(value as string)} value={filter} />
-        {entityType === "blueprint_instances" || entityType === "map_pins" || entityType === "events" ? (
-          <Select
-            hasSearch
-            isClearable
-            isDisabled={isFetchingParent}
-            isLoading={isFetchingParent}
-            label="Filter by parent"
-            name="parent_id"
-            onChange={({ value }) => setParentId(value as string)}
-            options={(parents?.data || []).map((bp) => ({
-              label: bp.title,
-              value: bp.id,
-              icon: bp.icon as AvailableIcons | undefined,
-            }))}
-            value={parentId}
+      <Tabs hasArrowNav onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+      {tabs[selectedTab].id === "tags" ? null : (
+        <div className="flex items-center gap-x-2">
+          <Input isClearable label="Filter" name="filter" onChange={({ value }) => setFilter(value as string)} value={filter} />
+          {entityType === "blueprint_instances" || entityType === "map_pins" || entityType === "events" ? (
+            <Select
+              hasSearch
+              isClearable
+              isDisabled={isFetchingParent}
+              isLoading={isFetchingParent}
+              label="Filter by parent"
+              name="parent_id"
+              onChange={({ value }) => setParentId(value as string)}
+              options={(parents?.data || []).map((bp) => ({
+                label: bp.title,
+                value: bp.id,
+                icon: bp.icon as AvailableIcons | undefined,
+              }))}
+              value={parentId}
+            />
+          ) : null}
+        </div>
+      )}
+      {tabs[selectedTab].id === "tags" ? (
+        <div className="flex flex-col gap-y-2">
+          <TagInput
+            handleChange={({ value }) => {
+              setTags(value);
+              setSelection((prev) => ({ ...prev, tags: value.map((t) => t.id) }));
+            }}
+            label="Tags"
+            tags={tags}
           />
-        ) : null}
-      </div>
-      <Table
-        columns={getColumns(
-          entityType as AvailableGatewayEntites,
-          Object.values(selection[entityType]).flat(),
-          (ids: string | string[]) => {
-            if (Array.isArray(ids)) {
-              let areAllSelected = true;
-              const temp = [...selection[entityType]];
-              for (let index = 0; index < ids.length; index++) {
-                const idx = selection[entityType].findIndex((item) => item === ids[index]);
-                if (idx === -1) {
-                  temp.push(ids[index]);
-                  if (areAllSelected) areAllSelected = false;
+        </div>
+      ) : (
+        <Table
+          columns={getColumns(
+            entityType as AvailableGatewayEntites,
+            Object.values(selection[entityType]).flat(),
+            (ids: string | string[]) => {
+              if (Array.isArray(ids)) {
+                let areAllSelected = true;
+                const temp = [...selection[entityType]];
+                for (let index = 0; index < ids.length; index++) {
+                  const idx = selection[entityType].findIndex((item) => item === ids[index]);
+                  if (idx === -1) {
+                    temp.push(ids[index]);
+                    if (areAllSelected) areAllSelected = false;
+                  }
                 }
-              }
-              if (areAllSelected) {
-                setSelection((prev) => ({ ...prev, [entityType]: prev[entityType].filter((item) => !temp.includes(item)) }));
+                if (areAllSelected) {
+                  setSelection((prev) => ({ ...prev, [entityType]: prev[entityType].filter((item) => !temp.includes(item)) }));
+                } else {
+                  setSelection((prev) => ({ ...prev, [entityType]: temp }));
+                }
               } else {
-                setSelection((prev) => ({ ...prev, [entityType]: temp }));
-              }
-            } else {
-              const idx = selection[entityType].findIndex((item) => item === ids);
+                const idx = selection[entityType].findIndex((item) => item === ids);
 
-              if (idx > -1) setSelection((prev) => ({ ...prev, [entityType]: prev[entityType].toSpliced(idx, 1) }));
-              else setSelection((prev) => ({ ...prev, [entityType]: prev[entityType].concat(ids) }));
+                if (idx > -1) setSelection((prev) => ({ ...prev, [entityType]: prev[entityType].toSpliced(idx, 1) }));
+                else setSelection((prev) => ({ ...prev, [entityType]: prev[entityType].concat(ids) }));
+              }
             }
-          }
-        )}
-        config={{
-          orderBy,
-          selection: { [0]: selection[entityType] },
-        }}
-        data={(entityType === "images" ? images?.data : entitiesData?.data) || []}
-        dispatch={dispatch}
-        pagination={pagination}
-        type={entityType as AvailableGatewayEntites}
-      />
+          )}
+          config={{
+            orderBy,
+            selection: { [0]: selection[entityType] },
+          }}
+          data={(entityType === "images" ? images?.data : entitiesData?.data) || []}
+          dispatch={dispatch}
+          pagination={pagination}
+          type={entityType as AvailableGatewayEntites}
+        />
+      )}
     </div>
   );
 }
@@ -450,6 +481,7 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
     events: [],
     images: [],
     random_tables: [],
+    tags: [],
   });
   const { mutate: grantAccess } = useGrantGatewayAccess();
   const { data: gatewayConfigurations } = useGetEntities<GatewayConfigType>(
@@ -497,6 +529,7 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
           events: [],
           images: [],
           random_tables: [],
+          tags: [],
         };
         for (let index = 0; index < keys.length; index++) {
           const key = keys[index] as AvailableGatewayEntites;
@@ -534,7 +567,12 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
         />
 
         {(configId && selection) || !data?.entity_id ? (
-          <EntitiesAccess configuration_id={data?.configuration_id} selection={selection} setSelection={setSelection} />
+          <EntitiesAccess
+            configuration_id={data?.configuration_id}
+            gateway_type={data?.gateway_type}
+            selection={selection}
+            setSelection={setSelection}
+          />
         ) : null}
       </div>
       <div>
