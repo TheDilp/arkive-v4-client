@@ -237,7 +237,9 @@ export function CharacterForm() {
             <li
               className={`border-b border-zinc-700 text-lg transition-all first:border-t ${section_id === section.id ? "bg-zinc-700" : ""}`}
               key={section.id}>
-              <Link className="block h-full w-full px-4 py-2" to={`/${type}/${access_id}/${entity_id}/${section.id}`}>
+              <Link
+                className="block h-full w-full px-4 py-2"
+                to={`/${type}/${access_id}/${entity_id || "create"}/${section.id}`}>
                 {section.title}
               </Link>
             </li>
@@ -311,7 +313,7 @@ export function CharacterForm() {
               label="Previous section"
               onClick={() => {
                 navigate(
-                  `/${type}/${access_id}/${entity_id}/${sections[getPreviousSection(sections, section_id as string)]?.id}`
+                  `/${type}/${access_id}/${entity_id || "create"}/${sections[getPreviousSection(sections, section_id as string)]?.id}`
                 );
               }}
               variant="info"
@@ -321,7 +323,9 @@ export function CharacterForm() {
               isDisabled={sections?.at(-1)?.id === section_id}
               label="Next section"
               onClick={() => {
-                navigate(`/${type}/${access_id}/${entity_id}/${sections[geNextSection(sections, section_id as string)]?.id}`);
+                navigate(
+                  `/${type}/${access_id}/${entity_id || "create"}/${sections[geNextSection(sections, section_id as string)]?.id}`
+                );
               }}
               variant="info"
             />
