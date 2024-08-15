@@ -21,7 +21,12 @@ const ImageClasses = tv({
 });
 
 function openImageView(setDialog: Dispatch<SetStateAction<DialogAtomType>>, image: string, title: string) {
-  setDialog((prev) => ({ ...prev, data: { image, title }, type: "image_view", title: "Image view" }));
+  setDialog((prev) => ({
+    ...prev,
+    data: { url: image, image_type: "images", title },
+    type: "image_view",
+    title: "Image view",
+  }));
 }
 
 export function Image({

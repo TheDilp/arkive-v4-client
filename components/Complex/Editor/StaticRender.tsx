@@ -40,7 +40,7 @@ function StaticRenderImage({ data }: { data: any }) {
             setDialog({
               title: data.node.attrs.title,
               type: "image_view",
-              data: { title: data.node.attrs.title, image: data.node.attrs.src },
+              data: { title: data.node.attrs.title, image_type: "images", url: data.node.attrs.src },
             })
           }
         />
@@ -225,4 +225,3 @@ export function StaticRender({ content }: { content: RemirrorJSON | undefined })
     </div>
   );
 }
-
