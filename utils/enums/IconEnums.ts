@@ -28,6 +28,7 @@ export const IconEnum = {
   check_circle: "ph:check-circle" as const,
   check_double: "ph:checks" as const,
   close: "mdi:close" as const,
+  copy: "ph:copy" as const,
   create_column_after: "mdi:table-column-add-before" as const,
   create_column_before: "mdi:table-column-add-after" as const,
   create_row_after: "mdi:table-row-add-before" as const,

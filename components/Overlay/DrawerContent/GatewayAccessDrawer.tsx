@@ -34,7 +34,7 @@ import {
 import { Table } from "../../DataDisplay";
 import { Button, Checkbox, Input, Select, TagInput, Title } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
-import { Avatar, Icon, Skeleton } from "../../Misc";
+import { Alert, Avatar, Icon, Skeleton } from "../../Misc";
 
 type Props = {
   data: {
@@ -229,8 +229,8 @@ function getSaveButtonLabel(config: Props) {
     if (config?.data?.configuration_id) return "Save";
     return "Create";
   }
-  if (config?.data?.gateway_type === "create") return "Grant create access";
-  if (config?.data?.gateway_type === "update") return "Grant edit access";
+  if (config?.data?.gateway_type === "create") return "Copy create access link";
+  if (config?.data?.gateway_type === "update") return "Copy edit access link";
   return "Save";
 }
 function getSaveButtonIcon(config: Props) {
@@ -238,7 +238,7 @@ function getSaveButtonIcon(config: Props) {
     if (config?.data?.configuration_id) return IconEnum.save;
     return IconEnum.add;
   }
-  return IconEnum.gateway;
+  return IconEnum.copy;
 }
 
 function getRelationsForGatewayConfig(relations: Record<string, string[]>) {
@@ -302,7 +302,7 @@ function EntitiesAccess({
     },
     entityType,
     {
-      enabled: entityType !== "images" && !configuration_id,
+      enabled: entityType !== "images" && entityType !== "tags" && !configuration_id,
       prefetch: true,
     }
   );
@@ -472,13 +472,14 @@ function EntitiesAccess({
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function GatewayAccessDrawer({ data, exceptions }: Props) {
   const { project_id } = useParams();
+
   const [createConfig, setCreateConfig] = useState<CreateConfigType>({
     is_locked: false,
     first_name: "",
     last_name: "",
     title: "",
   });
-  const [titleOrEmail, setTitleOrEmail] = useState("");
+  const [title, setTitle] = useState("");
   const [selection, setSelection] = useState<Record<AvailableGatewayEntites, string[]>>({
     characters: [],
     blueprint_instances: [],
@@ -490,13 +491,15 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
     random_tables: [],
     tags: [],
   });
+  const [configId, setConfigId] = useState<string>(data?.configuration_id || "custom");
+  const [access, setAccess] = useState<{ code: string; link: string } | undefined>();
+
   const { mutate: grantAccess, isLoading: isGrantingAccess } = useGrantGatewayAccess();
   const { data: gatewayConfigurations } = useGetEntities<GatewayConfigType>(
     { data: { project_id }, fields: ["id", "title"], relations: { entities: true } },
     "gateway_configurations",
     { enabled: data?.gateway_type === "create" || data?.gateway_type === "update" }
   );
-  const [configId, setConfigId] = useState<string>(data?.configuration_id || "custom");
 
   const { data: existingConfiguration, isInitialLoading } = useGetEntity<GatewayConfigType>(
     data?.configuration_id,
@@ -516,14 +519,15 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
     project_id
   );
   const saveButtonLabel = getSaveButtonLabel({ data, exceptions });
-  const isEmailValid = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(titleOrEmail);
   const configOptions = (gatewayConfigurations?.data || []).map((conf) => ({ value: conf.id, label: conf.title }));
   configOptions.unshift({ label: "Custom", value: "custom" });
+
   const resetDrawerAtom = useToggledResetAtom();
+
   useEffect(() => {
     if (configId) {
       if (existingConfiguration?.data) {
-        setTitleOrEmail(existingConfiguration?.data?.title);
+        setTitle(existingConfiguration?.data?.title);
       }
       const config =
         existingConfiguration?.data || (gatewayConfigurations?.data || []).find((config) => config?.id === configId);
@@ -557,122 +561,159 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
 
   return (
     <DrawerLayout>
-      <Input
-        helperText={titleOrEmail && !isEmailValid && data?.entity_id ? "Email is not valid" : ""}
-        label={exceptions?.gatewayConfiguration ? "Title (required)" : "Grant access to (email, required)"}
-        name="titleOrEmail"
-        onChange={({ value }) => setTitleOrEmail(value as string)}
-        type={data?.entity_id ? "email" : "text"}
-        value={titleOrEmail}
-        variant={titleOrEmail && (isEmailValid || !data?.entity_id) ? "primary" : "error"}
-      />
-
-      <div className="grid grid-cols-2 gap-x-2">
-        <Input
-          label="First name"
-          name="first_name"
-          onChange={handleChange}
-          value={"first_name" in createConfig ? createConfig?.first_name : createConfig?.title}
-        />
-        <div className="flex flex-nowrap gap-x-2">
-          <Input
-            label="Last name"
-            name="last_name"
-            onChange={handleChange}
-            value={"last_name" in createConfig ? createConfig?.last_name : createConfig?.title}
+      {access ? (
+        <div className="flex flex-col gap-y-4">
+          <Alert
+            // eslint-disable-next-line quotes
+            label={'By closing this drawer or clicking on "Create new gateway" you will lose access to this link and its code.'}
+            variant="warning-bordered"
           />
-          <span className="self-end pb-2">
-            <Checkbox
-              label="Locked"
-              name="is_locked"
-              onChange={handleChange}
-              tooltip="If checked the user won't be able to edit these properties"
-              value={createConfig.is_locked}
-            />
-          </span>
+          <div className="flex flex-col gap-y-2">
+            <Title isDrawerTitle label="Access link" size="2xl" />
+            <div className="flex flex-nowrap items-center justify-between">
+              <Title label={access.link} />
+              <div>
+                <Button
+                  icon={IconEnum.copy}
+                  label="Copy"
+                  onClick={() => navigator.clipboard.writeText(access.link)}
+                  variant="info"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col gap-y-2">
+            <Title isDrawerTitle label="Access code" size="2xl" />
+            <div className="flex flex-nowrap items-center justify-between">
+              <Title label={access.code} size="4xl" />
+              <div>
+                <Button
+                  icon={IconEnum.copy}
+                  label="Copy"
+                  onClick={() => navigator.clipboard.writeText(access.code)}
+                  variant="info"
+                />
+              </div>
+            </div>
+          </div>
+          <Button icon={IconEnum.gateway} label="Create new gateway" onClick={() => setAccess(undefined)} variant="success" />
         </div>
-      </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-x-2">
+            <Input
+              label="First name"
+              name="first_name"
+              onChange={handleChange}
+              value={"first_name" in createConfig ? createConfig?.first_name : createConfig?.title}
+            />
+            <div className="flex flex-nowrap gap-x-2">
+              <Input
+                label="Last name"
+                name="last_name"
+                onChange={handleChange}
+                value={"last_name" in createConfig ? createConfig?.last_name : createConfig?.title}
+              />
+              <span className="self-end pb-2">
+                <Checkbox
+                  label="Locked"
+                  name="is_locked"
+                  onChange={handleChange}
+                  tooltip="If checked the user won't be able to edit these properties"
+                  value={createConfig.is_locked}
+                />
+              </span>
+            </div>
+          </div>
 
-      <div className="flex flex-1 flex-col gap-y-2 overflow-hidden">
-        <Title isDrawerTitle label="Grant access to" size="xl" />
-        <Select
-          isClearable
-          label="Select premade configuration (optional)"
-          name="config_id"
-          onChange={({ value }) => setConfigId(value as string)}
-          options={configOptions}
-          value={configId}
-        />
+          <div className="flex flex-1 flex-col gap-y-2 overflow-hidden">
+            <Title isDrawerTitle label="Grant access to" size="xl" />
+            <Select
+              isClearable
+              label="Select premade configuration (optional)"
+              name="config_id"
+              onChange={({ value }) => setConfigId(value as string)}
+              options={configOptions}
+              value={configId}
+            />
 
-        {(configId && selection) || !data?.entity_id ? (
-          <EntitiesAccess
-            configuration_id={data?.configuration_id}
-            gateway_type={data?.gateway_type}
-            selection={selection}
-            setSelection={setSelection}
-          />
-        ) : null}
-      </div>
-      <div>
-        <Button
-          icon={getSaveButtonIcon({ data, exceptions })}
-          isDisabled={!titleOrEmail || isCreating || isUpdating || isGrantingAccess}
-          isLoading={isCreating || isUpdating || isGrantingAccess}
-          label={saveButtonLabel}
-          onClick={() => {
-            if (exceptions?.gatewayConfiguration) {
-              if (data?.configuration_id) {
-                const parsed = UpdateGatewayConfigurationSchema.parse({
-                  data: {
-                    id: existingConfiguration?.data?.id,
-                    title: titleOrEmail,
-                  },
-                  relations: getRelationsForGatewayConfig(selection || {}),
-                });
-                update(parsed, { onSuccess: resetDrawerAtom });
-              } else {
-                const parsed = InsertGatewayConfigurationSchema.parse({
-                  data: {
-                    title: titleOrEmail,
-                    gateway_type: "characters",
-                    project_id,
-                  },
-                  relations: getRelationsForGatewayConfig(selection || {}),
-                });
-                create(parsed, { onSuccess: resetDrawerAtom });
-              }
-            } else {
-              if (data?.gateway_type === "update" && data?.entity_id)
-                grantAccess(
-                  {
-                    data: {
-                      email: titleOrEmail,
-                      type: data.type,
-                      id: data?.entity_id,
-                      gateway_type: "update",
-                      config: getRelationsForGatewayConfig(selection || {}),
-                    },
-                  },
-                  { onSuccess: resetDrawerAtom }
-                );
-              else if (data?.gateway_type === "create")
-                grantAccess(
-                  {
-                    data: {
-                      email: titleOrEmail,
-                      type: data.type,
-                      gateway_type: "create",
-                      create_config: createConfig,
-                      config: getRelationsForGatewayConfig(selection || {}),
-                    },
-                  },
-                  { onSuccess: resetDrawerAtom }
-                );
-            }
-          }}
-          variant="success"
-        />
-      </div>
+            {(configId && selection) || !data?.entity_id ? (
+              <EntitiesAccess
+                configuration_id={data?.configuration_id}
+                gateway_type={data?.gateway_type}
+                selection={selection}
+                setSelection={setSelection}
+              />
+            ) : null}
+          </div>
+          <div>
+            <Button
+              icon={getSaveButtonIcon({ data, exceptions })}
+              isDisabled={isCreating || isUpdating || isGrantingAccess}
+              isLoading={isCreating || isUpdating || isGrantingAccess}
+              label={saveButtonLabel}
+              onClick={() => {
+                if (exceptions?.gatewayConfiguration) {
+                  if (data?.configuration_id) {
+                    const parsed = UpdateGatewayConfigurationSchema.parse({
+                      data: {
+                        id: existingConfiguration?.data?.id,
+                        title: title,
+                      },
+                      relations: getRelationsForGatewayConfig(selection || {}),
+                    });
+                    update(parsed, { onSuccess: resetDrawerAtom });
+                  } else {
+                    const parsed = InsertGatewayConfigurationSchema.parse({
+                      data: {
+                        title: title,
+                        gateway_type: "characters",
+                        project_id,
+                      },
+                      relations: getRelationsForGatewayConfig(selection || {}),
+                    });
+                    create(parsed, { onSuccess: resetDrawerAtom });
+                  }
+                } else {
+                  if (data?.gateway_type === "update" && data?.entity_id)
+                    grantAccess(
+                      {
+                        data: {
+                          type: data.type,
+                          id: data?.entity_id,
+                          gateway_type: "update",
+                          config: getRelationsForGatewayConfig(selection || {}),
+                        },
+                      },
+                      {
+                        onSuccess: async (res: { code: string; link: string }) => {
+                          setAccess(res);
+                        },
+                      }
+                    );
+                  else if (data?.gateway_type === "create")
+                    grantAccess(
+                      {
+                        data: {
+                          type: data.type,
+                          gateway_type: "create",
+                          create_config: createConfig,
+                          config: getRelationsForGatewayConfig(selection || {}),
+                        },
+                      },
+                      {
+                        onSuccess: async (res: { code: string; link: string }) => {
+                          setAccess(res);
+                        },
+                      }
+                    );
+                }
+              }}
+              variant="success"
+            />
+          </div>
+        </>
+      )}
     </DrawerLayout>
   );
 }

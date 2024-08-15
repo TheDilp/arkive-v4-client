@@ -388,7 +388,6 @@ export function useGrantGatewayAccess() {
   return useMutation(
     async (accessData: {
       data: {
-        email: string;
         type: GatewayEntityType;
         config: Record<string, string[]>;
       } & (

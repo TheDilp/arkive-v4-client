@@ -123,7 +123,7 @@ export function useUpdateEntity<
           }
         } else if (!data?.role_access) {
           createNotification({
-            title: `You do not have permission to edit this ${getSingularEntityType(type).toLowerCase()}.`,
+            title: `You do not have permission to update this ${getSingularEntityType(type).toLowerCase()}.`,
             timer: 5,
             hasNoTruncate: true,
             variant: "error",
