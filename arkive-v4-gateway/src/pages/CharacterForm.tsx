@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Avatar, AvatarUpload, Button, Editor, FieldTemplateRows, Input, Skeleton } from "../../../components";
 import { useGetEntities, useGetEntity, useGetGatewayOptions, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CharacterFieldTemplateType, CharacterFieldType, CharacterType, HandleChangePropsType } from "../../../types";
+import { CreateConfigType, GatewayEntityType } from "../../../types/EntityTypes/gatewayTypes";
 import {
   getCharacterFullName,
   getDifferenceForCharacterFields,
@@ -21,7 +22,17 @@ function SectionLayout({ children }: { children: ReactNode | ReactNode[] }) {
   return <section className="grid grid-cols-4 gap-x-2 gap-y-4"> {children} </section>;
 }
 
-function NameSection({ first_name, last_name, nickname, age, project_id, biography, portrait_id, handleChange }: SectionType) {
+function NameSection({
+  first_name,
+  last_name,
+  nickname,
+  age,
+  project_id,
+  biography,
+  portrait_id,
+  create_config,
+  handleChange,
+}: SectionType & { create_config: CreateConfigType | undefined }) {
   const { entity_id } = useParams();
   return (
     <SectionLayout>
@@ -30,6 +41,7 @@ function NameSection({ first_name, last_name, nickname, age, project_id, biograp
           <AvatarUpload id={entity_id as string} image_id={portrait_id} project_id={project_id as string} />
         </div>
         <Input
+          isDisabled={create_config?.is_locked}
           label="First name (required)"
           name="first_name"
           onChange={handleChange}
@@ -38,7 +50,13 @@ function NameSection({ first_name, last_name, nickname, age, project_id, biograp
         />
       </div>
       <Input label="Nickname" name="nickname" onChange={handleChange} value={nickname || ""} />
-      <Input label="Last name" name="last_name" onChange={handleChange} value={last_name || ""} />
+      <Input
+        isDisabled={create_config?.is_locked}
+        label="Last name"
+        name="last_name"
+        onChange={handleChange}
+        value={last_name || ""}
+      />
       <Input label="Age" name="age" onChange={handleChange} type="number" value={age || ""} />
       <div className="col-span-4 flex h-[30rem] flex-col">
         <span className="text-sm text-zinc-300">Biography</span>
@@ -63,17 +81,36 @@ function geNextSection(sections: { id: string; title: string }[], section_id: st
   return idx;
 }
 
+function getInitialCreateData(create_config: CreateConfigType | undefined, entity_type: GatewayEntityType) {
+  if (!create_config) return {};
+  if (create_config.is_locked) {
+    if ("first_name" in create_config) return { first_name: create_config.first_name, last_name: create_config.last_name };
+    else return { title: create_config.title };
+  } else {
+    if (entity_type === "characters")
+      return {
+        first_name: create_config.first_name || "",
+        last_name: create_config.last_name || "",
+      };
+    return {
+      title: create_config.title || "",
+    };
+  }
+}
+
 export function CharacterForm() {
   const { type, access_id, entity_id, section_id } = useParams();
   const [sections, setSections] = useState(baseCharacterSections);
   const [fields, setFields] = useState<Record<string, CharacterFieldType[]>>({ other: [] });
-  const [character, setCharacter] = useState<Partial<CharacterType>>();
-  const { handleChange, changedData, resetChanges } = useHandleChange({ data: character, setData: setCharacter });
 
   const { data } = useGetGatewayOptions(
     { data: { entity_type: type as "characters", access_id: access_id as string } },
     "characters"
   );
+  const [character, setCharacter] = useState<Partial<CharacterType>>(
+    data?.data?.create_config ? getInitialCreateData(data?.data?.create_config, type as GatewayEntityType) : {}
+  );
+  const { handleChange, changedData, resetChanges } = useHandleChange({ data: character, setData: setCharacter });
 
   const config_tags = (data?.data?.entities || []).filter((item) => item.entity_type === "tags");
 
@@ -260,6 +297,7 @@ export function CharacterForm() {
                 <NameSection
                   age={character?.age || undefined}
                   biography={character?.biography || undefined}
+                  create_config={data?.data?.create_config}
                   first_name={character?.first_name || ""}
                   handleChange={handleChange}
                   last_name={character?.last_name || ""}
