@@ -483,12 +483,14 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
     random_tables: [],
     tags: [],
   });
-  const { mutate: grantAccess } = useGrantGatewayAccess();
+  const { mutate: grantAccess, isLoading: isGrantingAccess } = useGrantGatewayAccess();
   const { data: gatewayConfigurations } = useGetEntities<GatewayConfigType>(
     { data: { project_id }, fields: ["id", "title"], relations: { entities: true } },
     "gateway_configurations",
     { enabled: data?.gateway_type === "create" || data?.gateway_type === "update" }
   );
+  const [configId, setConfigId] = useState<string>(data?.configuration_id || "custom");
+
   const { data: existingConfiguration, isInitialLoading } = useGetEntity<GatewayConfigType>(
     data?.configuration_id,
     "gateway_configurations",
@@ -500,7 +502,7 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
     },
     { enabled: !!data.configuration_id }
   );
-  const [configId, setConfigId] = useState<string>(data?.configuration_id || "custom");
+
   const { mutate: create, isLoading: isCreating } = useCreateEntity<InsertGatewayConfigurationType>("gateway_configurations");
   const { mutate: update, isLoading: isUpdating } = useUpdateEntity<UpdateGatewayConfigurationType>(
     "gateway_configurations",
@@ -578,8 +580,8 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
       <div>
         <Button
           icon={getSaveButtonIcon({ data, exceptions })}
-          isDisabled={!titleOrEmail || isCreating || isUpdating}
-          isLoading={isCreating || isUpdating}
+          isDisabled={!titleOrEmail || isCreating || isUpdating || isGrantingAccess}
+          isLoading={isCreating || isUpdating || isGrantingAccess}
           label={saveButtonLabel}
           onClick={() => {
             if (exceptions?.gatewayConfiguration) {
@@ -591,7 +593,7 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
                   },
                   relations: getRelationsForGatewayConfig(selection || {}),
                 });
-                update(parsed);
+                update(parsed, { onSuccess: resetDrawerAtom });
               } else {
                 const parsed = InsertGatewayConfigurationSchema.parse({
                   data: {
@@ -601,30 +603,35 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
                   },
                   relations: getRelationsForGatewayConfig(selection || {}),
                 });
-                create(parsed);
+                create(parsed, { onSuccess: resetDrawerAtom });
               }
             } else {
               if (data?.gateway_type === "update")
-                grantAccess({
-                  data: {
-                    email: titleOrEmail,
-                    type: data.type,
-                    id: data?.entity_id,
-                    gateway_type: "update",
-                    config: getRelationsForGatewayConfig(selection || {}),
+                grantAccess(
+                  {
+                    data: {
+                      email: titleOrEmail,
+                      type: data.type,
+                      id: data?.entity_id,
+                      gateway_type: "update",
+                      config: getRelationsForGatewayConfig(selection || {}),
+                    },
                   },
-                });
+                  { onSuccess: resetDrawerAtom }
+                );
               else if (data?.gateway_type === "create")
-                grantAccess({
-                  data: {
-                    email: titleOrEmail,
-                    type: data.type,
-                    gateway_type: "create",
-                    config: getRelationsForGatewayConfig(selection || {}),
+                grantAccess(
+                  {
+                    data: {
+                      email: titleOrEmail,
+                      type: data.type,
+                      gateway_type: "create",
+                      config: getRelationsForGatewayConfig(selection || {}),
+                    },
                   },
-                });
+                  { onSuccess: resetDrawerAtom }
+                );
             }
-            resetDrawerAtom();
           }}
           variant="success"
         />
