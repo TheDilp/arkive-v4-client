@@ -13,7 +13,7 @@ import {
   GraphType,
   NodeType,
 } from "../../types";
-import { GatewayEntityType } from "../../types/EntityTypes/gatewayTypes";
+import { CreateConfigType, GatewayEntityType } from "../../types/EntityTypes/gatewayTypes";
 import {
   baseURLS,
   edgesAtom,
@@ -387,11 +387,18 @@ export function useGrantGatewayAccess() {
     async (accessData: {
       data: {
         email: string;
-        id?: string;
-        gateway_type: "create" | "update";
         type: GatewayEntityType;
         config: Record<string, string[]>;
-      };
+      } & (
+        | {
+            id: string;
+            gateway_type: "update";
+          }
+        | {
+            gateway_type: "create";
+            create_config: CreateConfigType;
+          }
+      );
     }) =>
       FetchFunction({
         url: `${baseURLS.baseServer}/users/gateway/invite`,

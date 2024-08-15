@@ -15,7 +15,7 @@ import {
   UserStatusType,
   UserType,
 } from "../../types";
-import { GatewayConfigOptionType } from "../../types/EntityTypes/gatewayTypes";
+import { CreateConfigType, GatewayConfigOptionType } from "../../types/EntityTypes/gatewayTypes";
 import { ProjectDashboardType, ProjectType } from "../../types/EntityTypes/projectTypes";
 import {
   baseURLS,
@@ -491,7 +491,7 @@ export function useGetGatewayOptions(
   }
 ) {
   return useQuery<{
-    data: { project_id: string; entities: GatewayConfigOptionType[] };
+    data: { create_config: CreateConfigType | undefined; project_id: string; entities: GatewayConfigOptionType[] };
   }>(["gateway", "options", type].concat(options?.queryKeyConcat || []), async () => {
     if (type) {
       return FetchFunction({

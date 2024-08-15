@@ -34,3 +34,14 @@ export interface GatewayConfigOptionType {
     | "random_tables"
     | "tags";
 }
+
+export type CreateConfigType =
+  | ({
+      is_locked: true;
+    } & ({ first_name: string; last_name: string } | { title: string }))
+  | {
+      is_locked: false;
+      first_name?: string;
+      last_name?: string;
+      title?: string;
+    };
