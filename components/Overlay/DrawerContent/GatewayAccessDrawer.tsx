@@ -9,6 +9,7 @@ import {
   useGetEntity,
   useGetImages,
   useGrantGatewayAccess,
+  useHandleChange,
   useTable,
   useToggledResetAtom,
   useUpdateEntity,
@@ -22,7 +23,7 @@ import {
   TabType,
   TagType,
 } from "../../../types";
-import { GatewayConfigType } from "../../../types/EntityTypes/gatewayTypes";
+import { CreateConfigType, GatewayConfigType } from "../../../types/EntityTypes/gatewayTypes";
 import { AllEntities, AvailableIcons, getAvatarInitials, getParentEntityType, IconEnum, TextFilters } from "../../../utils";
 import {
   InsertGatewayConfigurationSchema,
@@ -471,6 +472,12 @@ function EntitiesAccess({
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function GatewayAccessDrawer({ data, exceptions }: Props) {
   const { project_id } = useParams();
+  const [createConfig, setCreateConfig] = useState<CreateConfigType>({
+    is_locked: false,
+    first_name: "",
+    last_name: "",
+    title: "",
+  });
   const [titleOrEmail, setTitleOrEmail] = useState("");
   const [selection, setSelection] = useState<Record<AvailableGatewayEntites, string[]>>({
     characters: [],
@@ -544,6 +551,8 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
     }
   }, [configId, existingConfiguration?.data]);
 
+  const { handleChange } = useHandleChange({ data: createConfig, setData: setCreateConfig });
+
   if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
@@ -557,6 +566,33 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
         value={titleOrEmail}
         variant={titleOrEmail && (isEmailValid || !data?.entity_id) ? "primary" : "error"}
       />
+
+      <div className="grid grid-cols-2 gap-x-2">
+        <Input
+          label="First name"
+          name="first_name"
+          onChange={handleChange}
+          value={"first_name" in createConfig ? createConfig?.first_name : createConfig?.title}
+        />
+        <div className="flex flex-nowrap gap-x-2">
+          <Input
+            label="Last name"
+            name="last_name"
+            onChange={handleChange}
+            value={"last_name" in createConfig ? createConfig?.last_name : createConfig?.title}
+          />
+          <span className="self-end pb-2">
+            <Checkbox
+              label="Locked"
+              name="is_locked"
+              onChange={handleChange}
+              tooltip="If checked the user won't be able to edit these properties"
+              value={createConfig.is_locked}
+            />
+          </span>
+        </div>
+      </div>
+
       <div className="flex flex-1 flex-col gap-y-2 overflow-hidden">
         <Title isDrawerTitle label="Grant access to" size="xl" />
         <Select
@@ -606,7 +642,7 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
                 create(parsed, { onSuccess: resetDrawerAtom });
               }
             } else {
-              if (data?.gateway_type === "update")
+              if (data?.gateway_type === "update" && data?.entity_id)
                 grantAccess(
                   {
                     data: {
@@ -626,6 +662,7 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
                       email: titleOrEmail,
                       type: data.type,
                       gateway_type: "create",
+                      create_config: createConfig,
                       config: getRelationsForGatewayConfig(selection || {}),
                     },
                   },
