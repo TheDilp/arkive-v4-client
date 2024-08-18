@@ -1,3 +1,4 @@
+import { useSetAtom } from "jotai";
 import { ReactNode, useEffect, useLayoutEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
@@ -13,6 +14,7 @@ import {
 import { CharacterFieldTemplateType, CharacterFieldType, CharacterType, HandleChangePropsType } from "../../../types";
 import { CreateConfigType, GatewayEntityType } from "../../../types/EntityTypes/gatewayTypes";
 import {
+  dialogAtom,
   getCharacterFullName,
   getDifferenceForCharacterFields,
   getSavingIcon,
@@ -112,7 +114,7 @@ export function CharacterForm() {
   const { type, access_id, entity_id, section_id } = useParams();
   const [sections, setSections] = useState(baseCharacterSections);
   const [fields, setFields] = useState<Record<string, CharacterFieldType[]>>({ other: [] });
-
+  const setDialog = useSetAtom(dialogAtom);
   const { data } = useGetGatewayOptions(
     { data: { entity_type: type as "characters", access_id: access_id as string } },
     "characters"
@@ -208,25 +210,34 @@ export function CharacterForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingCharacter, data?.data?.create_config]);
   useLayoutEffect(() => {
+    let hasOtherFields = false;
     const additionalSections: { id: string; title: string }[] = [];
     const tempFields: Record<string, CharacterFieldType[]> = { other: [] };
     if (templates?.data) {
       (templates?.data || []).forEach((template) => {
         additionalSections.push(...template.character_fields_sections);
+
         template.character_fields.forEach((field) => {
-          if (!field.section_id) tempFields["other"].push(field);
-          else {
+          if (field.section_id === null) {
+            hasOtherFields = true;
+            if (tempFields["other"]) tempFields["other"].push(field);
+            else {
+              tempFields["other"] = [];
+              tempFields["other"].push(field);
+            }
+          } else {
             if (tempFields?.[field.section_id]) tempFields[field.section_id].push(field);
             else tempFields[field.section_id] = [field];
           }
         });
       });
     }
-    setSections(
-      baseCharacterSections
-        .concat(additionalSections.filter((section) => tempFields?.[section.id] && !!tempFields[section.id].length))
-        .concat({ id: "other", title: "Other" })
+    const finalSections = baseCharacterSections.concat(
+      additionalSections.filter((section) => tempFields?.[section.id] && !!tempFields[section.id].length)
     );
+    if (hasOtherFields) finalSections.push({ id: "other", title: "Other" });
+
+    setSections(finalSections);
     setFields(tempFields);
   }, [templates]);
 
@@ -245,34 +256,58 @@ export function CharacterForm() {
     );
 
   function save() {
-    if (existingCharacter?.data) {
-      const dataToParse = {
-        data: character,
-        permissions: character?.permissions,
-        relations: {
-          character_fields: getDifferenceForCharacterFields(existingCharacter?.data, character || { character_fields: [] }),
+    setDialog((prev) => ({
+      ...prev,
+      isOverlay: true,
+      title: `Finish ${entity_id ? "editing" : "creating"} ${type === "characters" ? "character" : "blueprint instance"}?`,
+      confirm: {
+        action: () => {
+          if (existingCharacter?.data) {
+            const dataToParse = {
+              data: character,
+              permissions: character?.permissions,
+              relations: {
+                character_fields: getDifferenceForCharacterFields(
+                  existingCharacter?.data,
+                  character || { character_fields: [] }
+                ),
+              },
+            };
+            if (dataToParse?.data?.portrait?.id) {
+              dataToParse.data.portrait_id = dataToParse.data.portrait.id;
+            }
+            const parsedData = UpdateCharacterSchema.parse(dataToParse);
+            update(parsedData, {
+              onSuccess: () => {
+                document.location = "https://thearkive.app";
+              },
+            });
+          } else {
+            const dataToParse = {
+              data: character,
+              permissions: character?.permissions,
+              relations: {
+                tags: config_tags.map((t) => ({ id: t.value })),
+                character_fields: character?.character_fields || [],
+              },
+            };
+            if (dataToParse?.data?.portrait?.id) {
+              dataToParse.data.portrait_id = dataToParse.data.portrait.id;
+            }
+            const parsedData = InsertCharacterSchema.parse(dataToParse);
+            create(parsedData, {
+              onSuccess: () => {
+                document.location = "https://thearkive.app";
+              },
+            });
+          }
         },
-      };
-      if (dataToParse?.data?.portrait?.id) {
-        dataToParse.data.portrait_id = dataToParse.data.portrait.id;
-      }
-      const parsedData = UpdateCharacterSchema.parse(dataToParse);
-      update(parsedData);
-    } else {
-      const dataToParse = {
-        data: character,
-        permissions: character?.permissions,
-        relations: {
-          tags: config_tags.map((t) => ({ id: t.value })),
-          character_fields: character?.character_fields || [],
-        },
-      };
-      if (dataToParse?.data?.portrait?.id) {
-        dataToParse.data.portrait_id = dataToParse.data.portrait.id;
-      }
-      const parsedData = InsertCharacterSchema.parse(dataToParse);
-      create(parsedData);
-    }
+        label: "Complete",
+        variant: "success",
+        icon: IconEnum.check_circle,
+      },
+      cancel: { action: () => {}, label: "Cancel" },
+    }));
   }
   return (
     <>
