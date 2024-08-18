@@ -15,6 +15,7 @@ import {
   useUpdateEntity,
 } from "../../../hooks";
 import {
+  CharacterFieldTemplateType,
   CharacterType,
   DrawerAtomType,
   ImageType,
@@ -24,7 +25,15 @@ import {
   TagType,
 } from "../../../types";
 import { CreateConfigType, GatewayConfigType } from "../../../types/EntityTypes/gatewayTypes";
-import { AllEntities, AvailableIcons, getAvatarInitials, getParentEntityType, IconEnum, TextFilters } from "../../../utils";
+import {
+  AllEntities,
+  AvailableIcons,
+  getAvatarInitials,
+  getParentEntityType,
+  getSentenceCase,
+  IconEnum,
+  TextFilters,
+} from "../../../utils";
 import {
   InsertGatewayConfigurationSchema,
   InsertGatewayConfigurationType,
@@ -33,8 +42,8 @@ import {
 } from "../../../validation/gateway_configuration";
 import { Table } from "../../DataDisplay";
 import { Button, Checkbox, Input, Select, TagInput, Title } from "../../Form";
-import { DrawerLayout, Tabs } from "../../Layout";
-import { Alert, Avatar, Icon, Skeleton } from "../../Misc";
+import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
+import { Alert, Avatar, Badge, Icon, Skeleton } from "../../Misc";
 
 type Props = {
   data: {
@@ -320,6 +329,35 @@ function EntitiesAccess({
     { enabled: entityType === "images", prefetch: false }
   );
 
+  const { data: templates } = useGetEntities<CharacterFieldTemplateType>(
+    {
+      data: { project_id: project_id as string },
+      fields: ["id", "title", "sort"],
+      relations: { character_fields: true, character_fields_sections: true },
+      relationFilters: {
+        or: (selection?.tags || [])?.map((id) => ({
+          operator: "in",
+          value: id,
+          id: id,
+          header_name: "tags",
+          relationalData: { blueprint_field_id: "tags" },
+          field: "tags",
+        })),
+      },
+      orderBy: [
+        {
+          field: "sort",
+          sort: "asc",
+        },
+      ],
+    },
+    "character_fields_templates",
+    {
+      enabled: !!selection?.tags?.length,
+      staleTime: 5 * 60 * 1000,
+    }
+  );
+
   useEffect(() => {
     const values = Object.values(tableSelection || {}).flat();
 
@@ -425,6 +463,56 @@ function EntitiesAccess({
             label="Tags"
             tags={tags}
           />
+
+          <Title isDrawerTitle label="Addtional field templates (based on selected tags)" size="lg" />
+
+          {templates?.data?.length ? (
+            (templates?.data || []).map((t) => {
+              const otherFields = t.character_fields.filter((f) => !f.section_id);
+              return (
+                <Collapsible key={t.id} label={t.title} size="sm">
+                  <div className="flex flex-col gap-y-2 p-1.5">
+                    {t.character_fields_sections.map((section) => {
+                      return (
+                        <Collapsible key={section.id} label={section.title}>
+                          <div className="flex flex-col gap-y-1 p-2">
+                            {t.character_fields
+                              .filter((f) => f.section_id === section.id)
+                              .map((field) => (
+                                <div key={field.id} className="flex flex-nowrap justify-between border-b border-zinc-700">
+                                  <span>
+                                    <Badge label={field.title} variant="info" />
+                                  </span>
+                                  <span>{getSentenceCase(field.field_type)}</span>
+                                </div>
+                              ))}
+                          </div>
+                        </Collapsible>
+                      );
+                    })}
+                    {otherFields.length ? (
+                      <Collapsible label={"Other"}>
+                        <div className="flex flex-col gap-y-1 p-2">
+                          {t.character_fields
+                            .filter((f) => f.section_id === null)
+                            .map((field) => (
+                              <div key={field.id} className="flex flex-nowrap justify-between border-b border-zinc-700">
+                                <span>
+                                  <Badge label={field.title} variant="info" />
+                                </span>
+                                <span>{getSentenceCase(field.field_type)}</span>
+                              </div>
+                            ))}
+                        </div>
+                      </Collapsible>
+                    ) : null}
+                  </div>
+                </Collapsible>
+              );
+            })
+          ) : (
+            <Alert label="There are no additional field templates associated with the selected tags." variant="info-bordered" />
+          )}
         </div>
       ) : (
         <Table
