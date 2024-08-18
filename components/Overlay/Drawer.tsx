@@ -105,6 +105,7 @@ export function Drawer() {
   });
   const { isMounted, styles } = useTransitionStyles(context, {
     initial: {
+      position: "absolute",
       transform: "translateX(100%)",
       width: isExpanded ? "100%" : "10rem",
     },
@@ -135,7 +136,7 @@ export function Drawer() {
 
   if (isMounted)
     return (
-      <div className={base()} ref={refs.setFloating} style={styles}>
+      <div ref={refs.setFloating} className={base()} style={styles}>
         <h3 className={title()}>
           <span className="truncate">{drawer.title}</span>
           <div className="flex items-center gap-x-2">
