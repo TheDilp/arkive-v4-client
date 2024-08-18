@@ -259,7 +259,8 @@ export function CharacterForm() {
     setDialog((prev) => ({
       ...prev,
       isOverlay: true,
-      title: `Finish ${entity_id ? "editing" : "creating"} ${type === "characters" ? "character" : "blueprint instance"}?`,
+      title: `Complete ${entity_id ? "editing" : "creating"} ${type === "characters" ? "character" : "blueprint instance"}?`,
+      description: `Once complete, access to this gateway will be revoked. Are you sure you want to finish ${entity_id ? "editing" : "creating"} this ${type === "characters" ? "character" : "blueprint instance"}?`,
       confirm: {
         action: () => {
           if (existingCharacter?.data) {
