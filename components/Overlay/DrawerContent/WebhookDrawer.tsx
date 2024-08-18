@@ -52,14 +52,16 @@ export function WebhookDrawer({ data }: Props) {
         value={webhook?.title || ""}
         variant={webhook?.title ? "primary" : "error"}
       />
-      <Input
-        isDisabled={!!data?.id}
-        label="Webhook channel ID (required)"
-        name="channel_id"
-        onChange={handleChange}
-        value={webhook?.channel_id || ""}
-        variant={webhook?.channel_id ? "primary" : "error"}
-      />
+      {existingWebhook?.data ? null : (
+        <Input
+          isDisabled={!!data?.id}
+          label="Webhook channel ID (required)"
+          name="channel_id"
+          onChange={handleChange}
+          value={webhook?.channel_id || ""}
+          variant={webhook?.channel_id ? "primary" : "error"}
+        />
+      )}
       <div>
         <Button
           icon={data?.id ? IconEnum.save : IconEnum.add}
