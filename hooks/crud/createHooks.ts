@@ -76,7 +76,7 @@ export function useCreateEntity<
         method: "POST",
       });
 
-      if (!data?.role_access) {
+      if (!data?.role_access && !IS_GATEWAY) {
         createNotification({
           title: `Your current role in this project does not have permission to create ${getPluralEntityType(type)}.`,
           timer: 5,
