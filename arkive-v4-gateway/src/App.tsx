@@ -59,7 +59,7 @@ function CodeInput() {
     return (
       <div className="mx-auto flex h-full w-full max-w-6xl items-center justify-center">
         <div className="h-80 w-96 font-merriweather transition-all">
-          <Card title="Please input the access code you recieved in your email">
+          <Card title="Please enter your access code">
             <div className="mt-auto flex flex-col gap-y-10 [&>div>div>input::-webkit-inner-spin-button]:appearance-none [&>div>div>input]:text-center">
               <Input
                 max={999999}
