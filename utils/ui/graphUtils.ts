@@ -127,7 +127,7 @@ export async function getNodeImage(node: NodeType, project_id: string) {
   if (node?.image) {
     return getImageURL(getAssetURL(project_id as string, "images", node.image?.id));
   }
-  if (node?.image_id) {
+  if (node?.image_id && typeof node?.image_id === "string") {
     return getImageURL(getAssetURL(project_id as string, "images", node?.image_id));
   }
   if (node?.character?.portrait_id) {
