@@ -793,6 +793,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
           cy={cyRef?.current?._cy as Core}
           graphTitle={existingGraphData?.data?.title || ""}
           hasPermission={updateGraphActionPermission}
+          isFamilyTreeView={isFamilyTreeView}
           isReadOnly={isReadOnly ?? false}
           isViewOnly={isViewOnly ?? false}
         />

@@ -50,12 +50,14 @@ function changeCurveStyle(
 export function Quickbar({
   isViewOnly,
   isReadOnly,
+  isFamilyTreeView,
   graphTitle,
   hasPermission,
   cy,
 }: {
   isViewOnly: boolean;
   isReadOnly: boolean;
+  isFamilyTreeView?: boolean;
   graphTitle: string;
   hasPermission: boolean;
   cy: Core;
@@ -78,9 +80,14 @@ export function Quickbar({
   const { mutate: deleteManyNodes } = useDeleteMany("nodes", false);
   const { mutate: deleteManyEdges } = useDeleteMany("edges", false);
 
-  if (isReadOnly || IS_PUBLIC)
+  if (isFamilyTreeView) return null;
+
+  if (isReadOnly || isViewOnly || IS_PUBLIC)
     return (
-      <div className="absolute bottom-0 z-10 flex h-12 w-80 items-center justify-evenly gap-x-2 rounded bg-zinc-800 px-2 text-white shadow-md">
+      <div
+        className={
+          "absolute bottom-0 z-10 flex h-12 w-80 items-center justify-evenly gap-x-2 rounded bg-zinc-800 px-2 text-white shadow-md"
+        }>
         <Button
           hasNoBackground
           icon={IconEnum.search}
@@ -172,9 +179,9 @@ export function Quickbar({
           <div className="flex items-center gap-x-1 rounded bg-zinc-700 p-2">
             {curveStyles.map((curveStyle: CurveStyleType) => (
               <Button
+                key={curveStyle}
                 hasNoBackground
                 icon={getCurveStyleIcon(curveStyle)}
-                key={curveStyle}
                 onClick={() => {
                   changeCurveStyle(curveStyle, setBoardState);
                   changeDrawMode(true, setBoardState);

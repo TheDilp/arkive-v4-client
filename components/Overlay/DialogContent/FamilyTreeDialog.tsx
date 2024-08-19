@@ -90,4 +90,3 @@ export function FamilyTreeDialog({ data }: { data: { id: string } }) {
     </div>
   );
 }
-
