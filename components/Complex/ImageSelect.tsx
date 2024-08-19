@@ -60,7 +60,7 @@ export function ImageSelect({
           )}
         </div>
 
-        <div className={`self-end ${isIconOnly ? "col-span-1" : "col-span-2"}`}>
+        <div className={`self-center ${isIconOnly ? "col-span-1" : "col-span-2"}`}>
           <Button
             icon={IconEnum.upload}
             isDisabled={isDisabled || (!permissions?.create_assets && !isIgnoringPermissions)}
