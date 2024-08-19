@@ -3,7 +3,7 @@ import cytoscape, { Core } from "cytoscape";
 import { saveAs } from "file-saver";
 
 import { CurveStyleType, EdgeType, NodeType } from "../../types/EntityTypes/graphTypes";
-import { AvailableIcons, getCharacterFullName, getIconUrlFromIconEnum, getAssetURL, getImageURL, IconEnum } from "..";
+import { AvailableIcons, getAssetURL, getCharacterFullName, getIconUrlFromIconEnum, getImageURL, IconEnum } from "..";
 
 export function changeLockState(
   boardContext: cytoscape.Core,
@@ -123,18 +123,18 @@ export function getNodeLabel(node: NodeType): string {
   return "";
 }
 
-export function getNodeImage(node: NodeType, project_id: string, { width, height }: { width: number; height: number }) {
-  if (node?.character?.portrait_id) {
-    return getImageURL(getAssetURL(project_id as string, "images", node.character.portrait_id), { width, height });
-  }
-  if (node?.document?.image) {
-    return getImageURL(getAssetURL(project_id as string, "images", node.document.image_id), { width, height });
-  }
+export async function getNodeImage(node: NodeType, project_id: string) {
   if (node?.image) {
-    return getImageURL(getAssetURL(project_id as string, "images", node.image?.id), { width, height });
+    return getImageURL(getAssetURL(project_id as string, "images", node.image?.id));
   }
   if (node?.image_id) {
-    return getImageURL(getAssetURL(project_id as string, "images", node?.image_id), { width, height });
+    return getImageURL(getAssetURL(project_id as string, "images", node?.image_id));
+  }
+  if (node?.character?.portrait_id) {
+    return getImageURL(getAssetURL(project_id as string, "images", node.character.portrait_id));
+  }
+  if (node?.document?.image) {
+    return getImageURL(getAssetURL(project_id as string, "images", node.document.image_id));
   }
 
   if (node?.icon) {
@@ -143,50 +143,49 @@ export function getNodeImage(node: NodeType, project_id: string, { width, height
 
   return [];
 }
-export function mapNodes(nodes: NodeType[], project_id: string, isReadOnly?: boolean) {
-  return nodes
-    .filter((node) => !node.is_template)
-    .map((node: NodeType) => ({
-      data: {
-        id: node.id,
-        label: getNodeLabel(node),
+export async function mapNodes(nodes: NodeType[], project_id: string, isReadOnly?: boolean) {
+  const filtered = nodes.filter((node) => !node.is_template);
+  const images = await Promise.all(filtered.map((node) => getNodeImage(node, project_id)));
+  return filtered.map((node: NodeType, index) => ({
+    data: {
+      id: node.id,
+      label: getNodeLabel(node),
 
-        type: node?.type || "rectangle",
-        width: node?.width || 50,
-        height: node?.height || 50,
-        x: node?.x ?? 0,
-        y: node?.y ?? 0,
+      type: node?.type || "rectangle",
+      width: node?.width || 50,
+      height: node?.height || 50,
+      x: node?.x ?? 0,
+      y: node?.y ?? 0,
 
-        font_size: node?.font_size || 16,
-        font_color: node?.font_color || "#ffffff",
-        font_family: node?.font_family || "Lato",
-        text_v_align: node?.text_v_align || "top",
-        text_h_align: node?.text_h_align || "center",
+      font_size: node?.font_size || 16,
+      font_color: node?.font_color || "#ffffff",
+      font_family: node?.font_family || "Lato",
+      text_v_align: node?.text_v_align || "top",
+      text_h_align: node?.text_h_align || "center",
 
-        is_locked: node?.is_locked ?? false,
-        is_template: node?.is_template || false,
-        z_index: node?.z_index ?? 1,
+      is_locked: node?.is_locked ?? false,
+      is_template: node?.is_template || false,
+      z_index: node?.z_index ?? 1,
 
-        background_color: node?.background_color || "#595959",
-        background_opacity: node?.background_opacity ?? 1,
+      background_color: node?.background_color || "#595959",
+      background_opacity: node?.background_opacity ?? 1,
 
-        classes: `${isReadOnly ? "publicBoardNode" : "boardNode"}`,
-        z_index_compare: node.z_index === 0 ? "manual" : "auto",
+      classes: `${isReadOnly ? "publicBoardNode" : "boardNode"}`,
+      z_index_compare: node.z_index === 0 ? "manual" : "auto",
 
-        // Used for displaying in drawer
-        image: node?.image,
-        document: node?.document,
+      // Used for displaying in drawer
+      image: node?.image,
+      document: node?.document,
 
-        tags: node.tags,
+      tags: node.tags,
 
-        background_image:
-          getNodeImage(node, project_id, { width: (node.width || 50) * 3, height: (node.height || 50) * 3 }) || [],
-        doc_id: node?.doc_id,
-        character_id: node?.character_id,
-      },
-      locked: isReadOnly ?? node.is_locked,
-      position: { x: node.x, y: node.y },
-    }));
+      background_image: images[index] || [],
+      doc_id: node?.doc_id,
+      character_id: node?.character_id,
+    },
+    locked: isReadOnly ?? node.is_locked,
+    position: { x: node.x, y: node.y },
+  }));
 }
 export function mapEdges(edges: EdgeType[], isReadOnly?: boolean) {
   return edges.map((edge: EdgeType) => ({
