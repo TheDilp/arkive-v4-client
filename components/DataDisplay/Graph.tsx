@@ -727,7 +727,6 @@ export function Graph({
     }
     mapEls();
   }, [nodes, edges]);
-  console.log(elements);
   return (
     <div className="relative flex h-[calc(100%)] w-full flex-1 flex-col justify-center">
       <div
