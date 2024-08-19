@@ -115,7 +115,7 @@ export function EdgeDrawer({ data }: Props) {
   const createNotification = useNotifications();
   const permissions = useHasPermissions(
     ["update_graphs", "read_characters", "read_assets", "read_events", "read_documents", "read_tags"],
-    undefined,
+    undefined
   );
   const tabs = getTabs(permissions);
   const {
@@ -162,7 +162,7 @@ export function EdgeDrawer({ data }: Props) {
     },
     {
       enabled: !!data?.id,
-    },
+    }
   );
   const originalEdge = existingEdge?.data;
 
@@ -376,7 +376,7 @@ export function EdgeDrawer({ data }: Props) {
       <div className="flex flex-nowrap items-center gap-x-2">
         <Button
           icon={IconEnum.close}
-          label="Cancel"
+          label="Close"
           onClick={() => {
             if (changedData)
               setDialogAtom({
