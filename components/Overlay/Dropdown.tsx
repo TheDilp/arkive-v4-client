@@ -27,11 +27,12 @@ import { useEffect, useRef, useState } from "react";
 import { tv } from "tailwind-variants";
 
 import { DropdownItemType, DropdownType } from "../../types";
+import { IconEnum } from "../../utils";
 import { Avatar, Icon } from "../Misc";
 
 const DropdownClasses = tv({
   slots: {
-    base: "z-30 font-lato min-w-fit outline-none",
+    base: "z-30 font-lato min-w-fit outline-none max-w-fit",
     floatingBase:
       "border max-h-[40rem] rounded overflow-y-auto border-zinc-600 z-[9999] font-lato shadow-lg absolute top-0 left-0",
   },
@@ -88,7 +89,7 @@ function DropdownComponent({ allowedPlacements = [], children, items, isReferenc
       size({
         apply({ rects, elements }) {
           Object.assign(elements?.floating?.style, {
-            minWidth: `${rects.reference.width}px`,
+            minWidth: "fit-content",
             maxWidth: isReferenceMaxSize ? `${rects.reference.width}px` : "",
           });
         },
@@ -175,8 +176,8 @@ function DropdownComponent({ allowedPlacements = [], children, items, isReferenc
   return (
     <FloatingNode id={nodeId}>
       <div
-        className={isNested ? dropdownItemClasses : base()}
         ref={mergedRefs}
+        className={isNested ? dropdownItemClasses : base()}
         role={isNested ? "menuitem" : undefined}
         tabIndex={!isNested ? 0 : -1}
         {...getReferenceProps()}>
@@ -187,18 +188,18 @@ function DropdownComponent({ allowedPlacements = [], children, items, isReferenc
           <FloatingPortal>
             <FloatingFocusManager context={context} initialFocus={isNested ? -1 : 0} modal={false} returnFocus={!isNested}>
               <div
-                className={floatingBase()}
                 ref={refs.setFloating}
+                className={floatingBase()}
                 style={{ transform: floatingStyles.transform }}
                 {...getFloatingProps()}>
                 {items && isOpen
                   ? items.map((dropdownItem) =>
                       dropdownItem.subItems?.length ? (
                         <Dropdown
+                          key={dropdownItem.id}
                           allowedPlacements={dropdownItem?.allowedPlacements || allowedPlacements}
                           isDisabled={dropdownItem?.isDisabled}
-                          items={dropdownItem.subItems}
-                          key={dropdownItem.id}>
+                          items={dropdownItem.subItems}>
                           <DropdownItem
                             allowedPlacements={dropdownItem?.allowedPlacements || allowedPlacements}
                             child={dropdownItem?.child}
@@ -222,6 +223,7 @@ function DropdownComponent({ allowedPlacements = [], children, items, isReferenc
                         </Dropdown>
                       ) : (
                         <DropdownItem
+                          key={dropdownItem.id}
                           allowedPlacements={dropdownItem?.allowedPlacements || allowedPlacements}
                           child={dropdownItem?.child}
                           icon={dropdownItem.icon}
@@ -230,7 +232,6 @@ function DropdownComponent({ allowedPlacements = [], children, items, isReferenc
                           id={dropdownItem.id}
                           image={dropdownItem?.image}
                           isDisabled={dropdownItem?.isDisabled}
-                          key={dropdownItem.id}
                           onClick={() => {
                             if (dropdownItem?.isDisabled) return;
                             if (dropdownItem?.onClick) {
@@ -285,10 +286,15 @@ function DropdownItem({
       {image && !subItems?.length ? <Avatar image_id={image} size="sm" /> : null}
       {label && !child ? <div className="select-none truncate px-2">{label}</div> : null}
       {child ?? null}
-      <div className="ml-auto flex pr-2">
+      <div className="ml-auto flex gap-x-2 pr-2">
         {icon ? (
           <div>
             <Icon color={iconColor || "#ffffff"} fontSize={20} icon={icon} thickness={iconThickness || "regular"} />
+          </div>
+        ) : null}
+        {subItems?.length ? (
+          <div>
+            <Icon color={"#ffffff"} fontSize={20} icon={IconEnum.chevron_right} thickness={iconThickness || "regular"} />
           </div>
         ) : null}
       </div>
