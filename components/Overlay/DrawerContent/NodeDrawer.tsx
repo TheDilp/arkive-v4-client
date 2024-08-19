@@ -56,27 +56,21 @@ function UpdateGraphNodes({
   setNodes,
   changedData,
   node,
-  rest,
 }: {
   setNodes: (arg: SetStateAction<NodeType[]>) => void;
   changedData: Partial<NodeType>;
   node: Partial<NodeType> & { parent_id: string };
   project_id: string;
-  rest: Partial<NodeType>;
 }) {
   setNodes((oldNodes) => {
     if (oldNodes) {
       const newNodes = [...oldNodes];
       const idx = newNodes.findIndex((n) => n.id === node.id);
       if (idx > -1) {
-        const alteredNodeData = { ...newNodes[idx], ...(Object.keys(changedData).length ? changedData : rest) };
+        const alteredNodeData = { ...newNodes[idx], ...(Object.keys(changedData).length ? changedData : {}) };
         newNodes[idx] = {
           ...alteredNodeData,
           label: getNodeLabel(alteredNodeData as NodeType),
-          character: changedData?.character || rest?.character || undefined,
-          event: changedData?.event || rest?.event || undefined,
-          map_pin: changedData?.map_pin || rest?.map_pin || undefined,
-          document: changedData?.document || rest?.document || undefined,
         };
         return newNodes;
       }
@@ -122,7 +116,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
     },
     {
       enabled: !!data?.id,
-    },
+    }
   );
   const setNodes = useSetAtom(nodesAtom);
   const setDialogAtom = useSetAtom(dialogAtom);
@@ -140,7 +134,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
   const originalNode = existingNode?.data;
   const permissions = useHasPermissions(
     ["update_graphs", "read_characters", "read_assets", "read_events", "read_documents", "read_tags"],
-    undefined,
+    undefined
   );
   const tabs = getTabs(permissions);
 
@@ -155,20 +149,25 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
   }, [existingNode?.data]);
 
   useEffect(() => {
-    if (changedData) {
-      const nodeToUpdate = { ...node, ...(changedData || {}), id: node.id };
-      set(nodeToUpdate, "character_id", node?.character?.id ?? null);
-      set(nodeToUpdate, "image_id", node?.image?.id ?? null);
+    const timeout = setTimeout(() => {
+      if (changedData) {
+        const nodeToUpdate = { ...node, ...(changedData || {}), id: node.id };
+        set(nodeToUpdate, "character_id", node?.character?.id ?? null);
+        set(nodeToUpdate, "image_id", node?.image?.id ?? null);
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { tags, ...rest } = nodeToUpdate;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { tags, ...rest } = nodeToUpdate;
 
-      UpdateGraphNodes({ project_id: project_id as string, rest, node, changedData, setNodes });
-    }
+        UpdateGraphNodes({ project_id: project_id as string, node, changedData, setNodes });
+      }
+    }, 400);
+
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [changedData]);
 
   if (isInitialLoading) return <Skeleton type="drawer_form" />;
-
   return (
     <div className="flex flex-col gap-y-2 overflow-auto font-lato">
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
@@ -431,7 +430,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
       <div className="sticky bottom-0 flex flex-nowrap items-center gap-x-2">
         <Button
           icon={IconEnum.close}
-          label="Cancel"
+          label="Close"
           onClick={() => {
             if (changedData)
               setDialogAtom({
@@ -449,7 +448,6 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
                         changedData: {},
                         node,
                         project_id: project_id as string,
-                        rest: originalNode,
                       });
                     }
                     resetChanges();
