@@ -657,7 +657,7 @@ function conversationTableColumns(
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center">
           {row.original.characters.map((char) => (
-            <div className="-ml-4 first:ml-0" key={char.id}>
+            <div key={char.id} className="-ml-4 first:ml-0">
               <Avatar
                 image_id={char?.portrait_id}
                 initials={getAvatarInitials(char?.full_name || "")}
@@ -1074,10 +1074,10 @@ export function CharacterProfileView({
                           );
                           return (
                             <AdditionalFieldDisplay
+                              key={template_field.id}
                               character_field={template_field}
                               character_field_data={characterField ?? null}
                               isPreview={!!id}
-                              key={template_field.id}
                             />
                           );
                         })}
