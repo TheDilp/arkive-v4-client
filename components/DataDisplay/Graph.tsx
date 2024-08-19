@@ -16,11 +16,12 @@ import {
   useGetEntity,
   useHasPermissions,
   useNavbarTitle,
+  useUpdateGraphSubEntity,
   useUpdateManySubEntities,
 } from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
-import { GraphType } from "../../types";
-import { hasActionPermission, IconEnum, useNotifications } from "../../utils";
+import { GraphType, NodeType } from "../../types";
+import { ColorPresets, hasActionPermission, IconEnum, useNotifications } from "../../utils";
 import {
   BoardReferenceAtom,
   BoardStateAtom,
@@ -34,7 +35,17 @@ import {
   nodesAtom,
   userAtom,
 } from "../../utils/atoms";
-import { cytoscapeGridOptions, dagreLayoutOptions, DefaultNode, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
+import {
+  cytoscapeGridOptions,
+  dagreLayoutOptions,
+  DefaultNode,
+  getCytoscapeStylesheet,
+  GraphFontFamiliesEnum,
+  GraphFontSizesEnum,
+  NodeShapesEnum,
+  TextHAlignEnum,
+  TextVAlignEnum,
+} from "../../utils/enums/GraphEnums";
 import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
 import { InsertEdgeType, InsertNodeType } from "../../validation";
 import { Button, Quickbar, Spinner } from "..";
@@ -113,6 +124,33 @@ export function Graph({
   const [boardState, setBoardState] = useAtom(BoardStateAtom);
   const setBoardRef = useSetAtom(BoardReferenceAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
+
+  const { mutateAsync: update } = useUpdateGraphSubEntity<{
+    data: Partial<NodeType>;
+    relations?: {
+      tags?: { id: string }[];
+    };
+  }>("nodes", graph?.id as string);
+
+  function quickUpdateNode({ id, key, value }: { id: string; key: keyof NodeType; value: string }) {
+    update(
+      { data: { id, [key]: key === "font_size" ? Number(value) : value } },
+      {
+        onSuccess: () => {
+          setNodes((prev) => {
+            const idx = prev.findIndex((item) => item.id === id);
+            if (idx > -1) {
+              const temp = [...prev];
+              // @ts-ignore
+              temp[idx][key] = key === "font_size" ? Number(value) : value;
+              return temp;
+            }
+            return prev;
+          });
+        },
+      }
+    );
+  }
 
   const { mutate: deleteNode } = useDeleteSubEntity("nodes", project_id as string);
   const { mutate: deleteManyNodes } = useDeleteMany("nodes", false);
@@ -274,7 +312,77 @@ export function Graph({
                 selected.length <= 1
                   ? [
                       {
-                        id: "1",
+                        id: "quick_edit_node",
+                        title: "Quick edit node",
+                        icon: IconEnum.quick_edit,
+                        isDisabled: !updateGraphActionPermission,
+                        allowedPlacements: ["right", "left"],
+                        subItems: [
+                          {
+                            id: "font_family",
+                            title: "Edit font",
+                            subItems: GraphFontFamiliesEnum.map((fam) => ({
+                              id: fam.value,
+                              title: fam.label,
+                              onClick: () => quickUpdateNode({ id, key: "font_family", value: fam.value }),
+                            })),
+                          },
+                          {
+                            id: "font_size",
+                            title: "Edit font size",
+                            subItems: GraphFontSizesEnum.map((fam) => ({
+                              id: fam.value,
+                              title: fam.label,
+                              onClick: () => quickUpdateNode({ id, key: "font_size", value: fam.value }),
+                            })),
+                          },
+                          {
+                            id: "label_vertical_alignment",
+                            title: "Edit label vertical placement",
+                            subItems: TextVAlignEnum.map((fam) => ({
+                              id: fam.value,
+                              title: fam.label,
+                              onClick: () => quickUpdateNode({ id, key: "text_v_align", value: fam.value }),
+                            })),
+                          },
+                          {
+                            id: "label_horizontal_alignment",
+                            title: "Edit label horizontal placement",
+                            subItems: TextHAlignEnum.map((fam) => ({
+                              id: fam.value,
+                              title: fam.label,
+                              onClick: () => quickUpdateNode({ id, key: "text_h_align", value: fam.value }),
+                            })),
+                          },
+                          {
+                            id: "node_shape",
+                            title: "Edit node shape",
+                            subItems: NodeShapesEnum.map((fam) => ({
+                              id: fam.value,
+                              title: fam.label,
+                              onClick: () => quickUpdateNode({ id, key: "type", value: fam.value }),
+                            })),
+                          },
+                          {
+                            id: "node_color",
+                            title: "Edit node color",
+                            subItems: ColorPresets.map((color) => ({
+                              id: color,
+                              child: (
+                                <div
+                                  className="m-2 h-5 w-5 rounded-full"
+                                  style={{
+                                    backgroundColor: color,
+                                  }}
+                                />
+                              ),
+                              onClick: () => quickUpdateNode({ id, key: "background_color", value: color }),
+                            })),
+                          },
+                        ],
+                      },
+                      {
+                        id: "edit_node",
                         title: "Edit node",
                         icon: IconEnum.edit,
                         isDisabled: !updateGraphActionPermission,
@@ -290,7 +398,7 @@ export function Graph({
                           })),
                       },
                       {
-                        id: "2",
+                        id: "highlight_connected_nodes",
                         title: "Highlight connected nodes",
                         icon: IconEnum.graph,
                         onClick: () => {
@@ -304,14 +412,14 @@ export function Graph({
                         },
                       },
                       {
-                        id: "3",
+                        id: "un_lock_node",
                         title: locked ? "Unlock node" : "Lock node",
                         icon: locked ? IconEnum.unlock : IconEnum.lock,
                         onClick: () => changeLockState(cyRef?.current?._cy, !locked, updateManyNodes, item_id as string),
                         isDisabled: !updateGraphActionPermission,
                       },
                       {
-                        id: "4",
+                        id: "center_on_node",
                         title: "Center on node",
                         icon: IconEnum.center,
                         onClick: () => cyRef?.current?._cy.center(evt.target),
@@ -319,7 +427,7 @@ export function Graph({
                       // { title: "Template from node" },
                       // !ADD OPTION TO DELETE MULTIPLE NODES
                       {
-                        id: "5",
+                        id: "delete_node",
                         title: "Delete node",
                         icon: IconEnum.trash,
                         isDisabled: !updateGraphActionPermission,
@@ -338,7 +446,7 @@ export function Graph({
                     ]
                   : [
                       {
-                        id: "6",
+                        id: "edit_multiple_nodes",
                         title: "Edit multiple nodes",
                         isDisabled: !updateGraphActionPermission,
                         icon: IconEnum.edit,
@@ -355,20 +463,20 @@ export function Graph({
                         },
                       },
                       {
-                        id: "7",
+                        id: "un_lock_nodes",
                         title: locked ? "Unlock nodes" : "Lock nodes",
                         isDisabled: !updateGraphActionPermission,
                         icon: locked ? IconEnum.unlock : IconEnum.lock,
                         onClick: () => changeLockState(cyRef?.current?._cy, !locked, updateManyNodes, item_id as string),
                       },
                       {
-                        id: "8",
+                        id: "center_on_nodes",
                         title: "Center on nodes",
                         icon: IconEnum.center,
                         onClick: () => cyRef?.current?._cy.center(evt.target),
                       },
                       {
-                        id: "9",
+                        id: "delete_multiple_nodes",
                         title: "Delete multiple nodes",
                         isDisabled: !updateGraphActionPermission,
                         icon: IconEnum.trash,

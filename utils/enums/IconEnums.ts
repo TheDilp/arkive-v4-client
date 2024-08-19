@@ -110,6 +110,7 @@ export const IconEnum = {
   pdf: "ph:file-pdf" as const,
   pdf_download: "carbon:generate-pdf" as const,
   questionnaires: "fluent:person-question-mark-24-regular" as const,
+  quick_edit: "fluent-mdl2:set-action" as const,
   quote: "ph:quotes" as const,
   random_table: "game-icons:perspective-dice-six-faces-random" as const,
   range: "ph:rows" as const,
