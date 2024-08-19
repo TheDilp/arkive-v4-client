@@ -4,7 +4,7 @@ import "../modules.d.ts";
 import { Collection, Core, EventObject, LayoutOptions, NodeSingular } from "cytoscape";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import uniqBy from "lodash.uniqby";
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useParams } from "react-router-dom";
 
@@ -50,6 +50,7 @@ type Props = {
 
 export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeView, layoutOptions }: Props) {
   const { project_id, item_id, subitem_id } = useParams();
+  const [elements, setElements] = useState();
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
   const dialogValue = useAtomValue(dialogAtom);
 
@@ -508,6 +509,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
           if (prev?.data && "id" in prev.data) {
             if (prev?.data?.id === rest.id) return prev;
             createNotification({
+              hasNoTruncate: true,
               title: "Please close the current drawer before editing another.",
               variant: "info",
               timer: 5,
@@ -605,7 +607,6 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
   useEffect(() => {
     if (!isInitialLoading) {
       const timeout = setTimeout(() => {
-        console.log(subitem_id);
         // If there is a node id in the URL navigate to that node
         if ((subitem_id || center_on) && cyRef?.current?._cy) {
           const node = cyRef?.current?._cy.getElementById(subitem_id || center_on);
@@ -704,14 +705,19 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
   }, [drawer]);
   cyRef?.current?._cy.removeListener("grabon grab");
 
-  const elements = useMemo(
-    () =>
-      CytoscapeComponent.normalizeElements({
-        nodes: mapNodes(nodes || [], project_id as string, isReadOnly),
-        edges: mapEdges(edges || []),
-      }),
-    [nodes, edges]
-  );
+  useLayoutEffect(() => {
+    async function mapEls() {
+      await mapNodes(nodes || [], project_id as string, isReadOnly).then((res) => {
+        setElements(
+          CytoscapeComponent.normalizeElements({
+            nodes: res,
+            edges: mapEdges(edges || []),
+          })
+        );
+      });
+    }
+    mapEls();
+  }, [nodes, edges]);
 
   return (
     <div className="relative flex h-[calc(100%)] w-full flex-1 flex-col justify-center">
@@ -758,6 +764,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
         </div>
       ) : null}
       <CytoscapeComponent
+        ref={cyRef}
         className="h-full w-full"
         cy={(cy: Core) => {
           setBoardRef(cy);
@@ -774,10 +781,9 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
             cy.layout(layoutOptions).run();
           }
         }}
-        elements={elements}
+        elements={elements || []}
         maxZoom={5}
         minZoom={0.1}
-        ref={cyRef}
         stylesheet={styleSheet}
         wheelSensitivity={0.1}
         zoom={0.6}
