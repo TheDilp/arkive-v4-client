@@ -177,6 +177,7 @@ export function getCytoscapeStylesheet(curve_style: CurveStyleType) {
         "border-opacity": 0.25,
       },
     },
+
     {
       selector: "edge:selected",
       style: {
@@ -267,6 +268,15 @@ export function getCytoscapeStylesheet(curve_style: CurveStyleType) {
       style: {
         "background-image-opacity": 0,
         "background-color": "yellow",
+      },
+    },
+    {
+      selector: "node.highlighted",
+      style: {
+        "underlay-color": "yellow",
+        "underlay-padding": 4,
+        "underlay-opacity": 1,
+        "border-opacity": 0.25,
       },
     },
   ];

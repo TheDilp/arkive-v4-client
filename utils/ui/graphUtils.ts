@@ -143,9 +143,10 @@ export async function getNodeImage(node: NodeType, project_id: string) {
 
   return [];
 }
-export async function mapNodes(nodes: NodeType[], project_id: string, isReadOnly?: boolean) {
+export async function mapNodes(nodes: NodeType[], project_id: string, highlightNodeIds: string[] = [], isReadOnly?: boolean) {
   const filtered = nodes.filter((node) => !node.is_template);
   const images = await Promise.all(filtered.map((node) => getNodeImage(node, project_id)));
+
   return filtered.map((node: NodeType, index) => ({
     data: {
       id: node.id,
@@ -170,7 +171,7 @@ export async function mapNodes(nodes: NodeType[], project_id: string, isReadOnly
       background_color: node?.background_color || "#595959",
       background_opacity: node?.background_opacity ?? 1,
 
-      classes: `${isReadOnly ? "publicBoardNode" : "boardNode"}`,
+      classes: "",
       z_index_compare: node.z_index === 0 ? "manual" : "auto",
 
       // Used for displaying in drawer
@@ -183,6 +184,7 @@ export async function mapNodes(nodes: NodeType[], project_id: string, isReadOnly
       doc_id: node?.doc_id,
       character_id: node?.character_id,
     },
+    classes: `${isReadOnly ? "publicBoardNode" : "boardNode"} ${highlightNodeIds.includes(node.id) ? "highlighted" : ""}`,
     locked: isReadOnly ?? node.is_locked,
     position: { x: node.x, y: node.y },
   }));

@@ -45,10 +45,19 @@ type Props = {
   isViewOnly?: boolean;
   center_on?: string;
   isFamilyTreeView?: boolean;
+  highlightNodeIds?: string[];
   layoutOptions?: Partial<LayoutOptions> & { rankDir?: "LR" | "TB" };
 };
 
-export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeView, layoutOptions }: Props) {
+export function Graph({
+  data,
+  isReadOnly,
+  isViewOnly,
+  center_on,
+  isFamilyTreeView,
+  highlightNodeIds = [],
+  layoutOptions,
+}: Props) {
   const { project_id, item_id, subitem_id } = useParams();
   const [elements, setElements] = useState();
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
@@ -707,7 +716,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
 
   useLayoutEffect(() => {
     async function mapEls() {
-      await mapNodes(nodes || [], project_id as string, isReadOnly).then((res) => {
+      await mapNodes(nodes || [], project_id as string, highlightNodeIds, isReadOnly).then((res) => {
         setElements(
           CytoscapeComponent.normalizeElements({
             nodes: res,
@@ -718,7 +727,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
     }
     mapEls();
   }, [nodes, edges]);
-
+  console.log(elements);
   return (
     <div className="relative flex h-[calc(100%)] w-full flex-1 flex-col justify-center">
       <div
