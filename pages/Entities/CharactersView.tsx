@@ -283,6 +283,7 @@ function createColumns(
                           )}`,
                           data: { id: row.original.id },
                           size: "lg",
+                          isOverlay: true,
                         });
                       },
                     },
@@ -878,10 +879,10 @@ export function CharactersView() {
           {(cardData?.pages || [])?.map((page) =>
             page.data.map((char: CharacterType) => (
               <CharacterCard
+                key={char.id}
                 full_name={char.full_name}
                 id={char?.id}
                 is_favorite={char?.is_favorite}
-                key={char.id}
                 portrait_id={char?.portrait_id}
               />
             ))
