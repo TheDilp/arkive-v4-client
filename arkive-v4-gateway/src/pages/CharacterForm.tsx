@@ -345,8 +345,8 @@ export function CharacterForm() {
         <ul className="h-full overflow-y-auto">
           {sections.map((section) => (
             <li
-              className={`border-b border-zinc-700 text-lg transition-all first:border-t ${section_id === section.id ? "bg-zinc-700" : ""}`}
-              key={section.id}>
+              key={section.id}
+              className={`border-b border-zinc-700 text-lg transition-all first:border-t ${section_id === section.id ? "bg-zinc-700" : ""}`}>
               <Link
                 className="block h-full w-full px-4 py-2"
                 to={`/${type}/${access_id}/${entity_id || "create"}/${section.id}`}>
@@ -365,7 +365,7 @@ export function CharacterForm() {
           if (section.id !== section_id) return null;
 
           return (
-            <div className="" key={section.id}>
+            <div key={section.id} className="">
               {section.id === "name" ? (
                 <NameSection
                   age={character?.age || undefined}
