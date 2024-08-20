@@ -34,11 +34,11 @@ const DropdownClasses = tv({
   slots: {
     base: "z-30 font-lato min-w-fit outline-none max-w-fit",
     floatingBase:
-      "border max-h-[40rem] rounded overflow-y-auto border-zinc-600 z-[9999] font-lato shadow-lg absolute top-0 left-0",
+      "border max-h-[40rem] rounded overflow-y-auto border-zinc-600 z-[9999] font-lato shadow absolute top-0 left-0",
   },
 });
 const DropdownItemClasses = tv({
-  base: "flex flex-nowrap group group-hover:bg-zinc-500 hover:bg-zinc-500 h-10 min-h-[2.5rem] border-zinc-700 bg-zinc-700 cursor-pointer items-center border-0 text-left h-full w-full m-0 outline-0 text-white",
+  base: "flex flex-nowrap group group-hover:bg-zinc-500 hover:bg-zinc-500 h-10 min-h-[2.5rem] border-zinc-600 bg-zinc-800 cursor-pointer items-center border-b last:border-0 text-left h-full w-full m-0 outline-0 text-white",
   variants: {
     isDisabled: {
       true: "bg-zinc-500 text-zinc-300 cursor-not-allowed hover:bg-zinc-500 group-hover:bg-zinc-500",
