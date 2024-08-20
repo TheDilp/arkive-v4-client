@@ -101,5 +101,5 @@
     "*.{ts,tsx} !(*.config).ts": "eslint --fix --report-unused-disable-directives --max-warnings 0"
   },
   "type": "module",
-  "version": "0.0.3"
+  "version": "0.0.5"
 }

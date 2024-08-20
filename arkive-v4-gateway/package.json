@@ -1,7 +1,7 @@
 {
   "name": "arkive-v4-gateway",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.5",
   "type": "module",
   "scripts": {
     "start": "vite --port 5179 --config ../vite.config.ts",
@@ -29,4 +29,3 @@
     "vite": "^5.2.0"
   }
 }
-
