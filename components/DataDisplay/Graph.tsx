@@ -20,7 +20,7 @@ import {
   useUpdateManySubEntities,
 } from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
-import { GraphType, NodeType } from "../../types";
+import { EdgeType, GraphType, NodeType } from "../../types";
 import { ColorPresets, hasActionPermission, IconEnum, useNotifications } from "../../utils";
 import {
   BoardReferenceAtom,
@@ -39,6 +39,11 @@ import {
   cytoscapeGridOptions,
   dagreLayoutOptions,
   DefaultNode,
+  EdgeArrowFillEnum,
+  EdgeArrowShapesEnum,
+  EdgeCurveStylesEnum,
+  EdgeLineStylesEnum,
+  EdgeTaxiDirectionsEnum,
   getCytoscapeStylesheet,
   GraphFontFamiliesEnum,
   GraphFontSizesEnum,
@@ -125,19 +130,45 @@ export function Graph({
   const setBoardRef = useSetAtom(BoardReferenceAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
 
-  const { mutateAsync: update } = useUpdateGraphSubEntity<{
+  const { mutateAsync: updateNode } = useUpdateGraphSubEntity<{
     data: Partial<NodeType>;
     relations?: {
       tags?: { id: string }[];
     };
   }>("nodes", graph?.id as string);
 
+  const { mutateAsync: updateEdge } = useUpdateGraphSubEntity<{
+    data: Partial<EdgeType>;
+    relations?: {
+      tags?: { id: string }[];
+    };
+  }>("edges", graph?.id as string);
+
   function quickUpdateNode({ id, key, value }: { id: string; key: keyof NodeType; value: string }) {
-    update(
+    updateNode(
       { data: { id, [key]: key === "font_size" ? Number(value) : value } },
       {
         onSuccess: () => {
           setNodes((prev) => {
+            const idx = prev.findIndex((item) => item.id === id);
+            if (idx > -1) {
+              const temp = [...prev];
+              // @ts-ignore
+              temp[idx][key] = key === "font_size" ? Number(value) : value;
+              return temp;
+            }
+            return prev;
+          });
+        },
+      }
+    );
+  }
+  function quickUpdateEdge({ id, key, value }: { id: string; key: keyof EdgeType; value: string }) {
+    updateEdge(
+      { data: { id, [key]: key === "font_size" ? Number(value) : value } },
+      {
+        onSuccess: () => {
+          setEdges((prev) => {
             const idx = prev.findIndex((item) => item.id === id);
             if (idx > -1) {
               const temp = [...prev];
@@ -316,7 +347,6 @@ export function Graph({
                         title: "Quick edit node",
                         icon: IconEnum.quick_edit,
                         isDisabled: !updateGraphActionPermission,
-                        allowedPlacements: ["right", "left"],
                         subItems: [
                           {
                             id: "font_family",
@@ -509,7 +539,180 @@ export function Graph({
                 selected.length <= 1
                   ? [
                       {
-                        id: "1",
+                        id: "quick_edit_edge",
+                        title: "Quick edit edge",
+                        icon: IconEnum.quick_edit,
+                        isDisabled: !updateGraphActionPermission,
+                        subItems: [
+                          {
+                            id: "font_family",
+                            title: "Edit font",
+                            subItems: GraphFontFamiliesEnum.map((fam) => ({
+                              id: fam.value,
+                              title: fam.label,
+                              onClick: () => quickUpdateEdge({ id, key: "font_family", value: fam.value }),
+                            })),
+                          },
+                          {
+                            id: "font_size",
+                            title: "Edit font size",
+                            subItems: GraphFontSizesEnum.map((fam) => ({
+                              id: fam.value,
+                              title: fam.label,
+                              onClick: () => quickUpdateEdge({ id, key: "font_size", value: fam.value }),
+                            })),
+                          },
+                          {
+                            id: "curve_type",
+                            title: "Edit curve type",
+                            subItems: EdgeCurveStylesEnum.map((fam) => ({
+                              id: fam.value,
+                              title: fam.label,
+                              onClick: () => quickUpdateEdge({ id, key: "curve_style", value: fam.value }),
+                            })),
+                          },
+                          {
+                            id: "line_style",
+                            title: "Edit line style",
+                            subItems: EdgeLineStylesEnum.map((fam) => ({
+                              id: fam.value,
+                              title: fam.label,
+                              onClick: () => quickUpdateEdge({ id, key: "line_style", value: fam.value }),
+                            })),
+                          },
+                          {
+                            id: "edge_direction",
+                            title: "Edit edge direction",
+                            subItems: EdgeTaxiDirectionsEnum.map((fam) => ({
+                              id: fam.value,
+                              title: fam.label,
+                              onClick: () => quickUpdateEdge({ id, key: "taxi_direction", value: fam.value }),
+                            })),
+                          },
+                          {
+                            id: "arrow_shape",
+                            title: "Edit arrows",
+                            icon: IconEnum.flow_arrow,
+                            subItems: [
+                              {
+                                id: "target",
+                                title: "Target arrow",
+                                subItems: [
+                                  {
+                                    id: "shape",
+                                    title: "Shape",
+                                    subItems: EdgeArrowShapesEnum.map((shape) => ({
+                                      id: shape.value,
+                                      title: shape.label,
+                                      onClick: () => quickUpdateEdge({ id, key: "target_arrow_shape", value: shape.value }),
+                                    })),
+                                  },
+                                  {
+                                    id: "fill",
+                                    title: "Fill",
+                                    subItems: EdgeArrowFillEnum.map((shape) => ({
+                                      id: shape.value,
+                                      title: shape.label,
+                                      onClick: () => quickUpdateEdge({ id, key: "target_arrow_fill", value: shape.value }),
+                                    })),
+                                  },
+                                ],
+                              },
+                              {
+                                id: "source",
+                                title: "Source arrow",
+                                subItems: [
+                                  {
+                                    id: "shape",
+                                    title: "Shape",
+                                    subItems: EdgeArrowShapesEnum.map((shape) => ({
+                                      id: shape.value,
+                                      title: shape.label,
+                                      onClick: () => quickUpdateEdge({ id, key: "source_arrow_shape", value: shape.value }),
+                                    })),
+                                  },
+                                  {
+                                    id: "fill",
+                                    title: "Fill",
+                                    subItems: EdgeArrowFillEnum.map((shape) => ({
+                                      id: shape.value,
+                                      title: shape.label,
+                                      onClick: () => quickUpdateEdge({ id, key: "source_arrow_fill", value: shape.value }),
+                                    })),
+                                  },
+                                ],
+                              },
+                              {
+                                id: "mid_target",
+                                title: "Mid-target arrow",
+                                subItems: [
+                                  {
+                                    id: "shape",
+                                    title: "Shape",
+                                    subItems: EdgeArrowShapesEnum.map((shape) => ({
+                                      id: shape.value,
+                                      title: shape.label,
+                                      onClick: () => quickUpdateEdge({ id, key: "mid_target_arrow_shape", value: shape.value }),
+                                    })),
+                                  },
+                                  {
+                                    id: "fill",
+                                    title: "Fill",
+                                    subItems: EdgeArrowFillEnum.map((shape) => ({
+                                      id: shape.value,
+                                      title: shape.label,
+                                      onClick: () => quickUpdateEdge({ id, key: "mid_target_arrow_fill", value: shape.value }),
+                                    })),
+                                  },
+                                ],
+                              },
+                              {
+                                id: "mid_source",
+                                title: "Mid-source arrow",
+                                subItems: [
+                                  {
+                                    id: "shape",
+                                    title: "Shape",
+                                    subItems: EdgeArrowShapesEnum.map((shape) => ({
+                                      id: shape.value,
+                                      title: shape.label,
+                                      onClick: () => quickUpdateEdge({ id, key: "mid_source_arrow_shape", value: shape.value }),
+                                    })),
+                                  },
+                                  {
+                                    id: "fill",
+                                    title: "Fill",
+                                    subItems: EdgeArrowFillEnum.map((shape) => ({
+                                      id: shape.value,
+                                      title: shape.label,
+                                      onClick: () => quickUpdateEdge({ id, key: "mid_source_arrow_fill", value: shape.value }),
+                                    })),
+                                  },
+                                ],
+                              },
+                            ],
+                          },
+                          {
+                            id: "node_color",
+                            title: "Edit edge color",
+                            subItems: ColorPresets.map((color) => ({
+                              id: color,
+                              child: (
+                                <div
+                                  className="m-2 h-5 w-5 rounded-full"
+                                  style={{
+                                    backgroundColor: color,
+                                  }}
+                                />
+                              ),
+                              onClick: () => quickUpdateEdge({ id, key: "line_color", value: color }),
+                            })),
+                          },
+                        ],
+                      },
+
+                      {
+                        id: "edit_edge",
                         title: "Edit edge",
                         icon: IconEnum.edit,
                         isDisabled: !updateGraphActionPermission,
@@ -528,7 +731,7 @@ export function Graph({
                         },
                       },
                       {
-                        id: "2",
+                        id: "highlight_nodes",
                         title: "Highlight connected nodes",
                         icon: IconEnum.graph,
                         onClick: () => {
@@ -540,7 +743,7 @@ export function Graph({
                       },
                       // !DELETE MULTIPLE OR SINGLE EDGE
                       {
-                        id: "3",
+                        id: "delete_edge",
                         title: "Delete selected edge",
                         icon: IconEnum.trash,
                         isDisabled: !updateGraphActionPermission,
