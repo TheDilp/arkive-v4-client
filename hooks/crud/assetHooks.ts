@@ -17,7 +17,7 @@ export function useUploadAsset(type: AssetType, project_id: string) {
       }
 
       return FetchFunction({
-        url: `${baseURLS.baseServer}/assets/upload/${project_id}/${type}`,
+        url: `${baseURLS.baseAssetServer}/upload/${project_id}/${type}`,
         body: formData,
         method: "POST",
       });
