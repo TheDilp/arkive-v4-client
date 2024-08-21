@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 
 import { MapImage, Select } from "../../components";
 import { useGetEntities, useGetEntity, useHasPermissions, useNavbarTitle } from "../../hooks";
+import { useImageURL } from "../../hooks/ui/useImageURLHook";
 import { MapPinTypesType, MapType, onChangeValue } from "../../types";
 import { getAssetURL, hasEntityUpdatePermissionForEntityView } from "../../utils";
 
@@ -70,12 +71,12 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
       else setMapPinFilters(value);
     }
   }
-
+  const url = useImageURL(getAssetURL(project_id as string, "map_images", currentMap?.image_id));
   useEffect(() => {
-    if (currentMap && currentMap?.image_id && !bounds) {
+    if (currentMap && currentMap?.image_id && !bounds && url) {
       setEntityUpdatePermission(currentMap?.permissions?.some((p) => p.code === "update_maps") || false);
       const img = new Image();
-      img.src = getAssetURL(project_id as string, "map_images", currentMap?.image_id);
+      img.src = url;
       img.onload = () => {
         setBounds([
           [0, 0],
@@ -96,10 +97,8 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
         }
       }, 200);
     }
-  }, [currentMap, project_id]);
-
+  }, [currentMap, project_id, url]);
   if (!currentMap) return null;
-
   return (
     <div className="relative z-[2] flex h-full w-full flex-col overflow-hidden">
       <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
@@ -128,13 +127,6 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
       {currentMap && (!isLoading || (data && isLoading)) && !!bounds && (IS_PUBLIC || permissions?.read_maps) ? (
         <div className="z-0 min-h-full min-w-full">
           <MapContainer
-            attributionControl={false}
-            bounds={bounds as LatLngBoundsExpression}
-            center={[bounds[1][0] / 2, bounds[1][1] / 2]}
-            className="h-full w-full flex-1 outline-none"
-            crs={CRS.Simple}
-            maxZoom={5}
-            minZoom={-3}
             ref={(node) => {
               mapRef.current = node;
               if (bounds && firstRender.current) {
@@ -147,6 +139,13 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
                 }
               }
             }}
+            attributionControl={false}
+            bounds={bounds as LatLngBoundsExpression}
+            center={[bounds[1][0] / 2, bounds[1][1] / 2]}
+            className="h-full w-full flex-1 outline-none"
+            crs={CRS.Simple}
+            maxZoom={5}
+            minZoom={-3}
             scrollWheelZoom
             zoom={1}
             zoomSnap={0}>
@@ -160,7 +159,7 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
               mapData={currentMap}
               mapPinFilters={mapPinFilters}
               permissions={permissions}
-              src={getAssetURL(project_id as string, "map_images", currentMap?.image_id)}
+              src={url}
             />
           </MapContainer>
         </div>

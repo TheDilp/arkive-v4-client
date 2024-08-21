@@ -6,7 +6,7 @@ import MarkerClusterGroup from "react-leaflet-cluster";
 import { useParams } from "react-router-dom";
 
 import { MapPinType, MapType, UserHasPermissionsType } from "../../../types";
-import { contextMenuAtom, drawerAtom, getAssetURL, IconEnum } from "../../../utils";
+import { contextMenuAtom, drawerAtom, IconEnum } from "../../../utils";
 import { MapPin } from "./MapPin";
 
 type Props = {
@@ -35,7 +35,7 @@ export function MapImage({
   permissions,
 }: Props) {
   const firstRender = useRef(true);
-  const { project_id, item_id, subitem_id } = useParams();
+  const { item_id, subitem_id } = useParams();
   const setContextMenu = useSetAtom(contextMenuAtom);
 
   function PinFilter(mapPin: MapPinType) {
@@ -126,7 +126,7 @@ export function MapImage({
     };
   }, [subitem_id, bounds]);
 
-  if (!map) return null;
+  if (!map || !src) return null;
 
   const { nonCharacterPins, characterPins }: { nonCharacterPins: MapPinType[]; characterPins: MapPinType[] } = (
     mapData?.map_pins || []
@@ -147,7 +147,7 @@ export function MapImage({
   return (
     <LayersControl position="topright">
       <LayersControl.BaseLayer checked name="Map">
-        <ImageOverlay bounds={bounds} ref={imgRef} url={src} />
+        <ImageOverlay ref={imgRef} bounds={bounds} url={src} />
       </LayersControl.BaseLayer>
       {/* Characters layer */}
       <LayersControl.Overlay checked name="Character pins">
@@ -156,7 +156,7 @@ export function MapImage({
             {characterPins
               ?.filter(PinFilter)
               ?.map((pin) => (
-                <MapPin isReadOnly={isReadOnly} isViewOnly={isViewOnly} key={pin.id} map_id={item_id as string} pinData={pin} />
+                <MapPin key={pin.id} isReadOnly={isReadOnly} isViewOnly={isViewOnly} map_id={item_id as string} pinData={pin} />
               ))}
           </MarkerClusterGroup>
         ) : (
@@ -164,7 +164,7 @@ export function MapImage({
             {characterPins
               ?.filter(PinFilter)
               ?.map((pin) => (
-                <MapPin isReadOnly={isReadOnly} isViewOnly={isViewOnly} key={pin.id} map_id={item_id as string} pinData={pin} />
+                <MapPin key={pin.id} isReadOnly={isReadOnly} isViewOnly={isViewOnly} map_id={item_id as string} pinData={pin} />
               ))}
           </LayerGroup>
         )}
@@ -176,7 +176,7 @@ export function MapImage({
             {nonCharacterPins
               ?.filter(PinFilter)
               ?.map((pin) => (
-                <MapPin isReadOnly={isReadOnly} isViewOnly={isViewOnly} key={pin.id} map_id={item_id as string} pinData={pin} />
+                <MapPin key={pin.id} isReadOnly={isReadOnly} isViewOnly={isViewOnly} map_id={item_id as string} pinData={pin} />
               ))}
           </MarkerClusterGroup>
         ) : (
@@ -184,7 +184,7 @@ export function MapImage({
             {nonCharacterPins
               ?.filter(PinFilter)
               ?.map((pin) => (
-                <MapPin isReadOnly={isReadOnly} isViewOnly={isViewOnly} key={pin.id} map_id={item_id as string} pinData={pin} />
+                <MapPin key={pin.id} isReadOnly={isReadOnly} isViewOnly={isViewOnly} map_id={item_id as string} pinData={pin} />
               ))}
           </LayerGroup>
         )}
@@ -197,12 +197,7 @@ export function MapImage({
               .map((layer) => {
                 return (
                   <LayersControl.Overlay key={layer.id + layer.title} name={layer.title}>
-                    <ImageOverlay
-                      bounds={bounds}
-                      className="leafletImageOverlayLayer"
-                      url={getAssetURL(project_id as string, "map_images", layer.image_id)}
-                      zIndex={9999}
-                    />
+                    <ImageOverlay bounds={bounds} className="leafletImageOverlayLayer" url={src} zIndex={9999} />
                   </LayersControl.Overlay>
                 );
               })
