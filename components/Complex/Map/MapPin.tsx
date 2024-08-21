@@ -6,6 +6,7 @@ import { Marker, Tooltip } from "react-leaflet";
 import { useParams } from "react-router-dom";
 
 import { useUpdateMapSubEntity } from "../../../hooks";
+import { useImageURL } from "../../../hooks/ui/useImageURLHook";
 import { DropdownItemType, MapPinType } from "../../../types";
 import { contextMenuAtom, dialogAtom, drawerAtom, getAssetURL, IconEnum } from "../../../utils";
 
@@ -173,6 +174,7 @@ export function MapPin({
       }
     },
   };
+  const imageUrl = useImageURL(getAssetURL(project_id as string, "images", image_id || character?.portrait_id));
   const background = `url('https://api.iconify.design/${icon?.match(/.*:/g)?.[0]?.replace(":", "") || "mdi:"}/${
     icon ? icon?.replace(/.*:/g, "") : ""
   }.svg?color=%23${color ? color.replace("#", "") : ""}') no-repeat`;
@@ -187,10 +189,7 @@ export function MapPin({
             className={`fixed rounded-full ${isCharacterPin ? "h-6 w-6" : "h-8 w-8"}`}
             style={{
               background: image_id ? "" : background,
-              backgroundImage:
-                image_id || (isCharacterPin && character?.portrait_id)
-                  ? `url(${getAssetURL(project_id as string, "images", image_id || character?.portrait_id)})`
-                  : "",
+              backgroundImage: image_id || (isCharacterPin && character?.portrait_id) ? `url(${imageUrl})` : "",
               backgroundColor: show_background ? background_color || "" : "",
               backgroundPosition: "center",
               backgroundSize: image_id || (isCharacterPin && !!character?.portrait_id) ? "contain" : "2rem",
