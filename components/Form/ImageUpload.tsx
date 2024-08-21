@@ -131,6 +131,7 @@ export function AvatarUpload({
         className="pointer-events-auto relative z-20 flex h-full w-full cursor-pointer flex-col items-center justify-center"
         htmlFor="dropzone-file">
         <input
+          ref={ref}
           accept="image/*"
           className="hidden"
           disabled={isDisabled}
@@ -164,7 +165,6 @@ export function AvatarUpload({
               });
             }
           }}
-          ref={ref}
           type="file"
         />
       </label>
