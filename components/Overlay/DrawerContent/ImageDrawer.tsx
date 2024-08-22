@@ -80,9 +80,9 @@ export function ImageDrawer({ data }: Props) {
           {replacementImage.length ? (
             imageUrls.map((img) => (
               <ImagePreview
+                key={`${img.name}${img.url}`}
                 clearAction={() => setReplacementImage([])}
                 id={img.name}
-                key={`${img.name}${img.url}`}
                 title={img.name}
                 url={img.url}
               />
