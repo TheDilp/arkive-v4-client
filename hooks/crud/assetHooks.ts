@@ -45,7 +45,7 @@ export function useUploadAsset(type: AssetType, project_id: string) {
   );
 }
 
-export function useUploadAvatar(id: string, isAvatarUpload?: boolean) {
+export function useUploadAvatar(id: string, isAvatarUpload?: boolean, project_id?: string) {
   const createNotification = useNotifications();
   const queryClient = useQueryClient();
   return useMutation(
@@ -57,7 +57,7 @@ export function useUploadAvatar(id: string, isAvatarUpload?: boolean) {
       }
 
       return FetchFunction({
-        url: `${getServerUrl()}/${isAvatarUpload ? "users/update/avatar" : "assets/upload"}/${id}`,
+        url: `${baseURLS.baseAssetServer}/upload/${isAvatarUpload ? "users/avatar" : `gateway/${project_id}/${id}`}`,
         body: formData,
         method: "POST",
       });
@@ -206,28 +206,22 @@ export function useUpdateImage<
 
   return useMutation(
     async (updateValues: InsertType) => {
-      if (updateValues?.data?.file) {
-        const formData = new FormData();
+      const formData = new FormData();
 
-        if (updateValues?.data?.title) {
-          formData.append("title", updateValues.data.title);
-        }
-
-        if (updateValues?.data?.owner_id) {
-          formData.append("owner_id", updateValues.data.owner_id);
-        }
-
-        formData.append("file", updateValues?.data?.file, updateValues?.data?.file?.name);
-        return FetchFunction({
-          url: `${baseURLS.baseServer}/assets/update/${id}`,
-          body: formData,
-          method: "POST",
-        });
+      if (updateValues?.data?.title) {
+        formData.append("title", updateValues.data.title);
       }
 
+      if (updateValues?.data?.owner_id) {
+        formData.append("owner_id", updateValues.data.owner_id);
+      }
+
+      if (updateValues?.data?.file) {
+        formData.append("file", updateValues?.data?.file, updateValues?.data?.file?.name);
+      }
       return FetchFunction({
-        url: `${baseURLS.baseServer}/assets/update/${id}`,
-        body: JSON.stringify(updateValues),
+        url: `${baseURLS.baseAssetServer}/assets/update/${id}`,
+        body: formData,
         method: "POST",
       });
     },
