@@ -95,7 +95,7 @@ export function Avatar({
   const setDialog = useSetAtom(dialogAtom);
   const { base, image: imageClasses, text, spinner } = AvatarClasses({ isBordered, size, hasShowImage, shape });
   const url = useImageURL(
-    image_id ? getAssetURL((manual_project_id || project_id) as string, imageType, image_id) : null,
+    image_id && !image_url ? getAssetURL((manual_project_id || project_id) as string, imageType, image_id) : null,
     size
   );
   return (
