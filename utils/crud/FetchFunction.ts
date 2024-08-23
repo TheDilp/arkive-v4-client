@@ -1,6 +1,6 @@
 type AllowedMethodsType = "GET" | "POST" | "DELETE";
 
-function getContentType(url: string, body: string | FormData | undefined): { "Content-Type": string } | {} {
+function getContentType(body: string | FormData | undefined): { "Content-Type": string } | {} {
   if (typeof body === "string") return { "Content-Type": "application/json" };
   return {};
 }
@@ -24,7 +24,7 @@ export async function FetchFunction({
     body,
     headers: {
       module: "editor",
-      ...getContentType(url, body),
+      ...getContentType(body),
     },
   };
 
@@ -36,11 +36,11 @@ export async function FetchFunction({
   if (res.status === 401) {
     throw new Error("UNAUTHORIZED");
   }
-  if (res.url.startsWith(import.meta.env.VITE_ARKIVE_ASSET_SERVICE)) {
-    if (res.status === 200) {
-      return res.text();
-    }
+
+  if (res.headers.get("content-type") === "text/plain" && res.status === 200) {
+    return res.text();
   }
+
   if (res.url.endsWith("/generate/pdf")) {
     const disposition = res.headers
       .get("Content-Disposition")
