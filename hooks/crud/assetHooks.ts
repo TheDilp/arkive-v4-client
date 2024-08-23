@@ -330,7 +330,7 @@ export function useDeleteAsset<InsertType extends { data: { id: string } }>(proj
   const createNotification = useNotifications();
   return useMutation(
     async (vars: InsertType) =>
-      FetchFunction({ method: "DELETE", url: `${baseURLS.baseServer}/assets/${project_id}/${type}/${vars.data.id}` }),
+      FetchFunction({ method: "DELETE", url: `${baseURLS.baseAssetServer}/assets/${project_id}/${type}/${vars.data.id}` }),
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries(["allEntities", project_id, "images"]);
@@ -345,7 +345,7 @@ export function useDeleteAsset<InsertType extends { data: { id: string } }>(proj
         createNotification({
           title: `There was an error deleting this ${type === "images" ? "image" : "maps"}.`,
           timer: 3,
-          variant: "success",
+          variant: "error",
           icon: IconEnum.error,
         });
       },
