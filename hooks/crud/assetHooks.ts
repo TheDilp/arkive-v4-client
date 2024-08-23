@@ -259,7 +259,7 @@ export function useDownloadImages(project_id: string | undefined, type: AssetTyp
   return useMutation(
     async (images: { data: { id: string; title: string }[] }) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/assets/download/${project_id}/${type}`,
+        url: `${baseURLS.baseAssetServer}/assets/download/${project_id}/${type}`,
         method: "POST",
         body: JSON.stringify(images),
       });
