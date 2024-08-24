@@ -127,7 +127,7 @@ export function useDeleteMany(
   return useMutation(
     async (vars: { data: { ids: string[] } }) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/bulk/${arkive ? "arkive" : "delete"}/${type.toLowerCase()}`,
+        url: `${type === "images" ? `${baseURLS.baseAssetServer}/assets` : baseURLS.baseServer}/bulk/${arkive ? "arkive" : "delete"}/${type.toLowerCase()}`,
         body: JSON.stringify(type === "images" ? { data: { ids: vars.data.ids, project_id } } : vars),
         method: "DELETE",
       });
