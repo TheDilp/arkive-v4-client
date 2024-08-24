@@ -693,13 +693,15 @@ function CharacterViewHeader({
                 })),
             },
           ]}>
-          <Button
-            icon={IconEnum.add}
-            isDisabled={!permissions?.create_characters}
-            label="Create new character"
-            onClick={undefined}
-            tooltip={isMd ? undefined : "Create new character"}
-          />
+          <div className="lg:w-52">
+            <Button
+              icon={IconEnum.add}
+              isDisabled={!permissions?.create_characters}
+              label="Create new character"
+              onClick={undefined}
+              tooltip={isMd ? undefined : "Create new character"}
+            />
+          </div>
         </Dropdown>
       </div>
     </div>
