@@ -61,16 +61,36 @@ export function SelectColumn<T>(
                 .flatRows.findIndex(
                   (row) => row?.original?.id === (table.options.meta as MetaType)?.selection?.[pagination?.page || 0]?.[0]
                 );
+
               if (firstIdx > -1) {
-                dispatch({
-                  type: "selectAll",
-                  payload: {
-                    rows: table
-                      .getPaginationRowModel()
-                      .flatRows.slice(firstIdx, row.index + 1)
-                      .map((r) => r.original.id),
-                  },
-                });
+                if (firstIdx < row.index) {
+                  dispatch({
+                    type: "selectAll",
+                    payload: {
+                      rows: table
+                        .getPaginationRowModel()
+                        .flatRows.slice(firstIdx, row.index + 1)
+                        .map((r) => r.original.id),
+                    },
+                  });
+                } else {
+                  const lastIndex = table
+                    .getPaginationRowModel()
+                    .flatRows.findLastIndex((row) =>
+                      (table.options.meta as MetaType)?.selection?.[pagination?.page || 0]?.includes(row?.original?.id)
+                    );
+                  dispatch({
+                    type: "selectAll",
+                    payload: {
+                      rows: table
+                        .getPaginationRowModel()
+                        .flatRows.slice(row.index, lastIndex + 1)
+                        .map((r) => r.original.id),
+                    },
+                  });
+                }
+              } else {
+                dispatch({ type: "setSelection", payload: { row: row.original.id } });
               }
             } else {
               dispatch({ type: "setSelection", payload: { row: row.original.id } });
@@ -160,8 +180,8 @@ export function TagColumn<T>(hasTagsWarning?: boolean, dispatch?: TableDispatch<
                   <div className="grid max-w-48 grid-cols-2 gap-2 overflow-auto">
                     {row.original.tags.slice(1).map((tag: TagType) => (
                       <div
-                        className="col-span-1 cursor-pointer"
                         key={tag.id}
+                        className="col-span-1 cursor-pointer"
                         onClick={() => {
                           if (dispatch) {
                             dispatch({ type: "clearAllFilters" });
@@ -265,10 +285,10 @@ export function CharacterColumn({
         {characters?.slice(0, isMultiple ? 5 : 1)?.map((char) => {
           return (
             <Avatar
+              key={char?.related_id}
               image_id={char?.character?.portrait_id}
               initials={getAvatarInitials(char?.character?.full_name || "")}
               isBordered
-              key={char?.related_id}
               label={char?.character?.full_name || ""}
               size="sm"
               tooltipAllowedPlacements={["left", "right"]}
