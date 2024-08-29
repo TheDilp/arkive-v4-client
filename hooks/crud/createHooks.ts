@@ -505,29 +505,29 @@ export function useCreateFromTemplate(id: string, project_id: string) {
     }
   );
 }
-export function useCreatePDF() {
-  const createNotification = useNotifications();
+// export function useCreatePDF() {
+//   const createNotification = useNotifications();
 
-  return useMutation(
-    async (vars: { data: { title: string; body: string } }) =>
-      FetchFunction({
-        url: `${baseURLS.baseServer}/documents/generate/pdf`,
-        body: JSON.stringify(vars),
-        method: "POST",
-      }),
+//   return useMutation(
+//     async (vars: { data: { title: string; body: string } }) =>
+//       FetchFunction({
+//         url: `${baseURLS.baseServer}/documents/generate/pdf`,
+//         body: JSON.stringify(vars),
+//         method: "POST",
+//       }),
 
-    {
-      onError: (error: { message?: string }) => {
-        createNotification({
-          title: error?.message || "There was an error creating this PDF.",
-          variant: "error",
-          icon: IconEnum.error,
-          timer: 5,
-          position: "top-right",
-        });
-      },
-    }
-  );
-}
+//     {
+//       onError: (error: { message?: string }) => {
+//         createNotification({
+//           title: error?.message || "There was an error creating this PDF.",
+//           variant: "error",
+//           icon: IconEnum.error,
+//           timer: 5,
+//           position: "top-right",
+//         });
+//       },
+//     }
+//   );
+// }
 
 // #endregion misc
