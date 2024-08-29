@@ -160,8 +160,8 @@ export function TagColumn<T>(hasTagsWarning?: boolean, dispatch?: TableDispatch<
                   <div className="grid max-w-48 grid-cols-2 gap-2 overflow-auto">
                     {row.original.tags.slice(1).map((tag: TagType) => (
                       <div
-                        className="col-span-1 cursor-pointer"
                         key={tag.id}
+                        className="col-span-1 cursor-pointer"
                         onClick={() => {
                           if (dispatch) {
                             dispatch({ type: "clearAllFilters" });
@@ -265,10 +265,10 @@ export function CharacterColumn({
         {characters?.slice(0, isMultiple ? 5 : 1)?.map((char) => {
           return (
             <Avatar
+              key={char?.related_id}
               image_id={char?.character?.portrait_id}
               initials={getAvatarInitials(char?.character?.full_name || "")}
               isBordered
-              key={char?.related_id}
               label={char?.character?.full_name || ""}
               size="sm"
               tooltipAllowedPlacements={["left", "right"]}

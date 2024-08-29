@@ -135,7 +135,7 @@ function TableColumnFilterList({
         const filterType = filterOptions?.find((opt) => opt.value === filt.operator);
 
         return (
-          <div className="flex flex-col gap-y-2" key={filt.id}>
+          <div key={filt.id} className="flex flex-col gap-y-2">
             <div className="flex w-full flex-nowrap items-center gap-x-2">
               <div className="w-1/3">
                 <Select
@@ -462,9 +462,9 @@ function TableSubheaderFilterBadges<T>({
     <div className={subheaderFilterBadges()}>
       {fields.map((field) => (
         <Tooltip
+          key={field}
           content={getFilterTooltip({ and: andFiltersByField[field] || [], or: orFiltersByField[field] || [] })}
-          isPortal
-          key={field}>
+          isPortal>
           <div>
             <Badge
               clearAction={() =>
@@ -481,12 +481,12 @@ function TableSubheaderFilterBadges<T>({
       ))}
       {relationFields.map((field) => (
         <Tooltip
+          key={field}
           content={getFilterTooltip({
             and: andRelationFiltersByField[field] || [],
             or: orRelationFiltersByField[field] || [],
           })}
           isPortal
-          key={field}
           variant="secondary">
           <div>
             <Badge
@@ -628,8 +628,8 @@ export function Table<T>({ columns, data = [], config, isLoading, pagination, di
 
   return (
     <>
-      <div className="max-h-[calc(100%-2.5rem)] overflow-auto border-zinc-800" ref={bodyRef}>
-        <div className={head()} ref={headerRef}>
+      <div ref={bodyRef} className="max-h-[calc(100%-2.5rem)] overflow-auto border-zinc-800">
+        <div ref={headerRef} className={head()}>
           {table.getFlatHeaders().map((hdr) => {
             const { header, id, meta } = hdr.column.columnDef;
             const activeColumnFilters = {
@@ -798,12 +798,12 @@ export function Table<T>({ columns, data = [], config, isLoading, pagination, di
           rows.map((row) => {
             return (
               <div
+                key={row.id}
                 className={`${rowContainer()} ${
                   config?.selection && config?.selection[pagination?.page || 0]?.includes(row.original.id)
                     ? "group hover:text-white"
                     : "hover:bg-zinc-800"
-                }`}
-                key={row.id}>
+                }`}>
                 <Link
                   onClick={(e) => {
                     if (onRowClick) {
@@ -816,12 +816,12 @@ export function Table<T>({ columns, data = [], config, isLoading, pagination, di
                   <div className={`${rowClasses()} ${onRowClick ? hasRowAction() : ""} group`}>
                     {row.getVisibleCells().map((cell) => (
                       <div
+                        key={cell.id}
                         className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
                           (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
                         } ${cell.column.id === "select" && isLg ? "sticky left-0 z-10" : "z-0"} ${selected?.includes(row.original.id) ? "group-hover:bg-blue-300" : ""} ${
                           config?.selection && selected?.includes(row.original.id) ? "bg-blue-400" : "bg-zinc-950"
                         } ${(cell.column.columnDef.meta as MetaType)?.pinned && isLg ? "sticky z-10" : ""} ${getLink && !selected?.includes(row.original.id) ? hasLinkRow() : ""} ${cell.column.columnDef.id === "tags" ? "" : "cursor-default"} `}
-                        key={cell.id}
                         onClick={(e) => {
                           if (
                             cell.column.id === "select" ||
