@@ -288,24 +288,6 @@ function createColumns(
                       },
                     },
                     {
-                      id: "send_to_discord",
-                      title: "Send to Discord",
-                      icon: IconEnum.discord,
-                      isDisabled: !row.original.is_public,
-                      subItems: webhooks.map((webhook) => ({
-                        id: webhook.id,
-                        title: webhook.title,
-                        onClick: () =>
-                          FetchFunction({
-                            url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
-                            body: JSON.stringify({
-                              data: { id: row.original.id, type: "characters" },
-                            }),
-                            method: "POST",
-                          }),
-                      })),
-                    },
-                    {
                       id: "grant_access",
                       title: "Grant gateway access",
                       icon: IconEnum.gateway,
@@ -330,6 +312,25 @@ function createColumns(
                           type: "gateway_access",
                         })),
                     },
+                    {
+                      id: "send_to_discord",
+                      title: "Send to Discord",
+                      icon: IconEnum.discord,
+                      isDisabled: !row.original.is_public,
+                      subItems: webhooks.map((webhook) => ({
+                        id: webhook.id,
+                        title: webhook.title,
+                        onClick: () =>
+                          FetchFunction({
+                            url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                            body: JSON.stringify({
+                              data: { id: row.original.id, type: "characters" },
+                            }),
+                            method: "POST",
+                          }),
+                      })),
+                    },
+
                     {
                       id: "view_public",
                       title: "View public page",
