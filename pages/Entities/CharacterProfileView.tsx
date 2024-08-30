@@ -1276,7 +1276,7 @@ export function CharacterProfileView({
               </div>
             ) : null}
             {(isPreview ? tabs[selectedTab].id === "4" : type === "conversations") ? (
-              <div className="p-4">
+              <div className="h-full p-4">
                 {subitem_id && !isPreview ? null : (
                   <div className="col-span-3 flex flex-col">
                     <Table
@@ -1288,11 +1288,9 @@ export function CharacterProfileView({
                         generateDocument
                       )}
                       config={{
-                        onRowClick: isPreview
+                        getLink: isPreview
                           ? undefined
-                          : (rowData: ConversationType) => {
-                              navigate(`/projects/${project_id}/characters/${item_id}/conversations/${rowData.id}`);
-                            },
+                          : (rowData: EventType) => `/projects/${project_id}/characters/${item_id}/conversations/${rowData.id}`,
                       }}
                       data={existingConversations?.data || []}
                       dispatch={dispatch}

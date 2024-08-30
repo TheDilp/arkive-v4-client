@@ -310,7 +310,7 @@ export function CharacterTemplatesView() {
 
   useEffect(() => {
     dispatch({ type: "clearSelection" });
-    dispatch({ type: "setPagination", payload: { page: 0 } });
+    dispatch({ type: "setPagination", payload: { page: 0, limit: pagination?.limit } });
   }, [arkived]);
   return (
     <TablePageLayout>

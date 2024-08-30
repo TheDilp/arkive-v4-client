@@ -897,7 +897,7 @@ function FolderView() {
 
   useEffect(() => {
     dispatch({ type: "clearSelection" });
-    dispatch({ type: "setPagination", payload: { page: 0 } });
+    dispatch({ type: "setPagination", payload: { page: 0, limit: pagination?.limit } });
     if (arkived === "arkive") navigate(`/projects/${project_id}/${type}`);
   }, [item_id, arkived]);
 
@@ -908,7 +908,7 @@ function FolderView() {
       });
     }
     dispatch({ type: "clearSelection" });
-    dispatch({ type: "setPagination", payload: { page: 0 } });
+    dispatch({ type: "setPagination", payload: { page: 0, limit: pagination?.limit } });
     if (filter.length >= 3) {
       const timeout = setTimeout(() => {
         if (filter) {
@@ -1123,12 +1123,12 @@ function FolderView() {
         <div className="grid h-full w-full grid-cols-2 content-start gap-8 md:grid-cols-4 lg:grid-cols-10">
           {(base?.data?.length && (!item_id || isFolder) ? base.data : []).map((item) => (
             <EntityItem
+              key={item.id}
               changeParent={changeParent}
               icon={item.icon}
               id={item.id}
               image_id={item?.image_id}
               is_folder={item?.is_folder ?? false}
-              key={item.id}
               showContextMenu={(event: MouseEvent<HTMLDivElement, MouseEvent>, id: string) =>
                 setContextMenuAtom({
                   event,
@@ -1194,6 +1194,7 @@ function FolderView() {
       {view === "table" ? (
         <div className="w-full flex-1 overflow-hidden">
           <Table
+            key={type}
             columns={getColumns(
               setDrawer,
               setDialog,
@@ -1225,7 +1226,6 @@ function FolderView() {
             data={base?.data || []}
             dispatch={dispatch}
             isLoading={isInitialLoading || isInitialLoadingFolder}
-            key={type}
             pagination={pagination}
             type={type as AvailableEntityType}
           />
