@@ -662,7 +662,6 @@ function conversationTableColumns(
                 image_id={char?.portrait_id}
                 initials={getAvatarInitials(char?.full_name || "")}
                 isBordered
-                isTooltipDisabled
                 label={getCharacterFullName(char?.full_name || "")}
                 size="sm"
               />
