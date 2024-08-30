@@ -259,11 +259,11 @@ export function ConversationView({ id }: { id: string }) {
               if (m.type === "narration")
                 return (
                   <NarrationMessage
+                    key={m?.id}
                     content={m?.content}
                     deleteMessage={deleteMessage}
                     handleEditMessageDrawer={handleEditMessageDrawer}
                     id={m?.id}
-                    key={m?.id}
                     parent_id={existingConversation?.data?.id}
                   />
                 );
@@ -279,7 +279,7 @@ export function ConversationView({ id }: { id: string }) {
                   />
                 );
               return (
-                <div className="flex flex-nowrap" key={m?.id}>
+                <div key={m?.id} className="flex flex-nowrap">
                   <div
                     className={`group flex max-w-[100%] flex-nowrap lg:max-w-[50%] ${
                       getCharacterSide(item_id, selectedCharacter, char?.id)
@@ -336,7 +336,7 @@ export function ConversationView({ id }: { id: string }) {
           )}
         </div>
       </div>
-      <div className="flex min-h-fit flex-col gap-y-2 pt-2">
+      <div className="flex flex-col gap-y-2 pt-2">
         <div className="flex w-full flex-nowrap justify-end gap-x-2">
           <div className="w-32">
             <Select
@@ -409,7 +409,7 @@ export function ConversationView({ id }: { id: string }) {
             searchEntity="places"
           />
         ) : (
-          <div className="flex flex-nowrap gap-x-2 [&>.editor-component]:max-h-56 [&>.editor-component]:self-end [&>.editor-component]:overflow-y-auto">
+          <div className="flex flex-nowrap gap-x-2 pb-2 [&>.editor-component>div>.remirror-editor-wrapper]:min-h-24 [&>.editor-component]:h-56 [&>.editor-component]:self-end [&>.editor-component]:overflow-y-auto">
             <Editor
               customPlaceholder={
                 selectedType === "character" && !selectedCharacter ? "Please select a character first." : undefined
