@@ -1025,8 +1025,11 @@ export function CharacterProfileView({
                     />
                   </div>
                 ) : null}
-                {tabs[selectedTab].label} {subitem_id && tabs[selectedTab].label === "conversations" ? "-" : ""}
-                {existingConversations?.data?.find((convo) => convo?.id === subitem_id)?.title}
+                {tabs[selectedTab].id === "4" && subitem_id ? (
+                  <span className="text-xl">
+                    Conversation - {existingConversations?.data?.find((convo) => convo?.id === subitem_id)?.title}
+                  </span>
+                ) : null}
               </span>
               {type === "relationships" ? (
                 <div className="ml-auto w-min">
