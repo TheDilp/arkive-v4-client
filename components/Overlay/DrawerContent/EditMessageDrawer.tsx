@@ -3,7 +3,7 @@ import { isRemirrorJSON, RemirrorJSON } from "remirror";
 
 import { useGetSubEntity, useToggledResetAtom, useUpdateMessageSubEntity } from "../../../hooks";
 import { MessagePlaceContentType, MessageType } from "../../../types";
-import { getCharacterFullName, IconEnum } from "../../../utils";
+import { IconEnum } from "../../../utils";
 import { Editor } from "../../Complex";
 import { EntityPreview } from "../../DataDisplay";
 import { Button, Search } from "../../Form";
@@ -33,13 +33,13 @@ export function EditMessageDrawer({ data }: Props) {
     },
     {
       enabled: !!data?.id,
-    },
+    }
   );
   const resetDrawer = useToggledResetAtom();
   const [content, setContent] = useState<RemirrorJSON | MessagePlaceContentType>();
 
   const { mutateAsync: updateMessage, isLoading: isUpdating } = useUpdateMessageSubEntity<any>(
-    existingMessage?.data?.parent_id as string,
+    existingMessage?.data?.parent_id as string
   );
 
   async function handleSave() {
@@ -67,7 +67,7 @@ export function EditMessageDrawer({ data }: Props) {
               });
             resetDrawer();
           },
-        },
+        }
       );
   }
   function handleChange({ value }: { value: RemirrorJSON }) {
@@ -83,15 +83,11 @@ export function EditMessageDrawer({ data }: Props) {
   if (isInitialLoading) return <Skeleton type="drawer_form" />;
   return (
     <div className="flex flex-col gap-y-2">
-      {existingMessage?.data?.character ? (
+      {existingMessage?.data?.full_name ? (
         <EntityPreview
-          id={existingMessage?.data?.character?.id}
-          image_id={existingMessage?.data?.character?.portrait_id}
-          title={getCharacterFullName(
-            existingMessage?.data?.character?.first_name,
-            undefined,
-            existingMessage?.data?.character?.last_name,
-          )}
+          id={existingMessage?.data?.sender_id || ""}
+          image_id={existingMessage?.data?.portrait_id}
+          title={existingMessage?.data?.full_name}
           type="characters"
         />
       ) : null}
