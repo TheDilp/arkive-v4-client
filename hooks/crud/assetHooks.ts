@@ -219,6 +219,11 @@ export function useUpdateImage<
       if (updateValues?.data?.file) {
         formData.append("file", updateValues?.data?.file, updateValues?.data?.file?.name);
       }
+
+      if (updateValues?.permissions) {
+        formData.append("permissions", JSON.stringify(updateValues.permissions));
+      }
+
       return FetchFunction({
         url: `${baseURLS.baseAssetServer}/assets/update/${id}`,
         body: formData,
