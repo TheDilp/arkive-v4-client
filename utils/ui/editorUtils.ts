@@ -1,5 +1,4 @@
 import { PlaceholderExtension, useHelpers, useKeymap, useRemirrorContext } from "@remirror/react";
-import { useQueryClient } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
 import { Dispatch, SetStateAction, useCallback } from "react";
 import { useParams } from "react-router-dom";
@@ -249,6 +248,7 @@ export function documentEditorHooks(changedData: any, resetChanges: () => void, 
 export function messageEditorHooks(
   id: string,
   selectedCharacter: string | undefined,
+  characters: ConversationType["characters"],
   selectedType: MessageKindType,
   sendJsonMessage: SendJsonMessage,
   conversation: Partial<ConversationType> | undefined,
@@ -257,7 +257,6 @@ export function messageEditorHooks(
 ) {
   return [
     () => {
-      const queryClient = useQueryClient();
       const { getJSON } = useHelpers();
       const getContext = useRemirrorContext();
       const { project_id } = useParams();
@@ -267,24 +266,18 @@ export function messageEditorHooks(
       const handleSendMessage = useCallback(() => {
         if (!isMentionDropdownOpen && canSend && (selectedType === "character" || selectedType === "narration")) {
           const jsonContent = getJSON();
+
+          const character = selectedType === "character" ? characters.find((char) => char.id === selectedCharacter) : null;
           const messageData = {
             id: crypto.randomUUID(),
             parent_id: id,
             content: jsonContent,
             type: selectedType,
             sender_id: selectedCharacter,
+            full_name: character?.full_name || null,
+            portrait_id: character?.portrait_id || null,
           };
-          queryClient.setQueryData<{ data: ConversationType }>(["conversations", id], (old) => {
-            if (old)
-              return {
-                ...old,
-                data: {
-                  ...old?.data,
-                  messages: [...(old?.data?.messages || []), { ...messageData, content: jsonContent }],
-                },
-              };
-            return old;
-          });
+
           sendJsonMessage({
             data: messageData,
             project_id,
