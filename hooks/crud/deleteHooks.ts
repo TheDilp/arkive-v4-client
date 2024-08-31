@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { MutationOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 import cloneDeep from "lodash.clonedeep";
 import set from "lodash.set";
 
@@ -55,7 +55,12 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
   );
 }
 
-export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: string, parent_id?: string) {
+export function useDeleteSubEntity(
+  type: AvailableSubEntityType,
+  project_id: string,
+  parent_id?: string,
+  options?: MutationOptions<any, any, { data: { id: string; parent_id: string } }>
+) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   return useMutation(
@@ -87,12 +92,16 @@ export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: str
 
         return { old: {} };
       },
-      onSuccess: (data) => {
+      onSuccess: (data, vars, ctx) => {
         if (type === "events") {
           queryClient.invalidateQueries(["allEntities", project_id, parent_id]);
         }
         if (type === "map_pins") {
           queryClient.invalidateQueries(["maps"]);
+        }
+
+        if (options?.onSuccess) {
+          options?.onSuccess(data, vars, ctx);
         }
 
         queryClient.invalidateQueries(["allEntities", project_id, type]);
