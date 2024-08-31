@@ -855,7 +855,7 @@ export function CharacterProfileView({
       },
     },
     "conversations",
-    { enabled: selectedTab === 4 && !!existingCharacter?.data, queryKeyConcat: [item_id as string] }
+    { enabled: selectedTab === 4 && !!existingCharacter?.data && !subitem_id, queryKeyConcat: [item_id as string] }
   );
   function showRelationshipTree() {
     if (existingCharacter?.data)
