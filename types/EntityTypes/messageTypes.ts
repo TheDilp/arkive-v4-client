@@ -16,11 +16,12 @@ export type MessageType = {
   created_at?: string;
   parent_id: string;
   sender_id?: string;
-  character?: CharacterType;
+  full_name?: CharacterType["full_name"];
+  portrait_id?: CharacterType["portrait_id"];
 } & (
   | {
       type: "character" | "narration";
-      content: RemirrorJSON;
+      content: RemirrorJSON | undefined;
     }
   | {
       type: "place";
