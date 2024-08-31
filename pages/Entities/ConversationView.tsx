@@ -129,6 +129,67 @@ function PlaceMessage({
   );
 }
 
+function CharacterMessage({
+  item_id,
+  id,
+  content,
+  selectedCharacter,
+  sender_id,
+  full_name,
+  portrait_id,
+  parent_id,
+  handleEditMessageDrawer,
+  deleteMessage,
+}: Omit<MessageType, "type"> & {
+  item_id: string;
+  selectedCharacter: string;
+  handleEditMessageDrawer: () => void;
+  deleteMessage: DeleteMessageType;
+}) {
+  return (
+    <div className="flex flex-nowrap">
+      <div
+        className={`group flex max-w-[100%] flex-nowrap lg:max-w-[50%] ${
+          getCharacterSide(item_id, selectedCharacter, sender_id)
+            ? "ml-auto max-w-fit flex-row-reverse text-left tracking-tight"
+            : ""
+        } w-fit`}>
+        {sender_id ? (
+          <div className="flex flex-col items-end gap-x-1 self-end px-1">
+            <Avatar
+              image_id={portrait_id}
+              initials={getAvatarInitials(full_name || "") || ""}
+              label={full_name || ""}
+              size="2xs"
+              tooltipAllowedPlacements={["left", "right"]}
+            />
+          </div>
+        ) : null}
+        <div className="flex max-h-fit w-max max-w-fit flex-col rounded-md bg-zinc-800 p-2 shadow [&>.staticRendererContainer>*]:w-fit [&>.staticRendererContainer]:p-0 [&>.staticRendererContainer]:text-sm">
+          <StaticRender content={content as RemirrorJSON} />
+        </div>
+        {getCharacterSide(item_id, selectedCharacter, sender_id) ? (
+          <div className="left-0 flex flex-nowrap gap-x-1">
+            <div className="w-0 transition-all group-hover:w-4">
+              <Button
+                hasNoBackground
+                icon={IconEnum.close}
+                isIconOnly
+                onClick={async () => {
+                  await deleteMessage({ data: { id, parent_id } });
+                }}
+              />
+            </div>
+            <div className="w-0 transition-all group-hover:w-4">
+              <Button hasNoBackground icon={IconEnum.edit} isIconOnly onClick={handleEditMessageDrawer} />
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 export function ConversationView({ id }: { id: string }) {
   const { project_id, item_id } = useParams();
   const queryClient = useQueryClient();
@@ -146,7 +207,6 @@ export function ConversationView({ id }: { id: string }) {
     fields: ["id", "title"],
     relations: {
       characters: true,
-      messages: true,
     },
   });
   const {
@@ -182,7 +242,14 @@ export function ConversationView({ id }: { id: string }) {
       },
     }
   );
-  const { mutateAsync: deleteMessage } = useDeleteSubEntity("messages", project_id as string);
+  const { mutateAsync: deleteMessage } = useDeleteSubEntity("messages", project_id as string, undefined, {
+    onSuccess: (_, vars) => {
+      const idx = flatMessages?.findIndex((flatMsg) => flatMsg.id === vars.data.id);
+      if (idx > -1) {
+        setFlatMessages((prev) => prev.toSpliced(idx, 1));
+      }
+    },
+  });
 
   const [connect, setConnection] = useState(true);
 
@@ -267,7 +334,6 @@ export function ConversationView({ id }: { id: string }) {
                     parent_id={existingConversation?.data?.id}
                   />
                 );
-              const char = existingConversation?.data?.characters?.find((c) => c?.id === m?.sender_id);
               if (m.type === "place")
                 return (
                   <PlaceMessage
@@ -279,56 +345,19 @@ export function ConversationView({ id }: { id: string }) {
                   />
                 );
               return (
-                <div key={m?.id} className="flex flex-nowrap">
-                  <div
-                    className={`group flex max-w-[100%] flex-nowrap lg:max-w-[50%] ${
-                      getCharacterSide(item_id, selectedCharacter, char?.id)
-                        ? "ml-auto max-w-fit flex-row-reverse text-left tracking-tight"
-                        : ""
-                    } w-fit`}>
-                    {char ? (
-                      <div className="flex flex-col items-end gap-x-1 self-end px-1">
-                        <Avatar
-                          image_id={char?.portrait_id}
-                          initials={getAvatarInitials(char?.full_name || "") || ""}
-                          label={char?.full_name || ""}
-                          size="2xs"
-                          tooltipAllowedPlacements={["left", "right"]}
-                        />
-                      </div>
-                    ) : null}
-                    <div className="flex max-h-fit w-max max-w-fit flex-col rounded-md bg-zinc-800 p-2 shadow [&>.staticRendererContainer>*]:w-fit [&>.staticRendererContainer]:p-0 [&>.staticRendererContainer]:text-sm">
-                      <StaticRender content={m?.content} />
-                    </div>
-                    {getCharacterSide(item_id, selectedCharacter, char?.id) ? (
-                      <div className="left-0 flex flex-nowrap gap-x-1">
-                        <div className="w-0 transition-all group-hover:w-4">
-                          <Button
-                            hasNoBackground
-                            icon={IconEnum.close}
-                            isIconOnly
-                            onClick={async () => {
-                              if (existingConversation?.data?.id)
-                                await deleteMessage({ data: { id: m.id, parent_id: existingConversation?.data?.id } });
-                              const idx = flatMessages?.findIndex((flatMsg) => flatMsg.id === m.id);
-                              if (idx > -1) {
-                                setFlatMessages((prev) => prev.toSpliced(idx, 1));
-                              }
-                            }}
-                          />
-                        </div>
-                        <div className="w-0 transition-all group-hover:w-4">
-                          <Button
-                            hasNoBackground
-                            icon={IconEnum.edit}
-                            isIconOnly
-                            onClick={() => handleEditMessageDrawer(m.id)}
-                          />
-                        </div>
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
+                <CharacterMessage
+                  key={m?.id}
+                  content={m?.content}
+                  deleteMessage={deleteMessage}
+                  full_name={m.full_name}
+                  handleEditMessageDrawer={() => handleEditMessageDrawer(m.id)}
+                  id={m.id}
+                  item_id={item_id as string}
+                  parent_id={m.parent_id}
+                  portrait_id={m.portrait_id}
+                  selectedCharacter={selectedCharacter || ""}
+                  sender_id={m.sender_id}
+                />
               );
             })
           ) : (
@@ -417,6 +446,7 @@ export function ConversationView({ id }: { id: string }) {
               hooks={messageEditorHooks(
                 id,
                 selectedCharacter,
+                existingConversation?.data?.characters || [],
                 selectedType,
                 sendJsonMessage,
                 {
