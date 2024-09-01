@@ -16,6 +16,7 @@ import {
   IconEnum,
   messageEditorHooks,
   MessageTypeOptions,
+  projectAtom,
   userAtom,
 } from "../../utils";
 
@@ -196,11 +197,20 @@ export function ConversationView({ id }: { id: string }) {
   const setDrawer = useSetAtom(drawerAtom);
   const [selectedType, setSelectedType] = useState<MessageKindType>("character");
   const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
-  const [takenCharacters, setTakenCharacters] = useState<string[]>([]);
+  const [userCharacters, setUserCharacters] = useState<Record<string, string>>({});
   const [message, setMessage] = useState<RemirrorJSON | undefined>(undefined);
   const [messageLength, setMessageLength] = useState(0);
   const [flatMessages, setFlatMessages] = useState<MessageType[]>([]);
   const user = useAtomValue(userAtom);
+  const project = useAtomValue(projectAtom);
+  const [presentUsers, setPresentUsers] = useState<string[]>([]);
+  const isProjectOwnerPresent =
+    project?.owner_id && user?.id && project?.owner_id !== user?.id && presentUsers.includes(project?.owner_id);
+
+  const present_members = (project?.members || []).filter((member) => {
+    return presentUsers.includes(member.id) && member.id !== user?.id;
+  });
+
   const { data: existingConversation, isLoading } = useGetEntity<ConversationType>(id, "conversations", {
     data: {
       id,
@@ -275,11 +285,15 @@ export function ConversationView({ id }: { id: string }) {
           } else if (parsedData.event_type === "CONVERSATION_PRESENCE") {
             const parsedMessage: Record<string, string | null> = JSON.parse(parsedData.message); // Record<character_id, user_id>
 
-            const taken = Object.entries(parsedMessage || {})
-              .filter(([, user_id]) => user_id !== user?.id && user_id !== null)
-              .map(([character_id]) => character_id);
+            const temp: Record<string, string> = {};
 
-            setTakenCharacters(taken);
+            Object.entries(parsedMessage || {}).forEach(([character_id, user_id]) => {
+              if (user_id !== user?.id && user_id !== null) {
+                temp[character_id] = user_id;
+              }
+            });
+
+            setUserCharacters(temp);
           }
         } catch (error) {
           // console.error("ERROR PARSING MESSAGE.");
@@ -316,9 +330,21 @@ export function ConversationView({ id }: { id: string }) {
     }
   }, [selectedType]);
 
+  useEffect(() => {
+    if (userCharacters) {
+      setPresentUsers(Object.values(userCharacters));
+    }
+  }, [userCharacters]);
+
   if (isLoading) return <Skeleton type="conversations" />;
   return (
     <div className="relative flex h-full max-h-full flex-col justify-between">
+      <div className="absolute -top-16 right-0 z-50 flex items-center -space-x-2">
+        {isProjectOwnerPresent ? <Avatar image_url={project?.owner?.image} label={project?.owner?.nickname} size="xs" /> : null}
+        {present_members.map((m) => (
+          <Avatar key={m.id} image_url={m.image} label={m.nickname} size="xs" />
+        ))}
+      </div>
       <div className="flex flex-1 flex-col gap-y-2 overflow-auto">
         <div className="h-10">
           <Button
@@ -396,7 +422,7 @@ export function ConversationView({ id }: { id: string }) {
                   link: getAssetURL(project_id as string, "images", char.portrait_id),
                   shape: "circle",
                 },
-                isDisabled: takenCharacters.includes(char.id),
+                isDisabled: !!userCharacters[char.id],
                 label: char?.full_name || "",
                 value: char.id,
               }))}

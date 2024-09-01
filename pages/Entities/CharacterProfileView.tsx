@@ -1301,7 +1301,7 @@ export function CharacterProfileView({
                     />
                   </div>
                 )}
-                <div className="h-full max-h-[100%] overflow-hidden">
+                <div className="relative h-full max-h-[100%]">
                   {subitem_id && !isPreview ? <ConversationView id={subitem_id} /> : null}
                 </div>
               </div>
