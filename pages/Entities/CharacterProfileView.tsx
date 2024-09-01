@@ -46,6 +46,7 @@ import {
   FormattedRelationship,
   ImageType,
   MapType,
+  UserHasPermissionsType,
   WebhookType,
 } from "../../types";
 import {
@@ -648,7 +649,11 @@ function conversationTableColumns(
   item_id: string,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
-  generateDocument: GenerateDocumentType
+  generateDocument: GenerateDocumentType,
+  character_owner_id: string,
+  permissions: UserHasPermissionsType,
+  user_id: string | undefined,
+  isProjectOwner: boolean
 ) {
   return [
     conversationColumnHelper.display({
@@ -694,6 +699,7 @@ function conversationTableColumns(
                 id: "edit_conversation",
                 title: "Edit conversation",
                 icon: IconEnum.edit,
+                isDisabled: !isProjectOwner && character_owner_id !== user_id,
                 onClick: () => {
                   const char = row.original.characters.find((c) => c.id === item_id);
                   if (char) {
@@ -715,9 +721,24 @@ function conversationTableColumns(
                 },
               },
               {
+                id: "gateway",
+                title: "Create gateway access",
+                icon: IconEnum.gateway,
+                isDisabled: !isProjectOwner && character_owner_id !== user_id,
+                onClick: () => {},
+              },
+              {
                 id: "generate_document",
                 title: "Create document from conversation",
                 icon: IconEnum.document,
+                isDisabled: !hasActionPermission(
+                  isProjectOwner,
+                  user_id === character_owner_id,
+                  permissions,
+                  [],
+                  "create_documents",
+                  undefined
+                ),
                 onClick: async () => {
                   await generateDocument({
                     data: {
@@ -732,6 +753,7 @@ function conversationTableColumns(
                 id: "delete_conversation",
                 title: "Delete conversation",
                 icon: IconEnum.trash,
+                isDisabled: !isProjectOwner && character_owner_id !== user_id,
                 onClick: () => {
                   setDialog((prev) => ({
                     ...prev,
@@ -776,7 +798,7 @@ export function CharacterProfileView({
   const { isLg } = useBreakpoint();
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(
-    ["read_characters", "create_characters", "update_characters", "delete_characters"],
+    ["read_characters", "create_characters", "update_characters", "delete_characters", "create_documents", "read_tags"],
     undefined
   );
   const user = useAtomValue(userAtom);
@@ -1287,7 +1309,11 @@ export function CharacterProfileView({
                         item_id as string,
                         setDialog,
                         setDrawer,
-                        generateDocument
+                        generateDocument,
+                        existingCharacter?.data?.owner_id || "",
+                        permissions,
+                        user?.id,
+                        isProjectOwner
                       )}
                       config={{
                         getLink: isPreview
