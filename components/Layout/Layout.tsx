@@ -49,6 +49,7 @@ export function ProjectLayout() {
       relations: {
         members: true,
         feature_flags: true,
+        owner: true,
       },
     },
     { staleTime: 60 * 60 * 1 }
