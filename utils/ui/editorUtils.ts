@@ -247,7 +247,7 @@ export function documentEditorHooks(changedData: any, resetChanges: () => void, 
 }
 export function messageEditorHooks(
   id: string,
-  selectedCharacter: string | undefined,
+  selectedCharacter: string | null,
   characters: ConversationType["characters"],
   selectedType: MessageKindType,
   sendJsonMessage: SendJsonMessage,
@@ -279,6 +279,7 @@ export function messageEditorHooks(
           };
 
           sendJsonMessage({
+            type: "message",
             data: messageData,
             project_id,
             conversation,

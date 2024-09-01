@@ -84,7 +84,12 @@ export type DiceRollType = {
   ops: ("+" | "-" | "/" | "*")[];
 };
 
-export type WebsocketEventType = "NEW_MESSAGE" | "NEW_NOTIFICATION" | "ROLE_UPDATED" | "ROLE_ASSIGNED";
+export type WebsocketEventType =
+  | "NEW_MESSAGE"
+  | "NEW_NOTIFICATION"
+  | "ROLE_UPDATED"
+  | "ROLE_ASSIGNED"
+  | "CONVERSATION_PRESENCE";
 
 export type UpdatePublicManyType = UseMutateAsyncFunction<
   any,

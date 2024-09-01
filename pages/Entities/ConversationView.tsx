@@ -1,5 +1,5 @@
-import { UseMutateAsyncFunction, useQueryClient } from "@tanstack/react-query";
-import { useSetAtom } from "jotai";
+import { UseMutateAsyncFunction } from "@tanstack/react-query";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
@@ -16,6 +16,7 @@ import {
   IconEnum,
   messageEditorHooks,
   MessageTypeOptions,
+  userAtom,
 } from "../../utils";
 
 type DeleteMessageType = UseMutateAsyncFunction<
@@ -192,14 +193,14 @@ function CharacterMessage({
 
 export function ConversationView({ id }: { id: string }) {
   const { project_id, item_id } = useParams();
-  const queryClient = useQueryClient();
   const setDrawer = useSetAtom(drawerAtom);
   const [selectedType, setSelectedType] = useState<MessageKindType>("character");
-  const [selectedCharacter, setSelectedCharacter] = useState<string | undefined>(item_id ?? undefined);
+  const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
+  const [takenCharacters, setTakenCharacters] = useState<string[]>([]);
   const [message, setMessage] = useState<RemirrorJSON | undefined>(undefined);
   const [messageLength, setMessageLength] = useState(0);
   const [flatMessages, setFlatMessages] = useState<MessageType[]>([]);
-
+  const user = useAtomValue(userAtom);
   const { data: existingConversation, isLoading } = useGetEntity<ConversationType>(id, "conversations", {
     data: {
       id,
@@ -251,10 +252,10 @@ export function ConversationView({ id }: { id: string }) {
     },
   });
 
-  const [connect, setConnection] = useState(true);
+  const [connect, setConnection] = useState(false);
 
-  const { sendJsonMessage } = useWebSocket(
-    `ws://localhost:5174/ws/conversation/${id}`,
+  const { sendJsonMessage, readyState } = useWebSocket(
+    `ws://localhost:5174/ws/conversation/${id}?character_id=${selectedCharacter}&user_id=${user?.id}`,
     {
       onMessage: (e) => {
         try {
@@ -271,6 +272,14 @@ export function ConversationView({ id }: { id: string }) {
                 // console.error("ERROR PARSING MESSAGE CONTENT.");
               }
             }
+          } else if (parsedData.event_type === "CONVERSATION_PRESENCE") {
+            const parsedMessage: Record<string, string | null> = JSON.parse(parsedData.message); // Record<character_id, user_id>
+
+            const taken = Object.entries(parsedMessage || {})
+              .filter(([, user_id]) => user_id !== user?.id && user_id !== null)
+              .map(([character_id]) => character_id);
+
+            setTakenCharacters(taken);
           }
         } catch (error) {
           // console.error("ERROR PARSING MESSAGE.");
@@ -291,7 +300,7 @@ export function ConversationView({ id }: { id: string }) {
   }
 
   useEffect(() => {
-    if (!id) setConnection(false);
+    if (id) setConnection(true);
   }, [id]);
 
   useLayoutEffect(() => {
@@ -303,7 +312,7 @@ export function ConversationView({ id }: { id: string }) {
 
   useEffect(() => {
     if (selectedType !== "character") {
-      setSelectedCharacter(undefined);
+      setSelectedCharacter(null);
     }
   }, [selectedType]);
 
@@ -387,6 +396,7 @@ export function ConversationView({ id }: { id: string }) {
                   link: getAssetURL(project_id as string, "images", char.portrait_id),
                   shape: "circle",
                 },
+                isDisabled: takenCharacters.includes(char.id),
                 label: char?.full_name || "",
                 value: char.id,
               }))}
@@ -415,18 +425,8 @@ export function ConversationView({ id }: { id: string }) {
                 type: selectedType,
                 sender_id: selectedCharacter,
               };
-              queryClient.setQueryData<{ data: ConversationType }>(["conversations", id], (old) => {
-                if (old)
-                  return {
-                    ...old,
-                    data: {
-                      ...old?.data,
-                      messages: [...(old?.data?.messages || []), messageData],
-                    },
-                  };
-                return old;
-              });
               sendJsonMessage({
+                type: "message",
                 data: messageData,
                 project_id,
                 conversation: {
@@ -457,7 +457,7 @@ export function ConversationView({ id }: { id: string }) {
                 setMessageLength
               )}
               initialContent={message}
-              isDisabled={selectedType === "character" && !selectedCharacter}
+              isDisabled={(selectedType === "character" && !selectedCharacter) || readyState !== 1}
               menubarSize="sm"
               name="message"
               onChange={({ value }) => setMessage(value)}
