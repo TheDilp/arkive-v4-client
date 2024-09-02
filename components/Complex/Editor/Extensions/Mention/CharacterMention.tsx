@@ -76,13 +76,13 @@ export function CharacterMention({ id, project_id, title, label }: Props) {
     if (!data?.data?.is_public && IS_PUBLIC) return <span ref={mentionRef}>{label}</span>;
     if (!data?.data && !isPaused && isFetched)
       return (
-        <span className="font-lato underline" ref={mentionRef}>
+        <span ref={mentionRef} className="font-lato">
           {label}
         </span>
       );
     if (!data)
       return (
-        <span className="font-lato underline decoration-wavy" ref={mentionRef}>
+        <span ref={mentionRef} className="font-lato underline decoration-wavy">
           {label}
         </span>
       );
@@ -96,7 +96,7 @@ export function CharacterMention({ id, project_id, title, label }: Props) {
         <Link
           className="inline-flex items-center font-lato text-sm font-bold transition-colors"
           to={getMentionLink(id as string, "characters", project_id as string, data?.data?.is_public ?? false)}>
-          <div className="flex items-start" ref={mentionRef}>
+          <div ref={mentionRef} className="flex items-start">
             {data?.data?.portrait_id && project_id ? (
               <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
                 <Avatar hasShowImage image_id={data?.data?.portrait_id} size="3xs" />

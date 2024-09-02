@@ -66,13 +66,13 @@ export function GraphMention({ title, id, label, project_id }: Props) {
     if (!data?.data?.is_public && IS_PUBLIC) return <span ref={mentionRef}>{label}</span>;
     if (!data?.data && !isPaused && isFetched)
       return (
-        <span className="font-lato underline" ref={mentionRef}>
+        <span ref={mentionRef} className="font-lato">
           {label}
         </span>
       );
     if (!data)
       return (
-        <span className="font-lato underline decoration-wavy" ref={mentionRef}>
+        <span ref={mentionRef} className="font-lato underline decoration-wavy">
           {label}
         </span>
       );
@@ -88,7 +88,7 @@ export function GraphMention({ title, id, label, project_id }: Props) {
           className="mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
           id={`link-${id}`}
           to={getMentionLink(id as string, "graphs", project_id as string, !!data?.data?.is_public)}>
-          <div className="flex items-start" ref={mentionRef}>
+          <div ref={mentionRef} className="flex items-start">
             <span className="relative top-0.5">
               <Icon fontSize={14} icon={IconEnum.graph} />
             </span>
