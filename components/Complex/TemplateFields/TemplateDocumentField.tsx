@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 
 import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
 import { GatewayConfigOptionType } from "../../../types/EntityTypes/gatewayTypes";
-import { getEntityLink, getAssetURL } from "../../../utils";
+import { getAssetURL, getEntityLink } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search, Select } from "../../Form";
 import { TemplateFieldContainer } from ".";
@@ -169,6 +169,7 @@ export function TemplateDocumentField({
           {(currentValue || [])?.map((val) => {
             return (
               <EntityPreview
+                key={val.document.id}
                 clearAction={
                   isDisabled
                     ? undefined
@@ -183,7 +184,6 @@ export function TemplateDocumentField({
                 }
                 icon={val?.document?.icon || ""}
                 id={val?.document?.id}
-                key={val.document.id}
                 link={getEntityLink(val?.document?.project_id || project_id || "", "documents", val.document?.id, undefined)}
                 title={val.document?.title}
                 type="documents"

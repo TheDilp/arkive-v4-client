@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 
 import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
 import { GatewayConfigOptionType } from "../../../types/EntityTypes/gatewayTypes";
-import { getEntityLink, getAssetURL } from "../../../utils";
+import { getAssetURL, getEntityLink } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search, Select } from "../../Form";
 import { TemplateFieldContainer } from ".";
@@ -172,6 +172,7 @@ export function TemplateLocationsField({
           {(currentValue || [])?.map((val) => {
             return (
               <EntityPreview
+                key={val.map_pin?.id}
                 clearAction={
                   isDisabled
                     ? undefined
@@ -186,7 +187,6 @@ export function TemplateLocationsField({
                 }
                 icon={val?.map_pin?.icon || ""}
                 id={val?.map_pin?.id}
-                key={val.map_pin?.id}
                 link={getEntityLink(project_id as string, "map_pins", id, undefined)}
                 title={val?.map_pin?.title || ""}
                 type="map_pins"

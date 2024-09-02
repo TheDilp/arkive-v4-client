@@ -170,6 +170,7 @@ export function TemplateImageField({
           {(currentValue || [])?.map((val) => {
             return (
               <EntityPreview
+                key={val.image.id}
                 clearAction={
                   isDisabled
                     ? undefined
@@ -184,7 +185,6 @@ export function TemplateImageField({
                 }
                 id={val.image?.id}
                 image_id={val.image?.id}
-                key={val.image.id}
                 title={val.image?.title}
                 type="images"
               />

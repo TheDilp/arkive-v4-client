@@ -12,6 +12,7 @@ type Props = {
   options: { id: string; value: string }[];
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isEditEnabled?: boolean;
   isOpen?: boolean;
 };
 
