@@ -4,6 +4,7 @@ export * from "./Checkbox";
 export * from "./ImageUpload";
 export * from "./Input";
 export * from "./Range";
+export * from "./RelatedEntityForm";
 export * from "./Search";
 export * from "./Select";
 export * from "./TagInput";
