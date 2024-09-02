@@ -167,7 +167,7 @@ function CharacterMessage({
             />
           </div>
         ) : null}
-        <div className="flex max-h-fit w-max max-w-fit flex-col rounded-md bg-zinc-800 p-2 shadow [&>.staticRendererContainer>*]:w-fit [&>.staticRendererContainer]:p-0 [&>.staticRendererContainer]:text-sm">
+        <div className="messageContainer flex max-h-fit w-max max-w-fit flex-col rounded-md bg-zinc-800 p-2 shadow [&>.staticRendererContainer>*]:w-fit [&>.staticRendererContainer]:p-0 [&>.staticRendererContainer]:text-sm">
           <StaticRender content={content as RemirrorJSON} />
         </div>
         {getCharacterSide(item_id, selectedCharacter, sender_id) ? (

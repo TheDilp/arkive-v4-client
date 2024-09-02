@@ -337,6 +337,13 @@
     }
   }
 }
+.messageContainer {
+  .staticRendererContainer {
+    p:not(.ProseMirror-staticTrailingBreak) {
+      @apply min-h-0;
+    }
+  }
+}
 .drawerEventDescription {
   .staticRendererContainer {
     @apply p-0;
