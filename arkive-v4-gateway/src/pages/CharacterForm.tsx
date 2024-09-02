@@ -2,7 +2,7 @@ import { useSetAtom } from "jotai";
 import { ReactNode, useEffect, useLayoutEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
-import { Avatar, AvatarUpload, Button, Editor, FieldTemplateRows, Input, Skeleton } from "../../../components";
+import { Avatar, AvatarUpload, Button, Editor, Input, RelatedEntityForm, Skeleton } from "../../../components";
 import {
   useCreateEntity,
   useGetEntities,
@@ -381,9 +381,9 @@ export function CharacterForm() {
               ) : null}
 
               {section.id === "other" && !!fields?.["other"]?.length ? (
-                <FieldTemplateRows
-                  character_fields={fields?.["other"] || []}
-                  character_fields_data={character?.character_fields || []}
+                <RelatedEntityForm
+                  fields={fields?.["other"] || []}
+                  fields_data={character?.character_fields || []}
                   handleChange={handleChange}
                   hasCreateOrEdit={true}
                   isDrawer={false}
@@ -392,9 +392,9 @@ export function CharacterForm() {
               ) : null}
 
               {section.id !== "name" && section.id !== "other" && !!fields?.[section.id]?.length ? (
-                <FieldTemplateRows
-                  character_fields={fields?.[section.id] || []}
-                  character_fields_data={character?.character_fields || []}
+                <RelatedEntityForm
+                  fields={fields?.[section.id] || []}
+                  fields_data={character?.character_fields || []}
                   handleChange={handleChange}
                   hasCreateOrEdit={true}
                   isDrawer={false}
