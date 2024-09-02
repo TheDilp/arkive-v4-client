@@ -147,6 +147,7 @@ function FieldTemplateRows({
           if (template_field.field_type === "text" || template_field.field_type === "number")
             return (
               <TemplateInputField
+                key={template_field.id}
                 currentValue={
                   blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
                     ?.value as string | number | null
@@ -157,7 +158,6 @@ function FieldTemplateRows({
                 isCollapsible
                 isDisabled={isDisabled}
                 isOpen={areAllOpen}
-                key={template_field.id}
                 name={baseName}
                 title={template_field.title}
               />
@@ -166,6 +166,7 @@ function FieldTemplateRows({
           if (template_field.field_type === "select" || template_field.field_type === "select_multiple")
             return (
               <TemplateSelectField
+                key={template_field.id}
                 currentValue={
                   blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
                     ?.value as string | string[] | null
@@ -176,7 +177,6 @@ function FieldTemplateRows({
                 isCollapsible
                 isDisabled={isDisabled}
                 isOpen={areAllOpen}
-                key={template_field.id}
                 name={baseName}
                 options={template_field.options || []}
                 title={template_field.title}
@@ -185,6 +185,7 @@ function FieldTemplateRows({
           if (template_field.field_type === "textarea")
             return (
               <TemplateTextareaField
+                key={template_field.id}
                 currentValue={
                   blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
                     ?.value as any
@@ -194,7 +195,6 @@ function FieldTemplateRows({
                 isCollapsible
                 isDisabled={isDisabled}
                 isOpen={areAllOpen}
-                key={template_field.id}
                 name={baseName}
                 title={template_field.title}
               />
@@ -202,6 +202,7 @@ function FieldTemplateRows({
           if (template_field.field_type === "boolean")
             return (
               <TemplateBooleanField
+                key={template_field.id}
                 currentValue={
                   blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
                     ?.value as boolean | null
@@ -211,7 +212,6 @@ function FieldTemplateRows({
                 isCollapsible
                 isDisabled={isDisabled}
                 isOpen={areAllOpen}
-                key={template_field.id}
                 name={baseName}
                 title={template_field.title}
               />
@@ -219,6 +219,7 @@ function FieldTemplateRows({
           if (template_field.field_type === "dice_roll")
             return (
               <TemplateDiceRollField
+                key={template_field.id}
                 currentValue={
                   blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
                     ?.value as string
@@ -229,7 +230,6 @@ function FieldTemplateRows({
                 isCollapsible
                 isDisabled={isDisabled}
                 isOpen={areAllOpen}
-                key={template_field.id}
                 name={baseName}
                 title={template_field.title}
               />
@@ -237,6 +237,7 @@ function FieldTemplateRows({
           if (template_field.field_type === "date" && permissions?.read_calendars) {
             return (
               <TemplateDateField
+                key={template_field.id}
                 calendar={template_field.calendar}
                 currentValue={
                   blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
@@ -247,7 +248,6 @@ function FieldTemplateRows({
                 isCollapsible
                 isDisabled={isDisabled}
                 isOpen={areAllOpen}
-                key={template_field.id}
                 name={baseName}
                 title={template_field.title}
               />
@@ -256,6 +256,7 @@ function FieldTemplateRows({
           if (template_field.field_type === "random_table" && permissions?.read_random_tables)
             return (
               <TemplateRandomTableField
+                key={template_field.id}
                 currentValue={
                   blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
                     ?.random_table
@@ -265,7 +266,6 @@ function FieldTemplateRows({
                 isCollapsible
                 isDisabled={isDisabled}
                 isOpen={areAllOpen}
-                key={template_field.id}
                 name={baseName}
                 random_table={template_field.random_table}
                 title={template_field.title}
@@ -278,6 +278,7 @@ function FieldTemplateRows({
           ) {
             return (
               <TemplateCharacterField
+                key={template_field.id}
                 currentValue={
                   blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
                     ?.characters
@@ -288,7 +289,6 @@ function FieldTemplateRows({
                 isCollapsible
                 isDisabled={isDisabled}
                 isOpen={areAllOpen}
-                key={template_field.id}
                 name={baseName}
                 presetOptions={[]}
                 title={template_field.title}
@@ -302,6 +302,7 @@ function FieldTemplateRows({
           ) {
             return (
               <TemplateBlueprintField
+                key={template_field.id}
                 blueprint_id={template_field.blueprint_id}
                 currentValue={
                   blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
@@ -313,7 +314,6 @@ function FieldTemplateRows({
                 isCollapsible
                 isDisabled={isDisabled}
                 isOpen={areAllOpen}
-                key={template_field.id}
                 name={baseName}
                 presetOptions={[]}
                 title={template_field.title}
@@ -326,6 +326,7 @@ function FieldTemplateRows({
           ) {
             return (
               <TemplateDocumentField
+                key={template_field.id}
                 currentValue={
                   blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
                     ?.documents
@@ -336,7 +337,6 @@ function FieldTemplateRows({
                 isCollapsible
                 isDisabled={isDisabled}
                 isOpen={areAllOpen}
-                key={template_field.id}
                 name={baseName}
                 presetOptions={[]}
                 title={template_field.title}
@@ -349,6 +349,7 @@ function FieldTemplateRows({
           ) {
             return (
               <TemplateLocationsField
+                key={template_field.id}
                 currentValue={
                   blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
                     ?.map_pins
@@ -359,7 +360,6 @@ function FieldTemplateRows({
                 isCollapsible
                 isDisabled={isDisabled}
                 isOpen={areAllOpen}
-                key={template_field.id}
                 name={baseName}
                 presetOptions={[]}
                 title={template_field.title}
@@ -372,6 +372,7 @@ function FieldTemplateRows({
           ) {
             return (
               <TemplateEventField
+                key={template_field.id}
                 currentValue={
                   blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
                     ?.events
@@ -382,7 +383,6 @@ function FieldTemplateRows({
                 isCollapsible
                 isDisabled={isDisabled}
                 isOpen={areAllOpen}
-                key={template_field.id}
                 name={baseName}
                 presetOptions={[]}
                 title={template_field.title}
@@ -395,6 +395,7 @@ function FieldTemplateRows({
           ) {
             return (
               <TemplateImageField
+                key={template_field.id}
                 currentValue={
                   blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
                     ?.images
@@ -405,7 +406,6 @@ function FieldTemplateRows({
                 isCollapsible
                 isDisabled={isDisabled}
                 isOpen={areAllOpen}
-                key={template_field.id}
                 name={baseName}
                 presetOptions={[]}
                 title={template_field.title}
