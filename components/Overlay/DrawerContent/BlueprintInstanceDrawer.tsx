@@ -12,13 +12,10 @@ import {
   useUpdateSubEntity,
 } from "../../../hooks";
 import {
-  BlueprintFieldType,
-  BlueprintInstanceBlueprintFieldType,
   BlueprintInstanceType,
   BlueprintType,
   DrawerAtomType,
   EventStateType,
-  HandleChangePropsType,
   TabType,
   UserHasPermissionsType,
 } from "../../../types";
@@ -28,29 +25,13 @@ import {
   checkIfYearCorrect,
   createOrEditPermission,
   getDifferenceForBlueprintInstance,
-  getFieldValueFromType,
   IconEnum,
   useNotifications,
 } from "../../../utils";
 import { InsertBlueprintInstanceSchema, UpdateBlueprintInstanceSchema } from "../../../validation";
-import {
-  TemplateBlueprintField,
-  TemplateBooleanField,
-  TemplateCharacterField,
-  TemplateDateField,
-  TemplateDiceRollField,
-  TemplateDocumentField,
-  TemplateEventField,
-  TemplateImageField,
-  TemplateInputField,
-  TemplateLocationsField,
-  TemplateRandomTableField,
-  TemplateSelectField,
-  TemplateTextareaField,
-} from "../../Complex";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { EntityPreview } from "../../DataDisplay";
-import { Button, Checkbox, Input, Search, TagInput } from "../../Form";
+import { Button, Checkbox, Input, RelatedEntityForm, Search, TagInput } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 
@@ -97,327 +78,6 @@ function isSaveDisabled(blueprint_fields: BlueprintInstanceType["blueprint_field
     });
   }
   return false;
-}
-
-function FieldTemplateRows({
-  blueprint_fields = [],
-  blueprint_fields_data = [],
-  isDisabled,
-  handleChange,
-}: {
-  blueprint_fields?: BlueprintFieldType[] | undefined;
-  blueprint_fields_data: BlueprintInstanceBlueprintFieldType[];
-  isDisabled?: boolean;
-  handleChange: (props: HandleChangePropsType) => void;
-}) {
-  const [areAllOpen, setAreAllOpen] = useState(false);
-
-  const permissions = useHasPermissions(
-    [
-      "read_characters",
-      "read_blueprints",
-      "read_blueprint_instances",
-      "read_documents",
-      "read_map_pins",
-      "read_calendars",
-      "read_assets",
-      "read_random_tables",
-    ],
-    undefined
-  );
-  return (
-    <li className="flex flex-col first:mt-0">
-      <div className="sticky top-0 z-50 flex items-center justify-end bg-zinc-900">
-        <div className="h-8 w-8">
-          <Button
-            icon={areAllOpen ? IconEnum.chevron_down : IconEnum.chevron_up}
-            isIconOnly
-            onClick={() => setAreAllOpen((prev) => !prev)}
-            tooltip={"Open/Close all"}
-            variant="info"
-          />
-        </div>
-      </div>
-      <div className="flex select-none flex-col gap-y-2 pt-2">
-        {blueprint_fields.map((template_field) => {
-          const blueprintValueKey = getFieldValueFromType(template_field.field_type);
-          if (!blueprintValueKey) return null;
-          const blueprintValueIndex = blueprint_fields_data.findIndex((f) => f.id === template_field.id);
-          const baseName = `blueprint_fields[${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}]`;
-          if (template_field.field_type === "text" || template_field.field_type === "number")
-            return (
-              <TemplateInputField
-                key={template_field.id}
-                currentValue={
-                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
-                    ?.value as string | number | null
-                }
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isCollapsible
-                isDisabled={isDisabled}
-                isOpen={areAllOpen}
-                name={baseName}
-                title={template_field.title}
-              />
-            );
-
-          if (template_field.field_type === "select" || template_field.field_type === "select_multiple")
-            return (
-              <TemplateSelectField
-                key={template_field.id}
-                currentValue={
-                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
-                    ?.value as string | string[] | null
-                }
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isCollapsible
-                isDisabled={isDisabled}
-                isOpen={areAllOpen}
-                name={baseName}
-                options={template_field.options || []}
-                title={template_field.title}
-              />
-            );
-          if (template_field.field_type === "textarea")
-            return (
-              <TemplateTextareaField
-                key={template_field.id}
-                currentValue={
-                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
-                    ?.value as any
-                }
-                handleChange={handleChange}
-                id={template_field.id}
-                isCollapsible
-                isDisabled={isDisabled}
-                isOpen={areAllOpen}
-                name={baseName}
-                title={template_field.title}
-              />
-            );
-          if (template_field.field_type === "boolean")
-            return (
-              <TemplateBooleanField
-                key={template_field.id}
-                currentValue={
-                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
-                    ?.value as boolean | null
-                }
-                handleChange={handleChange}
-                id={template_field.id}
-                isCollapsible
-                isDisabled={isDisabled}
-                isOpen={areAllOpen}
-                name={baseName}
-                title={template_field.title}
-              />
-            );
-          if (template_field.field_type === "dice_roll")
-            return (
-              <TemplateDiceRollField
-                key={template_field.id}
-                currentValue={
-                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
-                    ?.value as string
-                }
-                formula={template_field.formula as string}
-                handleChange={handleChange}
-                id={template_field.id}
-                isCollapsible
-                isDisabled={isDisabled}
-                isOpen={areAllOpen}
-                name={baseName}
-                title={template_field.title}
-              />
-            );
-          if (template_field.field_type === "date" && permissions?.read_calendars) {
-            return (
-              <TemplateDateField
-                key={template_field.id}
-                calendar={template_field.calendar}
-                currentValue={
-                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
-                    ?.calendar
-                }
-                handleChange={handleChange}
-                id={template_field.id}
-                isCollapsible
-                isDisabled={isDisabled}
-                isOpen={areAllOpen}
-                name={baseName}
-                title={template_field.title}
-              />
-            );
-          }
-          if (template_field.field_type === "random_table" && permissions?.read_random_tables)
-            return (
-              <TemplateRandomTableField
-                key={template_field.id}
-                currentValue={
-                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
-                    ?.random_table
-                }
-                handleChange={handleChange}
-                id={template_field.id}
-                isCollapsible
-                isDisabled={isDisabled}
-                isOpen={areAllOpen}
-                name={baseName}
-                random_table={template_field.random_table}
-                title={template_field.title}
-              />
-            );
-
-          if (
-            (template_field.field_type === "characters_single" || template_field.field_type === "characters_multiple") &&
-            permissions?.read_characters
-          ) {
-            return (
-              <TemplateCharacterField
-                key={template_field.id}
-                currentValue={
-                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
-                    ?.characters
-                }
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isCollapsible
-                isDisabled={isDisabled}
-                isOpen={areAllOpen}
-                name={baseName}
-                presetOptions={[]}
-                title={template_field.title}
-              />
-            );
-          }
-          if (
-            (template_field.field_type === "blueprints_single" || template_field.field_type === "blueprints_multiple") &&
-            permissions?.read_blueprint_instances &&
-            permissions?.read_blueprints
-          ) {
-            return (
-              <TemplateBlueprintField
-                key={template_field.id}
-                blueprint_id={template_field.blueprint_id}
-                currentValue={
-                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
-                    ?.blueprint_instances
-                }
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isCollapsible
-                isDisabled={isDisabled}
-                isOpen={areAllOpen}
-                name={baseName}
-                presetOptions={[]}
-                title={template_field.title}
-              />
-            );
-          }
-          if (
-            (template_field.field_type === "documents_single" || template_field.field_type === "documents_multiple") &&
-            permissions?.read_documents
-          ) {
-            return (
-              <TemplateDocumentField
-                key={template_field.id}
-                currentValue={
-                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
-                    ?.documents
-                }
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isCollapsible
-                isDisabled={isDisabled}
-                isOpen={areAllOpen}
-                name={baseName}
-                presetOptions={[]}
-                title={template_field.title}
-              />
-            );
-          }
-          if (
-            (template_field.field_type === "locations_single" || template_field.field_type === "locations_multiple") &&
-            permissions?.read_map_pins
-          ) {
-            return (
-              <TemplateLocationsField
-                key={template_field.id}
-                currentValue={
-                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
-                    ?.map_pins
-                }
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isCollapsible
-                isDisabled={isDisabled}
-                isOpen={areAllOpen}
-                name={baseName}
-                presetOptions={[]}
-                title={template_field.title}
-              />
-            );
-          }
-          if (
-            (template_field.field_type === "events_single" || template_field.field_type === "events_multiple") &&
-            permissions?.read_events
-          ) {
-            return (
-              <TemplateEventField
-                key={template_field.id}
-                currentValue={
-                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
-                    ?.events
-                }
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isCollapsible
-                isDisabled={isDisabled}
-                isOpen={areAllOpen}
-                name={baseName}
-                presetOptions={[]}
-                title={template_field.title}
-              />
-            );
-          }
-          if (
-            (template_field.field_type === "images_single" || template_field.field_type === "images_multiple") &&
-            permissions?.read_assets
-          ) {
-            return (
-              <TemplateImageField
-                key={template_field.id}
-                currentValue={
-                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
-                    ?.images
-                }
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isCollapsible
-                isDisabled={isDisabled}
-                isOpen={areAllOpen}
-                name={baseName}
-                presetOptions={[]}
-                title={template_field.title}
-              />
-            );
-          }
-
-          return null;
-        })}
-      </div>
-    </li>
-  );
 }
 
 function getTabs(permissions: UserHasPermissionsType, id: string | undefined): TabType[] {
@@ -589,11 +249,11 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
           {!!blueprint?.data && !blueprint?.data?.blueprint_fields?.length && instance?.parent_id ? (
             <Alert label="This blueprint has no fields." variant="info" />
           ) : null}
-          <FieldTemplateRows
-            blueprint_fields={blueprint?.data?.blueprint_fields || []}
-            blueprint_fields_data={instance.blueprint_fields}
+          <RelatedEntityForm
+            fields={blueprint?.data?.blueprint_fields || []}
+            fields_data={instance.blueprint_fields}
             handleChange={handleChange}
-            isDisabled={!canCreateOrEdit}
+            hasCreateOrEdit={canCreateOrEdit}
           />
         </>
       ) : null}

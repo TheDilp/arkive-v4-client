@@ -17,7 +17,6 @@ import {
 import {
   CharacterCharacterFieldType,
   CharacterFieldTemplateType,
-  CharacterFieldType,
   CharacterRelatedType,
   CharacterRelationshipType,
   CharacterType,
@@ -26,39 +25,12 @@ import {
   TagType,
   UserHasPermissionsType,
 } from "../../../types";
-import { GatewayConfigOptionType } from "../../../types/EntityTypes/gatewayTypes";
-import {
-  createOrEditPermission,
-  getDifferenceForCharacterFields,
-  getFieldValueFromType,
-  IconEnum,
-  useNotifications,
-} from "../../../utils";
+import { createOrEditPermission, getDifferenceForCharacterFields, IconEnum, useNotifications } from "../../../utils";
 import { InsertCharacterSchema, InsertCharacterType, UpdateCharacterSchema, UpdateCharacterType } from "../../../validation";
-import {
-  DrawerLayout,
-  Dropdown,
-  Editor,
-  EntityPreview,
-  ImagePreview,
-  Skeleton,
-  TemplateBlueprintField,
-  TemplateBooleanField,
-  TemplateCharacterField,
-  TemplateDiceRollField,
-  TemplateDocumentField,
-  TemplateEventField,
-  TemplateImageField,
-  TemplateInputField,
-  TemplateLocationsField,
-  TemplateRandomTableField,
-  TemplateSelectField,
-  TemplateTextareaField,
-} from "../..";
+import { DrawerLayout, Dropdown, Editor, EntityPreview, ImagePreview, Skeleton } from "../..";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { ImageSelect } from "../../Complex/ImageSelect";
-import { TemplateDateField } from "../../Complex/TemplateFields/TemplateDateField";
-import { Button, Checkbox, Input, Search, TagInput } from "../../Form";
+import { Button, Checkbox, Input, RelatedEntityForm, Search, TagInput } from "../../Form";
 import { Collapsible } from "../../Layout/Collapsible";
 import { Tabs } from "../../Layout/Tabs";
 import { Alert } from "../../Misc";
@@ -103,268 +75,6 @@ function RelationshipRow({
           size="lg"
           variant="error"
         />
-      </div>
-    </li>
-  );
-}
-
-export function FieldTemplateRows({
-  character_fields = [],
-  character_fields_data = [],
-  handleChange,
-  hasCreateOrEdit,
-  isDrawer = true,
-  options,
-}: {
-  character_fields?: CharacterFieldType[] | undefined;
-  character_fields_data: CharacterCharacterFieldType[];
-  handleChange: (props: HandleChangePropsType) => void;
-  hasCreateOrEdit: boolean;
-  isDrawer?: boolean;
-  options?: GatewayConfigOptionType[] | null;
-}) {
-  if (!character_fields.length) return null;
-  return (
-    <li className="flex flex-col first:mt-0">
-      <div
-        className={`${isDrawer ? "flex flex-col gap-y-2 pt-2" : "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-8 [&>*>*>.text-sm]:mb-2 [&>*>*>.text-sm]:border-b [&>*>*>.text-sm]:border-zinc-700 [&>*>.text-sm]:mb-2 [&>*>.text-sm]:border-b [&>*>.text-sm]:border-zinc-700"} select-none`}>
-        {character_fields.map((template_field) => {
-          const templateValueKey = getFieldValueFromType(template_field.field_type);
-          if (!templateValueKey) return null;
-          const presetOptions =
-            options && templateValueKey
-              ? options?.filter((opt) => opt.entity_type === templateValueKey && opt.parent_id === template_field.blueprint_id)
-              : null;
-          const templateValueIndex = character_fields_data.findIndex((f) => f.id === template_field.id);
-
-          const baseName = `character_fields[${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}]`;
-          if (template_field.field_type === "text" || template_field.field_type === "number") {
-            return (
-              <TemplateInputField
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
-                    ?.value as string | number | null
-                }
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                key={template_field.id}
-                name={baseName}
-                title={template_field.title}
-              />
-            );
-          }
-
-          if (template_field.field_type === "select" || template_field.field_type === "select_multiple")
-            return (
-              <TemplateSelectField
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
-                    ?.value as string | string[] | null
-                }
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                key={template_field.id}
-                name={baseName}
-                options={template_field.options || []}
-                title={template_field.title}
-              />
-            );
-          if (template_field.field_type === "textarea")
-            return (
-              <TemplateTextareaField
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
-                    ?.value as any
-                }
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                key={template_field.id}
-                name={baseName}
-                title={template_field.title}
-              />
-            );
-          if (template_field.field_type === "boolean")
-            return (
-              <TemplateBooleanField
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
-                    ?.value as boolean | null
-                }
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                key={template_field.id}
-                name={baseName}
-                title={template_field.title}
-              />
-            );
-          if (template_field.field_type === "dice_roll")
-            return (
-              <TemplateDiceRollField
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
-                    ?.value as string
-                }
-                formula={template_field.formula as string}
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                key={template_field.id}
-                name={baseName}
-                title={template_field.title}
-              />
-            );
-          if (template_field.field_type === "date") {
-            return (
-              <TemplateDateField
-                calendar={template_field.calendar}
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
-                    ?.calendar
-                }
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                key={template_field.id}
-                name={baseName}
-                title={template_field.title}
-              />
-            );
-          }
-          if (template_field.field_type === "random_table") {
-            return (
-              <TemplateRandomTableField
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
-                    ?.random_table
-                }
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                key={template_field.id}
-                name={baseName}
-                random_table={template_field.random_table}
-                title={template_field.title}
-              />
-            );
-          }
-
-          if (template_field.field_type === "characters_single" || template_field.field_type === "characters_multiple") {
-            return (
-              <TemplateCharacterField
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
-                    ?.characters
-                }
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                key={template_field.id}
-                name={baseName}
-                presetOptions={presetOptions || []}
-                title={template_field.title}
-              />
-            );
-          }
-
-          if (template_field.field_type === "blueprints_single" || template_field.field_type === "blueprints_multiple") {
-            return (
-              <TemplateBlueprintField
-                blueprint_id={template_field.blueprint_id}
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
-                    ?.blueprint_instances
-                }
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                key={template_field.id}
-                name={baseName}
-                presetOptions={presetOptions || []}
-                title={template_field.title}
-              />
-            );
-          }
-          if (template_field.field_type === "documents_single" || template_field.field_type === "documents_multiple") {
-            return (
-              <TemplateDocumentField
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
-                    ?.documents
-                }
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                key={template_field.id}
-                name={baseName}
-                presetOptions={presetOptions || []}
-                title={template_field.title}
-              />
-            );
-          }
-          if (template_field.field_type === "locations_single" || template_field.field_type === "locations_multiple") {
-            return (
-              <TemplateLocationsField
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
-                    ?.map_pins
-                }
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                key={template_field.id}
-                name={baseName}
-                presetOptions={presetOptions || []}
-                title={template_field.title}
-              />
-            );
-          }
-          if (template_field.field_type === "images_single" || template_field.field_type === "images_multiple") {
-            return (
-              <TemplateImageField
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]?.images
-                }
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                key={template_field.id}
-                name={baseName}
-                presetOptions={presetOptions || []}
-                title={template_field.title}
-              />
-            );
-          }
-          if (template_field.field_type === "events_single" || template_field.field_type === "events_multiple") {
-            return (
-              <TemplateEventField
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]?.events
-                }
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                key={template_field.id}
-                name={baseName}
-                presetOptions={presetOptions || []}
-                title={template_field.title}
-              />
-            );
-          }
-
-          return null;
-        })}
       </div>
     </li>
   );
@@ -420,15 +130,15 @@ function AdditionalFieldsTab({
       {(templates || []).map((t) => {
         const otherFields = t.character_fields.filter((f) => !f.section_id);
         return (
-          <Collapsible initialOpen={areAllOpen} key={t.id} label={t.title}>
+          <Collapsible key={t.id} initialOpen={areAllOpen} label={t.title}>
             <div className="flex flex-col gap-y-2 p-1.5">
               {t.character_fields_sections.map((section) => {
                 return (
-                  <Collapsible initialOpen={areAllOpen} key={section.id} label={section.title}>
+                  <Collapsible key={section.id} initialOpen={areAllOpen} label={section.title}>
                     <div className="min-h-8 p-2">
-                      <FieldTemplateRows
-                        character_fields={t.character_fields.filter((f) => f.section_id === section.id)}
-                        character_fields_data={character_fields || []}
+                      <RelatedEntityForm
+                        fields={t.character_fields.filter((f) => f.section_id === section.id)}
+                        fields_data={character_fields || []}
                         handleChange={handleChange}
                         hasCreateOrEdit={hasCreateOrEdit}
                       />
@@ -439,9 +149,9 @@ function AdditionalFieldsTab({
               {otherFields.length ? (
                 <Collapsible initialOpen={areAllOpen} label={"Other"}>
                   <div className="min-h-8 p-2">
-                    <FieldTemplateRows
-                      character_fields={otherFields}
-                      character_fields_data={character_fields || []}
+                    <RelatedEntityForm
+                      fields={otherFields}
+                      fields_data={character_fields || []}
                       handleChange={handleChange}
                       hasCreateOrEdit={hasCreateOrEdit}
                     />
@@ -757,7 +467,7 @@ export function CharacterDrawer({
                   ? (character?.related_other || [])?.filter((char) => char.relation_type_id === rg.id)
                   : [];
                 return (
-                  <Collapsible initialOpen={false} key={rg.id} label={rg.title}>
+                  <Collapsible key={rg.id} initialOpen={false} label={rg.title}>
                     {isOther ? (
                       <div className="flex flex-col gap-y-2 p-2">
                         <Search
