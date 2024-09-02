@@ -9,6 +9,7 @@ import { deleteObjectPropsRecursive, dialogAtom, IconEnum, useNotifications } fr
 import { Collapsible } from "../../Layout";
 import { BlueprintMention, DocumentMention, EventMention, GraphMention, MapMention, WordMention } from "./Extensions/Mention";
 import { CharacterMention } from "./Extensions/Mention/CharacterMention";
+import { MapPinMention } from "./Extensions/Mention/MapPinMention";
 import { TableOfContents, TOCHeadingType } from "./Extensions/TableOfContentsExtension";
 // import WordMention from "../Mention/WordMention";
 
@@ -150,7 +151,7 @@ function typeMap(project_id: string, content: RemirrorJSON) {
           {props?.[0]?.children?.map((c: ReactElement) => {
             const id = crypto.randomUUID();
             return (
-              <div className="max-w-sm break-all" key={id}>
+              <div key={id} className="max-w-sm break-all">
                 {c}
               </div>
             );
@@ -173,6 +174,7 @@ function typeMap(project_id: string, content: RemirrorJSON) {
             return <DocumentMention alterId={alterid} id={id} label={label} project_id={project_id} title={label} />;
 
           if (type === "maps") return <MapMention id={id} label={label} project_id={project_id} />;
+          if (type === "map_pins") return <MapPinMention id={id} label={label} parent_id={parentid} project_id={project_id} />;
           if (type === "graphs") return <GraphMention id={id} label={label} project_id={project_id} />;
           if (type === "words") return <WordMention id={id} label={label} title={label} />;
           if (type === "events")
