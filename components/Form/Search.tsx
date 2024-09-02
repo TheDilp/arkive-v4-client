@@ -165,7 +165,7 @@ const Item = forwardRef<HTMLDivElement, ItemProps & HTMLProps<HTMLDivElement>>(
   ({ children, isActive, isSelected, ...rest }, ref) => {
     const id = useId();
     return (
-      <div aria-selected={isActive} className={SearchItem({ isActive, isSelected })} id={id} ref={ref} role="option" {...rest}>
+      <div ref={ref} aria-selected={isActive} className={SearchItem({ isActive, isSelected })} id={id} role="option" {...rest}>
         {children}
       </div>
     );
@@ -336,6 +336,7 @@ export function Search({
           <Avatar imageLoading="lazy" image_id={value as string} isTooltipDisabled label={label || ""} size="xs" />
         ) : null}
         <input
+          ref={inputRef}
           autoComplete="off"
           autoFocus={isAutofocused}
           className={input()}
@@ -415,7 +416,6 @@ export function Search({
             }
           }}
           placeholder={placeholder}
-          ref={inputRef}
           type="search"
           value={hasShownOption && !inputValue ? displayValue : inputValue}
         />
