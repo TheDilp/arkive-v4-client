@@ -28,7 +28,7 @@ export default function GatewayForm() {
   return (
     <FormLayout>
       <Dialog />
-      {type === "characters" ? <CharacterForm /> : <CharacterForm />}
+      {type === "characters" ? <CharacterForm /> : null}
     </FormLayout>
   );
 }
