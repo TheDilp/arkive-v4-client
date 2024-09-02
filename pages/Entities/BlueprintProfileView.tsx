@@ -1,8 +1,18 @@
 import { useAtomValue, useSetAtom } from "jotai";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { AdditionalBlueprintFieldDisplay, Alert, Badge, Breadcrumbs, Button, Collapsible, Skeleton } from "../../components";
+import {
+  AdditionalBlueprintFieldDisplay,
+  Alert,
+  Badge,
+  Breadcrumbs,
+  Button,
+  Collapsible,
+  RelatedEntityForm,
+  Skeleton,
+} from "../../components";
+import { Toggle } from "../../components/Form/Toggle";
 import { useBreakpoint, useGetEntity, useGetSubEntity, useHasPermissions, useNavbarTitle } from "../../hooks";
 import { BlueprintInstanceType, BlueprintType } from "../../types";
 import { breadcrumbsAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, userAtom } from "../../utils";
@@ -10,6 +20,7 @@ import { breadcrumbsAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOw
 export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: string; parent_id?: string; isViewOnly?: boolean }) {
   const { project_id, item_id, subitem_id } = useParams();
   const { isMd } = useBreakpoint();
+  const [isEditable, setIsEditable] = useState(false);
   const setDrawer = useSetAtom(drawerAtom);
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
@@ -95,6 +106,17 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
         <div className="flex h-12 min-h-[3rem] items-center justify-between">
           <Breadcrumbs />
           <div className="flex flex-nowrap gap-x-2">
+            <div className="flex w-24 items-center justify-end">
+              <Toggle
+                allowedPlacements={["left"]}
+                name="isEditable"
+                offIcon={IconEnum.close}
+                onChange={(e) => setIsEditable(e.checked)}
+                onIcon={IconEnum.edit}
+                tooltip="Toggle edit mode"
+                value={isEditable}
+              />
+            </div>
             <div className="max-w-[208px] lg:w-52">
               <Button
                 icon={IconEnum.edit}
@@ -156,26 +178,38 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
         <div className="flex max-h-full flex-1 flex-col overflow-auto rounded-lg bg-zinc-950 p-4 lg:col-span-4">
           <div className="flex flex-col gap-y-2">
             <Collapsible icon={IconEnum.additional_fields} initialOpen label="Fields">
-              <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-2 overflow-auto">
-                {blueprintInstance?.data
-                  ? blueprintInstance?.data?.blueprint_fields
-                      ?.toSorted((a, b) => a.sort - b.sort)
-                      .map((blueprint_field) => {
-                        const blueprintField = blueprint?.data?.blueprint_fields?.find(
-                          (field) => field.id === blueprint_field.id
-                        );
-                        if (!blueprintField) return null;
-                        return (
-                          <AdditionalBlueprintFieldDisplay
-                            key={blueprint_field.id}
-                            blueprint_field={blueprintField}
-                            blueprint_field_data={blueprint_field}
-                            isPreview={!!id}
-                          />
-                        );
-                      })
-                  : null}
-              </div>
+              {isEditable ? (
+                <div className="flex flex-col pt-2">
+                  <RelatedEntityForm
+                    fields={blueprint?.data?.blueprint_fields || []}
+                    fields_data={blueprintInstance?.data?.blueprint_fields || []}
+                    handleChange={() => {}}
+                    hasCreateOrEdit
+                    isDrawer={false}
+                  />
+                </div>
+              ) : (
+                <div className="grid h-[calc(100%-3rem)] max-h-[calc(100%-3rem)] grid-cols-6 flex-col gap-2 overflow-auto">
+                  {blueprintInstance?.data
+                    ? blueprintInstance?.data?.blueprint_fields
+                        ?.toSorted((a, b) => a.sort - b.sort)
+                        .map((blueprint_field) => {
+                          const blueprintField = blueprint?.data?.blueprint_fields?.find(
+                            (field) => field.id === blueprint_field.id
+                          );
+                          if (!blueprintField) return null;
+                          return (
+                            <AdditionalBlueprintFieldDisplay
+                              key={blueprint_field.id}
+                              blueprint_field={blueprintField}
+                              blueprint_field_data={blueprint_field}
+                              isPreview={!!id}
+                            />
+                          );
+                        })
+                    : null}
+                </div>
+              )}
             </Collapsible>
 
             {IS_PUBLIC ? null : (
