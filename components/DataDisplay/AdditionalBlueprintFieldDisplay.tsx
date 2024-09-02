@@ -5,7 +5,7 @@ import { useGetSubEntity } from "../../hooks";
 import { BlueprintFieldType, BlueprintInstanceBlueprintFieldType, RandomTableOptionType } from "../../types";
 import { FieldClasses, formatDateToString, getEntityLink, IconEnum } from "../../utils";
 import { StaticRender } from "../Complex";
-import { Input } from "../Form";
+import { Input, Title } from "../Form";
 import { Alert, FormattedDate } from "../Misc";
 import { Tooltip } from "../Overlay";
 import { Gallery } from "./Gallery";
@@ -256,19 +256,22 @@ export function AdditionalBlueprintFieldDisplay({
           </div>
         ) : null}
         {blueprint_field.field_type === "images_multiple" && blueprint_field_data?.images?.length ? (
-          <Gallery
-            columns={6}
-            images={blueprint_field_data.images
-              .filter((img) => !!img.image)
-              .map((img) => ({
-                id: img.image.id,
-                title: img.image.title,
-                project_id: project_id as string,
-                type: "images",
-              }))}
-            isOpenable
-            type="images"
-          />
+          <div className="flex flex-col gap-y-1">
+            <Title isDrawerTitle label={blueprint_field.title} size="sm" />
+            <Gallery
+              columns={6}
+              images={blueprint_field_data.images
+                .filter((img) => !!img.image)
+                .map((img) => ({
+                  id: img.image.id,
+                  title: img.image.title,
+                  project_id: project_id as string,
+                  type: "images",
+                }))}
+              isOpenable
+              type="images"
+            />
+          </div>
         ) : null}
         {blueprint_field.field_type === "random_table" ? (
           <RandomTableField
@@ -282,4 +285,3 @@ export function AdditionalBlueprintFieldDisplay({
     </Tooltip>
   );
 }
-

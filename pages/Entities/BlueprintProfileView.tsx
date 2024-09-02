@@ -167,10 +167,10 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
                         if (!blueprintField) return null;
                         return (
                           <AdditionalBlueprintFieldDisplay
+                            key={blueprint_field.id}
                             blueprint_field={blueprintField}
                             blueprint_field_data={blueprint_field}
                             isPreview={!!id}
-                            key={blueprint_field.id}
                           />
                         );
                       })
