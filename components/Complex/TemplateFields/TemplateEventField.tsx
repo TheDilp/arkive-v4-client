@@ -175,6 +175,7 @@ export function TemplateEventField({
           {(currentValue || [])?.map((val) => {
             return (
               <EntityPreview
+                key={val?.event.id}
                 clearAction={
                   isDisabled
                     ? undefined
@@ -188,7 +189,6 @@ export function TemplateEventField({
                       }
                 }
                 id={val?.event?.id}
-                key={val?.event.id}
                 link={getEntityLink(project_id as string, "events", id, val?.event.parent_id)}
                 title={val?.event.title}
                 type="events"

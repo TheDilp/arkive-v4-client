@@ -30,6 +30,7 @@ export function RelatedEntityForm({
   hasCreateOrEdit,
   isDrawer = true,
   options,
+  type,
 }: {
   fields: CharacterFieldType[] | BlueprintFieldType[] | undefined;
   fields_data: CharacterCharacterFieldType[] | BlueprintInstanceBlueprintFieldType[];
@@ -38,6 +39,7 @@ export function RelatedEntityForm({
   isDrawer?: boolean;
   isEditEnabled?: boolean;
   options?: GatewayConfigOptionType[] | null;
+  type: "characters" | "blueprint_instances";
 }) {
   if (!fields.length) return null;
   return (
@@ -53,7 +55,7 @@ export function RelatedEntityForm({
               : null;
           const templateValueIndex = fields_data.findIndex((f) => f.id === template_field.id);
 
-          const baseName = `character_fields[${templateValueIndex < 0 ? fields_data.length : templateValueIndex}]`;
+          const baseName = `${type === "characters" ? "character_fields" : "blueprint_fields"}[${templateValueIndex < 0 ? fields_data.length : templateValueIndex}]`;
           if (template_field.field_type === "text" || template_field.field_type === "number") {
             return (
               <TemplateInputField

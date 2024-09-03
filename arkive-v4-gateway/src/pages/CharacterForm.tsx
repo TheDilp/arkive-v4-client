@@ -388,6 +388,7 @@ export function CharacterForm() {
                   hasCreateOrEdit={true}
                   isDrawer={false}
                   options={data?.data?.entities || null}
+                  type="characters"
                 />
               ) : null}
 
@@ -399,6 +400,7 @@ export function CharacterForm() {
                   hasCreateOrEdit={true}
                   isDrawer={false}
                   options={data?.data?.entities || null}
+                  type="characters"
                 />
               ) : null}
             </div>

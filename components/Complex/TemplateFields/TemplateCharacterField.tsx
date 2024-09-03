@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 
 import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
 import { GatewayConfigOptionType } from "../../../types/EntityTypes/gatewayTypes";
-import { getEntityLink, getAssetURL } from "../../../utils";
+import { getAssetURL, getEntityLink } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search, Select } from "../../Form";
 import { TemplateFieldContainer } from ".";
@@ -17,6 +17,7 @@ type Props = {
   isOpen?: boolean;
   isDisabled?: boolean;
   isGlobal?: boolean;
+  isDrawer?: boolean;
   presetOptions: GatewayConfigOptionType[];
   currentValue: BlueprintInstanceBlueprintFieldType["characters"];
 };
@@ -31,6 +32,7 @@ export function TemplateCharacterField({
   isCollapsible,
   isDisabled,
   isGlobal,
+  isDrawer,
   presetOptions = [],
   isOpen,
 }: Props) {
@@ -38,7 +40,8 @@ export function TemplateCharacterField({
   const projectId = project_id || presetOptions?.[0]?.project_id;
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="col-span-1 flex max-h-56 flex-col gap-y-2 overflow-y-auto md:col-span-2 lg:col-span-4">
+      <div
+        className={`col-span-1 ${isDrawer ? "md:col-span-2 lg:col-span-4" : ""} flex max-h-56 flex-col gap-y-2 overflow-y-auto`}>
         {isDisabled || IS_GATEWAY ? null : (
           <Search
             isDisabled={isDisabled}
@@ -172,6 +175,7 @@ export function TemplateCharacterField({
           {(currentValue || [])?.map((val) => {
             return (
               <EntityPreview
+                key={val?.character?.id}
                 clearAction={(char_id) => {
                   handleChange([
                     {
@@ -182,7 +186,6 @@ export function TemplateCharacterField({
                 }}
                 id={val?.character?.id}
                 image_id={val?.character?.portrait_id}
-                key={val?.character?.id}
                 link={getEntityLink(projectId || "", "characters", id, undefined)}
                 manual_project_id={projectId}
                 title={val?.character?.full_name || ""}

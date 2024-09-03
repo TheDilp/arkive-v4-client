@@ -8,18 +8,45 @@ import {
   Badge,
   Breadcrumbs,
   Button,
+  Checkbox,
   Collapsible,
+  Input,
   RelatedEntityForm,
   Skeleton,
+  TagInput,
 } from "../../components";
 import { Toggle } from "../../components/Form/Toggle";
-import { useBreakpoint, useGetEntity, useGetSubEntity, useHasPermissions, useNavbarTitle } from "../../hooks";
+import {
+  useBreakpoint,
+  useGetEntity,
+  useGetSubEntity,
+  useHandleChange,
+  useHasPermissions,
+  useNavbarTitle,
+  useUpdateSubEntity,
+} from "../../hooks";
 import { BlueprintInstanceType, BlueprintType } from "../../types";
-import { breadcrumbsAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, userAtom } from "../../utils";
+import {
+  breadcrumbsAtom,
+  drawerAtom,
+  getDifferenceForBlueprintInstance,
+  hasActionPermission,
+  IconEnum,
+  isProjectOwnerAtom,
+  userAtom,
+} from "../../utils";
+import { UpdateBlueprintInstanceSchema } from "../../validation";
 
 export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: string; parent_id?: string; isViewOnly?: boolean }) {
   const { project_id, item_id, subitem_id } = useParams();
   const { isMd } = useBreakpoint();
+  const [blueprintInstance, setBlueprintInstance] = useState<BlueprintInstanceType | null>(null);
+  const { mutate: update, isLoading: isUpdating } = useUpdateSubEntity("blueprint_instances", project_id, item_id);
+  const { handleChange } = useHandleChange({
+    data: blueprintInstance,
+    setData: setBlueprintInstance,
+  });
+
   const [isEditable, setIsEditable] = useState(false);
   const setDrawer = useSetAtom(drawerAtom);
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
@@ -37,9 +64,10 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
     ],
     undefined
   );
+
   const user = useAtomValue(userAtom);
 
-  const { data: blueprintInstance, isLoading } = useGetSubEntity<BlueprintInstanceType>(
+  const { data: existingBlueprintInstance, isLoading } = useGetSubEntity<BlueprintInstanceType>(
     id || subitem_id,
     "blueprint_instances",
     {
@@ -54,11 +82,11 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
     { staleTime: 3 * 60 * 1000 }
   );
   const { data: blueprint } = useGetEntity<BlueprintType>(
-    isViewOnly ? (blueprintInstance?.data?.parent_id as string) : parent_id || item_id,
+    isViewOnly ? (existingBlueprintInstance?.data?.parent_id as string) : parent_id || item_id,
     "blueprints",
     {
       data: {
-        id: isViewOnly ? blueprintInstance?.data?.parent_id : parent_id || item_id,
+        id: isViewOnly ? existingBlueprintInstance?.data?.parent_id : parent_id || item_id,
       },
       fields: ["id", "title", "title_name", "icon", "owner_id"],
       relations: {
@@ -67,20 +95,40 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
       },
       permissions: true,
     },
-    { enabled: isViewOnly ? !!blueprintInstance?.data?.parent_id : true, staleTime: 3 * 60 * 1000 }
+    { enabled: isViewOnly ? !!existingBlueprintInstance?.data?.parent_id : true, staleTime: 3 * 60 * 1000 }
   );
 
   function openEditTagDrawer() {
-    if (blueprintInstance?.data?.id) {
+    if (existingBlueprintInstance?.data?.id) {
       setDrawer((prev) => ({
         ...prev,
         type: "edit_tags",
         title: "Edit tags",
         data: {
-          tags: blueprintInstance?.data?.tags || [],
-          entity: { type: "blueprint_instances", id: blueprintInstance?.data?.id },
+          tags: existingBlueprintInstance?.data?.tags || [],
+          entity: { type: "blueprint_instances", id: existingBlueprintInstance?.data?.id },
         },
       }));
+    }
+  }
+
+  function handleSave() {
+    if (existingBlueprintInstance?.data && blueprintInstance) {
+      const dataToParse = {
+        data: {
+          id: blueprintInstance.id,
+          title: blueprintInstance.title,
+          is_public: blueprintInstance?.is_public,
+          parent_id: item_id,
+        },
+        relations: {
+          tags: blueprintInstance?.tags?.map((t) => ({ id: t.id })),
+          blueprint_fields: getDifferenceForBlueprintInstance(existingBlueprintInstance?.data, blueprintInstance),
+        },
+        permissions: blueprintInstance?.permissions,
+      };
+      const parsedData = UpdateBlueprintInstanceSchema.parse(dataToParse);
+      update(parsedData);
     }
   }
 
@@ -93,9 +141,15 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
     }
   }, [blueprint?.data]);
 
+  useLayoutEffect(() => {
+    if (existingBlueprintInstance?.data) {
+      setBlueprintInstance(existingBlueprintInstance?.data);
+    }
+  }, [existingBlueprintInstance]);
+
   useNavbarTitle(
-    `Blueprints | ${blueprint?.data?.title} | ${blueprintInstance?.data?.title}`,
-    !!blueprint?.data && !!blueprintInstance?.data
+    `Blueprints | ${blueprint?.data?.title} | ${existingBlueprintInstance?.data?.title}`,
+    !!blueprint?.data && !!existingBlueprintInstance?.data
   );
 
   if (isLoading) return <Skeleton type="character_profile" />;
@@ -149,9 +203,9 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
                 isDisabled={
                   !hasActionPermission(
                     isProjectOwner,
-                    user?.id === blueprintInstance?.data?.owner_id,
+                    user?.id === existingBlueprintInstance?.data?.owner_id,
                     permissions,
-                    blueprintInstance?.data?.permissions || [],
+                    existingBlueprintInstance?.data?.permissions || [],
                     "update_blueprint_instances",
                     user?.role?.id
                   )
@@ -177,21 +231,49 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
 
         <div className="flex max-h-full flex-1 flex-col overflow-auto rounded-lg bg-zinc-950 p-4 lg:col-span-4">
           <div className="flex flex-col gap-y-2">
+            {isEditable ? (
+              <Collapsible icon={IconEnum.info_circle} label="Basic info">
+                <div className="flex w-full items-center gap-x-6 pt-2">
+                  <div className="flex-1">
+                    <Input
+                      isDisabled={!permissions?.update_blueprint_instances}
+                      label={`${blueprint?.data?.title_name} (required)`}
+                      name="title"
+                      onChange={handleChange}
+                      value={blueprintInstance?.title}
+                      variant={blueprintInstance?.title ? "primary" : "error"}
+                    />
+                  </div>
+                  <div className="flex w-min items-center justify-between self-end pb-1.5">
+                    <Checkbox
+                      isDisabled={!permissions?.update_blueprint_instances}
+                      name="is_public"
+                      onChange={handleChange}
+                      tooltip="Is public"
+                      value={blueprintInstance?.is_public ?? false}
+                    />
+                  </div>
+                </div>
+              </Collapsible>
+            ) : null}
+
             <Collapsible icon={IconEnum.additional_fields} initialOpen label="Fields">
               {isEditable ? (
-                <div className="flex flex-col pt-2">
+                <div className="pt-2">
                   <RelatedEntityForm
                     fields={blueprint?.data?.blueprint_fields || []}
-                    fields_data={blueprintInstance?.data?.blueprint_fields || []}
-                    handleChange={() => {}}
+                    fields_data={blueprintInstance?.blueprint_fields || []}
+                    handleChange={handleChange}
                     hasCreateOrEdit
                     isDrawer={false}
+                    isEditEnabled={isEditable}
+                    type="blueprint_instances"
                   />
                 </div>
               ) : (
                 <div className="grid h-[calc(100%-3rem)] max-h-[calc(100%-3rem)] grid-cols-6 flex-col gap-2 overflow-auto">
-                  {blueprintInstance?.data
-                    ? blueprintInstance?.data?.blueprint_fields
+                  {blueprintInstance
+                    ? blueprintInstance?.blueprint_fields
                         ?.toSorted((a, b) => a.sort - b.sort)
                         .map((blueprint_field) => {
                           const blueprintField = blueprint?.data?.blueprint_fields?.find(
@@ -224,21 +306,36 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
                 icon={IconEnum.tags}
                 initialOpen={false}
                 label="Tags">
-                {blueprintInstance?.data?.tags?.length ? (
-                  <div className="animate-in fade-in fill-mode-both mt-2 flex w-full flex-wrap gap-2">
-                    {blueprintInstance.data.tags.map((tag) => (
-                      <div key={tag.id}>
-                        <Badge customColor={tag.color} label={tag.title} />
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="mt-2 w-full">
-                    <Alert label="There is no content." variant="info" />
-                  </div>
-                )}
+                <>
+                  {blueprintInstance?.tags?.length && !isEditable ? (
+                    <div className="animate-in fade-in fill-mode-both mt-2 flex w-full flex-wrap gap-2">
+                      {blueprintInstance.tags.map((tag) => (
+                        <div key={tag.id}>
+                          <Badge customColor={tag.color} label={tag.title} size="lg" />
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  {!blueprintInstance?.tags?.length && !isEditable ? (
+                    <div className="mt-2 w-full">
+                      <Alert label="There is no content." variant="info" />
+                    </div>
+                  ) : null}
+
+                  {isEditable ? <TagInput handleChange={handleChange} tags={blueprintInstance?.tags || []} /> : null}
+                </>
               </Collapsible>
             )}
+            {isEditable ? (
+              <Button
+                icon={IconEnum.save}
+                isDisabled={isUpdating || !blueprintInstance?.title}
+                label="Save"
+                onClick={handleSave}
+                variant="success"
+              />
+            ) : null}
           </div>
         </div>
       </div>

@@ -141,6 +141,7 @@ function AdditionalFieldsTab({
                         fields_data={character_fields || []}
                         handleChange={handleChange}
                         hasCreateOrEdit={hasCreateOrEdit}
+                        type="characters"
                       />
                     </div>
                   </Collapsible>
@@ -154,6 +155,7 @@ function AdditionalFieldsTab({
                       fields_data={character_fields || []}
                       handleChange={handleChange}
                       hasCreateOrEdit={hasCreateOrEdit}
+                      type="characters"
                     />
                   </div>
                 </Collapsible>

@@ -170,6 +170,7 @@ export function TemplateBlueprintField({
           {(currentValue || [])?.map((val) => {
             return (
               <EntityPreview
+                key={val?.blueprint_instance?.id}
                 clearAction={
                   isDisabled
                     ? undefined
@@ -184,7 +185,6 @@ export function TemplateBlueprintField({
                 }
                 icon={val?.blueprint_instance?.icon}
                 id={val?.blueprint_instance?.id}
-                key={val?.blueprint_instance?.id}
                 link={getEntityLink(projectId || "", "blueprint_instances", id, val?.blueprint_instance?.parent_id)}
                 manual_project_id={projectId}
                 title={val?.blueprint_instance?.title}
