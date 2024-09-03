@@ -619,7 +619,7 @@ export function TimelineView({
   }, [goToYear]);
 
   return (
-    <div className="flex h-full flex-col gap-y-2" ref={timelineLayoutContainer}>
+    <div ref={timelineLayoutContainer} className="flex h-full flex-col gap-y-2">
       <div className="flex w-full items-center gap-x-1">
         <div className="h-10 w-10 self-end">
           <Button
@@ -657,20 +657,21 @@ export function TimelineView({
         </div>
       </div>
       <div
-        className={`relative ${isLg ? "max-h-[calc(78%)]" : "max-h-[calc(75%)]"} w-full max-w-full flex-1 overflow-x-auto`}
-        ref={scrollContainer}>
-        <div className="hidden w-fit" ref={container} />
+        ref={scrollContainer}
+        className={`relative ${isLg ? "max-h-[calc(78%)]" : "max-h-[calc(75%)]"} w-full max-w-full flex-1 overflow-x-auto`}>
+        <div ref={container} className="hidden w-fit" />
         {/* min-w-1 is required so that the SVG element has minimum clientWidth which is a condition for rendering the timeline */}
         <div
           className="min-w-full"
           style={{
             height: events.length * 50,
+            minHeight: "100%",
             width: `${zoom * numberOfTicks}rem`,
           }}>
           {events.length ? (
             <>
               <svg className="sticky top-0 h-8 w-full min-w-full max-w-fit bg-black" id="xAxisContainer" />
-              <svg className="block min-h-full w-full min-w-full overflow-y-auto bg-zinc-900" ref={timelineContainer} />
+              <svg ref={timelineContainer} className="block min-h-full w-full min-w-full overflow-y-auto bg-zinc-900" />
             </>
           ) : null}
         </div>
@@ -678,4 +679,3 @@ export function TimelineView({
     </div>
   );
 }
-
