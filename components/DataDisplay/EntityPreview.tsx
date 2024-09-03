@@ -91,6 +91,7 @@ export function EntityPreview({
     action: actionClasses,
     otherAction: otherActionClasses,
   } = EntityPreviewClasses({ hasNoBackground, variant, size, hasLink: !!link });
+
   return (
     <div className={container()}>
       {label ? <div className={labelClasses()}>{label}</div> : null}
@@ -114,7 +115,7 @@ export function EntityPreview({
           <span className={linkTitle()}>{title}</span>
         </Link>
         {previewAction ? (
-          <span className={actionClasses()}>
+          <span className={actionClasses()} tabIndex={0}>
             <Button
               hasNoBackground
               icon={IconEnum.eye}
