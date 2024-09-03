@@ -77,9 +77,10 @@ export function TagsDrawer() {
             </div>
           </div>
           {tags.map((tag, index) => (
-            <div className="flex items-end gap-x-2" key={tag.id}>
+            <div key={tag.id} className="flex items-end gap-x-2">
               <Input
                 label="Tag name (required, must be unique for entire project)"
+                maxLength={50}
                 name={`[${index}].title`}
                 onChange={handleChange}
                 value={tag.title}
@@ -140,7 +141,7 @@ export function TagsDrawer() {
                   resetDrawerAtom();
                   setTags([]);
                 },
-              },
+              }
             );
           }
         }}

@@ -59,7 +59,7 @@ export function EditTagDrawer({ data }: Props) {
 
       {tabs[selectedTab].id === "1" ? (
         <div className="flex items-center justify-between gap-x-2">
-          <Input label="Title" name="title" onChange={handleChange} value={tag?.title} />
+          <Input label="Title" maxLength={50} name="title" onChange={handleChange} value={tag?.title} />
           <div className="mb-2 self-end">
             <ColorPicker name="color" onChange={handleChange} value={tag?.color || DefaultTagColor} />
           </div>
