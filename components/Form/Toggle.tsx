@@ -26,6 +26,11 @@ const classes = tv({
         label: "h-6 w-12",
       },
     },
+    isDisabled: {
+      true: {
+        label: "cursor-not-allowed",
+      },
+    },
   },
 });
 
@@ -35,15 +40,23 @@ export function Toggle({
   onIcon = IconEnum.check,
   value = false,
   tooltip,
+  isDisabled,
   allowedPlacements = [],
   name,
   onChange,
 }: ToggleComponentType) {
-  const { input, label, buttonContainer, icon: iconClasses } = classes({ size });
+  const { input, label, buttonContainer, icon: iconClasses } = classes({ size, isDisabled });
   return (
     <Tooltip allowedPlacements={allowedPlacements} content={tooltip || ""} isDisabled={!tooltip}>
       <label className={label()}>
-        <input checked={value} className={input()} name={name} onChange={(e) => onChange(e.target)} type="checkbox" />
+        <input
+          checked={value}
+          className={input()}
+          disabled={isDisabled}
+          name={name}
+          onChange={(e) => onChange(e.target)}
+          type="checkbox"
+        />
 
         <span className={buttonContainer()}>
           <div className={iconClasses()} data-unchecked-icon>
