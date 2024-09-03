@@ -1078,7 +1078,7 @@ export function CharacterProfileView({
               ) : null}
             </h2>
             {(isPreview ? tabs[selectedTab].id === "0" : type === "biography") ? (
-              <div className="flex h-full items-start gap-x-4 p-4">
+              <div className="flex h-full items-start gap-x-4 px-4">
                 <div className="overflow-auto [&>.staticRendererContainer]:p-0">
                   <StaticRender content={(existingCharacter?.data?.biography as RemirrorJSON | null) ?? undefined} />
                 </div>
@@ -1086,7 +1086,7 @@ export function CharacterProfileView({
             ) : null}
             {(isPreview ? tabs[selectedTab].id === "1" : type === "additional fields") &&
             enabledEntities.includes("character_fields_templates") ? (
-              <ul className="animate-in fade-in fill-mode-both flex max-h-[80%] flex-col gap-y-2 overflow-y-auto p-4">
+              <ul className="animate-in fade-in fill-mode-both flex max-h-[80%] flex-col gap-y-2 overflow-y-auto px-4">
                 {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
                 {(existingTemplates?.data || []).map((t) => {
                   return (
@@ -1116,7 +1116,7 @@ export function CharacterProfileView({
               </ul>
             ) : null}
             {(isPreview ? tabs[selectedTab].id === "2" : type === "relationships") ? (
-              <div className="h-full p-4">
+              <div className="h-full px-4">
                 {isFetching ? (
                   <div className="pt-10">
                     <Skeleton limit={5} type="table" />
@@ -1139,7 +1139,7 @@ export function CharacterProfileView({
             ) : null}
 
             {(isPreview ? tabs[selectedTab].id === "3" : type === "resources") ? (
-              <div className="flex h-[calc(100%-3rem)] max-h-[calc(100%-3rem)] flex-col gap-y-2 overflow-auto p-4">
+              <div className="flex h-[calc(100%-3rem)] max-h-[calc(100%-3rem)] flex-col gap-y-2 overflow-auto px-4">
                 {enabledEntities.includes("documents") ? (
                   <Collapsible
                     actions={
@@ -1300,7 +1300,7 @@ export function CharacterProfileView({
               </div>
             ) : null}
             {(isPreview ? tabs[selectedTab].id === "4" : type === "conversations") ? (
-              <div className="h-full p-4">
+              <div className="h-full px-4">
                 {subitem_id && !isPreview ? null : (
                   <div className="col-span-3 flex flex-col">
                     <Table
