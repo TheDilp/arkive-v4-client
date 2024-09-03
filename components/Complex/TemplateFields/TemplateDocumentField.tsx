@@ -38,43 +38,45 @@ export function TemplateDocumentField({
   const projectId = project_id || presetOptions?.[0]?.project_id;
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
+      <div className="relative flex max-h-96 flex-col gap-y-2 overflow-y-auto">
         {isDisabled || IS_GATEWAY ? null : (
-          <Search
-            isDisabled={isDisabled}
-            isGlobal={isGlobal}
-            label={isCollapsible ? "" : title}
-            name={name}
-            onChange={({ value, label, icon }) => {
-              if ((currentValue || [])?.some((doc) => doc.related_id === value)) {
+          <div className="sticky top-0">
+            <Search
+              isDisabled={isDisabled}
+              isGlobal={isGlobal}
+              label={isCollapsible ? "" : title}
+              name={name}
+              onChange={({ value, label, icon }) => {
+                if ((currentValue || [])?.some((doc) => doc.related_id === value)) {
+                  handleChange([
+                    { name: `${name}.id`, value: id },
+                    {
+                      name: `${name}.documents`,
+                      value: (currentValue || []).filter((t) => t.related_id !== value),
+                    },
+                  ]);
+                  return;
+                }
                 handleChange([
                   { name: `${name}.id`, value: id },
                   {
-                    name: `${name}.documents`,
-                    value: (currentValue || []).filter((t) => t.related_id !== value),
-                  },
-                ]);
-                return;
-              }
-              handleChange([
-                { name: `${name}.id`, value: id },
-                {
-                  name: `${name}.documents[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
-                  value: {
-                    related_id: value,
-                    document: {
-                      id: value,
-                      title: label,
-                      icon,
+                    name: `${name}.documents[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
+                    value: {
+                      related_id: value,
+                      document: {
+                        id: value,
+                        title: label,
+                        icon,
+                      },
                     },
                   },
-                },
-              ]);
-            }}
-            placeholder="Type at least 2 documents"
-            searchEntity="documents"
-            value={fieldType === "documents_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
-          />
+                ]);
+              }}
+              placeholder="Type at least 2 documents"
+              searchEntity="documents"
+              value={fieldType === "documents_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
+            />
+          </div>
         )}
         {!IS_GATEWAY ? null : (
           <Select

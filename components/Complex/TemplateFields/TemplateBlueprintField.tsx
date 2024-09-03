@@ -40,45 +40,47 @@ export function TemplateBlueprintField({
   const projectId = project_id || presetOptions?.[0]?.project_id;
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="col-span-4 flex max-h-56 flex-col gap-y-2 overflow-y-auto">
+      <div className="relative col-span-4 flex max-h-96 flex-col gap-y-2 overflow-y-auto">
         {isDisabled || IS_GATEWAY ? null : (
-          <Search
-            isDisabled={isDisabled}
-            isGlobal={isGlobal}
-            isMultiple={fieldType === "blueprints_multiple"}
-            label={isCollapsible ? "" : title}
-            name={name}
-            onChange={({ value, label, icon }) => {
-              if ((currentValue || [])?.some((bpi) => bpi.related_id === value)) {
+          <div className="sticky top-0">
+            <Search
+              isDisabled={isDisabled}
+              isGlobal={isGlobal}
+              isMultiple={fieldType === "blueprints_multiple"}
+              label={isCollapsible ? "" : title}
+              name={name}
+              onChange={({ value, label, icon }) => {
+                if ((currentValue || [])?.some((bpi) => bpi.related_id === value)) {
+                  handleChange([
+                    { name: `${name}.id`, value: id },
+                    {
+                      name: `${name}.blueprint_instances`,
+                      value: (currentValue || []).filter((t) => t.related_id !== value),
+                    },
+                  ]);
+                  return;
+                }
                 handleChange([
                   { name: `${name}.id`, value: id },
                   {
-                    name: `${name}.blueprint_instances`,
-                    value: (currentValue || []).filter((t) => t.related_id !== value),
-                  },
-                ]);
-                return;
-              }
-              handleChange([
-                { name: `${name}.id`, value: id },
-                {
-                  name: `${name}.blueprint_instances[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
-                  value: {
-                    related_id: value,
-                    blueprint_instance: {
-                      id: value,
-                      title: label,
-                      icon,
+                    name: `${name}.blueprint_instances[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
+                    value: {
+                      related_id: value,
+                      blueprint_instance: {
+                        id: value,
+                        title: label,
+                        icon,
+                      },
                     },
                   },
-                },
-              ]);
-            }}
-            parent_id={blueprint_id || undefined}
-            placeholder="Type at least 2 characters"
-            searchEntity="blueprint_instances"
-            value={fieldType === "blueprints_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
-          />
+                ]);
+              }}
+              parent_id={blueprint_id || undefined}
+              placeholder="Type at least 2 characters"
+              searchEntity="blueprint_instances"
+              value={fieldType === "blueprints_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
+            />
+          </div>
         )}
         {!IS_GATEWAY ? null : (
           <Select

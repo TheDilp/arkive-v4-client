@@ -38,42 +38,44 @@ export function TemplateImageField({
   const projectId = project_id || presetOptions?.[0]?.project_id;
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
+      <div className="flex max-h-96 flex-col gap-y-2 overflow-y-auto">
         {isDisabled || IS_GATEWAY ? null : (
-          <Search
-            isGlobal={isGlobal}
-            isMultiple={fieldType === "images_multiple"}
-            label={isCollapsible ? "" : title}
-            name={name}
-            onChange={({ value, label }) => {
-              if ((currentValue || [])?.some((image) => image.related_id === value)) {
+          <div className="sticky top-0">
+            <Search
+              isGlobal={isGlobal}
+              isMultiple={fieldType === "images_multiple"}
+              label={isCollapsible ? "" : title}
+              name={name}
+              onChange={({ value, label }) => {
+                if ((currentValue || [])?.some((image) => image.related_id === value)) {
+                  handleChange([
+                    { name: `${name}.id`, value: id },
+                    {
+                      name: `${name}.images`,
+                      value: (currentValue || []).filter((t) => t.related_id !== value),
+                    },
+                  ]);
+                  return;
+                }
                 handleChange([
                   { name: `${name}.id`, value: id },
                   {
-                    name: `${name}.images`,
-                    value: (currentValue || []).filter((t) => t.related_id !== value),
-                  },
-                ]);
-                return;
-              }
-              handleChange([
-                { name: `${name}.id`, value: id },
-                {
-                  name: `${name}.images[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
-                  value: {
-                    related_id: value,
-                    image: {
-                      id: value,
-                      title: label,
+                    name: `${name}.images[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
+                    value: {
+                      related_id: value,
+                      image: {
+                        id: value,
+                        title: label,
+                      },
                     },
                   },
-                },
-              ]);
-            }}
-            placeholder="Type at least 2 characters"
-            searchEntity="images"
-            value={fieldType === "images_multiple" ? (currentValue || [])?.map((t) => t.related_id) : undefined}
-          />
+                ]);
+              }}
+              placeholder="Type at least 2 characters"
+              searchEntity="images"
+              value={fieldType === "images_multiple" ? (currentValue || [])?.map((t) => t.related_id) : undefined}
+            />
+          </div>
         )}
 
         {!IS_GATEWAY ? null : (

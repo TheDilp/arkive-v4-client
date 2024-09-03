@@ -39,45 +39,47 @@ export function TemplateEventField({
 
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
+      <div className="relative flex max-h-96 flex-col gap-y-2 overflow-y-auto">
         {isDisabled || IS_GATEWAY ? null : (
-          <Search
-            isDisabled={isDisabled}
-            isGlobal={isGlobal}
-            label={isCollapsible ? "" : title}
-            name={name}
-            onChange={({ value, label, icon, parent_id, project_id: entity_project_id }) => {
-              if ((currentValue || [])?.some((event) => event.related_id === value)) {
+          <div className="sticky top-0">
+            <Search
+              isDisabled={isDisabled}
+              isGlobal={isGlobal}
+              label={isCollapsible ? "" : title}
+              name={name}
+              onChange={({ value, label, icon, parent_id, project_id: entity_project_id }) => {
+                if ((currentValue || [])?.some((event) => event.related_id === value)) {
+                  handleChange([
+                    { name: `${name}.id`, value: id },
+                    {
+                      name: `${name}.events`,
+                      value: (currentValue || []).filter((t) => t.related_id !== value),
+                    },
+                  ]);
+                  return;
+                }
                 handleChange([
                   { name: `${name}.id`, value: id },
                   {
-                    name: `${name}.events`,
-                    value: (currentValue || []).filter((t) => t.related_id !== value),
-                  },
-                ]);
-                return;
-              }
-              handleChange([
-                { name: `${name}.id`, value: id },
-                {
-                  name: `${name}.events[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
-                  value: {
-                    related_id: value,
-                    event: {
-                      id: value,
-                      title: label,
-                      parent_id,
-                      icon,
-                      project_id: entity_project_id || project_id,
+                    name: `${name}.events[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
+                    value: {
+                      related_id: value,
+                      event: {
+                        id: value,
+                        title: label,
+                        parent_id,
+                        icon,
+                        project_id: entity_project_id || project_id,
+                      },
                     },
                   },
-                },
-              ]);
-            }}
-            placeholder="Type at least 2 characters"
-            searchEntity="events"
-            value={fieldType === "events_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
-          />
+                ]);
+              }}
+              placeholder="Type at least 2 characters"
+              searchEntity="events"
+              value={fieldType === "events_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
+            />
+          </div>
         )}
 
         {!IS_GATEWAY ? null : (
