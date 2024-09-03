@@ -45,7 +45,7 @@ export function RelatedEntityForm({
   return (
     <div className="flex flex-col first:mt-0">
       <div
-        className={`${isDrawer ? "flex flex-col gap-y-2 pt-2" : "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-8"} select-none`}>
+        className={`${isDrawer ? "flex flex-col gap-y-2 pt-2" : "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4"} select-none`}>
         {fields.map((template_field) => {
           const templateValueKey = getFieldValueFromType(template_field.field_type);
           if (!templateValueKey) return null;
