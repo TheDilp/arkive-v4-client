@@ -151,6 +151,7 @@ export function Input({
   step,
   prefix,
   suffix,
+  maxLength,
 }: InputType) {
   const {
     base,
@@ -172,7 +173,7 @@ export function Input({
           className={input()}
           disabled={isDisabled || isReadOnly}
           max={max}
-          maxLength={type === "code" ? 6 : undefined}
+          maxLength={type === "code" ? 6 : maxLength || undefined}
           min={min}
           name={name}
           onBlur={onBlur}
