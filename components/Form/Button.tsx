@@ -33,8 +33,12 @@ const ButtonClasses = tv({
       "error-bordered": {
         base: "text-red-700 border-red-700",
       },
-      "primary-bordered": {},
-      "secondary-bordered": {},
+      "primary-bordered": {
+        base: "bg-zinc-950 text-white border-zinc-600 focus:border-zinc-200 ",
+      },
+      "secondary-bordered": {
+        base: "bg-zinc-600 text-white border-zinc-200",
+      },
       "success-bordered": {},
       "warning-bordered": {},
     },
