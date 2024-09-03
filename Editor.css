@@ -6,7 +6,7 @@
 }
 
 .editor-component {
-  @apply h-full overflow-auto transition-colors duration-200;
+  @apply h-96 overflow-auto transition-colors duration-200;
   .remirror-editor.ProseMirror {
     @apply overflow-hidden !important;
   }
@@ -14,9 +14,11 @@
     @apply border-zinc-500;
   }
 }
-
+.remirror-is-empty {
+  @apply min-h-80;
+}
 .remirror-editor-wrapper:has(.remirror-is-empty) {
-  @apply min-h-96;
+  @apply min-h-80;
 }
 
 .remirror-editor,
