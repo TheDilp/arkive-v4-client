@@ -1,7 +1,7 @@
 import { QueryClient, UseMutateAsyncFunction, useQueryClient } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import groupBy from "lodash.groupby";
-import { Dispatch, useEffect, useMemo, useState } from "react";
+import { Dispatch, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
@@ -15,6 +15,7 @@ import {
   Collapsible,
   createColumnHelper,
   Dropdown,
+  Editor,
   Gallery,
   Icon,
   Skeleton,
@@ -22,12 +23,14 @@ import {
   Table,
   Tabs,
 } from "../../components";
+import { Toggle } from "../../components/Form/Toggle";
 import {
   useBreakpoint,
   useDownloadImages,
   useGenerateDocument,
   useGetEntities,
   useGetEntity,
+  useHandleChange,
   useHasPermissions,
   useNavbarTitle,
   useRemoveFromEntity,
@@ -793,6 +796,9 @@ export function CharacterProfileView({
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState(getCharacterProfileTabFromType(type));
   const [assetView, setAssetView] = useState<"table" | "card">("table");
+  const [isEditable, setIsEditable] = useState(false);
+  const [character, setCharacter] = useState<CharacterType | null>(null);
+  const { handleChange } = useHandleChange({ data: character, setData: setCharacter });
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const { isLg } = useBreakpoint();
@@ -930,6 +936,12 @@ export function CharacterProfileView({
     setSelectedTab(getCharacterProfileTabFromType(type));
   }, [type]);
 
+  useLayoutEffect(() => {
+    if (existingCharacter?.data) {
+      setCharacter(existingCharacter?.data);
+    }
+  }, [existingCharacter]);
+
   const formattedRelationships: FormattedRelationship[] = Object.entries(groupBy(relationships, "id")).map(([key, value]) => {
     return {
       id: key,
@@ -939,37 +951,50 @@ export function CharacterProfileView({
     };
   });
 
+  const canUpdate = hasActionPermission(
+    isProjectOwner,
+    user?.id === existingCharacter?.data?.owner_id,
+    permissions,
+    existingCharacter?.data?.permissions || [],
+    "update_characters",
+    user?.role?.id
+  );
+
   return (
     <div className={"flex h-full max-h-full flex-col gap-y-2 overflow-hidden"}>
       {isPreview ? null : (
         <div className="flex h-12 min-h-[3rem] items-center justify-between gap-x-2">
           <Breadcrumbs />
           {item_id ? (
-            <div className="ml-auto h-10 w-10">
-              <Button
-                icon={IconEnum.public}
-                isDisabled={!existingCharacter?.data?.is_public}
-                isIconOnly
-                onClick={() => openPublicPage(`/${project_id}/characters/${existingCharacter?.data?.id}`)}
-                tooltip="View public page"
-                variant="info"
-              />
+            <div className="ml-auto flex h-10 w-fit items-center gap-x-2">
+              <div className="pt-1">
+                <Toggle
+                  allowedPlacements={["left"]}
+                  name="isEditable"
+                  offIcon={IconEnum.close}
+                  onChange={(e) => setIsEditable(e.checked)}
+                  onIcon={IconEnum.edit}
+                  tooltip="Toggle edit mode"
+                  value={isEditable}
+                />
+              </div>
+              <div className="h-8 w-8">
+                <Button
+                  icon={IconEnum.public}
+                  isDisabled={!existingCharacter?.data?.is_public}
+                  isIconOnly
+                  onClick={() => openPublicPage(`/${project_id}/characters/${existingCharacter?.data?.id}`)}
+                  tooltip="View public page"
+                  variant="info"
+                />
+              </div>
             </div>
           ) : null}
           {item_id ? (
             <div className="lg:w-52">
               <Button
                 icon={IconEnum.edit}
-                isDisabled={
-                  !hasActionPermission(
-                    isProjectOwner,
-                    user?.id === existingCharacter?.data?.owner_id,
-                    permissions,
-                    existingCharacter?.data?.permissions || [],
-                    "update_characters",
-                    user?.role?.id
-                  )
-                }
+                isDisabled={!canUpdate}
                 label="Edit current character"
                 onClick={() => {
                   setDrawer((prev) => ({
@@ -1014,15 +1039,13 @@ export function CharacterProfileView({
                 size={isLg ? "4xl" : "xl"}
               />
 
-              <h2 className="text-center font-merriweather text-2xl">
-                {`${existingCharacter?.data?.full_name || ""}`.trimEnd()}
-              </h2>
-              {existingCharacter?.data?.nickname ? (
+              <h2 className="text-center font-merriweather text-2xl">{`${character?.full_name || ""}`.trimEnd()}</h2>
+              {character?.nickname ? (
                 <h3 className="text-center font-lato">{existingCharacter?.data?.nickname || ""}</h3>
               ) : null}
-              {existingCharacter?.data?.tags?.length ? (
+              {character?.tags?.length ? (
                 <div className="animate-in fade-in fill-mode-both flex w-full flex-wrap justify-center gap-2 lg:mt-2">
-                  {existingCharacter.data.tags.map((tag) => (
+                  {character.tags.map((tag) => (
                     <div key={tag.id}>
                       <Badge customColor={tag.color} label={tag.title} />
                     </div>
@@ -1078,9 +1101,19 @@ export function CharacterProfileView({
               ) : null}
             </h2>
             {(isPreview ? tabs[selectedTab].id === "0" : type === "biography") ? (
-              <div className="flex h-full items-start gap-x-4 px-4">
-                <div className="overflow-auto [&>.staticRendererContainer]:p-0">
-                  <StaticRender content={(existingCharacter?.data?.biography as RemirrorJSON | null) ?? undefined} />
+              <div className="flex h-full w-full items-start gap-x-4 px-4">
+                <div className="w-full overflow-auto [&>.staticRendererContainer]:p-0">
+                  {isEditable ? (
+                    <Editor
+                      initialContent={character?.biography || undefined}
+                      isDisabled={!canUpdate}
+                      isFullHeight
+                      name="biography"
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    <StaticRender content={(character?.biography as RemirrorJSON | null) ?? undefined} />
+                  )}
                 </div>
               </div>
             ) : null}
@@ -1334,6 +1367,17 @@ export function CharacterProfileView({
             ) : null}
           </div>
         </div>
+        {isEditable ? (
+          <div>
+            <Button
+              icon={IconEnum.save}
+              isDisabled={!character?.first_name}
+              label="Save"
+              onClick={() => {}}
+              variant="success"
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );
