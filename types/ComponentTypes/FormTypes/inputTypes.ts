@@ -22,6 +22,7 @@ export interface InputType extends BaseFormComponentType {
   helperText?: string;
   min?: number;
   max?: number;
+  maxLength?: number;
   step?: number;
   suffix?: string;
   prefix?: string;

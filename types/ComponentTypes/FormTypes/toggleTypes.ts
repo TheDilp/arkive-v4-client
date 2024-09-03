@@ -9,6 +9,7 @@ export interface ToggleComponentType {
   tooltip?: string;
   allowedPlacements?: TooltipType["allowedPlacements"];
   value: boolean;
+  isDisabled?: boolean;
   name: string;
   onChange: ({ name, checked }: { name: string; checked: boolean }) => void;
 }
