@@ -165,95 +165,85 @@ export function AdditionalBlueprintFieldDisplay({
         {blueprint_field.field_type === "date" ? <DateField field={blueprint_field} fieldData={blueprint_field_data} /> : null}
 
         {blueprint_field.field_type === "characters_single" || blueprint_field.field_type === "characters_multiple" ? (
-          <div className="grid w-full grid-cols-6 gap-1 truncate">
-            <GroupEntityPreview
-              field_label={blueprint_field.title}
-              items={(blueprint_field_data.characters || [])
-                .filter((char) => !!char.character)
-                .map((char) => ({
-                  id: char.related_id,
-                  title: char.character.full_name || "",
-                  image_id: char.character.portrait_id,
-                  type: "characters",
-                  link: getEntityLink(project_id as string, "characters", char.related_id, undefined),
-                }))}
-            />
-          </div>
+          <GroupEntityPreview
+            field_label={blueprint_field.title}
+            items={(blueprint_field_data.characters || [])
+              .filter((char) => !!char.character)
+              .map((char) => ({
+                id: char.related_id,
+                title: char.character.full_name || "",
+                image_id: char.character.portrait_id,
+                type: "characters",
+                link: getEntityLink(project_id as string, "characters", char.related_id, undefined),
+              }))}
+          />
         ) : null}
         {blueprint_field.field_type === "blueprints_single" || blueprint_field.field_type === "blueprints_multiple" ? (
-          <div className="grid w-full grid-cols-6 gap-1 truncate">
-            <GroupEntityPreview
-              field_label={blueprint_field.title}
-              items={(blueprint_field_data.blueprint_instances || [])
-                .filter((bpi) => !!bpi.blueprint_instance)
-                .map((blueprint_instance) => ({
-                  id: blueprint_instance.blueprint_instance.id,
-                  parent_id: blueprint_instance.blueprint_instance.parent_id,
-                  title: blueprint_instance.blueprint_instance.title || "",
-                  icon: blueprint_instance.blueprint_instance.icon || IconEnum.document,
-                  type: "blueprint_instances",
-                  link: getEntityLink(
-                    project_id as string,
-                    "blueprint_instances",
-                    blueprint_instance.related_id,
-                    blueprint_instance.blueprint_instance.parent_id
-                  ),
-                }))}
-            />
-          </div>
+          <GroupEntityPreview
+            field_label={blueprint_field.title}
+            items={(blueprint_field_data.blueprint_instances || [])
+              .filter((bpi) => !!bpi.blueprint_instance)
+              .map((blueprint_instance) => ({
+                id: blueprint_instance.blueprint_instance.id,
+                parent_id: blueprint_instance.blueprint_instance.parent_id,
+                title: blueprint_instance.blueprint_instance.title || "",
+                icon: blueprint_instance.blueprint_instance.icon || IconEnum.document,
+                type: "blueprint_instances",
+                link: getEntityLink(
+                  project_id as string,
+                  "blueprint_instances",
+                  blueprint_instance.related_id,
+                  blueprint_instance.blueprint_instance.parent_id
+                ),
+              }))}
+          />
         ) : null}
         {blueprint_field.field_type === "documents_single" || blueprint_field.field_type === "documents_multiple" ? (
-          <div className="grid w-full grid-cols-6 gap-1 truncate">
-            <GroupEntityPreview
-              field_label={blueprint_field.title}
-              items={(blueprint_field_data.documents || [])
-                .filter((d) => !!d.document)
-                .map((doc) => ({
-                  id: doc.related_id,
-                  title: doc.document.title,
-                  icon: doc.document.icon || IconEnum.document,
-                  type: "documents",
-                  link: getEntityLink(project_id as string, "documemnts", doc.related_id, undefined),
-                }))}
-            />
-          </div>
+          <GroupEntityPreview
+            field_label={blueprint_field.title}
+            items={(blueprint_field_data.documents || [])
+              .filter((d) => !!d.document)
+              .map((doc) => ({
+                id: doc.related_id,
+                title: doc.document.title,
+                icon: doc.document.icon || IconEnum.document,
+                type: "documents",
+                link: getEntityLink(project_id as string, "documemnts", doc.related_id, undefined),
+              }))}
+          />
         ) : null}
         {blueprint_field.field_type === "locations_single" || blueprint_field.field_type === "locations_multiple" ? (
-          <div className="grid w-full grid-cols-6 gap-1 truncate">
-            <GroupEntityPreview
-              field_label={blueprint_field.title}
-              items={(blueprint_field_data.map_pins || [])
-                .filter((m) => !!m.map_pin)
-                .map((map_pin) => ({
-                  id: map_pin.map_pin.id,
-                  parent_id: map_pin.map_pin.parent_id,
-                  title: map_pin.map_pin.title || "",
-                  icon: map_pin.map_pin.icon || IconEnum.document,
-                  type: "map_pins",
-                  link: getEntityLink(project_id as string, "map_pins", map_pin.related_id, map_pin.map_pin.parent_id),
-                }))}
-            />
-          </div>
+          <GroupEntityPreview
+            field_label={blueprint_field.title}
+            items={(blueprint_field_data.map_pins || [])
+              .filter((m) => !!m.map_pin)
+              .map((map_pin) => ({
+                id: map_pin.map_pin.id,
+                parent_id: map_pin.map_pin.parent_id,
+                title: map_pin.map_pin.title || "",
+                icon: map_pin.map_pin.icon || IconEnum.document,
+                type: "map_pins",
+                link: getEntityLink(project_id as string, "map_pins", map_pin.related_id, map_pin.map_pin.parent_id),
+              }))}
+          />
         ) : null}
         {blueprint_field.field_type === "images_single" ? (
-          <div className="grid w-full grid-cols-6 gap-1 truncate">
-            <GroupEntityPreview
-              field_label={blueprint_field.title}
-              items={
-                blueprint_field_data?.images?.[0]
-                  ? [
-                      {
-                        id: blueprint_field_data.images[0].related_id as string,
-                        image_id: blueprint_field_data?.images?.[0].image.id,
-                        title: blueprint_field_data?.images?.[0].image.title,
-                        label: blueprint_field.title,
-                        type: "images",
-                      },
-                    ]
-                  : []
-              }
-            />
-          </div>
+          <GroupEntityPreview
+            field_label={blueprint_field.title}
+            items={
+              blueprint_field_data?.images?.[0]
+                ? [
+                    {
+                      id: blueprint_field_data.images[0].related_id as string,
+                      image_id: blueprint_field_data?.images?.[0].image.id,
+                      title: blueprint_field_data?.images?.[0].image.title,
+                      label: blueprint_field.title,
+                      type: "images",
+                    },
+                  ]
+                : []
+            }
+          />
         ) : null}
         {blueprint_field.field_type === "images_multiple" && blueprint_field_data?.images?.length ? (
           <div className="flex flex-col gap-y-1">

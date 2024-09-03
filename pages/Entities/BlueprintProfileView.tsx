@@ -229,11 +229,11 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
       <div className="w-full flex-1 flex-col content-start gap-4 pt-0">
         {isLoading ? <Skeleton type="character_profile" /> : null}
 
-        <div className="flex max-h-full flex-1 flex-col overflow-auto rounded-lg bg-zinc-950 p-4 lg:col-span-4">
+        <div className="flex max-h-full flex-1 flex-col overflow-auto rounded-lg bg-zinc-900 p-4 lg:col-span-4">
           <div className="flex flex-col gap-y-2">
             {isEditable ? (
               <Collapsible icon={IconEnum.info_circle} label="Basic info">
-                <div className="flex w-full items-center gap-x-6 pt-2">
+                <div className="flex w-full items-center gap-x-6 bg-zinc-800 p-2">
                   <div className="flex-1">
                     <Input
                       isDisabled={!permissions?.update_blueprint_instances}
@@ -259,7 +259,7 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
 
             <Collapsible icon={IconEnum.additional_fields} initialOpen label="Fields">
               {isEditable ? (
-                <div className="pt-2">
+                <div className="bg-zinc-800 p-2">
                   <RelatedEntityForm
                     fields={blueprint?.data?.blueprint_fields || []}
                     fields_data={blueprintInstance?.blueprint_fields || []}
@@ -271,7 +271,7 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
                   />
                 </div>
               ) : (
-                <div className="grid h-[calc(100%-3rem)] max-h-[calc(100%-3rem)] grid-cols-6 flex-col gap-2 overflow-auto">
+                <div className="grid h-[calc(100%-3rem)] max-h-[calc(100%-3rem)] grid-cols-6 flex-col gap-2 overflow-auto p-2">
                   {blueprintInstance
                     ? blueprintInstance?.blueprint_fields
                         ?.toSorted((a, b) => a.sort - b.sort)
@@ -296,19 +296,23 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
 
             {IS_PUBLIC ? null : (
               <Collapsible
-                actions={[
-                  {
-                    icon: IconEnum.edit,
-                    tooltip: "Edit tags",
-                    onClick: openEditTagDrawer,
-                  },
-                ]}
+                actions={
+                  isEditable
+                    ? []
+                    : [
+                        {
+                          icon: IconEnum.edit,
+                          tooltip: "Edit tags",
+                          onClick: openEditTagDrawer,
+                        },
+                      ]
+                }
                 icon={IconEnum.tags}
                 initialOpen={false}
                 label="Tags">
-                <>
+                <div className={`flex flex-col p-2 ${isEditable ? "bg-zinc-800" : ""}`}>
                   {blueprintInstance?.tags?.length && !isEditable ? (
-                    <div className="animate-in fade-in fill-mode-both mt-2 flex w-full flex-wrap gap-2">
+                    <div className="animate-in fade-in fill-mode-both flex w-full flex-wrap gap-2">
                       {blueprintInstance.tags.map((tag) => (
                         <div key={tag.id}>
                           <Badge customColor={tag.color} label={tag.title} size="lg" />
@@ -324,7 +328,7 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
                   ) : null}
 
                   {isEditable ? <TagInput handleChange={handleChange} tags={blueprintInstance?.tags || []} /> : null}
-                </>
+                </div>
               </Collapsible>
             )}
             {isEditable ? (
