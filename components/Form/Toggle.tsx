@@ -7,7 +7,8 @@ import { Tooltip } from "../Overlay";
 
 const classes = tv({
   slots: {
-    input: "peer sr-only [&:checked_+_span_div[data-checked-icon]]:block [&:checked_+_span_div[data-unchecked-icon]]:hidden",
+    input:
+      "caret-transparent peer sr-only [&:checked_+_span_div[data-checked-icon]]:block [&:checked_+_span_div[data-unchecked-icon]]:hidden",
     label:
       "relative inline-block cursor-pointer rounded-full [&:has(:checked_+_span_div[data-checked-icon])]:bg-green-600 bg-zinc-700 transition [-webkit-tap-highlight-color:_transparent]",
     buttonContainer:
