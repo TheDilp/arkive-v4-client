@@ -38,7 +38,7 @@ const SelectClasses = tv({
   variants: {
     variant: {
       primary: {
-        select: "border-zinc-800 focus:border-zinc-700",
+        select: "border-zinc-800 focus:border-zinc-400",
         label: "text-zinc-300",
         helperText: "text-zinc-300",
         placeholder: "text-zinc-300",
@@ -409,10 +409,10 @@ export function Select({
       }}>
       {label ? <span className={labelClasses()}>{label}</span> : null}
       <div
+        ref={refs.setReference}
         aria-autocomplete="none"
         aria-labelledby="select-label"
         className={select()}
-        ref={refs.setReference}
         tabIndex={0}
         {...getReferenceProps({
           onKeyDown(e) {
@@ -480,7 +480,7 @@ export function Select({
       {isOpen && options.length ? (
         <FloatingPortal>
           <FloatingFocusManager context={context} modal={false}>
-            <div className={optionsContainer()} ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
+            <div ref={refs.setFloating} className={optionsContainer()} style={floatingStyles} {...getFloatingProps()}>
               {hasSearch ? (
                 <input
                   // @ts-ignore
@@ -514,6 +514,9 @@ export function Select({
               {filteredItems.map((opt, i) => {
                 return (
                   <div
+                    ref={(node) => {
+                      listRef.current[i] = node;
+                    }}
                     aria-selected={i === activeIndex}
                     className={SelectOption({
                       isActive: activeIndex === i,
@@ -523,9 +526,6 @@ export function Select({
                       isDisabled: opt.isDisabled,
                       size,
                     })}
-                    ref={(node) => {
-                      listRef.current[i] = node;
-                    }}
                     role="option"
                     tabIndex={i === activeIndex ? 0 : -1}
                     {...getItemProps({
