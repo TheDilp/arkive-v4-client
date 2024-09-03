@@ -464,6 +464,7 @@ function TableSubheaderFilterBadges<T>({
         <Tooltip
           key={field}
           content={getFilterTooltip({ and: andFiltersByField[field] || [], or: orFiltersByField[field] || [] })}
+          isInline
           isPortal>
           <div>
             <Badge
@@ -486,6 +487,7 @@ function TableSubheaderFilterBadges<T>({
             and: andRelationFiltersByField[field] || [],
             or: orRelationFiltersByField[field] || [],
           })}
+          isInline
           isPortal
           variant="secondary">
           <div>

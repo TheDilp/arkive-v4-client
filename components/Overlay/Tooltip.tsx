@@ -24,7 +24,7 @@ import { tv } from "tailwind-variants";
 import { DefaultTooltipType, TooltipType, Variant } from "../../types";
 
 const defaultTooltipClasses = tv({
-  base: "z-50 select-none rounded border-none border-transparent p-1 text-sm text-white shadow ",
+  base: "z-50 select-none rounded border-none border-transparent p-1 text-sm text-white shadow break-all",
   variants: {
     variant: {
       primary: "bg-black",
@@ -151,10 +151,10 @@ export function Tooltip({
               </OnlySoleChild>
             )}
             <FloatingArrow
+              ref={arrowRef}
               className="z-[9998] [&>path:first-of-type]:stroke-none"
               context={context}
               fill={arrowColor || getArrowColor(variant) || "black"}
-              ref={arrowRef}
               strokeWidth={0}
             />
           </div>
@@ -182,10 +182,10 @@ export function Tooltip({
             })
           )}
           <FloatingArrow
+            ref={arrowRef}
             className="z-[9998] [&>path:first-of-type]:stroke-none"
             context={context}
             fill={arrowColor || getArrowColor(variant) || "black"}
-            ref={arrowRef}
             strokeWidth={0}
           />
         </div>
