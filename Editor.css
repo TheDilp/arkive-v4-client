@@ -361,6 +361,13 @@
       @apply p-0 text-zinc-100 !important;
     }
   }
+  .secretBlock {
+    border: solid 2px rgba(131, 238, 255, 0.5);
+    background-color: rgba(131, 238, 255, 0.2);
+    padding: 1rem;
+    border-radius: 0.1rem;
+    overflow: auto;
+  }
   .spoiler {
     @apply cursor-pointer bg-zinc-500 px-2 text-white transition-none;
 
