@@ -243,7 +243,7 @@ export function CharacterForm() {
 
   useEffect(() => {
     if (character?.first_name && !!entity_id) {
-      save();
+      save(false);
       resetChanges();
     }
   }, [section_id]);
@@ -255,60 +255,61 @@ export function CharacterForm() {
       </div>
     );
 
-  function save() {
-    setDialog((prev) => ({
-      ...prev,
-      isOverlay: true,
-      title: `Complete ${entity_id ? "editing" : "creating"} ${type === "characters" ? "character" : "blueprint instance"}?`,
-      description: `Once complete, access to this gateway will be revoked. Are you sure you want to finish ${entity_id ? "editing" : "creating"} this ${type === "characters" ? "character" : "blueprint instance"}?`,
-      confirm: {
-        action: () => {
-          if (existingCharacter?.data) {
-            const dataToParse = {
-              data: character,
-              permissions: character?.permissions,
-              relations: {
-                character_fields: getDifferenceForCharacterFields(
-                  existingCharacter?.data,
-                  character || { character_fields: [] }
-                ),
-              },
-            };
-            if (dataToParse?.data?.portrait?.id) {
-              dataToParse.data.portrait_id = dataToParse.data.portrait.id;
+  function save(isComplete: boolean) {
+    if (isComplete && changedData)
+      setDialog((prev) => ({
+        ...prev,
+        isOverlay: true,
+        title: `Complete ${entity_id ? "editing" : "creating"} ${type === "characters" ? "character" : "blueprint instance"}?`,
+        description: `Once complete, access to this gateway will be revoked. Are you sure you want to finish ${entity_id ? "editing" : "creating"} this ${type === "characters" ? "character" : "blueprint instance"}?`,
+        confirm: {
+          action: () => {
+            if (existingCharacter?.data) {
+              const dataToParse = {
+                data: character,
+                permissions: character?.permissions,
+                relations: {
+                  character_fields: getDifferenceForCharacterFields(
+                    existingCharacter?.data,
+                    character || { character_fields: [] }
+                  ),
+                },
+              };
+              if (dataToParse?.data?.portrait?.id) {
+                dataToParse.data.portrait_id = dataToParse.data.portrait.id;
+              }
+              const parsedData = UpdateCharacterSchema.parse(dataToParse);
+              update(parsedData, {
+                onSuccess: () => {
+                  document.location = "https://thearkive.app";
+                },
+              });
+            } else {
+              const dataToParse = {
+                data: character,
+                permissions: character?.permissions,
+                relations: {
+                  tags: config_tags.map((t) => ({ id: t.value })),
+                  character_fields: character?.character_fields || [],
+                },
+              };
+              if (dataToParse?.data?.portrait?.id) {
+                dataToParse.data.portrait_id = dataToParse.data.portrait.id;
+              }
+              const parsedData = InsertCharacterSchema.parse(dataToParse);
+              create(parsedData, {
+                onSuccess: () => {
+                  document.location = "https://thearkive.app";
+                },
+              });
             }
-            const parsedData = UpdateCharacterSchema.parse(dataToParse);
-            update(parsedData, {
-              onSuccess: () => {
-                document.location = "https://thearkive.app";
-              },
-            });
-          } else {
-            const dataToParse = {
-              data: character,
-              permissions: character?.permissions,
-              relations: {
-                tags: config_tags.map((t) => ({ id: t.value })),
-                character_fields: character?.character_fields || [],
-              },
-            };
-            if (dataToParse?.data?.portrait?.id) {
-              dataToParse.data.portrait_id = dataToParse.data.portrait.id;
-            }
-            const parsedData = InsertCharacterSchema.parse(dataToParse);
-            create(parsedData, {
-              onSuccess: () => {
-                document.location = "https://thearkive.app";
-              },
-            });
-          }
+          },
+          label: "Complete",
+          variant: "success",
+          icon: IconEnum.check_circle,
         },
-        label: "Complete",
-        variant: "success",
-        icon: IconEnum.check_circle,
-      },
-      cancel: { action: () => {}, label: "Cancel" },
-    }));
+        cancel: { action: () => {}, label: "Cancel" },
+      }));
   }
   return (
     <>
@@ -318,7 +319,9 @@ export function CharacterForm() {
           gridRow: "1 / 2",
         }}>
         <h1 className="flex items-center gap-x-4">
-          {character?.portrait_id ? <Avatar image_id={character?.portrait_id} /> : null}
+          {character?.portrait_id ? (
+            <Avatar image_id={character?.portrait_id} manual_project_id={character?.project_id} />
+          ) : null}
           {getCharacterFullName(character?.first_name || "", null, character?.last_name)}
           {entity_id ? (
             <div className="ml-auto">
@@ -415,7 +418,7 @@ export function CharacterForm() {
               label="Previous section"
               onClick={() => {
                 navigate(
-                  `/${type}/${access_id}/${entity_id || "create"}/${sections[getPreviousSection(sections, section_id as string)]?.id}`
+                  `/${type}/${access_id}/${entity_id ? `update/${entity_id}` : "create"}/${sections[getPreviousSection(sections, section_id as string)]?.id}`
                 );
               }}
               variant="info"
@@ -425,7 +428,7 @@ export function CharacterForm() {
               isDisabled={!character?.first_name || isCreating || isUpdating}
               isLoading={isCreating || isUpdating}
               label={entity_id ? "Complete" : "Create"}
-              onClick={save}
+              onClick={() => save(true)}
               variant="success"
             />
             <Button
@@ -434,7 +437,7 @@ export function CharacterForm() {
               label="Next section"
               onClick={() => {
                 navigate(
-                  `/${type}/${access_id}/${entity_id || "create"}/${sections[geNextSection(sections, section_id as string)]?.id}`
+                  `/${type}/${access_id}/${entity_id ? `update/${entity_id}` : "create"}/${sections[geNextSection(sections, section_id as string)]?.id}`
                 );
               }}
               variant="info"
