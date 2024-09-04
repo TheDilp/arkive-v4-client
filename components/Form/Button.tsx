@@ -62,7 +62,7 @@ const ButtonClasses = tv({
       true: "",
     },
     hasNoBackground: {
-      true: "bg-transparent shadow-none border-0",
+      true: "bg-transparent shadow-none",
     },
     hasNoLabel: {
       true: "p-0 w-full h-full",
