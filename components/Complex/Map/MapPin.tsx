@@ -6,7 +6,7 @@ import { Marker, Tooltip } from "react-leaflet";
 import { useParams } from "react-router-dom";
 
 import { useUpdateMapSubEntity } from "../../../hooks";
-import { useImageURL } from "../../../hooks/ui/useImageURLHook";
+import { useImageURL } from "../../../hooks/ui/useImageURL";
 import { DropdownItemType, MapPinType } from "../../../types";
 import { contextMenuAtom, dialogAtom, drawerAtom, getAssetURL, IconEnum } from "../../../utils";
 

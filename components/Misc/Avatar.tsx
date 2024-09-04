@@ -2,7 +2,7 @@ import { useSetAtom } from "jotai";
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { useImageURL } from "../../hooks/ui/useImageURLHook";
+import { useImageURL } from "../../hooks/ui/useImageURL";
 import { AvatarType } from "../../types";
 import { dialogAtom, getAssetURL, getFirstLetters } from "../../utils";
 import { Tooltip } from "../Overlay/Tooltip";

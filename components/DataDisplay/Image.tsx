@@ -3,7 +3,7 @@ import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { useImageURL } from "../../hooks/ui/useImageURLHook";
+import { useImageURL } from "../../hooks/ui/useImageURL";
 import { DialogAtomType, ImageComponentType } from "../../types";
 import { dialogAtom, getAssetURL } from "../../utils";
 

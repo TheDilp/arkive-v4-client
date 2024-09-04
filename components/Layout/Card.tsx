@@ -1,6 +1,6 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 
-import { useImageURL } from "../../hooks/ui/useImageURLHook";
+import { useImageURL } from "../../hooks/ui/useImageURL";
 import { BaseCardType, CharacterType, ProjectGameCardType } from "../../types";
 import { getAssetURL, IconEnum, projectCardNavItems } from "../../utils";
 import { Avatar, Icon } from "../Misc";

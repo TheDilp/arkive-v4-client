@@ -4,7 +4,7 @@ import { capitalCase } from "remirror";
 
 import { Button, Search } from "../../../components";
 import { useGetEntity } from "../../../hooks";
-import { useImageURL } from "../../../hooks/ui/useImageURLHook";
+import { useImageURL } from "../../../hooks/ui/useImageURL";
 import { AllAvailableEntities, AvailableEntityType, ProjectType } from "../../../types";
 import { getDefaultEntityIcon, getEntityLink, IconEnum } from "../../../utils";
 

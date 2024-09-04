@@ -445,8 +445,8 @@ function DocumentViewEditor({
           </li>
           {headings.map((h) => (
             <li
-              className={`cursor-pointer hover:text-blue-400 ${uiOptions.outline ? "" : "hidden"}`}
               key={h.id}
+              className={`cursor-pointer hover:text-blue-400 ${uiOptions.outline ? "" : "hidden"}`}
               onClick={() => {
                 const el = document.getElementById(h.id);
                 if (el) {

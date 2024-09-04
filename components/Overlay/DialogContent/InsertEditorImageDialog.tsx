@@ -73,9 +73,9 @@ export function InsertEditorImageDialog({ data }: Props) {
         <Title isDrawerTitle label="Images to insert" size="xl" />
         {selectedImages.map((img) => (
           <ImagePreview
+            key={img.value}
             clearAction={(id) => setSelectedImages((prev) => prev.filter((im) => im.value !== id))}
             id={img.value}
-            key={img.value}
             manual_project_id={selectedImages?.[0]?.project_id}
             title={img.label}
           />

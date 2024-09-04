@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-import { useImageURL } from "../../../hooks/ui/useImageURLHook";
+import { useImageURL } from "../../../hooks/ui/useImageURL";
 import { getAssetURL } from "../../../utils";
 
 export function ImageViewDialog({

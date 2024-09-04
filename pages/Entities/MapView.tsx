@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 
 import { MapImage, Select } from "../../components";
 import { useGetEntities, useGetEntity, useHasPermissions, useNavbarTitle } from "../../hooks";
-import { useImageURL } from "../../hooks/ui/useImageURLHook";
+import { useImageURL } from "../../hooks/ui/useImageURL";
 import { MapPinTypesType, MapType, onChangeValue } from "../../types";
 import { getAssetURL, hasEntityUpdatePermissionForEntityView } from "../../utils";
 

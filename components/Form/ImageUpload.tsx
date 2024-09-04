@@ -2,7 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { MutableRefObject, useRef } from "react";
 
 import { useUploadAvatar } from "../../hooks";
-import { useImageURL } from "../../hooks/ui/useImageURLHook";
+import { useImageURL } from "../../hooks/ui/useImageURL";
 import { ImageUploadType } from "../../types";
 import { changeImagesForUpload, getAssetURL, IconEnum, useNotifications } from "../../utils";
 
