@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { MutableRefObject, useRef } from "react";
 
 import { useUploadAvatar } from "../../hooks";
+import { useImageURL } from "../../hooks/ui/useImageURLHook";
 import { ImageUploadType } from "../../types";
 import { changeImagesForUpload, getAssetURL, IconEnum, useNotifications } from "../../utils";
 
@@ -116,16 +117,17 @@ export function AvatarUpload({
   const ref = useRef() as MutableRefObject<HTMLInputElement>;
   const { mutate: upload } = useUploadAvatar(id, isUserAvatar);
 
+  const url = useImageURL(image_id ? getAssetURL(project_id as string, "images", image_id) : null);
+
   return (
     <div
-      className="pointer-events-none h-12 w-12 cursor-pointer select-none rounded-full border-2 border-dashed border-zinc-400 hover:bg-zinc-700"
+      className="pointer-events-none h-12 w-12 cursor-pointer select-none rounded-full border-2 border-dashed border-zinc-400 bg-cover hover:bg-zinc-700"
       id="dropzone-container"
       onDragOver={(e) => e.preventDefault()}
       style={{
-        backgroundImage: image_id ? `url(${getAssetURL(project_id, "images", image_id)})` : `url(${image || ""})`,
+        backgroundImage: image_id ? `url(${url})` : `url(${image})`,
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
-        backgroundSize: "cover",
       }}>
       <label
         className="pointer-events-auto relative z-20 flex h-full w-full cursor-pointer flex-col items-center justify-center"
