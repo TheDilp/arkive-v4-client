@@ -71,10 +71,9 @@ export function Gallery({ images, isOpenable, columns = 4, size = "md", type }: 
           gridAutoRows: `${rowSize}rem`,
         }}>
         {images.map((image) => (
-          <Image image={image} isOpenable={isOpenable} key={image.id} type={type} />
+          <Image key={image.id} image={image} isOpenable={isOpenable} type={type} />
         ))}
       </div>
     </div>
   );
 }
-
