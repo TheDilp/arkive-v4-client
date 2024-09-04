@@ -81,7 +81,7 @@ export function ProjectLayout() {
   );
   const title = useAtomValue(navbarTitleAtom);
   const [history, setHistory] = useAtom(historyAtom);
-  const setProjectAtom = useSetAtom(projectAtom);
+  const [projectAtomData, setProjectAtom] = useAtom(projectAtom);
   const setDialog = useSetAtom(dialogAtom);
   const setPermissions = useSetAtom(permissionsAtom);
   const setUserPermissions = useSetAtom(currentUserPermissionsAtom);
@@ -189,7 +189,7 @@ export function ProjectLayout() {
         <Navbar isDisabled={isInitialLoading || isInitialLoadingUser} />
         <div className="h-[calc(100%-6rem)] max-w-full overflow-hidden p-4 lg:h-[calc(100%-2rem)]">
           <Drawer />
-          {isInitialLoading || isInitialLoadingUser || isInitialLoadingPermissions ? null : <Outlet />}
+          {isInitialLoading || isInitialLoadingUser || isInitialLoadingPermissions || !projectAtomData ? null : <Outlet />}
         </div>
         {!isLg ? (
           <Sidebar isLoading={isInitialLoading || isInitialLoadingUser} isUsingPermissions items={projectSidebarItems} />
