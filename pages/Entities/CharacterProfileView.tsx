@@ -12,16 +12,22 @@ import {
   Badge,
   Breadcrumbs,
   Button,
+  Checkbox,
   Collapsible,
   createColumnHelper,
   Dropdown,
   Editor,
   Gallery,
   Icon,
+  ImagePreview,
+  ImageSelect,
+  Input,
+  RelatedEntityForm,
   Skeleton,
   StaticRender,
   Table,
   Tabs,
+  TagInput,
 } from "../../components";
 import { Toggle } from "../../components/Form/Toggle";
 import {
@@ -35,6 +41,7 @@ import {
   useNavbarTitle,
   useRemoveFromEntity,
   useTable,
+  useUpdateEntity,
   useUpdateManyPublic,
 } from "../../hooks";
 import {
@@ -63,6 +70,7 @@ import {
   getCharacterFullName,
   getCharacterProfileTabFromType,
   getDefaultEntityIcon,
+  getDifferenceForCharacterFields,
   getEntityLink,
   getFirstLetters,
   getSentenceCase,
@@ -73,7 +81,7 @@ import {
   sortCharactersByName,
   userAtom,
 } from "../../utils";
-import { RemoveFromCharacterSchema } from "../../validation";
+import { RemoveFromCharacterSchema, UpdateCharacterSchema } from "../../validation";
 import { ConversationView } from ".";
 
 const relationshipColumnHelper = createColumnHelper<FormattedRelationship>();
@@ -813,33 +821,26 @@ export function CharacterProfileView({
     data: existingCharacter,
     isLoading,
     isFetching,
-  } = useGetEntity<CharacterType>(
-    id || item_id,
-    "characters",
-    {
-      relations: {
-        tags: true,
-        character_fields: enabledEntities.includes("character_fields_templates"),
-        locations: enabledEntities.includes("maps"),
-        relationships: true,
-        character_relationship_types: true,
-        documents: enabledEntities.includes("documents"),
-        images: true,
-        events: enabledEntities.includes("calendars"),
-        portrait: true,
-      },
-      fields: ["id", "full_name", "nickname", "age", "biography", "is_public", "owner_id"],
-      permissions: true,
+  } = useGetEntity<CharacterType>(id || item_id, "characters", {
+    relations: {
+      tags: true,
+      character_fields: enabledEntities.includes("character_fields_templates"),
+      locations: enabledEntities.includes("maps"),
+      relationships: true,
+      character_relationship_types: true,
+      documents: enabledEntities.includes("documents"),
+      images: true,
+      events: enabledEntities.includes("calendars"),
+      portrait: true,
     },
-    {
-      staleTime: 60 * 1000,
-    }
-  );
+    fields: ["id", "first_name", "last_name", "full_name", "nickname", "age", "biography", "is_public", "owner_id"],
+    permissions: true,
+  });
+  const { mutate: save, isLoading: isMutating } = useUpdateEntity("characters", project_id);
   const { mutateAsync: downloadImages } = useDownloadImages(project_id, "images");
   const { mutateAsync: updateDocumentsPublic } = useUpdateManyPublic("documents", project_id as string);
   const { mutateAsync: updateImagesPublic } = useUpdateManyPublic("images", project_id as string);
   const { mutateAsync: updateEventsPublic } = useUpdateManyPublic("events", project_id as string);
-
   const { mutateAsync: removeItem } = useRemoveFromEntity("characters", item_id as string, project_id as string);
   const { mutateAsync: generateDocument } = useGenerateDocument("conversations");
   const relationships = [
@@ -930,6 +931,24 @@ export function CharacterProfileView({
         size: "lg",
       });
   }
+  function handleSave() {
+    const dataToParse = {
+      data: character,
+      permissions: character?.permissions,
+      relations: {
+        tags: character?.tags?.map((t) => ({ id: t.id })),
+        character_fields: getDifferenceForCharacterFields(existingCharacter?.data || {}, character || {}),
+        is_favorite: character?.is_favorite,
+        is_public: character?.is_public,
+      },
+    };
+    if (dataToParse?.data?.portrait?.id) {
+      dataToParse.data.portrait_id = dataToParse.data.portrait.id;
+    }
+    const parsedData = UpdateCharacterSchema.parse(dataToParse);
+    save(parsedData, { onSuccess: () => queryClient.invalidateQueries(["characters", existingCharacter?.data?.id]) });
+  }
+
   const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate, setDrawer, isPreview), []);
 
   useEffect(() => {
@@ -937,7 +956,7 @@ export function CharacterProfileView({
   }, [type]);
 
   useLayoutEffect(() => {
-    if (existingCharacter?.data) {
+    if (existingCharacter?.data && !character) {
       setCharacter(existingCharacter?.data);
     }
   }, [existingCharacter]);
@@ -970,6 +989,7 @@ export function CharacterProfileView({
               <div className="pt-1">
                 <Toggle
                   allowedPlacements={["left"]}
+                  isDisabled={!canUpdate}
                   name="isEditable"
                   offIcon={IconEnum.close}
                   onChange={(e) => setIsEditable(e.checked)}
@@ -1043,7 +1063,7 @@ export function CharacterProfileView({
               {character?.nickname ? (
                 <h3 className="text-center font-lato">{existingCharacter?.data?.nickname || ""}</h3>
               ) : null}
-              {character?.tags?.length ? (
+              {!isEditable && character?.tags?.length ? (
                 <div className="animate-in fade-in fill-mode-both flex w-full flex-wrap justify-center gap-2 lg:mt-2">
                   {character.tags.map((tag) => (
                     <div key={tag.id}>
@@ -1052,6 +1072,7 @@ export function CharacterProfileView({
                   ))}
                 </div>
               ) : null}
+              {isEditable ? <TagInput handleChange={handleChange} isAutofocused={false} tags={character?.tags || []} /> : null}
             </div>
           ) : null}
           <div className="col-span-6 flex h-full flex-1 flex-col overflow-auto lg:col-span-5 lg:py-4">
@@ -1101,7 +1122,102 @@ export function CharacterProfileView({
               ) : null}
             </h2>
             {(isPreview ? tabs[selectedTab].id === "0" : type === "biography") ? (
-              <div className="flex h-full w-full items-start gap-x-4 px-4">
+              <div className="flex h-full w-full flex-col items-start gap-x-4 gap-y-2 px-4">
+                {isEditable ? (
+                  <>
+                    <div className="flex w-full flex-col gap-2 lg:flex-row lg:flex-nowrap lg:items-center">
+                      <div className="w-full lg:w-1/2">
+                        <Input
+                          isAutofocused
+                          isDisabled={!canUpdate}
+                          label="First name (required)"
+                          name="first_name"
+                          onChange={handleChange}
+                          value={character?.first_name || ""}
+                          variant={character?.first_name ? "primary" : "error"}
+                        />
+                      </div>
+                      <div className="w-full lg:w-1/2">
+                        <Input
+                          isDisabled={!canUpdate}
+                          label="Nickname (optional)"
+                          name="nickname"
+                          onChange={handleChange}
+                          value={character?.nickname || ""}
+                        />
+                      </div>
+                      <div className="w-full lg:w-1/2">
+                        <Input
+                          isDisabled={!canUpdate}
+                          label="Last name (optional)"
+                          name="last_name"
+                          onChange={handleChange}
+                          value={character?.last_name || ""}
+                        />
+                      </div>
+                    </div>
+                    <div className="w-full">
+                      <span className="text-sm text-zinc-300">Character image (optional)</span>
+                      {!character?.portrait?.id ? (
+                        <ImageSelect
+                          isDisabled={!canUpdate}
+                          isIconOnly
+                          name="portrait"
+                          onChange={({ name, label, value }) => {
+                            handleChange({ name, value: { id: value, title: label } });
+                          }}
+                          type="images"
+                          value={character?.portrait?.id ?? ""}
+                        />
+                      ) : (
+                        <ImagePreview
+                          clearAction={
+                            permissions?.update_characters
+                              ? () => {
+                                  handleChange([
+                                    { name: "portrait", value: null },
+                                    { name: "portrait_id", value: null },
+                                  ]);
+                                }
+                              : undefined
+                          }
+                          id={character?.portrait?.id}
+                          title={character?.portrait?.title}
+                        />
+                      )}
+                    </div>
+                    <Input
+                      isDisabled={!canUpdate}
+                      label="Age (optional)"
+                      name="age"
+                      onChange={handleChange}
+                      type="number"
+                      value={character?.age || ""}
+                    />
+
+                    <ul className="flex w-full flex-col gap-y-2">
+                      <li className="flex items-center justify-between">
+                        <span>Favorite:</span>
+                        <Checkbox
+                          isDisabled={!canUpdate}
+                          name="is_favorite"
+                          onChange={handleChange}
+                          value={character?.is_favorite ?? false}
+                        />
+                      </li>
+                      <li className="flex w-full items-center justify-between">
+                        <span>Is public:</span>
+                        <Checkbox
+                          isDisabled={!canUpdate}
+                          name="is_public"
+                          onChange={handleChange}
+                          value={character?.is_public ?? false}
+                        />
+                      </li>
+                    </ul>
+                    <hr className="w-full border-zinc-700" />
+                  </>
+                ) : null}
                 <div className="w-full overflow-auto [&>.staticRendererContainer]:p-0">
                   {isEditable ? (
                     <Editor
@@ -1119,29 +1235,52 @@ export function CharacterProfileView({
             ) : null}
             {(isPreview ? tabs[selectedTab].id === "1" : type === "additional fields") &&
             enabledEntities.includes("character_fields_templates") ? (
-              <ul className="animate-in fade-in fill-mode-both flex max-h-[80%] flex-col gap-y-2 overflow-y-auto px-4">
+              <ul className="animate-in fade-in fill-mode-both flex max-h-[90%] flex-col gap-y-2 overflow-y-auto px-4">
                 {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
-                {(existingTemplates?.data || []).map((t) => {
-                  return (
-                    <Collapsible key={t.id} label={t.title}>
-                      <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-2 overflow-auto">
-                        {t.character_fields.map((template_field) => {
-                          const characterField = existingCharacter?.data?.character_fields?.find(
-                            (f) => f.id === template_field.id
-                          );
-                          return (
-                            <AdditionalFieldDisplay
-                              key={template_field.id}
-                              character_field={template_field}
-                              character_field_data={characterField ?? null}
-                              isPreview={!!id}
+
+                {isEditable
+                  ? (existingTemplates?.data || []).map((t) => {
+                      return (
+                        <Collapsible key={t.id} label={t.title}>
+                          <div className="pt-2">
+                            <RelatedEntityForm
+                              fields={t.character_fields}
+                              fields_data={character?.character_fields || []}
+                              handleChange={handleChange}
+                              hasCreateOrEdit={canUpdate}
+                              isDrawer={false}
+                              isEditEnabled
+                              type="characters"
                             />
-                          );
-                        })}
-                      </div>
-                    </Collapsible>
-                  );
-                })}
+                          </div>
+                        </Collapsible>
+                      );
+                    })
+                  : null}
+
+                {isEditable
+                  ? null
+                  : (existingTemplates?.data || []).map((t) => {
+                      return (
+                        <Collapsible key={t.id} label={t.title}>
+                          <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-2 overflow-auto">
+                            {t.character_fields.map((template_field) => {
+                              const characterField = existingCharacter?.data?.character_fields?.find(
+                                (f) => f.id === template_field.id
+                              );
+                              return (
+                                <AdditionalFieldDisplay
+                                  key={template_field.id}
+                                  character_field={template_field}
+                                  character_field_data={characterField ?? null}
+                                  isPreview={!!id}
+                                />
+                              );
+                            })}
+                          </div>
+                        </Collapsible>
+                      );
+                    })}
 
                 {!isFetchingTemplates && !existingTemplates?.data?.length ? (
                   <Alert label="There are no templates available." variant="info" />
@@ -1367,18 +1506,19 @@ export function CharacterProfileView({
             ) : null}
           </div>
         </div>
-        {isEditable ? (
-          <div>
-            <Button
-              icon={IconEnum.save}
-              isDisabled={!character?.first_name}
-              label="Save"
-              onClick={() => {}}
-              variant="success"
-            />
-          </div>
-        ) : null}
       </div>
+      {isEditable ? (
+        <div>
+          <Button
+            icon={IconEnum.save}
+            isDisabled={!character?.first_name || isMutating || !canUpdate}
+            isLoading={isMutating}
+            label="Save"
+            onClick={handleSave}
+            variant="success"
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

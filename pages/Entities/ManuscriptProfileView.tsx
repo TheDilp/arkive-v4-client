@@ -76,6 +76,15 @@ export function ManuscriptProfileView() {
 
   const manuscriptTree = buildManuscript(existingManuscript?.data);
 
+  const canUpdate = hasActionPermission(
+    isProjectOwner,
+    user?.id === existingManuscript?.data?.owner_id,
+    permissions,
+    existingManuscript?.data?.permissions || [],
+    "update_manuscripts",
+    user?.role?.id
+  );
+
   useLayoutEffect(() => {
     if (existingManuscript?.data) {
       setBreadcrumbs({
@@ -108,16 +117,7 @@ export function ManuscriptProfileView() {
             <div className="max-w-[208px] lg:w-52">
               <Button
                 icon={IconEnum.edit}
-                isDisabled={
-                  !hasActionPermission(
-                    isProjectOwner,
-                    user?.id === existingManuscript?.data?.owner_id,
-                    permissions,
-                    existingManuscript?.data?.permissions || [],
-                    "update_manuscripts",
-                    user?.role?.id
-                  )
-                }
+                isDisabled={!canUpdate}
                 label="Edit current manuscript"
                 onClick={() => {
                   setDrawer((prev) => ({
@@ -153,7 +153,7 @@ export function ManuscriptProfileView() {
             <ul>
               {manuscriptTree?.length
                 ? manuscriptTree?.map((entity) => {
-                    return <ManuscriptEntityLink entity={entity} key={entity.id} />;
+                    return <ManuscriptEntityLink key={entity.id} entity={entity} />;
                   })
                 : null}
             </ul>

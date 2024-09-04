@@ -112,6 +112,15 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
     }
   }
 
+  const canUpdate = hasActionPermission(
+    isProjectOwner,
+    user?.id === existingBlueprintInstance?.data?.owner_id,
+    permissions,
+    existingBlueprintInstance?.data?.permissions || [],
+    "update_blueprint_instances",
+    user?.role?.id
+  );
+
   function handleSave() {
     if (existingBlueprintInstance?.data && blueprintInstance) {
       const dataToParse = {
@@ -163,6 +172,7 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
             <div className="flex w-24 items-center justify-end">
               <Toggle
                 allowedPlacements={["left"]}
+                isDisabled={!canUpdate}
                 name="isEditable"
                 offIcon={IconEnum.close}
                 onChange={(e) => setIsEditable(e.checked)}
@@ -334,7 +344,8 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
             {isEditable ? (
               <Button
                 icon={IconEnum.save}
-                isDisabled={isUpdating || !blueprintInstance?.title}
+                isDisabled={isUpdating || !blueprintInstance?.title || !canUpdate}
+                isLoading={isUpdating}
                 label="Save"
                 onClick={handleSave}
                 variant="success"
