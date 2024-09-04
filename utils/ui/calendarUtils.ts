@@ -53,7 +53,7 @@ export function checkIfYearCorrect(start_year: number | undefined, end_year: num
 
 function checkLeapDayCondition(
   cond: { type: LeapDayConditionType; value: number | string },
-  date: { year: number; month: number },
+  date: { year: number; month: number }
 ) {
   if (cond.type === "every") return date.year % Number(cond.value) === 0;
   if (cond.type === "divisible_by") return date.year % Number(cond.value) === 0;
@@ -84,7 +84,7 @@ export function getStartingDayForMonth(
   monthIndex: number,
   weekdays: number | undefined,
   starts_on_day: number | null | undefined,
-  previousMonthLeapDays: number,
+  previousMonthLeapDays: number
 ) {
   // ! There is no need to use leap days in the starting day calculation as
   // ! they are already used when calculating filler days
@@ -113,7 +113,7 @@ export function getFillerDayNumber(
   calendarMonths: MonthType[],
   currentMonthIndex: number,
   day: number,
-  previousMonthLeapDays: number,
+  previousMonthLeapDays: number
 ) {
   let previousMonthIndex = currentMonthIndex - 1;
 
@@ -126,8 +126,10 @@ export function getFillerDayNumber(
   }
   return 0;
 }
-export function getDayOrdinal(day: number): "st" | "nd" | "rd" | "th" {
-  const dayString = day.toString();
+export function getDayOrdinal(day?: number): "st" | "nd" | "rd" | "th" | "" {
+  if (!day) return "";
+  const dayString = day?.toString();
+
   if (dayString.endsWith("1")) return "st";
   if (dayString.endsWith("2")) return "nd";
   if (dayString.endsWith("3")) return "rd";
@@ -137,7 +139,7 @@ export function formatDateToString(
   day: number | undefined,
   year: number | undefined,
   monthId: string | undefined,
-  months: { id: string; title: string }[] | undefined,
+  months: { id: string; title: string }[] | undefined
 ): string {
   if (day === undefined) return "";
   if (year === undefined) return "";
@@ -155,7 +157,7 @@ export function getCalendarFilters(
   start_range: number | undefined,
   end_range: number | undefined,
   month_id: string,
-  filters: CalendarFilters,
+  filters: CalendarFilters
 ): { and: RequestFilterType[]; or: RequestFilterType[] } {
   const finalFilters: { and: RequestFilterType[]; or: RequestFilterType[] } = { and: [], or: [] };
   finalFilters.and.push({
@@ -210,7 +212,7 @@ export function getCalendarFilters(
         field: "end_month_id",
         value: month_id,
         operator: "eq",
-      },
+      }
     );
   }
 
