@@ -5,7 +5,8 @@ import { Link, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import { useGetImage } from "../../../hooks";
-import { deleteObjectPropsRecursive, dialogAtom, IconEnum, useNotifications } from "../../../utils";
+import { useImageURL } from "../../../hooks/ui/useImageURL";
+import { deleteObjectPropsRecursive, dialogAtom, getAssetURL, IconEnum, useNotifications } from "../../../utils";
 import { Collapsible } from "../../Layout";
 import { BlueprintMention, DocumentMention, EventMention, GraphMention, MapMention, WordMention } from "./Extensions/Mention";
 import { CharacterMention } from "./Extensions/Mention/CharacterMention";
@@ -28,6 +29,7 @@ function StaticRenderImage({ data }: { data: any }) {
     { enabled: IS_PUBLIC }
   );
 
+  const url = useImageURL(getAssetURL(data.node.attrs.project_id, "images", data.node.attrs.id));
   if (isInitialLoading) return null;
   if (!imageData?.data?.is_public && IS_PUBLIC) return null;
   if (data?.node?.attrs)
@@ -44,6 +46,7 @@ function StaticRenderImage({ data }: { data: any }) {
               data: { title: data.node.attrs.title, image_type: "images", url: data.node.attrs.src },
             })
           }
+          src={url}
         />
       </div>
     );
