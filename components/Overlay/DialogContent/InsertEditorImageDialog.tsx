@@ -90,11 +90,12 @@ export function InsertEditorImageDialog({ data }: Props) {
             const image = selectedImages[index];
             data?.getContext?.chain
               ?.insertImage({
-                src: getAssetURL((image.project_id || project_id) as string, "images", image.value),
+                src: "",
                 alt: image.label,
                 title: image.label,
                 align: "right",
                 id: image.value,
+                project_id,
               })
               ?.run();
           }

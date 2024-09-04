@@ -174,11 +174,17 @@ export function DefaultEditorExtensions(
     DiceRollerExtension,
     new CustomImageExtension({
       enableResizing: true,
+
       extraAttributes: {
         id: {
           default: "",
           validate: () => true,
           toDOM: () => ["data-id"],
+        },
+        project_id: {
+          default: "",
+          validate: () => true,
+          toDOM: () => ["data-project-id"],
         },
       },
       nodeOverride: {
