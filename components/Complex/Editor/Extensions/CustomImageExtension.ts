@@ -12,8 +12,6 @@ export class CustomImageExtension extends ImageExtension {
         title: { default: "" },
       },
       toDOM: (node) => {
-        console.log(node);
-
         return [
           "img",
           {
