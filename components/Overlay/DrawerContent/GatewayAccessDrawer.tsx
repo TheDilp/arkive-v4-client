@@ -688,31 +688,33 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-x-2">
-            <Input
-              label="First name"
-              name="first_name"
-              onChange={handleChange}
-              value={"first_name" in createConfig ? createConfig?.first_name : createConfig?.title}
-            />
-            <div className="flex flex-nowrap gap-x-2">
+          {data?.entity_id ? null : (
+            <div className="grid grid-cols-2 gap-x-2">
               <Input
-                label="Last name"
-                name="last_name"
+                label="First name"
+                name="first_name"
                 onChange={handleChange}
-                value={"last_name" in createConfig ? createConfig?.last_name : createConfig?.title}
+                value={"first_name" in createConfig ? createConfig?.first_name : createConfig?.title}
               />
-              <span className="self-end pb-2">
-                <Checkbox
-                  label="Locked"
-                  name="is_locked"
+              <div className="flex flex-nowrap gap-x-2">
+                <Input
+                  label="Last name"
+                  name="last_name"
                   onChange={handleChange}
-                  tooltip="If checked the user won't be able to edit these properties"
-                  value={createConfig.is_locked}
+                  value={"last_name" in createConfig ? createConfig?.last_name : createConfig?.title}
                 />
-              </span>
+                <span className="self-end pb-2">
+                  <Checkbox
+                    label="Locked"
+                    name="is_locked"
+                    onChange={handleChange}
+                    tooltip="If checked the user won't be able to edit these properties"
+                    value={createConfig.is_locked}
+                  />
+                </span>
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="flex flex-1 flex-col gap-y-2 overflow-hidden">
             <Title isDrawerTitle label="Grant access to" size="xl" />
@@ -768,7 +770,7 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
                       {
                         data: {
                           type: data.type,
-                          id: data?.entity_id,
+                          entity_id: data?.entity_id,
                           gateway_type: "update",
                           config: getRelationsForGatewayConfig(selection || {}),
                         },

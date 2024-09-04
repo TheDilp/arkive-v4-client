@@ -392,7 +392,8 @@ export function useGrantGatewayAccess() {
         config: Record<string, string[]>;
       } & (
         | {
-            id: string;
+            entity_id: string;
+
             gateway_type: "update";
           }
         | {
