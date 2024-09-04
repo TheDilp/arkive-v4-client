@@ -60,7 +60,7 @@ export function TagInput({
       <div className="flex flex-wrap gap-2">
         {tags?.length
           ? tags.map((tag) => (
-              <div className="w-fit" key={tag.id}>
+              <div key={tag.id} className="w-fit">
                 <Badge
                   clearAction={
                     isDisabled
