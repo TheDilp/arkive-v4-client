@@ -94,6 +94,10 @@ export function useCreateEntity<
         if (data?.ok) {
           if (type === "character_relationship_types") {
             queryClient.invalidateQueries(["projects", vars.data.project_id]);
+          } else if (type === "games") {
+            queryClient.invalidateQueries({
+              predicate: (q) => q.queryKey[0] === "allEntities" && q.queryKey.includes("games"),
+            });
           } else {
             queryClient.invalidateQueries(["allEntities", vars.data.project_id, type]);
           }
