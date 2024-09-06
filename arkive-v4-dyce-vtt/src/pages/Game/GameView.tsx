@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 
-import { Avatar, Button, Input, Select, Tooltip } from "../../../../components";
+import { Avatar, Button, Input, Select } from "../../../../components";
 import { useGetEntities, useHandleChange } from "../../../../hooks";
 import { CharacterType } from "../../../../types";
 import { AvailableIcons, getAvatarInitials, IconEnum } from "../../../../utils";
 import { DiceRollInput } from "./DiceRollInput";
 
-const sections: { tooltip: string; id: "roll_history" | "characters" | "journal" | "music"; icon: AvailableIcons }[] = [
+type GameDrawerType = "roll_history" | "characters" | "journal" | "music" | null;
+
+const sections: { tooltip: string; id: GameDrawerType; icon: AvailableIcons }[] = [
   { id: "roll_history", tooltip: "Roll history", icon: IconEnum.random_table },
 
   { id: "characters", tooltip: "Characters", icon: IconEnum.character },
@@ -15,7 +17,6 @@ const sections: { tooltip: string; id: "roll_history" | "characters" | "journal"
 
   { id: "music", tooltip: "Music", icon: IconEnum.music },
 ];
-type GameDrawerType = "roll_history" | "characters" | "journal" | "music" | null;
 
 function RollHistory() {
   const [filter, setFilter] = useState<{ type: "character" | "player" | null; value: string[] | null }>({
@@ -176,7 +177,7 @@ function RollHistory() {
           ? rolls.filter((roll) => filter.value?.includes(filter.type === "character" ? roll.character.id : roll.user))
           : rolls
         ).map((roll) => (
-          <li className="flex flex-col justify-center border-b border-zinc-700 p-2 first:border-t" key={roll.id}>
+          <li key={roll.id} className="flex flex-col justify-center border-b border-zinc-700 p-2 first:border-t">
             <div className="flex items-center gap-x-2">
               <Avatar image_id={roll.character.image} size="xs" />
               <h2 className="text-zinc-300">
@@ -230,8 +231,8 @@ function Characters() {
         {importedCharacters?.length
           ? importedCharacters?.map((char) => (
               <li
-                className="flex items-center justify-between border-b border-zinc-600 bg-zinc-700 p-2 first:border-t"
-                key={char.id}>
+                key={char.id}
+                className="flex items-center justify-between border-b border-zinc-600 bg-zinc-700 p-2 first:border-t">
                 <div className="flex items-center gap-x-2">
                   <Avatar image_id={char.portrait_id} initials={getAvatarInitials(char.full_name)} size="sm" />
                   <span>{char.full_name}</span>
@@ -248,42 +249,66 @@ function Characters() {
   );
 }
 
+const shortcutKeys = ["1", "2", "3", "4"];
 export function GameView() {
   const [drawer, setDrawer] = useState<GameDrawerType>(null);
+  function handleShortcut(e: KeyboardEvent) {
+    if (e.ctrlKey && shortcutKeys.includes(e.key)) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const numberKey = Number(e.key);
+      if (typeof numberKey === "number") {
+        if (drawer && drawer === sections?.[numberKey - 1]?.id) setDrawer(null);
+        else setDrawer(sections?.[numberKey - 1]?.id);
+      }
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleShortcut);
+    return () => {
+      document.removeEventListener("keydown", handleShortcut);
+    };
+  }, [drawer]);
 
   return (
     <div className="flex h-full w-full flex-col text-white">
-      <nav className={`absolute top-20 transition-all ${drawer ? "right-96" : "right-0"}`}>
-        <ul className="flex flex-col gap-y-4">
-          {sections.map((section) => (
-            <li
-              className="flex cursor-pointer items-center justify-center rounded-l-md shadow transition-colors"
-              key={section.id}>
-              <Tooltip content={section.tooltip}>
-                <div className="[&>button]:rounded-r-none">
-                  <Button
-                    icon={section.icon}
-                    iconSize={32}
-                    isIconOnly
-                    onClick={() => {
-                      if (drawer && drawer === section.id.toLowerCase()) setDrawer(null);
-                      else setDrawer(section.id.toLowerCase() as GameDrawerType);
-                    }}
-                    variant={drawer === section.id.toLowerCase() ? "info" : "secondary"}
-                  />
-                </div>
-              </Tooltip>
-            </li>
-          ))}
-        </ul>
-      </nav>
       <div
         className={`${drawer ? "" : "translate-x-96"} absolute right-0 ml-auto h-full w-96 max-w-96 bg-zinc-800 transition-all`}>
         {drawer === "roll_history" ? <RollHistory /> : null}
         {drawer === "characters" ? <Characters /> : null}
       </div>
-      <div className={`mt-auto ${drawer ? "w-[calc(100%-24rem)]" : "w-full"} p-4 transition-width`}>
-        <DiceRollInput />
+      <div
+        className={`mt-auto flex items-center gap-x-2 ${drawer ? "w-[calc(100%-24rem)]" : "w-full"} px-4 pt-4 transition-width`}>
+        <nav className="self-end transition-all">
+          <ul className="flex flex-row gap-x-2">
+            {sections.map((section) => (
+              <li
+                key={section.id}
+                className={"flex cursor-pointer items-center justify-center rounded-t-md shadow transition-all"}>
+                <div
+                  className={`relative h-14 transition-all [&>button>svg]:mb-4 [&>button]:rounded-b-none ${drawer === section.id ? "bottom-0" : "top-4"}`}>
+                  <Button
+                    allowedPlacements={["top"]}
+                    icon={section.icon}
+                    iconSize={32}
+                    isIconOnly
+                    onClick={() => {
+                      if (drawer && drawer === section.id) setDrawer(null);
+                      else if (section.id) setDrawer(section.id);
+                    }}
+                    tooltip={section.tooltip}
+                    variant={drawer === section.id ? "info" : "secondary"}
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div className="relative top-1 flex-1">
+          <DiceRollInput />
+        </div>
       </div>
     </div>
   );
