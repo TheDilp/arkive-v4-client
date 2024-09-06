@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-import { useHandleChange } from "../../../hooks";
+import { useCreateEntity, useHandleChange, useToggledResetAtom } from "../../../hooks";
 import { GameType } from "../../../types";
-import { IconEnum } from "../../../utils";
-import { ImageSelect } from "../../Complex";
+import { IconEnum, toIsoUtc } from "../../../utils";
+import { InsertGameSchema, InsertGameType } from "../../../validation/games";
 import { EntityPreview } from "../../DataDisplay";
 import { Button, Input, Search } from "../../Form";
 import { DrawerLayout } from "../../Layout";
@@ -20,9 +20,10 @@ export function GameDrawer({ data }: Props) {
     title: "",
     image: undefined,
   });
-  const [game, setGame] = useState<Partial<GameType>>({});
+  const [game, setGame] = useState<Partial<GameType>>({ description: "" });
   const { handleChange } = useHandleChange({ data: game, setData: setGame });
-
+  const resetDrawer = useToggledResetAtom();
+  const { mutate } = useCreateEntity<InsertGameType>("games");
   // const { mutate } = useCreateEntity<{ data: Partial<GameType> }>("games");
   return (
     <DrawerLayout>
@@ -66,7 +67,7 @@ export function GameDrawer({ data }: Props) {
         type="datetime-local"
         value={game?.next_session_date}
       />
-      <ImageSelect
+      {/* <ImageSelect
         isDisabled={!game?.project_id}
         isIgnoringPermissions
         label="Cover image (optional)"
@@ -75,14 +76,18 @@ export function GameDrawer({ data }: Props) {
         onChange={handleChange}
         type="images"
         value={game.background_image || ""}
-      />
+      /> */}
       <div>
         <Button
           icon={data?.id ? IconEnum.save : IconEnum.add}
           isDisabled={!game?.project_id || !game?.title}
           label={data?.id ? "Save" : "Create"}
-          // onClick={() => mutate({ data: game })}
-          onClick={undefined}
+          onClick={() => {
+            const parsed = InsertGameSchema.parse({
+              data: { ...game, next_session_date: game.next_session_date ? toIsoUtc(game.next_session_date) : null },
+            });
+            mutate(parsed, { onSuccess: resetDrawer });
+          }}
           variant="success"
         />
       </div>

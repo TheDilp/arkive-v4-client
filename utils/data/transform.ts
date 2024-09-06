@@ -51,3 +51,7 @@ export function permissionsByEntity(permissions: PermissionType[]) {
 
   return Object.values(formatted);
 }
+
+export function toIsoUtc(dateString: string) {
+  return `${dateString}:00Z`;
+}
