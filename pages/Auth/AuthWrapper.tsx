@@ -5,15 +5,16 @@ import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { Spinner } from "../../components";
 import { useUpdateAuthStatus } from "../../hooks";
-import { IconEnum, loggedInAtom, semverCompare, useNotifications, userStatusAtom } from "../../utils";
+import { IconEnum, loggedInAtom, moduleAtom, semverCompare, useNotifications, userStatusAtom } from "../../utils";
 
 export function AuthWrapper() {
-  const { project_id } = useParams();
+  const { project_id, game_id } = useParams();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const createNotification = useNotifications();
-  const { mutate: updateAuthStatus, isLoading: isUpdatingStatus, isIdle } = useUpdateAuthStatus();
+  const { mutate: updateAuthStatus, isLoading: isUpdatingStatus, isSuccess, isIdle } = useUpdateAuthStatus();
 
+  const module = useAtomValue(moduleAtom);
   const loggedIn = useAtomValue(loggedInAtom);
   const userStatus = useAtomValue(userStatusAtom);
 
@@ -39,20 +40,25 @@ export function AuthWrapper() {
   useEffect(() => {
     if (!isUpdatingStatus && !isIdle) {
       if (!loggedIn && !pathname.endsWith("/auth/login")) {
-        document.location = `${import.meta.env.VITE_HOME}/signin/editor`;
+        if (module === "editor") {
+          document.location = `${import.meta.env.VITE_HOME}/signin/editor`;
+        } else if (module === "dyce_vtt") {
+          document.location = `${import.meta.env.VITE_HOME}/signin/dyce`;
+        }
       } else if (loggedIn && (pathname.includes("auth/") || pathname === "/")) {
-        navigate("/projects");
+        if (module === "editor") navigate("/projects");
+        if (module === "dyce_vtt") navigate("/games");
       }
     }
   }, [loggedIn, pathname, userStatus?.status, isUpdatingStatus, isIdle]);
 
   useLayoutEffect(() => {
-    updateAuthStatus(project_id ?? null);
-  }, [project_id]);
+    updateAuthStatus({ project_id: project_id ?? null, game_id: game_id ?? null });
+  }, [project_id, game_id]);
   if (
     (userStatus?.status !== "authenticated" && userStatus?.status !== undefined) ||
-    (isUpdatingStatus && !isIdle) ||
-    (project_id && !userStatus?.project_id)
+    (isUpdatingStatus && !isIdle && !isSuccess) ||
+    (project_id && !userStatus?.project_id && module === "editor")
   )
     if (userStatus?.status === "unauthenticated") {
       document.location = import.meta.env.VITE_HOME;

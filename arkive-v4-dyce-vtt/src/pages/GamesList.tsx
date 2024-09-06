@@ -22,7 +22,7 @@ export function GamesList() {
       </div>
       <div className="grid h-full max-h-full flex-1 grid-cols-1 gap-4 overflow-auto xl:grid-cols-2 2xl:grid-cols-4">
         {(data?.data || [])?.map((game) => (
-          <ProjectGameCard feature_flags={{}} id={game.id} key={game.id} module="dyce_vtt" title={game.title}></ProjectGameCard>
+          <ProjectGameCard key={game.id} feature_flags={{}} id={game.id} module="dyce_vtt" title={game.title}></ProjectGameCard>
         ))}
       </div>
     </div>

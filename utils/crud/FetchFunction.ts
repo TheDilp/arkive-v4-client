@@ -1,3 +1,5 @@
+import ls from "localstorage-slim";
+
 type AllowedMethodsType = "GET" | "POST" | "DELETE";
 
 function getContentType(body: string | FormData | undefined): { "Content-Type": string } | {} {
@@ -14,6 +16,8 @@ export async function FetchFunction({
   method: AllowedMethodsType;
   body?: string | FormData;
 }) {
+  const module: string | null = ls.get("module");
+  if (!module) return;
   const fetchParams: {
     method: AllowedMethodsType;
     headers: Record<string, string>;
@@ -23,7 +27,7 @@ export async function FetchFunction({
     method,
     body,
     headers: {
-      module: "editor",
+      module,
       ...getContentType(body),
     },
   };

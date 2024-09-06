@@ -15,7 +15,11 @@ type Props = {
 };
 
 export function GameDrawer({ data }: Props) {
-  const [project, setProject] = useState({ id: "", title: "" });
+  const [project, setProject] = useState<{ id: string; title: string; image: string | undefined }>({
+    id: "",
+    title: "",
+    image: undefined,
+  });
   const [game, setGame] = useState<Partial<GameType>>({});
   const { handleChange } = useHandleChange({ data: game, setData: setGame });
 
@@ -25,20 +29,22 @@ export function GameDrawer({ data }: Props) {
       {game?.project_id ? (
         <EntityPreview
           clearAction={() => {
-            setProject({ id: "", title: "" });
+            setProject({ id: "", title: "", image: undefined });
             handleChange({ name: "project_id", value: null });
           }}
           id={game?.project_id}
+          image_id={project.image}
+          label="Project"
+          manual_project_id={game?.project_id}
           title={project.title}
           type="projects"
         />
       ) : (
         <Search
           label="Linked project (required)"
-          manual_project_id={game?.project_id}
           name="project_id"
-          onChange={({ name, label, value }) => {
-            setProject({ id: value, title: label as string });
+          onChange={({ name, label, value, image }) => {
+            setProject({ id: value, title: label as string, image });
             handleChange({ name, value });
           }}
           searchEntity="projects"

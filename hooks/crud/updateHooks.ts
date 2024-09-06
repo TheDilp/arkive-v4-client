@@ -842,19 +842,29 @@ export function useUpdateAuthStatus() {
   const setLoggedIn = useSetAtom(loggedInAtom);
   const setUserStatus = useSetAtom(userStatusAtom);
 
-  return useMutation(async (project_id: string | null) => {
+  return useMutation(async (payload: { project_id: string | null; game_id: string | null }) => {
+    const module = ls.get("module");
     const res = await fetch(`${baseURLS.baseAuthServer}/auth/status/update`, {
+      // @ts-ignore
       headers: {
         "Content-Type": "application/json",
+        module: module,
       },
       credentials: "include",
-      body: JSON.stringify({ project_id }),
+      body: JSON.stringify(payload),
       method: "POST",
     });
 
     if (res.status >= 400) {
       setLoggedIn(false);
-      setUserStatus({ status: "unauthenticated", user_id: "", project_id: null, name: null, image_url: null });
+      setUserStatus({
+        status: "unauthenticated",
+        user_id: "",
+        game_id: null,
+        project_id: null,
+        name: null,
+        image_url: null,
+      });
       throw new Error("UNAUTHORIZED");
     }
 
@@ -879,7 +889,7 @@ export function useSignout() {
       const text = await res.text();
       if (res.status >= 400 || text === "UNAUTHORIZED") {
         setLoggedIn(false);
-        setUserStatus({ status: "unauthenticated", user_id: "", project_id: null, name: null, image_url: null });
+        setUserStatus({ status: "unauthenticated", user_id: "", project_id: null, game_id: null, name: null, image_url: null });
         return;
       }
     },

@@ -2,9 +2,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useSetAtom } from "jotai";
 import { useLayoutEffect } from "react";
-import { Outlet, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import { NotificationContainer } from "../../components";
+import { AuthWrapper } from "../../pages";
 import { moduleAtom } from "../../utils";
 import { GameLayout, GameView } from "./pages/Game";
 import { GamesList } from "./pages/GamesList";
@@ -29,12 +30,10 @@ export default function App() {
         <NotificationContainer />
         <ReactQueryDevtools position="top-right" />
         <Routes>
-          <Route element={<Outlet />} path="/">
-            <Route path="games/*">
-              <Route element={<GameLayout />}>
-                <Route element={<GamesList />} path="*" />
-                <Route element={<GameView />} path=":/project_id/:game_id" />
-              </Route>
+          <Route element={<AuthWrapper />} path="/">
+            <Route element={<GameLayout />} path="games/*">
+              <Route element={<GamesList />} path="*" />
+              <Route element={<GameView />} path=":/project_id/:game_id" />
             </Route>
           </Route>
         </Routes>

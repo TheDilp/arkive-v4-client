@@ -46,7 +46,7 @@ export default function App() {
   });
 
   useLayoutEffect(() => {
-    setModule("arkive");
+    setModule("editor");
   }, []);
 
   return (

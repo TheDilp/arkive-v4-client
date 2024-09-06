@@ -336,8 +336,8 @@ export function useSearch<ReturnType>(
     async () => {
       if (type) {
         return FetchFunction({
-          url: `${getServerUrl()}/search/${
-            isGlobal ? "global/" : `${project_id}/`
+          url: `${getServerUrl()}/search${
+            isGlobal ? "/global/" : `${project_id ? `/${project_id}/` : ""}`
           }${getSearchURL(type)}${options?.isFolders ? "/folder" : ""}${type === "projects" ? `/${type}` : ""}`,
           method: "POST",
           body: JSON.stringify(request),
