@@ -329,8 +329,8 @@ function HistoryList({ history, closeTooltip }: { history: { label: string; link
     <ul className="flex flex-col gap-y-1 rounded bg-zinc-700 p-2 shadow">
       {history.map((link, i) => (
         <li
-          className="cursor-pointer text-lg transition-all [&>button]:p-0 [&>button]:hover:text-blue-400"
-          key={(link.link + i).toString()}>
+          key={(link.link + i).toString()}
+          className="cursor-pointer text-lg transition-all [&>button]:p-0 [&>button]:hover:text-blue-400">
           <Button
             hasNoBackground
             label={link.label}
@@ -384,8 +384,8 @@ function NotificationList({
         {notifications?.length ? (
           notifications?.map((notif) => (
             <li
-              className="flex max-w-full flex-nowrap gap-x-1 rounded bg-zinc-700 p-2 shadow"
               key={notif?.id}
+              className="flex max-w-full flex-nowrap gap-x-1 rounded bg-zinc-700 p-2 shadow"
               onClick={() => {
                 if (closeTooltip) closeTooltip();
               }}>
