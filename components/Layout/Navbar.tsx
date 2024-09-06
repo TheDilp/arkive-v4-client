@@ -439,6 +439,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
   const { project_id, subitem_id } = useParams();
   const { isLg } = useBreakpoint();
   const navigate = useNavigate();
+  const module = ls.get("module");
   const queryClient = useQueryClient();
   const isMutating = useIsMutating();
   const isMutatingDocument = useIsMutating({ mutationKey: ["document_view", "update"] });
@@ -568,24 +569,6 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
   }, [lastJsonMessage]);
   const history = useAtomValue(historyAtom);
 
-  // useLayoutEffect(() => {
-  //   if (versionMessage) {
-  //     const currentTimestamp: number | null = ls.get("version_timestamp");
-  //     const oldDate = currentTimestamp ?? null;
-  //     if (!oldDate || oldDate < versionMessage.timestamp) {
-  //       createNotification({
-  //         title:
-  //           "There's an update available for the app! Please save your progress and refresh the page to get the latest version.",
-  //         timer: 600,
-  //         variant: "success",
-  //         icon: IconEnum.reload,
-  //         hasNoTruncate: true,
-  //       });
-  //     }
-
-  //     ls.set("version_timestamp", versionMessage.timestamp);
-  //   }
-  // }, [versionMessage]);
   return (
     <div className="flex h-16 max-h-16 min-h-[4rem] max-w-full flex-1 overflow-hidden border-b border-zinc-800 bg-zinc-900 shadow">
       {isMutating && !isMutatingDocument ? <IndeterminateProgressBar /> : null}
@@ -593,7 +576,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
         <span className="truncate">{navbarTitle || "The Arkive"}</span>
       </h1>
       <div className="ml-auto flex items-center gap-x-2 pr-4">
-        {project_id && user?.id && !isDisabled ? (
+        {project_id && user?.id && !isDisabled && module === "editor" ? (
           <>
             {permissions?.create_assets ? (
               <>
@@ -662,6 +645,36 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
                   />
                 </div>
               </Tooltip>
+            </div>
+          </>
+        ) : null}
+
+        {project_id && user?.id && !isDisabled && module === "dyce_vtt" ? (
+          <>
+            {isLg ? (
+              <div className="w-fit">
+                <Tooltip
+                  arrowColor="#27272a"
+                  content={<DiceRoller />}
+                  customOffset={{ mainAxis: 25, crossAxis: 50 }}
+                  isClickable>
+                  <div className="h-full">
+                    <Button hasNoBackground icon={IconEnum.d20} iconSize={24} isIconOnly onClick={undefined} />
+                  </div>
+                </Tooltip>
+              </div>
+            ) : null}
+            <div className="w-fit">
+              <div className="h-full">
+                <Button
+                  hasNoBackground
+                  icon={IconEnum.settings}
+                  iconSize={24}
+                  isIconOnly
+                  onClick={undefined}
+                  tooltip={"Game settings"}
+                />
+              </div>
             </div>
           </>
         ) : null}
