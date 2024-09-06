@@ -5,7 +5,7 @@ import { useGetEntities } from "../../../hooks";
 import { GameType } from "../../../types";
 import { drawerAtom, IconEnum, userAtom } from "../../../utils";
 
-export function GamesList() {
+export function GamesView() {
   const user = useAtomValue(userAtom);
   const { data } = useGetEntities<GameType>({ fields: [] }, "games", {
     enabled: !!user?.id,
@@ -22,7 +22,13 @@ export function GamesList() {
       </div>
       <div className="grid h-full max-h-full flex-1 grid-cols-1 gap-4 overflow-auto xl:grid-cols-2 2xl:grid-cols-4">
         {(data?.data || [])?.map((game) => (
-          <ProjectGameCard key={game.id} feature_flags={{}} id={game.id} module="dyce_vtt" title={game.title}></ProjectGameCard>
+          <ProjectGameCard
+            key={game.id}
+            feature_flags={{}}
+            id={game.id}
+            module="dyce_vtt"
+            project_id={game.project_id}
+            title={game.title}></ProjectGameCard>
         ))}
       </div>
     </div>

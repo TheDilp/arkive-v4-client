@@ -8,7 +8,7 @@ import { NotificationContainer } from "../../components";
 import { AuthWrapper } from "../../pages";
 import { moduleAtom } from "../../utils";
 import { GameLayout, GameView } from "./pages/Game";
-import { GamesList } from "./pages/GamesList";
+import { GamesView } from "./pages/GamesView";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,8 +32,8 @@ export default function App() {
         <Routes>
           <Route element={<AuthWrapper />} path="/">
             <Route element={<GameLayout />} path="games/*">
-              <Route element={<GamesList />} path="*" />
-              <Route element={<GameView />} path=":/project_id/:game_id" />
+              <Route element={<GamesView />} path="*" />
+              <Route element={<GameView />} path=":project_id/:game_id" />
             </Route>
           </Route>
         </Routes>

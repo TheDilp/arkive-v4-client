@@ -8,8 +8,8 @@ import { Tooltip } from "../Overlay/Tooltip";
 
 const alwaysEnabledItems = ["/", "settings", "tags", "assets"];
 
-export function ProjectGameCard({ id, title, image, feature_flags, module }: ProjectGameCardType) {
-  const baseUrl = module === "arkive" ? "projects" : "games";
+export function ProjectGameCard({ id, project_id, title, image, feature_flags, module }: ProjectGameCardType) {
+  const baseUrl = module === "editor" ? "projects" : `games/${project_id}`;
   const navigate = useNavigate();
   const url = useImageURL(image);
   return (
@@ -19,7 +19,7 @@ export function ProjectGameCard({ id, title, image, feature_flags, module }: Pro
       <h2 className="absolute top-[20%] z-10 max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow transition-all">
         {title}
       </h2>
-      {module === "arkive" ? (
+      {module === "editor" ? (
         <div className="count absolute top-[50%] z-20 mb-12 grid w-full grid-cols-3 gap-y-2 opacity-0 transition-all group-hover:opacity-100">
           {projectCardNavItems
             .filter((item) => feature_flags?.[`${item.navigate}_enabled`] || alwaysEnabledItems.includes(item.navigate))

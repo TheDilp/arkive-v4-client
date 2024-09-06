@@ -3,6 +3,8 @@ import { UseMutateAsyncFunction, UseMutateFunction } from "@tanstack/react-query
 import { SelectOptionType } from "./ComponentTypes";
 import { AllAvailableEntities } from "./EntityTypes";
 
+export type AvailableModuleType = "editor" | "dyce_vtt" | null;
+
 export type Size = "4xl" | "3xs" | "2xs" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
 export type Variant =
   | "primary"

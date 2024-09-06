@@ -198,11 +198,11 @@ export function ProjectsView() {
             <div className="grid h-full max-h-full flex-1 grid-cols-1 gap-4 overflow-auto xl:grid-cols-2 2xl:grid-cols-4">
               {(data?.data || []).map((project) => (
                 <ProjectGameCard
+                  key={project.id}
                   feature_flags={project.feature_flags}
                   id={project.id}
                   image={getAssetURL(project.id, "images", project.image_id)}
-                  key={project.id}
-                  module="arkive"
+                  module="editor"
                   title={project.title}
                 />
               ))}
