@@ -24,7 +24,6 @@ export function GameDrawer({ data }: Props) {
   const { handleChange } = useHandleChange({ data: game, setData: setGame });
   const resetDrawer = useToggledResetAtom();
   const { mutate } = useCreateEntity<InsertGameType>("games");
-  // const { mutate } = useCreateEntity<{ data: Partial<GameType> }>("games");
   return (
     <DrawerLayout>
       {game?.project_id ? (
