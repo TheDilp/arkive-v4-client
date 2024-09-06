@@ -124,6 +124,7 @@ const ButtonClasses = tv({
 });
 
 export function Button({
+  allowedPlacements,
   label,
   icon,
   iconPos = "right",
@@ -148,7 +149,7 @@ export function Button({
     isIconOnly: isIconOnly || !label || label?.length === 0,
   });
   return (
-    <Tooltip content={tooltip || ""} isDisabled={!tooltip} isIgnoringHover>
+    <Tooltip allowedPlacements={allowedPlacements} content={tooltip || ""} isDisabled={!tooltip} isIgnoringHover>
       <button
         className={base()}
         disabled={isDisabled}
