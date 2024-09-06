@@ -12,7 +12,7 @@ export function AuthWrapper() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const createNotification = useNotifications();
-  const { mutate: updateAuthStatus, isLoading: isUpdatingStatus, isSuccess, isIdle } = useUpdateAuthStatus();
+  const { reset, mutate: updateAuthStatus, isLoading: isUpdatingStatus, isSuccess, isIdle } = useUpdateAuthStatus();
 
   const module = useAtomValue(moduleAtom);
   const loggedIn = useAtomValue(loggedInAtom);
@@ -53,6 +53,7 @@ export function AuthWrapper() {
   }, [loggedIn, pathname, userStatus?.status, isUpdatingStatus, isIdle]);
 
   useLayoutEffect(() => {
+    reset();
     updateAuthStatus({ project_id: project_id ?? null, game_id: game_id ?? null });
   }, [project_id, game_id]);
   if (

@@ -9,6 +9,7 @@ import { AuthWrapper } from "../../pages";
 import { moduleAtom } from "../../utils";
 import { GameLayout, GameView } from "./pages/Game";
 import { GamesView } from "./pages/GamesView";
+import { GameSettings } from "./pages/settings/GameSettings";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,6 +34,7 @@ export default function App() {
           <Route element={<AuthWrapper />} path="/">
             <Route element={<GameLayout />} path="games/*">
               <Route element={<GamesView />} path="*" />
+              <Route element={<GameSettings />} path=":game_id/settings" />
               <Route element={<GameView />} path=":project_id/:game_id" />
             </Route>
           </Route>

@@ -436,7 +436,7 @@ function NotificationList({
 }
 
 export function Navbar({ isDisabled }: { isDisabled: boolean }) {
-  const { project_id, subitem_id } = useParams();
+  const { project_id, game_id, subitem_id } = useParams();
   const { isLg } = useBreakpoint();
   const navigate = useNavigate();
   const module = ls.get("module");
@@ -664,18 +664,20 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
                 </Tooltip>
               </div>
             ) : null}
-            <div className="w-fit">
-              <div className="h-full">
-                <Button
-                  hasNoBackground
-                  icon={IconEnum.settings}
-                  iconSize={24}
-                  isIconOnly
-                  onClick={undefined}
-                  tooltip={"Game settings"}
-                />
+            {game_id ? (
+              <div className="h-full w-fit">
+                <Link to={`/games/${game_id}/settings`}>
+                  <Button
+                    hasNoBackground
+                    icon={IconEnum.settings}
+                    iconSize={24}
+                    isIconOnly
+                    onClick={undefined}
+                    tooltip={"Game settings"}
+                  />
+                </Link>
               </div>
-            </div>
+            ) : null}
           </>
         ) : null}
         {authUser ? (

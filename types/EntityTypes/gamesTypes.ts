@@ -1,3 +1,5 @@
+export type GameRoleType = "gamemaster" | "player";
+
 export interface GameType {
   id: string;
   title: string;
@@ -6,4 +8,12 @@ export interface GameType {
   background_image: string;
   next_session_date: string;
   description: string;
+  game_players: GamePlayerType[];
+}
+
+export interface GamePlayerType {
+  id: string;
+  nickname: string;
+  password: string;
+  role: GameRoleType;
 }
