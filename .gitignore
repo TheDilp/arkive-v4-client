@@ -13,7 +13,8 @@ node_modules
 dist
 dist-ssr
 *.local
-/arkive-v4-editor/public/assets/themes
+/arkive-v4-editor/public/assets
+/arkive-v4-dyce-vtt/public/assets
 # Editor directories and files
 .vscode/*
 .idea
