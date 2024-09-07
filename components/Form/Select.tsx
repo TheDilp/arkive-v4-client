@@ -473,8 +473,9 @@ export function Select({
             </span>
           </div>
         ) : null}
-
-        <RightIcon isLoading={isLoading} isOpen={isOpen} optionsLength={options.length} />
+        <div>
+          <RightIcon isLoading={isLoading} isOpen={isOpen} optionsLength={options.length} />
+        </div>
       </div>
       {helperText ? <div className={helperTextClasses()}>{helperText}</div> : null}
       {isOpen && options.length ? (
