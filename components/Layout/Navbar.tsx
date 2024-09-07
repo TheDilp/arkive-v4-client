@@ -471,7 +471,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
   const featureFlags = useAtomValue(projectFeatureFlagsAtom);
 
   const { data: notifications } = useGetNotifications(project_id, user?.id, {
-    enabled: !!user?.id && !!project_id,
+    enabled: !!user?.id && !!project_id && module === "editor",
   });
 
   const setDrawer = useSetAtom(drawerAtom);
@@ -517,7 +517,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
       reconnectInterval: 5000,
       reconnectAttempts: 10,
     },
-    !!project_id
+    !!project_id && module === "editor"
   );
   useLayoutEffect(() => {
     if (lastJsonMessage && !isDisabled) {

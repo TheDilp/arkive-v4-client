@@ -9,13 +9,13 @@ import { Tooltip } from "../Overlay/Tooltip";
 const alwaysEnabledItems = ["/", "settings", "tags", "assets"];
 
 export function ProjectGameCard({ id, project_id, title, image, feature_flags, module }: ProjectGameCardType) {
-  const baseUrl = module === "editor" ? "projects" : `games/${project_id}`;
+  const baseUrl = module === "editor" ? `/projects/${id}` : `/games/${id}/${project_id}`;
   const navigate = useNavigate();
   const url = useImageURL(image);
   return (
     <Link
       className="animate-in fade-in group relative col-span-1 flex h-[28rem] flex-col items-center justify-center rounded bg-zinc-950 bg-cover bg-center bg-no-repeat shadow transition-all duration-500"
-      to={`/${baseUrl}/${id}`}>
+      to={baseUrl}>
       <h2 className="absolute top-[20%] z-10 max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow transition-all">
         {title}
       </h2>

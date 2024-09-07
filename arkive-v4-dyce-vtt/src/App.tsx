@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useSetAtom } from "jotai";
 import { useLayoutEffect } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Outlet, Route, Routes } from "react-router-dom";
 
 import { NotificationContainer } from "../../components";
 import { AuthWrapper } from "../../pages";
@@ -29,13 +29,15 @@ export default function App() {
     <main className="relative h-screen max-h-screen w-screen max-w-[100%] overflow-hidden">
       <QueryClientProvider client={queryClient}>
         <NotificationContainer />
-        <ReactQueryDevtools position="top-right" />
+        <ReactQueryDevtools position="bottom-right" />
         <Routes>
           <Route element={<AuthWrapper />} path="/">
-            <Route element={<GameLayout />} path="games/*">
+            <Route element={<Outlet />} path="games/*">
               <Route element={<GamesView />} path="*" />
-              <Route element={<GameSettings />} path=":game_id/settings" />
-              <Route element={<GameView />} path=":project_id/:game_id" />
+              <Route element={<GameLayout />} path=":game_id/*">
+                <Route element={<GameSettings />} path="settings" />
+                <Route element={<GameView />} path=":project_id" />
+              </Route>
             </Route>
           </Route>
         </Routes>
