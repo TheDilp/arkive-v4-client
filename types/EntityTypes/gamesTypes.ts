@@ -1,4 +1,4 @@
-export type GameRoleType = "gamemaster" | "player";
+export type GamePlayerRoleType = "gamemaster" | "player";
 
 export interface GameType {
   id: string;
@@ -13,7 +13,8 @@ export interface GameType {
 
 export interface GamePlayerType {
   id: string;
+  game_id: string;
   nickname: string;
   password: string;
-  role: GameRoleType;
+  role: GamePlayerRoleType;
 }

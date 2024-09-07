@@ -1,3 +1,4 @@
+export * from "./PlayerDrawer";
 export * from "./AutomentionDrawer";
 export * from "./BlueprintDrawer";
 export * from "./BlueprintInstanceDrawer";

@@ -192,6 +192,7 @@ export type DrawerAtomType = {
       };
     }
   | { type: "node_search"; data: { cy: Core } }
+  | { type: "players"; data: { id?: string; game_id: string } }
 );
 
 export interface ContextMenuAtomType {

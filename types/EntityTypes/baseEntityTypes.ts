@@ -73,8 +73,7 @@ export type AvailableSubEntityType =
   | "character_fields"
   | "blueprint_instances"
   | "messages"
-  | "questions"
-  | "answers";
+  | "players";
 
 export type AvailableDyceEntityType = "games";
 

@@ -1,87 +1,88 @@
 import { createColumnHelper } from "@tanstack/react-table";
-import { SetStateAction, useSetAtom } from "jotai";
-import { Dispatch, useState } from "react";
+import { useSetAtom } from "jotai";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { capitalize } from "remirror";
 
 import { Avatar, Button, Dropdown, Skeleton, Table, Tabs } from "../../../../components";
-import { useBreakpoint, useGetEntity, useTable } from "../../../../hooks";
-import { DialogAtomType, GamePlayerType, GameRoleType, GameType, TabType } from "../../../../types";
-import { dialogAtom, getFirstLetters, IconEnum } from "../../../../utils";
+import { useBreakpoint, useGetEntity, useRemovePlayer, useTable } from "../../../../hooks";
+import { GamePlayerType, GameType, TabType } from "../../../../types";
+import { dialogAtom, drawerAtom, getFirstLetters, IconEnum } from "../../../../utils";
 
 const rolesColumnHelper = createColumnHelper<GamePlayerType>();
 
-const roles = [
-  { id: "gamemaster", title: "Gamemaster" },
-  { id: "player", title: "Player" },
-];
-
-function playersColumns(setDialog: Dispatch<SetStateAction<DialogAtomType>>) {
-  return [
-    rolesColumnHelper.display({
-      id: "nickname",
-      header: "Nickname",
-      cell: ({ row }) => row.original.nickname,
-      maxSize: 20,
-    }),
-
-    rolesColumnHelper.display({
-      id: "role",
-      header: "Role",
-      cell: ({ getValue }) => <div>{capitalize(getValue() as GameRoleType)}</div>,
-      maxSize: 2,
-      size: 2,
-      meta: {
-        centered: true,
-      },
-    }),
-    rolesColumnHelper.display({
-      id: "action",
-      header: "Actions",
-      meta: {
-        centered: true,
-      },
-      cell: () => (
-        <div className="flex items-center justify-center">
-          <Dropdown
-            allowedPlacements={["left", "left-start", "left-end"]}
-            items={[
-              {
-                id: "assign_role",
-                title: "Assign role",
-                icon: IconEnum.permissions,
-                subItems: roles.map((role) => ({
-                  id: role.id,
-                  title: role.title,
-                  onClick: () => {},
-                })),
-              },
-              {
-                id: "remove_member",
-                title: "Remove player from game",
-                icon: IconEnum.user_remove,
-                onClick: () => {
-                  setDialog((prev) => ({
-                    ...prev,
-                    title: "Are you sure you wish to remove this member from this project?",
-                    cancel: { action: () => {} },
-                    isOverlay: true,
-                    confirm: {
-                      variant: "info-bordered",
-                      action: () => {},
-                    },
-                    size: "sm",
-                  }));
+function PlayersTableActions({ id, game_id }: Pick<GamePlayerType, "id" | "game_id">) {
+  const setDialog = useSetAtom(dialogAtom);
+  const setDrawer = useSetAtom(drawerAtom);
+  const { mutate } = useRemovePlayer(id);
+  return (
+    <div className="flex items-center justify-center">
+      <Dropdown
+        allowedPlacements={["left", "left-start", "left-end"]}
+        items={[
+          {
+            id: "edit_player",
+            title: "Edit player",
+            icon: IconEnum.edit,
+            onClick: () => {
+              setDrawer((prev) => ({
+                ...prev,
+                title: "Edit player",
+                data: { id, game_id },
+                type: "players",
+              }));
+            },
+          },
+          {
+            id: "remove_member",
+            title: "Remove player from game",
+            icon: IconEnum.user_remove,
+            onClick: () => {
+              setDialog((prev) => ({
+                ...prev,
+                title: "Are you sure you wish to remove this player from this game?",
+                cancel: { action: () => {} },
+                isOverlay: true,
+                confirm: {
+                  variant: "error-bordered",
+                  action: mutate,
                 },
-              },
-            ]}>
-            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
-          </Dropdown>
-        </div>
-      ),
-    }),
-  ];
+                size: "sm",
+              }));
+            },
+          },
+        ]}>
+        <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+      </Dropdown>
+    </div>
+  );
 }
+const playersColumns = [
+  rolesColumnHelper.display({
+    id: "nickname",
+    header: "Nickname",
+    cell: ({ row }) => row.original.nickname,
+  }),
+
+  rolesColumnHelper.display({
+    id: "role",
+    header: "Role",
+    cell: ({ row }) => <div>{capitalize(row.original.role)}</div>,
+    maxSize: 4,
+    size: 4,
+    meta: {
+      centered: true,
+    },
+  }),
+  rolesColumnHelper.display({
+    id: "action",
+    header: "Actions",
+    meta: {
+      centered: true,
+    },
+    cell: ({ row }) => <PlayersTableActions game_id={row.original.game_id} id={row.original.id} />,
+  }),
+];
 const tabs: TabType[] = [
   { id: "game_settings", label: "Game settings", icon: IconEnum.settings, isOwner: true },
   { id: "players", label: "Players", icon: IconEnum.user, isOwner: true },
@@ -90,7 +91,7 @@ const tabs: TabType[] = [
 export function GameSettings() {
   const { game_id } = useParams();
   const { isLg } = useBreakpoint();
-  const setDialog = useSetAtom(dialogAtom);
+  const setDrawer = useSetAtom(drawerAtom);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [game, setGame] = useState<GameType | null>();
   const [, dispatch] = useTable({});
@@ -136,15 +137,29 @@ export function GameSettings() {
             </div>
           ) : null}
           {tabs?.[selectedTab]?.id === "players" ? (
-            <div className="h-full">
-              <div className="h-fit w-full">
-                <Table
-                  columns={playersColumns(setDialog)}
-                  data={gameData?.data?.game_players || []}
-                  dispatch={dispatch}
-                  type="character_relationship_types"
+            <div className="flex flex-col gap-y-2 lg:col-span-4">
+              <div className="w-fit self-end">
+                <Button
+                  icon={IconEnum.user_invite}
+                  label="Add new player"
+                  onClick={() =>
+                    setDrawer((prev) => ({
+                      ...prev,
+                      title: "Add player",
+                      data: { game_id: game_id as string },
+                      type: "players",
+                    }))
+                  }
+                  size="xs"
+                  variant="info"
                 />
               </div>
+              <Table
+                columns={playersColumns}
+                data={gameData?.data?.game_players || []}
+                dispatch={dispatch}
+                type="character_relationship_types"
+              />
             </div>
           ) : null}
         </div>

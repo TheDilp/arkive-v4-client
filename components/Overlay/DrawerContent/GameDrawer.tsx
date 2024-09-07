@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useCreateEntity, useHandleChange, useToggledResetAtom } from "../../../hooks";
 import { GameType } from "../../../types";
 import { IconEnum, toIsoUtc } from "../../../utils";
-import { InsertGameSchema, InsertGameType } from "../../../validation/games";
+import { InsertGameSchema, InsertGameType } from "../../../validation/games/games";
 import { EntityPreview } from "../../DataDisplay";
 import { Button, Input, Search } from "../../Form";
 import { DrawerLayout } from "../../Layout";
