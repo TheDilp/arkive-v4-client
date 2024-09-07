@@ -108,61 +108,59 @@ export function GameSettings() {
   );
 
   return (
-    <div className="h-full p-4">
-      <div className="flex h-full min-h-full flex-col gap-y-2">
-        <div className="w-full flex-1 content-start gap-4 pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
-          {isLoading ? <Skeleton type="character_profile" /> : null}
-          {!isLoading && isLg ? (
-            <div className="flex flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">
-              <Avatar
-                hasShowImage
-                image_id={gameData?.data?.background_image}
-                initials={getFirstLetters(gameData?.data?.title as string)}
-                isTooltipDisabled
-                size="4xl"
-              />
+    <div className="flex h-full min-h-full w-full flex-col gap-y-2 p-4">
+      <div className="w-full flex-1 content-start gap-4 pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
+        {isLoading ? <Skeleton type="character_profile" /> : null}
+        {!isLoading && isLg ? (
+          <div className="flex flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">
+            <Avatar
+              hasShowImage
+              image_id={gameData?.data?.background_image}
+              initials={getFirstLetters(gameData?.data?.title as string)}
+              isTooltipDisabled
+              size="4xl"
+            />
 
-              <div className="mt-2 flex flex-col gap-y-1">
-                <h2 className="text-center font-merriweather text-lg">{`${gameData?.data?.title || ""}`.trimEnd()}</h2>
-              </div>
-
-              <div className="w-full">
-                <Tabs isVertical onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
-              </div>
+            <div className="mt-2 flex flex-col gap-y-1">
+              <h2 className="text-center font-merriweather text-lg">{`${gameData?.data?.title || ""}`.trimEnd()}</h2>
             </div>
-          ) : null}
-          {!isLoading && !isLg ? (
+
             <div className="w-full">
-              <Tabs hasArrowNav onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+              <Tabs isVertical onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
             </div>
-          ) : null}
-          {tabs?.[selectedTab]?.id === "players" ? (
-            <div className="flex flex-col gap-y-2 lg:col-span-4">
-              <div className="w-fit self-end">
-                <Button
-                  icon={IconEnum.user_invite}
-                  label="Add new player"
-                  onClick={() =>
-                    setDrawer((prev) => ({
-                      ...prev,
-                      title: "Add player",
-                      data: { game_id: game_id as string },
-                      type: "players",
-                    }))
-                  }
-                  size="xs"
-                  variant="info"
-                />
-              </div>
-              <Table
-                columns={playersColumns}
-                data={gameData?.data?.game_players || []}
-                dispatch={dispatch}
-                type="character_relationship_types"
+          </div>
+        ) : null}
+        {!isLoading && !isLg ? (
+          <div className="w-full">
+            <Tabs hasArrowNav onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+          </div>
+        ) : null}
+        {tabs?.[selectedTab]?.id === "players" ? (
+          <div className="flex flex-col gap-y-2 lg:col-span-4">
+            <div className="w-fit self-end">
+              <Button
+                icon={IconEnum.user_invite}
+                label="Add new player"
+                onClick={() =>
+                  setDrawer((prev) => ({
+                    ...prev,
+                    title: "Add player",
+                    data: { game_id: game_id as string },
+                    type: "players",
+                  }))
+                }
+                size="xs"
+                variant="info"
               />
             </div>
-          ) : null}
-        </div>
+            <Table
+              columns={playersColumns}
+              data={gameData?.data?.game_players || []}
+              dispatch={dispatch}
+              type="character_relationship_types"
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );

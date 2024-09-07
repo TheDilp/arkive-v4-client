@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect } from "react";
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet, useLocation, useParams } from "react-router-dom";
 
 import { Dialog, Drawer, Navbar, Sidebar } from "../../../../components";
 import { useBreakpoint, useGetUser, useNavbarTitle } from "../../../../hooks";
@@ -8,6 +8,7 @@ import { userAtom, userStatusAtom } from "../../../../utils";
 
 export function GameLayout() {
   useNavbarTitle("", true);
+  const { pathname } = useLocation();
   const { game_id } = useParams();
   const user = useAtomValue(userStatusAtom);
 
@@ -31,13 +32,13 @@ export function GameLayout() {
     }
   }, [userData?.data]);
 
-  if (!userData?.data) return null;
-
   return (
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
       <Dialog />
       <Drawer />
-      {isLg && !game_id ? <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={[]} /> : null}
+      {isLg && (!game_id || pathname.endsWith("settings")) ? (
+        <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={[]} />
+      ) : null}
       <div className="flex h-full w-full flex-col">
         <div className="w-full">
           <Navbar isDisabled={isInitialLoadingUser} />

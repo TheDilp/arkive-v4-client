@@ -65,6 +65,7 @@ export default function App() {
               <Route element={<ProjectsView />} path="*" />
               <Route element={<ProjectLayout />} path=":project_id/*">
                 <Route element={<MainView />} path=":type" />
+                <Route element={<MainView />} path=":type/folder/:item_id/*" />
                 <Route element={<ManuscriptProfileView />} path="manuscripts/:item_id" />
                 <Route element={<ManuscriptProfileView />} path="manuscripts/:item_id/:subitem_id" />
                 <Route element={<CharacterProfileView />} path="characters/:item_id" />
@@ -73,7 +74,6 @@ export default function App() {
                 <Route element={<BlueprintProfileView />} path="blueprints/:item_id/:subitem_id/:type" />
                 <Route element={<EntitiesView />} path=":type/:item_id/*" />
                 <Route element={<EntitiesView />} path=":type/:item_id/:subitem_id/*" />
-                <Route element={<MainView />} path=":type/folder/:item_id/*" />
                 <Route element={<Dashboard />} path="*" />
               </Route>
             </Route>
