@@ -108,7 +108,7 @@ export function GameSettings() {
   );
 
   return (
-    <div className="flex h-full min-h-full w-full flex-col gap-y-2 p-4">
+    <div className="flex h-full max-h-[95%] w-full flex-col gap-y-2 overflow-hidden p-4">
       <div className="w-full flex-1 content-start gap-4 pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
         {isLoading ? <Skeleton type="character_profile" /> : null}
         {!isLoading && isLg ? (
