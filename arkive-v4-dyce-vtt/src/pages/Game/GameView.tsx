@@ -150,27 +150,36 @@ function RollHistory() {
   return (
     <div className="flex h-full max-h-full flex-col overflow-hidden">
       <div className="flex flex-nowrap gap-x-2 p-2">
-        <Select
-          label="Filter type"
-          name="type"
-          onChange={handleChange}
-          options={[
-            { label: "Character", value: "character" },
-            { label: "Player", value: "player" },
-          ]}
-          value={filter.type}
-        />
-        <Select
-          isClearable
-          isMultiple
-          label="Filter"
-          name="value"
-          onChange={handleChange}
-          options={rolls.map((r) =>
-            filter.type === "character" ? { label: r.character.title, value: r.character.id } : { label: r.user, value: r.user }
-          )}
-          value={filter.value}
-        />
+        <div className="w-1/2">
+          <Select
+            label="Filter type"
+            name="type"
+            onChange={handleChange}
+            options={[
+              { label: "Character", value: "character" },
+              { label: "Player", value: "player" },
+            ]}
+            size="sm"
+            value={filter.type}
+          />
+        </div>
+        <div className="w-1/2">
+          <Select
+            isClearable
+            isDisabled={!filter.type}
+            isMultiple
+            label="Filter"
+            name="value"
+            onChange={handleChange}
+            options={rolls.map((r) =>
+              filter.type === "character"
+                ? { label: r.character.title, value: r.character.id }
+                : { label: r.user, value: r.user }
+            )}
+            size="sm"
+            value={filter.value}
+          />
+        </div>
       </div>
       <ul className="max-h-full overflow-auto p-2">
         {(filter.type && filter.value
