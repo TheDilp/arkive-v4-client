@@ -857,6 +857,7 @@ export function useUpdateAuthStatus() {
 
     if (res.status >= 400) {
       setLoggedIn(false);
+      ls.clear();
       setUserStatus({
         status: "unauthenticated",
         user_id: "",
@@ -895,6 +896,7 @@ export function useSignout() {
     },
     {
       onSettled: () => {
+        ls.clear();
         queryClient.refetchQueries(["auth_status"]);
       },
     }
