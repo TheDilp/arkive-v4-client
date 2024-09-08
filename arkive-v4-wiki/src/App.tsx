@@ -1,6 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useSetAtom } from "jotai";
+import { useLayoutEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 
+import { moduleAtom } from "../../utils";
 import { PublicEntitiesView, PublicLayout, PublicListView } from "./Public";
 
 const queryClient = new QueryClient({
@@ -12,6 +15,11 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  const setModule = useSetAtom(moduleAtom);
+
+  useLayoutEffect(() => {
+    setModule("wiki");
+  }, []);
   return (
     <main className="h-screen max-h-screen w-screen overflow-hidden bg-black">
       <QueryClientProvider client={queryClient}>
