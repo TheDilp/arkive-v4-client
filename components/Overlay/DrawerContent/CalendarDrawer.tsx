@@ -88,13 +88,13 @@ function MonthsSection({
           {(providedDroppable) => (
             <div className="flex flex-col" {...providedDroppable.droppableProps} ref={providedDroppable.innerRef}>
               {months.map((item, index) => (
-                <Draggable draggableId={item.id || item.title + index} index={index} key={item.id}>
+                <Draggable key={item.id} draggableId={item.id || item.title + index} index={index}>
                   {(provided, draggableSnapshot) => (
                     <div
+                      ref={provided.innerRef}
                       className={`my-1 flex w-full flex-nowrap items-center gap-x-2 rounded px-1 ${
                         draggableSnapshot.isDragging ? "ml-8 w-full rounded bg-transparent bg-none shadow-sm" : ""
                       }`}
-                      ref={provided.innerRef}
                       {...provided.draggableProps}
                       style={{
                         ...provided.draggableProps.style,
@@ -164,13 +164,13 @@ function DaysSection({ days, setDays }: { days: DayStateType[]; setDays: Dispatc
           {(providedDroppable) => (
             <div className="flex flex-col" {...providedDroppable.droppableProps} ref={providedDroppable.innerRef}>
               {days.map((item, index) => (
-                <Draggable draggableId={item.id || item.title + index} index={index} key={item.id}>
+                <Draggable key={item.id} draggableId={item.id || item.title + index} index={index}>
                   {(provided, draggableSnapshot) => (
                     <div
+                      ref={provided.innerRef}
                       className={`my-1 flex w-full flex-nowrap items-center gap-x-2 rounded px-1 ${
                         draggableSnapshot.isDragging ? "ml-8 w-full rounded bg-transparent bg-none shadow-sm" : ""
                       }`}
-                      ref={provided.innerRef}
                       {...provided.draggableProps}
                       style={{
                         ...provided.draggableProps.style,
@@ -234,7 +234,7 @@ function LeapDaysSection({
               setLeapDays((prev) =>
                 prev.concat([
                   { id: crypto.randomUUID(), parent_id, month_id: months?.[0]?.id || "", conditions: { and: [], or: [] } },
-                ]),
+                ])
               )
             }
             variant="info"
@@ -243,7 +243,7 @@ function LeapDaysSection({
       </div>
       <div className="flex flex-col">
         {leapDays.map((item, index) => (
-          <div className="my-1 flex w-full flex-col flex-nowrap items-center gap-x-2 rounded bg-zinc-800 p-1" key={item.id}>
+          <div key={item.id} className="my-1 flex w-full flex-col flex-nowrap items-center gap-x-2 rounded bg-zinc-800 p-1">
             <div className="flex w-full items-center justify-between gap-x-2">
               <Select
                 label="Month"
@@ -288,7 +288,7 @@ function LeapDaysSection({
                 </div>
               </div>
               {(item.conditions.and || []).map((cond, idx) => (
-                <div className="mt-1 flex flex-col gap-y-1" key={`${cond.type}_${idx.toString()}`}>
+                <div key={`${cond.type}_${idx.toString()}`} className="mt-1 flex flex-col gap-y-1">
                   <div className="flex items-center gap-x-2">
                     <Select
                       label="Type"
@@ -365,7 +365,7 @@ function LeapDaysSection({
                 </div>
               </div>
               {(item.conditions.or || []).map((cond, idx) => (
-                <div className="mt-1 flex flex-col gap-y-1" key={`${cond.type}_${idx.toString()}`}>
+                <div key={`${cond.type}_${idx.toString()}`} className="mt-1 flex flex-col gap-y-1">
                   <div className="flex items-center gap-x-2">
                     <Select
                       label="Type"
@@ -454,7 +454,7 @@ export function CalendarDrawer({ data, exceptions }: Props) {
       relations: { eras: true, months: true, leap_days: true, tags: true },
       permissions: true,
     },
-    { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
+    { enabled: !!data?.id, queryKeyConcat: ["drawer"] }
   );
 
   const { handleChange } = useHandleChange({ data: calendar, setData: setCalendar });
@@ -462,11 +462,11 @@ export function CalendarDrawer({ data, exceptions }: Props) {
   const { mutateAsync: createCalendar, isLoading: isCreating } = useCreateEntity<InsertCalendarType>("calendars");
   const { mutateAsync: updateCalendar, isLoading: isUpdating } = useUpdateEntity<UpdateCalendarType>(
     "calendars",
-    project_id as string,
+    project_id as string
   );
   const permissions = useHasPermissions(
     ["read_calendars", "create_calendars", "update_calendars", "read_tags", "read_character_fields_templates"],
-    calendar?.owner_id,
+    calendar?.owner_id
   );
   const tabs = getTabs(permissions, data?.id);
 
@@ -486,10 +486,12 @@ export function CalendarDrawer({ data, exceptions }: Props) {
         data: { ...calendar, days: days.map((d) => d.title) },
         relations: {
           eras: (calendar.eras || []).map((e) => ({
-            data: { ...e, background_gradient: JSON.stringify(e.color) },
+            data: { ...e, id: e?.id || crypto.randomUUID(), background_gradient: JSON.stringify(e.color) },
           })),
-          months: months.map((m, i) => ({ data: { ...m, sort: i } })).sort((a, b) => a.data.sort - b.data.sort),
-          leap_days: leapDays.map((ld) => ({ data: ld })),
+          months: months
+            .map((m, i) => ({ data: { ...m, id: m?.id || crypto.randomUUID(), sort: i } }))
+            .sort((a, b) => a.data.sort - b.data.sort),
+          leap_days: leapDays.map((ld) => ({ data: { ...ld, id: ld?.id || crypto.randomUUID() } })),
           tags: calendar.tags,
         },
         permissions: calendar?.permissions,
@@ -630,6 +632,7 @@ export function CalendarDrawer({ data, exceptions }: Props) {
 
           {calendar.eras?.map((era, i) => (
             <Collapsible
+              key={era.id}
               actions={[
                 {
                   icon: IconEnum.trash,
@@ -639,7 +642,6 @@ export function CalendarDrawer({ data, exceptions }: Props) {
                 },
               ]}
               initialOpen={era.title === "New era"}
-              key={era.id}
               label={era.title}>
               <div className="flex items-start justify-between gap-x-2 p-2">
                 <Input label="Title" name={`eras[${i}].title`} onChange={handleChange} value={era.title} />
