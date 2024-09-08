@@ -31,7 +31,7 @@ export async function FetchFunction({
       ...getContentType(body),
     },
   };
-
+  console.log(module);
   if (IS_PUBLIC === false || IS_PUBLIC === undefined) {
     fetchParams.credentials = "include";
   }
