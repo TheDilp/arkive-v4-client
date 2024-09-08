@@ -10,11 +10,8 @@ type GameDrawerType = "roll_history" | "characters" | "journal" | "music" | null
 
 const sections: { tooltip: string; id: GameDrawerType; icon: AvailableIcons }[] = [
   { id: "roll_history", tooltip: "Roll history", icon: IconEnum.random_table },
-
   { id: "characters", tooltip: "Characters", icon: IconEnum.character },
-
   { id: "journal", tooltip: "Journal", icon: IconEnum.info_circle },
-
   { id: "music", tooltip: "Music", icon: IconEnum.music },
 ];
 
