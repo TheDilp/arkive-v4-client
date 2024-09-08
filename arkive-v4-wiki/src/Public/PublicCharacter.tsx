@@ -104,7 +104,7 @@ export function PublicCharacter() {
             {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
             {(existingTemplates?.data || []).map((t) => {
               return (
-                <div className="grid h-full grid-cols-6 flex-col content-start gap-y-2" key={t.id}>
+                <div key={t.id} className="grid h-full grid-cols-6 flex-col content-start gap-y-2">
                   <div className="col-span-6">
                     <Title isDrawerTitle label={t.title} size="lg" variant="primary" />
                   </div>
@@ -114,10 +114,10 @@ export function PublicCharacter() {
                       if (checkIfFieldHasValue(characterField))
                         return (
                           <AdditionalFieldDisplay
+                            key={template_field.id}
                             character_field={template_field}
                             character_field_data={characterField ?? null}
                             isPreview={false}
-                            key={template_field.id}
                           />
                         );
                     }
@@ -151,7 +151,7 @@ export function PublicCharacter() {
             <Tabs onChange={(_, tab) => setSelectedTab(tab)} selectedTab={selectedTab} tabs={tabs} />
             <div className="grid grid-cols-1 gap-2 py-2 md:grid-cols-3 xl:grid-cols-6">
               {(relatedEntities.items || []).map((d) => (
-                <div className="col-span-1 xl:col-span-2" key={d.id}>
+                <div key={d.id} className="col-span-1 xl:col-span-2">
                   <EntityPreview
                     id={d.id}
                     image_id={"image_id" in d ? d.image_id : ""}

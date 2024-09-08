@@ -457,9 +457,9 @@ export function checkIfFieldHasValue(field: CharacterCharacterFieldType): boolea
   )
     return true;
 
-  if (field.calendar.start_year) return true;
+  if (field?.calendar?.start_year) return true;
 
-  if (field.random_table.option_id) return true;
+  if (field?.random_table?.option_id) return true;
 
   return false;
 }
