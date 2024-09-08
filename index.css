@@ -29,7 +29,7 @@
 }
 
 body {
-  @apply font-lato relative bg-black text-white;
+  @apply relative bg-black font-lato text-white;
 }
 
 ::-webkit-scrollbar {
@@ -52,6 +52,9 @@ body {
 }
 .scrollbar-hidden::-webkit-scrollbar {
   @apply hidden;
+}
+.scrollbar-thick::-webkit-scrollbar {
+  @apply h-4 w-4;
 }
 
 summary::-webkit-details-marker {
@@ -127,7 +130,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   .marker-cluster-large {
     @apply flex items-center justify-center border border-white bg-zinc-800 !important;
     div {
-      @apply font-lato m-0 bg-transparent text-base !important;
+      @apply m-0 bg-transparent font-lato text-base !important;
     }
   }
 }
