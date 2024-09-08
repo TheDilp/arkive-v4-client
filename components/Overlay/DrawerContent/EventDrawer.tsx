@@ -27,9 +27,9 @@ import {
   checkIfMonthCorrect,
   checkIfYearCorrect,
   drawerAtom,
+  getAssetURL,
   getDefaultEntityIcon,
   getEntityLink,
-  getAssetURL,
   IconEnum,
 } from "../../../utils";
 import { InsertEventSchema, UpdateEventSchema } from "../../../validation/calendars/event";
@@ -302,6 +302,7 @@ export function EventDrawer({ data, exceptions }: Props) {
                   onChange={handleChange}
                   placeholder="Event title"
                   value={event?.title || ""}
+                  variant={event?.title ? "primary" : "error"}
                 />
                 <div className="flex flex-col justify-between">
                   <span className="block min-h-[20px] truncate text-center text-sm text-zinc-300">Color</span>
@@ -329,6 +330,7 @@ export function EventDrawer({ data, exceptions }: Props) {
                       onChange={handleChange}
                       type="number"
                       value={event?.start_day || ""}
+                      variant={event?.start_day ? "primary" : "error"}
                     />
                     <Select
                       isDisabled={isFetchingMonths}
@@ -339,6 +341,7 @@ export function EventDrawer({ data, exceptions }: Props) {
                       onChange={handleMonthChange}
                       options={existingMonths?.map((month) => ({ label: month.title, value: month.id })) || []}
                       value={typeof event?.start_month === "number" ? existingMonths?.[event?.start_month]?.id : undefined}
+                      variant={event?.start_month_id ? "primary" : "error"}
                     />
                     <Input
                       isReadOnly={data?.isReadOnly}
