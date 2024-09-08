@@ -6,7 +6,7 @@ import { Button, Search } from "../../../components";
 import { useGetEntity } from "../../../hooks";
 import { useImageURL } from "../../../hooks/ui/useImageURL";
 import { AllAvailableEntities, AvailableEntityType, ProjectType } from "../../../types";
-import { getDefaultEntityIcon, getEntityLink, IconEnum } from "../../../utils";
+import { getAssetURL, getDefaultEntityIcon, getEntityLink, IconEnum } from "../../../utils";
 
 const navItems = ["manuscripts", "characters", "blueprints", "documents", "maps", "graphs", "calendars", "dictionaries"];
 
@@ -30,7 +30,7 @@ export function PublicNavbar() {
     }
   );
 
-  const imageUrl = useImageURL(project?.data?.image_id, "3xs");
+  const imageUrl = useImageURL(getAssetURL(project_id as string, "images", project?.data?.image_id));
 
   useLayoutEffect(() => {
     if (project?.data) {
@@ -59,7 +59,7 @@ export function PublicNavbar() {
           <nav className="hidden text-base md:block">
             <ul className="flex flex-nowrap gap-x-2">
               {navItems.map((item) => (
-                <li className={item === type ? "text-blue-400" : ""} key={item}>
+                <li key={item} className={item === type ? "text-blue-400" : ""}>
                   <Link className="hover:text-blue-400" to={`/${project_id}/${item}`}>
                     {capitalCase(item || "")}
                   </Link>
