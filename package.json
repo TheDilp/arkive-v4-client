@@ -2,6 +2,7 @@
   "dependencies": {
     "@3d-dice/dice-box": "^1.0.12",
     "@3d-dice/dice-parser-interface": "^0.2.1",
+    "@floating-ui/dom": "^1.6.10",
     "@floating-ui/react": "^0.26.22",
     "@hello-pangea/dnd": "^16.6.0",
     "@iconify-json/ph": "^1.1.14",
