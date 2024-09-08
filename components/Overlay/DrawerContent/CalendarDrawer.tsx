@@ -510,10 +510,12 @@ export function CalendarDrawer({ data, exceptions }: Props) {
         data: { ...calendar, days: days.map((d) => d.title) },
         relations: {
           eras: (calendar.eras || []).map((e) => ({
-            data: { ...e, background_gradient: JSON.stringify(e.color) },
+            data: { ...e, id: e?.id || crypto.randomUUID(), background_gradient: JSON.stringify(e.color) },
           })),
-          months: months.map((m, i) => ({ data: { ...m, sort: i } })).sort((a, b) => a.data.sort - b.data.sort),
-          leap_days: leapDays.map((ld) => ({ data: ld })),
+          months: months
+            .map((m, i) => ({ data: { ...m, id: m?.id || crypto.randomUUID(), sort: i } }))
+            .sort((a, b) => a.data.sort - b.data.sort),
+          leap_days: leapDays.map((ld) => ({ data: { ...ld, id: ld?.id || crypto.randomUUID() } })),
           tags: calendar.tags,
         },
         permissions: calendar?.permissions,
