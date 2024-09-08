@@ -31,7 +31,7 @@ export function ProjectGameCard({ id, project_id, title, image, feature_flags }:
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  navigate(`/${baseUrl}/${item.navigate}`);
+                  navigate(`${baseUrl}/${item.navigate}`);
                 }}
                 onKeyDown={() => {}}
                 role="link"
