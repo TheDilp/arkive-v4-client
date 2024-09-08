@@ -168,7 +168,7 @@ export function TimelineView({
               x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
               y: e.start_year + Math.floor(i / 10) * 30,
               width: isYearsOnly
-                ? Number(e?.end_year) - e.start_year - 30
+                ? Number(e?.end_year) - e.start_year
                 : Number(e?.end_year || 0) - e.start_year + Math.abs(Number(e?.end_month || 0) - e.start_month),
               background_color: e.color || DefaultTagColor,
               title: `${e.title} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${
