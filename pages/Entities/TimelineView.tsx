@@ -1,3 +1,4 @@
+import { autoPlacement, computePosition, offset } from "@floating-ui/dom";
 import * as d3 from "d3";
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
@@ -381,21 +382,25 @@ export function TimelineView({
               });
             })
             .on("mouseover", (evt: MouseEvent) => {
-              // Activate tooltip only if the text of the event
-              // has an ellipsis i.e. isn't fully visible
-              if (
-                evt.currentTarget.parentElement?.lastChild?.lastChild?.textContent === "..." ||
-                !evt.currentTarget.parentElement?.lastChild?.firstChild?.textContent?.length
-              )
-                tooltip
-                  .style("display", "block")
-                  .style(
-                    "transform",
-                    `translate(${Number(evt.currentTarget.getAttribute("x")) + X_AXIS_OFFSET || 0}px, ${
-                      Number(evt.currentTarget.getAttribute("y")) - 25 || 0
-                    }px)`
-                  )
-                  .html(`${event.title} ${event.date_string}`);
+              const tooltipNode = tooltip.node();
+              if (tooltipNode) {
+                tooltip.style("display", "block");
+                computePosition(evt.currentTarget, tooltipNode, {
+                  middleware: [offset({ mainAxis: 10 }), autoPlacement()],
+                }).then(({ x: xPos, y: yPos }) => {
+                  tooltip
+                    .style("transform", `translate(${xPos || 0}px, ${yPos || 0}px)`)
+                    .html(`${event.title} ${event.date_string}`);
+                });
+              }
+
+              // // Activate tooltip only if the text of the event
+              // // has an ellipsis i.e. isn't fully visible
+              // if (
+              //   evt.currentTarget.parentElement?.lastChild?.lastChild?.textContent === "..." ||
+              //   !evt.currentTarget.parentElement?.lastChild?.firstChild?.textContent?.length
+              // )
+              //  ;
             })
             .on("mouseout", () => {
               tooltip.style("display", "none");
@@ -658,7 +663,7 @@ export function TimelineView({
       </div>
       <div
         ref={scrollContainer}
-        className={`relative ${isLg ? "max-h-[calc(78%)]" : "max-h-[calc(75%)]"} w-full max-w-full flex-1 overflow-x-auto`}>
+        className={`relative ${isLg ? "max-h-[calc(78%)]" : "max-h-[calc(75%)]"} scrollbar-thick w-full max-w-full flex-1 overflow-x-auto`}>
         <div ref={container} className="hidden w-fit" />
         {/* min-w-1 is required so that the SVG element has minimum clientWidth which is a condition for rendering the timeline */}
         <div
