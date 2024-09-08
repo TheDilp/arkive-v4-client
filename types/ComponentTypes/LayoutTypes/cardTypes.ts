@@ -1,4 +1,3 @@
-import { AvailableModuleType } from "../../baseTypes";
 import { ProjectType } from "../../EntityTypes";
 
 export interface BaseCardType {
@@ -11,5 +10,4 @@ export interface ProjectGameCardType extends BaseCardType {
   id: string;
   project_id?: string;
   feature_flags: ProjectType["feature_flags"];
-  module: AvailableModuleType;
 }

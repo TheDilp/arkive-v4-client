@@ -202,7 +202,6 @@ export function ProjectsView() {
                   feature_flags={project.feature_flags}
                   id={project.id}
                   image={getAssetURL(project.id, "images", project.image_id)}
-                  module="editor"
                   title={project.title}
                 />
               ))}

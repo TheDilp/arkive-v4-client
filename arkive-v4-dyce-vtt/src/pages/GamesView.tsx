@@ -45,7 +45,6 @@ export function GamesView() {
                 key={game.id}
                 feature_flags={{}}
                 id={game.id}
-                module="dyce_vtt"
                 project_id={game.project_id}
                 title={game.title}></ProjectGameCard>
             ))}

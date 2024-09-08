@@ -1,3 +1,4 @@
+import ls from "localstorage-slim";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { useImageURL } from "../../hooks/ui/useImageURL";
@@ -8,7 +9,8 @@ import { Tooltip } from "../Overlay/Tooltip";
 
 const alwaysEnabledItems = ["/", "settings", "tags", "assets"];
 
-export function ProjectGameCard({ id, project_id, title, image, feature_flags, module }: ProjectGameCardType) {
+export function ProjectGameCard({ id, project_id, title, image, feature_flags }: ProjectGameCardType) {
+  const module = ls.get("module");
   const baseUrl = module === "editor" ? `/projects/${id}` : `/games/${id}/${project_id}`;
   const navigate = useNavigate();
   const url = useImageURL(image);
@@ -29,7 +31,7 @@ export function ProjectGameCard({ id, project_id, title, image, feature_flags, m
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  navigate(`/${baseUrl}/${id}/${item.navigate}`);
+                  navigate(`/${baseUrl}/${item.navigate}`);
                 }}
                 onKeyDown={() => {}}
                 role="link"
