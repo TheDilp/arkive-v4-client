@@ -18,3 +18,5 @@ export interface GamePlayerType {
   password: string;
   role: GamePlayerRoleType;
 }
+
+export type GamePermissionType = "none" | "view" | "read" | "own";

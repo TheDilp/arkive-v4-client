@@ -40,6 +40,7 @@ export async function FetchFunction({
     throw new Error("UNAUTHORIZED");
   }
 
+  // For image urls
   if (res.headers.get("content-type") === "text/plain" && res.status === 200) {
     return res.text();
   }
