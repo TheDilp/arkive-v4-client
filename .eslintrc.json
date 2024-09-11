@@ -26,6 +26,7 @@
     "JSX": true,
     "IS_PUBLIC": "readonly",
     "IS_GATEWAY": "readonly",
+    "IS_DYCE_VTT": "readonly",
     "APP_VERSION": "readonly"
   },
   "root": true,

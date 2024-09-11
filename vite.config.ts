@@ -10,6 +10,7 @@ export default ({ mode }: { mode: any }) =>
         process.env.npm_package_name === "arkive-v4-wiki" && loadEnv(mode, process.cwd()).VITE_IS_PUBLIC === "true"
       ),
       IS_GATEWAY: process.env.npm_package_name === "arkive-v4-gateway",
+      IS_DYCE_VTT: process.env.npm_package_name === "arkive-v4-dyce-vtt",
     },
 
     plugins: [
