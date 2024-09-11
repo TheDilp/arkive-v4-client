@@ -1,3 +1,5 @@
+import { CharacterType } from "./characterTypes";
+
 export type GamePlayerRoleType = "gamemaster" | "player";
 
 export interface GameType {
@@ -20,3 +22,7 @@ export interface GamePlayerType {
 }
 
 export type GamePermissionType = "none" | "view" | "read" | "own";
+
+export type GameCharacterType = Pick<CharacterType, "id" | "full_name" | "portrait_id"> & {
+  player_permissions: Record<string, GamePermissionType>;
+};

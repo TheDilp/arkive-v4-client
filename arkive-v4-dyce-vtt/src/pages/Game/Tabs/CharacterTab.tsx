@@ -3,21 +3,21 @@ import { useParams } from "react-router-dom";
 
 import { Avatar, Button, Search, Tooltip } from "../../../../../components";
 import { useGetEntities } from "../../../../../hooks";
-import { CharacterType } from "../../../../../types";
+import { GameCharacterType } from "../../../../../types";
 import { getAvatarInitials, IconEnum } from "../../../../../utils";
 import { PermissionPicker } from "../../../components/PermissionPicker";
 import { useAddCharacterToGame } from "../../../hooks";
 
 export function CharacterTab() {
   const { game_id } = useParams();
-  const [importedCharacters, setImportedCharacters] = useState<CharacterType[]>([]);
+  const [importedCharacters, setImportedCharacters] = useState<GameCharacterType[]>([]);
   const [filter] = useState("");
 
   const { mutate: addCharacter } = useAddCharacterToGame();
 
-  const { data: characters } = useGetEntities<CharacterType>(
+  const { data: characters } = useGetEntities<GameCharacterType>(
     {
-      fields: ["id", "project_id", "full_name", "portrait_id"],
+      fields: ["id", "full_name", "portrait_id"],
     },
     "characters"
   );
@@ -63,7 +63,10 @@ export function CharacterTab() {
                   <span>{char.full_name}</span>
                 </div>
                 <div className="flex items-center gap-x-1">
-                  <Tooltip content={<PermissionPicker />} isClickable isIgnoringHover>
+                  <Tooltip
+                    content={<PermissionPicker player_permissions={char.player_permissions} related_id={char.id} />}
+                    isClickable
+                    isIgnoringHover>
                     <div>
                       <Button icon={IconEnum.eye} onClick={undefined} tooltip="Change permissions" />
                     </div>

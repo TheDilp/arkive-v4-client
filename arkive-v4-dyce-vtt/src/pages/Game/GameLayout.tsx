@@ -3,8 +3,9 @@ import { useEffect } from "react";
 import { Outlet, useLocation, useParams } from "react-router-dom";
 
 import { Dialog, Drawer, Navbar, Sidebar } from "../../../../components";
-import { useBreakpoint, useGetUser, useNavbarTitle } from "../../../../hooks";
-import { userAtom, userStatusAtom } from "../../../../utils";
+import { useBreakpoint, useGetEntity, useGetUser, useNavbarTitle } from "../../../../hooks";
+import { GameType } from "../../../../types";
+import { gameAtom, userAtom, userStatusAtom } from "../../../../utils";
 
 export function GameLayout() {
   useNavbarTitle("", true);
@@ -23,8 +24,10 @@ export function GameLayout() {
     },
     { enabled: !!user?.user_id }
   );
+  const { data: gameData, isInitialLoading: isInitialLoadingGame } = useGetEntity<GameType>(game_id, "games", { fields: [] });
 
   const setUserAtom = useSetAtom(userAtom);
+  const setGameAtom = useSetAtom(gameAtom);
 
   useEffect(() => {
     if (userData) {
@@ -32,16 +35,22 @@ export function GameLayout() {
     }
   }, [userData?.data]);
 
+  useEffect(() => {
+    if (gameData) {
+      setGameAtom(gameData.data);
+    }
+  }, [gameData?.data]);
+
   return (
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
       <Dialog />
       <Drawer />
       {isLg && (!game_id || pathname.endsWith("settings")) ? (
-        <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={[]} />
+        <Sidebar isLoading={isInitialLoadingUser || isInitialLoadingGame} isUsingPermissions={false} items={[]} />
       ) : null}
       <div className="flex h-full w-full flex-col">
         <div className="w-full">
-          <Navbar isDisabled={isInitialLoadingUser} />
+          <Navbar isDisabled={isInitialLoadingUser || isInitialLoadingGame} />
         </div>
         <Outlet />
       </div>
