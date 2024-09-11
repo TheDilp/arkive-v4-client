@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 
-import { Avatar, Button, Select, Spinner } from "../../../../components";
-import { useGetEntity, useHandleChange } from "../../../../hooks";
-import { GameType } from "../../../../types";
+import { Avatar, Button, Select } from "../../../../components";
+import { useHandleChange } from "../../../../hooks";
 import { AvailableIcons, IconEnum } from "../../../../utils";
 import { DiceRollInput } from "./DiceRollInput";
 import { CharacterTab } from "./Tabs/CharacterTab";
@@ -202,7 +200,6 @@ function RollHistory() {
 
 const shortcutKeys = ["1", "2", "3", "4"];
 export function GameView() {
-  const { game_id } = useParams();
   const [drawer, setDrawer] = useState<GameDrawerType>(null);
   function handleShortcut(e: KeyboardEvent) {
     if (e.ctrlKey && shortcutKeys.includes(e.key)) {
@@ -217,8 +214,6 @@ export function GameView() {
     }
   }
 
-  const { data, isLoading } = useGetEntity<GameType>(game_id, "games", { fields: [] });
-
   useEffect(() => {
     document.addEventListener("keydown", handleShortcut);
     return () => {
@@ -226,13 +221,12 @@ export function GameView() {
     };
   }, [drawer]);
 
-  if (isLoading) return <Spinner />;
   return (
     <div className="flex h-full w-full flex-col text-white">
       <div
         className={`${drawer ? "" : "translate-x-96"} absolute right-0 ml-auto h-full w-96 max-w-96 bg-zinc-800 transition-all`}>
         {drawer === "roll_history" ? <RollHistory /> : null}
-        {drawer === "characters" ? <CharacterTab players={data?.data?.game_players || []} /> : null}
+        {drawer === "characters" ? <CharacterTab /> : null}
       </div>
       <div
         className={`mt-auto flex items-center gap-x-2 ${drawer ? "w-[calc(100%-24rem)]" : "w-full"} px-4 pt-4 transition-width`}>

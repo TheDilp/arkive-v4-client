@@ -2,7 +2,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect } from "react";
 import { Outlet, useLocation, useParams } from "react-router-dom";
 
-import { Dialog, Drawer, Navbar, Sidebar } from "../../../../components";
+import { Dialog, Drawer, Navbar, Sidebar, Spinner } from "../../../../components";
 import { useBreakpoint, useGetEntity, useGetUser, useNavbarTitle } from "../../../../hooks";
 import { GameType } from "../../../../types";
 import { gameAtom, userAtom, userStatusAtom } from "../../../../utils";
@@ -52,7 +52,7 @@ export function GameLayout() {
         <div className="w-full">
           <Navbar isDisabled={isInitialLoadingUser || isInitialLoadingGame} />
         </div>
-        <Outlet />
+        {isInitialLoadingGame ? <Spinner /> : <Outlet />}
       </div>
     </div>
   );
