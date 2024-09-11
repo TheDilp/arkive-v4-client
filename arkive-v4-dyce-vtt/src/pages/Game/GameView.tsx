@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { Avatar, Button, Input, Select } from "../../../../components";
-import { useGetEntities, useHandleChange } from "../../../../hooks";
-import { CharacterType } from "../../../../types";
-import { AvailableIcons, getAvatarInitials, IconEnum } from "../../../../utils";
+import { Avatar, Button, Select } from "../../../../components";
+import { useHandleChange } from "../../../../hooks";
+import { AvailableIcons, IconEnum } from "../../../../utils";
 import { DiceRollInput } from "./DiceRollInput";
+import { CharacterTab } from "./Tabs/CharacterTab";
 
 type GameDrawerType = "roll_history" | "characters" | "journal" | "music" | null;
 
@@ -198,63 +198,6 @@ function RollHistory() {
   );
 }
 
-function Characters() {
-  const [importedCharacters, setImportedCharacters] = useState<CharacterType[]>([]);
-  const [filter, setFilter] = useState("");
-  const { data: characters } = useGetEntities<CharacterType>(
-    {
-      data: { project_id: "43e1c879-415b-4394-95ad-f9a4c42a43c5" },
-      fields: ["id", "project_id", "full_name", "portrait_id"],
-    },
-    "characters"
-  );
-
-  useEffect(() => {
-    if (characters?.data) setImportedCharacters(characters?.data || []);
-  }, [characters]);
-
-  useEffect(() => {
-    if (filter) {
-      const timeout = setTimeout(() => {
-        setImportedCharacters((prev) => prev.filter((char) => char.full_name.toLowerCase().includes(filter.toLowerCase())));
-      }, 300);
-
-      return () => {
-        clearTimeout(timeout);
-      };
-    } else {
-      setImportedCharacters(characters?.data || []);
-    }
-  }, [filter]);
-
-  return (
-    <div>
-      <div className="flex flex-col gap-y-1 p-2">
-        <h2 className="">Characters</h2>
-        <Input name="filter" onChange={({ value }) => setFilter(value as string)} placeholder="Search" value={filter} />
-      </div>
-      <ul className="h-full max-h-full overflow-y-auto">
-        {importedCharacters?.length
-          ? importedCharacters?.map((char) => (
-              <li
-                key={char.id}
-                className="flex items-center justify-between border-b border-zinc-600 bg-zinc-700 p-2 first:border-t">
-                <div className="flex items-center gap-x-2">
-                  <Avatar image_id={char.portrait_id} initials={getAvatarInitials(char.full_name)} size="sm" />
-                  <span>{char.full_name}</span>
-                </div>
-                <div className="flex items-center gap-x-1">
-                  <Button icon={IconEnum.eye} onClick={undefined} tooltip="Change permissions" />
-                  <Button icon={IconEnum.image} onClick={undefined} tooltip="Reveal image" />
-                </div>
-              </li>
-            ))
-          : null}
-      </ul>
-    </div>
-  );
-}
-
 const shortcutKeys = ["1", "2", "3", "4"];
 export function GameView() {
   const [drawer, setDrawer] = useState<GameDrawerType>(null);
@@ -283,7 +226,7 @@ export function GameView() {
       <div
         className={`${drawer ? "" : "translate-x-96"} absolute right-0 ml-auto h-full w-96 max-w-96 bg-zinc-800 transition-all`}>
         {drawer === "roll_history" ? <RollHistory /> : null}
-        {drawer === "characters" ? <Characters /> : null}
+        {drawer === "characters" ? <CharacterTab /> : null}
       </div>
       <div
         className={`mt-auto flex items-center gap-x-2 ${drawer ? "w-[calc(100%-24rem)]" : "w-full"} px-4 pt-4 transition-width`}>
