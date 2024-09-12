@@ -18,6 +18,7 @@ import { DialogAtomType, DictionaryType, DrawerAtomType, UpdatePublicManyType, W
 import {
   baseURLS,
   BooleanFilters,
+  breadcrumbsAtom,
   dialogAtom,
   drawerAtom,
   FetchFunction,
@@ -208,6 +209,7 @@ export function DictionaryView({ id }: { id?: string }) {
 
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
   const resetDialogAtom = useResetAtom(dialogAtom);
   const { mutateAsync: deleteMany } = useDeleteMany("words", false, project_id);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
@@ -227,7 +229,7 @@ export function DictionaryView({ id }: { id?: string }) {
     item_id || id,
     "dictionaries",
     {
-      fields: ["id", "owner_id", "title", "is_public"],
+      fields: ["id", "owner_id", "is_folder", "title", "is_public"],
       permissions: true,
     },
     {
@@ -258,6 +260,22 @@ export function DictionaryView({ id }: { id?: string }) {
     }
   );
   useNavbarTitle(`Dictionaries | ${data?.data?.title}`, !!data?.data?.title);
+
+  useLayoutEffect(() => {
+    if (data?.data) {
+      setBreadcrumbs({
+        items: [
+          {
+            id: data?.data?.id,
+            title: data?.data?.title,
+            is_folder: !!data?.data?.is_folder,
+            parent_id: data?.data?.parent_id || null,
+          },
+        ],
+        type: "dictionaries",
+      });
+    }
+  }, [data]);
 
   useEffect(() => {
     setEntityUpdatePermission(updateDictionaryPermission);
@@ -301,7 +319,7 @@ export function DictionaryView({ id }: { id?: string }) {
   return (
     <>
       <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">
-        {IS_PUBLIC ? <h2 className="font-lato flex-1 text-3xl">{data?.data?.title || ""}</h2> : null}
+        {IS_PUBLIC ? <h2 className="flex-1 font-lato text-3xl">{data?.data?.title || ""}</h2> : null}
         <div className="w-48">
           <Input
             isClearable
