@@ -41,9 +41,9 @@ export function AuthWrapper() {
     if (!isUpdatingStatus && !isIdle) {
       if (!loggedIn && !pathname.endsWith("/auth/login")) {
         if (module === "editor") {
-          document.location = `${import.meta.env.VITE_HOME}/signin/editor`;
+          document.location = `${import.meta.env.VITE_HOME}/arkive/sign-in`;
         } else if (module === "dyce_vtt") {
-          document.location = `${import.meta.env.VITE_HOME}/signin/dyce`;
+          document.location = `${import.meta.env.VITE_HOME}/dyce/sign-in`;
         }
       } else if (loggedIn && (pathname.includes("auth/") || pathname === "/")) {
         if (module === "editor") navigate("/projects");
