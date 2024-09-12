@@ -142,13 +142,22 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
   }
 
   useLayoutEffect(() => {
-    if (blueprint?.data) {
+    if (blueprint?.data && existingBlueprintInstance?.data) {
       setBreadcrumbs({
-        items: [{ id: blueprint.data.id, title: blueprint.data.title, is_folder: false, parent_id: null }],
+        items: [
+          { id: blueprint.data.id, title: blueprint.data.title, is_folder: false, parent_id: null },
+          {
+            id: existingBlueprintInstance.data.id,
+            title: existingBlueprintInstance.data.title,
+            is_folder: false,
+            parent_id: null,
+            url: `/projects/${project_id}/blueprints/${blueprint?.data?.id}/${existingBlueprintInstance?.data?.id}/resources`,
+          },
+        ],
         type: "blueprints",
       });
     }
-  }, [blueprint?.data]);
+  }, [blueprint?.data, existingBlueprintInstance?.data]);
 
   useLayoutEffect(() => {
     if (existingBlueprintInstance?.data) {

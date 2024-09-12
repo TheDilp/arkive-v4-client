@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
-import { Dispatch, useEffect } from "react";
+import { Dispatch, useEffect, useLayoutEffect } from "react";
 import { useParams } from "react-router-dom";
 
 import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Table } from "../../components";
@@ -37,6 +37,7 @@ import {
 import {
   baseURLS,
   BooleanFilters,
+  breadcrumbsAtom,
   CharacterBlueprintRelationFilter,
   dialogAtom,
   DiceRollRegex,
@@ -692,6 +693,17 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
       enabled: !!blueprint?.data,
     }
   );
+
+  const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
+
+  useLayoutEffect(() => {
+    if (blueprint?.data) {
+      setBreadcrumbs({
+        items: [{ id: blueprint.data.id, title: blueprint.data.title, is_folder: false, parent_id: null }],
+        type: "blueprints",
+      });
+    }
+  }, [blueprint]);
 
   useEffect(() => {
     // dispatch({ type: "clearSelection" });

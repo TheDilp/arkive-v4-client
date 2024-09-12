@@ -349,6 +349,7 @@ export function BlueprintView() {
   const [filter, setFilter] = useState("");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+
   const columns = createColumns(setDrawer, setDialog, permissions, isProjectOwner, user?.id as string, user?.role?.id);
   const resetDialogAtom = useResetAtom(dialogAtom);
   const { mutate: updateMany } = useBulkUpdate(project_id as string, "blueprints");
