@@ -423,7 +423,7 @@ export function AssetView() {
       pagination,
       permissions: true,
     },
-    { enabled: view === "table", prefetch: false }
+    { enabled: view === "table", prefetch: true }
   );
 
   const {
@@ -573,8 +573,8 @@ export function AssetView() {
           {(infiniteAssets?.pages || [])?.map((page) =>
             page.data.map((img: ImageType) => (
               <div
-                className="animate-in fade-in relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500"
-                key={img.id}>
+                key={img.id}
+                className="animate-in fade-in relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500">
                 <Image
                   hasTitle
                   image={{ title: img.title, project_id: img.project_id, type: "images", id: img.id }}
