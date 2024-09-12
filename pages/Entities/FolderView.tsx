@@ -712,6 +712,14 @@ function getSelectedActions(
 export function MainView() {
   const { type, item_id } = useParams();
 
+  const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
+
+  useLayoutEffect(() => {
+    if (!item_id) {
+      setBreadcrumbs({ items: [], type: type as AvailableEntityType | null });
+    }
+  }, [item_id]);
+
   if (!item_id && type === "characters") return <CharactersView />;
   if (!item_id && type === "blueprints") return <BlueprintView />;
   if (!item_id && type === "manuscripts") return <ManuscriptView />;

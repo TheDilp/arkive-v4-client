@@ -61,6 +61,7 @@ import {
 } from "../../types";
 import {
   baseURLS,
+  breadcrumbsAtom,
   dialogAtom,
   drawerAtom,
   enabledEntitiesAtom,
@@ -809,6 +810,7 @@ export function CharacterProfileView({
   const { handleChange } = useHandleChange({ data: character, setData: setCharacter });
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
   const { isLg } = useBreakpoint();
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(
@@ -886,6 +888,16 @@ export function CharacterProfileView({
     "conversations",
     { enabled: selectedTab === 4 && !!existingCharacter?.data, queryKeyConcat: [item_id as string] }
   );
+  useLayoutEffect(() => {
+    if (existingCharacter?.data) {
+      setBreadcrumbs({
+        items: [
+          { id: existingCharacter?.data?.id, title: existingCharacter.data.full_name, is_folder: false, parent_id: null },
+        ],
+        type: "characters",
+      });
+    }
+  }, [existingCharacter?.data]);
   function showRelationshipTree() {
     if (existingCharacter?.data)
       setDialog({

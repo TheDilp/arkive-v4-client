@@ -8,8 +8,8 @@ import { Icon, Tooltip } from "..";
 export function Breadcrumbs() {
   const { project_id } = useParams();
   const { items, type } = useAtomValue(breadcrumbsAtom);
-  const itemsToShow = items.slice(-3);
-  const tooltipItems = items.slice(0, -3);
+  const itemsToShow = (items || []).slice(-3);
+  const tooltipItems = (items || []).slice(0, -3);
   return (
     <div className="flex h-8 max-h-8 max-w-fit flex-nowrap items-center justify-between gap-x-2">
       <Link to={`../${type}`}>
