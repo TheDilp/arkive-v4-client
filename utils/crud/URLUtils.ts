@@ -19,10 +19,36 @@ export function getAssetURL(project_id: string, type: AssetType, image_id?: stri
   return `${project_id}/${type}/${image_id}`;
 }
 
-export function getSearchURL(type: SearchableEntities) {
-  if (type === "all" || type === "projects") return "";
-  if (type === "by_tags") return "all/tags";
-  return `${type}`;
+export function getSearchURL(
+  type: SearchableEntities,
+  isGlobal: boolean,
+  project_id: string,
+  isFolders: boolean,
+  entityType: string
+) {
+  const parts = [];
+  if (isGlobal) {
+    parts.push("global");
+  }
+
+  if (project_id && !IS_DYCE_VTT) {
+    parts.push(project_id);
+  }
+  if (type === "by_tags") {
+    parts.push("all/tags");
+  } else if (type === "all") {
+    parts.push("projects");
+  } else {
+    parts.push(entityType);
+  }
+  if (isFolders) {
+    parts.push("folder");
+  }
+  if (entityType === "projects") {
+    parts.push(entityType);
+  }
+
+  return parts.join("/");
 }
 
 export async function getImageURL(url: string, dimensions?: { width: number; height: number }) {
