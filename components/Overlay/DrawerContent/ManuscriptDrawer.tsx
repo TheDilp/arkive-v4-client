@@ -100,7 +100,7 @@ export function ManuscriptDrawer({ data }: Props) {
     data?.id
   );
 
-  const { handleChange } = useHandleChange({ data: manuscript, setData: setManuscript });
+  const { handleChange, resetChanges } = useHandleChange({ data: manuscript, setData: setManuscript });
 
   const tabs = getTabs(permissions, data?.id);
   const { mutate: create, isLoading: isCreating } = useCreateEntity<InsertManuscriptType>("manuscripts");
@@ -190,14 +190,14 @@ export function ManuscriptDrawer({ data }: Props) {
             }}>
             <Droppable droppableId="manuscript">
               {(providedDroppable) => (
-                <div className="flex flex-col" ref={providedDroppable.innerRef} {...providedDroppable.droppableProps}>
+                <div ref={providedDroppable.innerRef} className="flex flex-col" {...providedDroppable.droppableProps}>
                   {entities.map((entity, index) => {
                     return (
-                      <Draggable draggableId={entity.id} index={index} key={entity.id}>
+                      <Draggable key={entity.id} draggableId={entity.id} index={index}>
                         {(providedDraggable) => (
                           <div
-                            className="my-1 flex items-center gap-x-2"
                             ref={providedDraggable.innerRef}
+                            className="my-1 flex items-center gap-x-2"
                             {...providedDraggable.draggableProps}>
                             <span {...providedDraggable.dragHandleProps}>
                               <Icon fontSize={24} icon={IconEnum.menu} />
@@ -338,7 +338,13 @@ export function ManuscriptDrawer({ data }: Props) {
                   },
                   relations,
                 });
-                create(parsed);
+                create(parsed, {
+                  onSuccess: () => {
+                    resetChanges();
+                    setManuscript({});
+                    setEntities([]);
+                  },
+                });
               }
             }
             resetDrawer();
