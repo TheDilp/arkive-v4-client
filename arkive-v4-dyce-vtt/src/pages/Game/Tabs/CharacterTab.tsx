@@ -43,12 +43,12 @@ export function CharacterTab() {
   return (
     <div>
       <div className="flex flex-col gap-y-1 p-2">
-        <h2 className="">Characters</h2>
         <Search
           name="character"
           onChange={({ value }) => {
             addCharacter({ game_id: game_id as string, related_id: value });
           }}
+          placeholder="Search (press enter to add character)"
           searchEntity="characters"
         />
       </div>
@@ -72,6 +72,14 @@ export function CharacterTab() {
                     </div>
                   </Tooltip>
                   <Button icon={IconEnum.image} onClick={undefined} tooltip="Reveal image" />
+                  <Button
+                    hasNoBackground
+                    icon={IconEnum.trash}
+                    isIconOnly
+                    onClick={undefined}
+                    tooltip="Remove character"
+                    variant="error"
+                  />
                 </div>
               </li>
             ))
