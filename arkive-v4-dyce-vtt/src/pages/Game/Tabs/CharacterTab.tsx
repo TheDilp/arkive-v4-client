@@ -1,10 +1,11 @@
+import { useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Avatar, Button, Search, Tooltip } from "../../../../../components";
 import { useGetEntities } from "../../../../../hooks";
 import { GameCharacterType } from "../../../../../types";
-import { getAvatarInitials, IconEnum } from "../../../../../utils";
+import { dialogAtom, getAvatarInitials, IconEnum } from "../../../../../utils";
 import { PermissionPicker } from "../../../components/PermissionPicker";
 import { useAddCharacterToGame } from "../../../hooks";
 import { useRemoveCharacterFromGame } from "../../../hooks/deleteGameHooks";
@@ -13,7 +14,7 @@ export function CharacterTab() {
   const { game_id } = useParams();
   const [importedCharacters, setImportedCharacters] = useState<GameCharacterType[]>([]);
   const [filter] = useState("");
-
+  const setDialog = useSetAtom(dialogAtom);
   const { mutate: addCharacter } = useAddCharacterToGame();
   const { mutate: removeCharacter } = useRemoveCharacterFromGame();
   const { data: characters } = useGetEntities<GameCharacterType>(
@@ -77,7 +78,23 @@ export function CharacterTab() {
                     hasNoBackground
                     icon={IconEnum.trash}
                     isIconOnly
-                    onClick={() => removeCharacter(char.id)}
+                    onClick={() => {
+                      setDialog((prev) => ({
+                        ...prev,
+                        position: "center",
+                        title: `Are you sure you want to remove ${char.full_name} from the game?`,
+                        description: "Their game data will be lost",
+                        cancel: {
+                          variant: "secondary",
+                          action: () => {},
+                        },
+                        confirm: {
+                          action: () => removeCharacter(char.id),
+                          variant: "error",
+                        },
+                        isOverlay: true,
+                      }));
+                    }}
                     tooltip="Remove character"
                     variant="error"
                   />
