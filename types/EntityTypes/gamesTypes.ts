@@ -27,3 +27,36 @@ export type GameCharacterType = Pick<CharacterType, "id" | "full_name" | "portra
   related_id: string;
   player_permissions: Record<string, GamePermissionType>;
 };
+
+export type GameJournalEntryType = {
+  id: string;
+  title: string;
+  game_id: string;
+  characters: GameJournalEntryEntityType[];
+  blueprint_instances: GameJournalEntryEntityType[];
+  documents: GameJournalEntryEntityType[];
+  maps: GameJournalEntryEntityType[];
+  map_pins: GameJournalEntryEntityType[];
+  graphs: GameJournalEntryEntityType[];
+  events: GameJournalEntryEntityType[];
+  images: GameJournalEntryEntityType[];
+};
+
+export type GameJournalEntryEntityType = {
+  id: string;
+  title: string;
+  image_id?: string | null;
+  related_id: string;
+  type: GameJournalEntryEntityTypes;
+  sort: number;
+};
+
+export type GameJournalEntryEntityTypes =
+  | "characters"
+  | "blueprint_instances"
+  | "documents"
+  | "maps"
+  | "map_pins"
+  | "graphs"
+  | "events"
+  | "images";
