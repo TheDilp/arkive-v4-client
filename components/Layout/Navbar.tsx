@@ -571,7 +571,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
 
   return (
     <div className="flex h-16 max-h-16 min-h-[4rem] max-w-full flex-1 overflow-hidden border-b border-zinc-800 bg-zinc-900 shadow">
-      {isMutating && !isMutatingDocument ? <IndeterminateProgressBar /> : null}
+      {isMutating && !isMutatingDocument && !IS_DYCE_VTT ? <IndeterminateProgressBar /> : null}
       <h1 className="flex h-full min-h-[64px] max-w-[50%] select-none items-center pl-4 font-merriweather text-2xl text-white">
         <span className="truncate">{navbarTitle || "The Arkive"}</span>
       </h1>
