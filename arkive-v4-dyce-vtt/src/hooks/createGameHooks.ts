@@ -17,16 +17,8 @@ export function useAddCharacterToGame() {
       return data;
     },
     {
-      onSuccess: (data) => {
+      onSuccess: () => {
         queryClient.invalidateQueries({ predicate: (q) => q.queryKey.includes("characters") });
-
-        createNotification({
-          title: data?.message || "Character added successfully.",
-          variant: "success",
-          icon: IconEnum.check,
-          timer: 2,
-          position: "top-right",
-        });
       },
       onError: (error: { message?: string }) => {
         createNotification({
