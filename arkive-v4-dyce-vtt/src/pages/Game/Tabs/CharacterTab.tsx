@@ -20,6 +20,9 @@ export function CharacterTab() {
   const { data: characters } = useGetEntities<GameCharacterType>(
     {
       fields: ["id", "full_name", "portrait_id"],
+      relationFilters: {
+        and: [{ id: "game", field: "game", header_name: "Game", value: game_id as string, operator: "eq" }],
+      },
     },
     "characters"
   );

@@ -101,6 +101,9 @@ export function GameSettings() {
     "games",
     {
       fields: ["id", "title", "background_image", "next_session_date", "owner_id", "project_id"],
+      relations: {
+        game_players: true,
+      },
     },
     {
       queryKeyConcat: ["settings"],
@@ -116,7 +119,7 @@ export function GameSettings() {
             <Avatar
               hasShowImage
               image_id={gameData?.data?.background_image}
-              initials={getFirstLetters(gameData?.data?.title as string)}
+              initials={getFirstLetters(gameData?.data?.title || "")}
               isTooltipDisabled
               size="4xl"
             />

@@ -24,7 +24,12 @@ export function GameLayout() {
     },
     { enabled: !!user?.user_id }
   );
-  const { data: gameData, isInitialLoading: isInitialLoadingGame } = useGetEntity<GameType>(game_id, "games", { fields: [] });
+  const { data: gameData, isInitialLoading: isInitialLoadingGame } = useGetEntity<GameType>(game_id, "games", {
+    fields: ["id", "background_image", "description", "title", "next_session_date", "project_id"],
+    relations: {
+      game_players: true,
+    },
+  });
 
   const setUserAtom = useSetAtom(userAtom);
   const setGameAtom = useSetAtom(gameAtom);

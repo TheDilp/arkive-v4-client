@@ -8,9 +8,14 @@ import { drawerAtom, IconEnum, userStatusAtom } from "../../../utils";
 export function GamesView() {
   const { isLg } = useBreakpoint();
   const user = useAtomValue(userStatusAtom);
-  const { data, isFetching: isFetchingGames } = useGetEntities<GameType>({ fields: [] }, "games", {
-    enabled: !!user?.user_id,
-  });
+  const { data, isFetching: isFetchingGames } = useGetEntities<GameType>(
+    //! needs project_id for link
+    { fields: ["id", "title", "background_image", "project_id", "next_session_date"] },
+    "games",
+    {
+      enabled: !!user?.user_id,
+    }
+  );
   const { isInitialLoading: isInitialLoadingUser } = useGetUser(
     {
       data: { id: user?.user_id as string },

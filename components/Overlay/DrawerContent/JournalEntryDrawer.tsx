@@ -88,23 +88,34 @@ export function JournalEntryDrawer({ data }: Props) {
           <span>Add:</span>
           <Dropdown
             allowedPlacements={["left-start", "left-end"]}
-            items={AvailableManuscriptEntityTypesEnum.map((entity) => ({
-              id: entity.type,
-              title: getSentenceCase(entity.type),
-              icon: entity.icon,
-
-              onClick: () =>
-                setEntities((prev) =>
-                  prev.concat({
-                    title: "",
-                    related_id: "",
-                    image_id: "",
-                    id: crypto.randomUUID(),
-                    type: entity.type,
-                    sort: entities.length,
-                  })
-                ),
-            }))}>
+            items={[
+              {
+                id: "new",
+                title: "New",
+                icon: IconEnum.add,
+              },
+              {
+                id: "existing",
+                title: "Existing",
+                icon: IconEnum.search,
+                subItems: AvailableManuscriptEntityTypesEnum.map((entity) => ({
+                  id: entity.type,
+                  title: getSentenceCase(entity.type),
+                  icon: entity.icon,
+                  onClick: () =>
+                    setEntities((prev) =>
+                      prev.concat({
+                        title: "",
+                        related_id: "",
+                        image_id: "",
+                        id: crypto.randomUUID(),
+                        type: entity.type,
+                        sort: entities.length,
+                      })
+                    ),
+                })),
+              },
+            ]}>
             <div className="h-8 w-8">
               <Button icon={IconEnum.add} isIconOnly onClick={undefined} variant="info" />
             </div>

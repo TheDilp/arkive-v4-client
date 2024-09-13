@@ -54,7 +54,7 @@ export function AuthWrapper() {
 
   useLayoutEffect(() => {
     reset();
-    updateAuthStatus({ project_id: project_id ?? null, game_id: game_id ?? null });
+    updateAuthStatus({ project_id: project_id === "undefined" || !project_id ? null : project_id, game_id: game_id ?? null });
   }, [project_id, game_id]);
   if (
     (userStatus?.status !== "authenticated" && userStatus?.status !== undefined) ||

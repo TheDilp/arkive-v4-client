@@ -225,7 +225,7 @@ export function GameView() {
   return (
     <div className="flex h-full w-full flex-col text-white">
       <div
-        className={`${drawer ? "" : "translate-x-96"} absolute right-0 ml-auto h-full w-96 max-w-96 bg-zinc-800 transition-all`}>
+        className={`${drawer ? "" : "translate-x-96"} absolute right-0 ml-auto h-full w-96 max-w-96 bg-zinc-900 transition-all`}>
         {drawer === "roll_history" ? <RollHistory /> : null}
         {drawer === "characters" ? <CharacterTab /> : null}
         {drawer === "journal" ? <JournalEntriesTab /> : null}
