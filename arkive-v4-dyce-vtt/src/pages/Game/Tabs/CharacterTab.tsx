@@ -64,7 +64,7 @@ export function CharacterTab() {
                 </div>
                 <div className="flex items-center gap-x-1">
                   <Tooltip
-                    content={<PermissionPicker player_permissions={char.player_permissions} related_id={char.id} />}
+                    content={<PermissionPicker game_character_id={char.id} player_permissions={char.player_permissions} />}
                     isClickable
                     isIgnoringHover>
                     <div>

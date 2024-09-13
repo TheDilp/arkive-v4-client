@@ -24,5 +24,6 @@ export interface GamePlayerType {
 export type GamePermissionType = "none" | "view" | "read" | "own";
 
 export type GameCharacterType = Pick<CharacterType, "id" | "full_name" | "portrait_id"> & {
+  related_id: string;
   player_permissions: Record<string, GamePermissionType>;
 };

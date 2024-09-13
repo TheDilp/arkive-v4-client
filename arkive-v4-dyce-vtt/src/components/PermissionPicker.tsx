@@ -7,10 +7,10 @@ import { gameAtom, GamePermissionsEnum } from "../../../utils";
 import { useUpdateGameCharacterPermission } from "../hooks";
 
 export function PermissionPicker({
-  related_id,
+  game_character_id,
   player_permissions,
 }: {
-  related_id: string;
+  game_character_id: string;
   player_permissions: Record<string, GamePermissionType>;
 }) {
   const { mutate } = useUpdateGameCharacterPermission();
@@ -25,9 +25,13 @@ export function PermissionPicker({
               key={perm}
               label={capitalize(perm)}
               onClick={() => {
-                mutate({ data: { related_id, player_id: player?.id, permission: perm } });
+                mutate({ data: { related_id: game_character_id, player_id: player?.id, permission: perm } });
               }}
-              variant={player_permissions?.[player.id] === perm ? "info" : "secondary"}
+              variant={
+                player_permissions?.[player.id] === perm || (perm === "none" && !player_permissions?.[player.id])
+                  ? "info"
+                  : "secondary"
+              }
             />
           ))}
         </li>
