@@ -5,6 +5,7 @@ import { useHandleChange } from "../../../../hooks";
 import { AvailableIcons, IconEnum } from "../../../../utils";
 import { DiceRollInput } from "./DiceRollInput";
 import { CharacterTab } from "./Tabs/CharacterTab";
+import { JournalEntriesTab } from "./Tabs/JournalEntriesTab";
 
 type GameDrawerType = "roll_history" | "characters" | "journal" | "music" | null;
 
@@ -227,6 +228,7 @@ export function GameView() {
         className={`${drawer ? "" : "translate-x-96"} absolute right-0 ml-auto h-full w-96 max-w-96 bg-zinc-800 transition-all`}>
         {drawer === "roll_history" ? <RollHistory /> : null}
         {drawer === "characters" ? <CharacterTab /> : null}
+        {drawer === "journal" ? <JournalEntriesTab /> : null}
       </div>
       <div
         className={`mt-auto flex items-center gap-x-2 ${drawer ? "w-[calc(100%-24rem)]" : "w-full"} px-4 pt-4 transition-width`}>
