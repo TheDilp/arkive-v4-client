@@ -7,6 +7,7 @@ import { GameCharacterType } from "../../../../../types";
 import { getAvatarInitials, IconEnum } from "../../../../../utils";
 import { PermissionPicker } from "../../../components/PermissionPicker";
 import { useAddCharacterToGame } from "../../../hooks";
+import { useRemoveCharacterFromGame } from "../../../hooks/deleteGameHooks";
 
 export function CharacterTab() {
   const { game_id } = useParams();
@@ -14,7 +15,7 @@ export function CharacterTab() {
   const [filter] = useState("");
 
   const { mutate: addCharacter } = useAddCharacterToGame();
-
+  const { mutate: removeCharacter } = useRemoveCharacterFromGame();
   const { data: characters } = useGetEntities<GameCharacterType>(
     {
       fields: ["id", "full_name", "portrait_id"],
@@ -76,7 +77,7 @@ export function CharacterTab() {
                     hasNoBackground
                     icon={IconEnum.trash}
                     isIconOnly
-                    onClick={undefined}
+                    onClick={() => removeCharacter(char.id)}
                     tooltip="Remove character"
                     variant="error"
                   />
