@@ -22,6 +22,7 @@ import {
   buildManuscript,
   createOrEditPermission,
   getDefaultEntityIcon,
+  getSentenceCase,
   IconEnum,
 } from "../../../utils";
 import {
@@ -32,9 +33,10 @@ import {
 } from "../../../validation/manuscripts";
 import { EntityPermission } from "../../Complex";
 import { EntityPreview } from "../../DataDisplay";
-import { Button, Checkbox, Input, Search, Select, TagInput } from "../../Form";
+import { Button, Checkbox, Input, Search, TagInput } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
 import { Icon, Skeleton } from "../../Misc";
+import { Dropdown } from "../Dropdown";
 import { IconPicker } from "../IconPicker";
 
 type Props = {
@@ -122,7 +124,7 @@ export function ManuscriptDrawer({ data }: Props) {
         <>
           <div className="flex items-center justify-between gap-x-2">
             <Input
-              isDisabled={!canCreateOrEdit || isCreating}
+              isDisabled={!canCreateOrEdit || isCreating || isUpdating}
               label="Title (required)"
               name="title"
               onChange={handleChange}
@@ -133,7 +135,7 @@ export function ManuscriptDrawer({ data }: Props) {
             <div className="self-end pb-1.5">
               <IconPicker
                 icon={(manuscript?.icon as AvailableIcons | undefined) || IconEnum.manuscripts}
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!canCreateOrEdit || isCreating || isUpdating}
                 name="icon"
                 onChange={handleChange}
               />
@@ -142,7 +144,7 @@ export function ManuscriptDrawer({ data }: Props) {
           <div className="flex w-full items-center justify-between">
             <span>Is public:</span>
             <Checkbox
-              isDisabled={!canCreateOrEdit}
+              isDisabled={!canCreateOrEdit || isCreating || isUpdating}
               name="is_public"
               onChange={handleChange}
               value={manuscript?.is_public ?? false}
@@ -153,25 +155,29 @@ export function ManuscriptDrawer({ data }: Props) {
 
           <div className="flex items-center justify-between">
             <span>Add:</span>
-            <div className="h-8 w-8">
-              <Button
-                icon={IconEnum.add}
-                isIconOnly
-                onClick={() => {
+            <Dropdown
+              allowedPlacements={["left-start", "left-end"]}
+              items={AvailableManuscriptEntityTypesEnum.map((entity) => ({
+                id: entity.type,
+                title: getSentenceCase(entity.type),
+                icon: entity.icon,
+
+                onClick: () =>
                   setEntities((prev) =>
                     prev.concat({
                       title: "",
                       related_id: "",
                       image_id: "",
                       id: crypto.randomUUID(),
-                      type: "documents",
+                      type: entity.type,
                       sort: entities.length,
                     })
-                  );
-                }}
-                variant="info"
-              />
-            </div>
+                  ),
+              }))}>
+              <div className="h-8 w-8">
+                <Button icon={IconEnum.add} isIconOnly onClick={undefined} variant="info" />
+              </div>
+            </Dropdown>
           </div>
 
           <DragDropContext
@@ -220,19 +226,7 @@ export function ManuscriptDrawer({ data }: Props) {
                                     variant={entity.related_id ? "primary" : "error"}
                                   />
                                 </div>
-                                <div className="flex w-1/3 items-center gap-x-1">
-                                  <Select
-                                    name="type"
-                                    onChange={({ value }) =>
-                                      setEntities((prev) => {
-                                        const temp = [...prev];
-                                        temp[index].type = value as AvailableManuscriptEntityTypes;
-                                        return temp;
-                                      })
-                                    }
-                                    options={AvailableManuscriptEntityTypesEnum}
-                                    value={entity.type}
-                                  />
+                                <div className="flex items-center gap-x-1">
                                   <div>
                                     <Button
                                       hasNoBackground
@@ -256,7 +250,7 @@ export function ManuscriptDrawer({ data }: Props) {
                                   clearAction={() => setEntities((prev) => prev.toSpliced(index, 1))}
                                   icon={getDefaultEntityIcon(entity.type)}
                                   id={entity.related_id}
-                                  image_id={entity.image_id}
+                                  image_id={entity.type === "images" ? entity.related_id : entity.image_id}
                                   title={entity.title}
                                   type={entity.type}
                                 />

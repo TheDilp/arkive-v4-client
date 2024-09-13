@@ -1,3 +1,6 @@
+import { AvailableManuscriptEntityTypes } from "../../types/EntityTypes/manuscriptTypes";
+import { AvailableIcons, IconEnum } from "./IconEnums";
+
 export const AllEntities = [
   "manuscripts",
   "characters",
@@ -248,37 +251,13 @@ export const RolePermissionCodes = [
   "delete_manuscripts",
 ] as const;
 
-export const AvailableManuscriptEntityTypesEnum = [
-  {
-    label: "Characters",
-    value: "characters",
-  },
-  {
-    label: "Blueprint instances",
-    value: "blueprint_instances",
-  },
-  {
-    label: "Documents",
-    value: "documents",
-  },
-  {
-    label: "Maps",
-    value: "maps",
-  },
-  {
-    label: "Map pins",
-    value: "map_pins",
-  },
-  {
-    label: "Graphs",
-    value: "graphs",
-  },
-  {
-    label: "Events",
-    value: "events",
-  },
-  {
-    label: "Images",
-    value: "images",
-  },
+export const AvailableManuscriptEntityTypesEnum: { type: AvailableManuscriptEntityTypes; icon: AvailableIcons }[] = [
+  { type: "characters" as const, icon: IconEnum.character },
+  { type: "blueprint_instances" as const, icon: IconEnum.blueprint },
+  { type: "documents" as const, icon: IconEnum.document },
+  { type: "maps" as const, icon: IconEnum.map },
+  { type: "map_pins" as const, icon: IconEnum.map_pin },
+  { type: "graphs" as const, icon: IconEnum.graph },
+  { type: "events" as const, icon: IconEnum.event },
+  { type: "images" as const, icon: IconEnum.image },
 ];
