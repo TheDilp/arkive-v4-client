@@ -33,7 +33,7 @@ export function Tabs({ tabs, selectedTab, onChange, isVertical, hasArrowNav }: T
 
   return (
     <div className={base()}>
-      <ul className={tabsContainer()} ref={tabsContainerRef}>
+      <ul ref={tabsContainerRef} className={tabsContainer()}>
         {hasArrowNav ? (
           <li className="sticky left-0 [&>button:active]:opacity-100 [&>button]:w-5 [&>button]:rounded-none [&>button]:shadow-none">
             <Button
