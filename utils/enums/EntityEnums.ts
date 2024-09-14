@@ -1,3 +1,4 @@
+import { GameJournalEntryEntityTypes } from "../../types";
 import { AvailableManuscriptEntityTypes } from "../../types/EntityTypes/manuscriptTypes";
 import { AvailableIcons, IconEnum } from "./IconEnums";
 
@@ -258,4 +259,15 @@ export const AvailableManuscriptEntityTypesEnum: { type: AvailableManuscriptEnti
   { type: "maps" as const, icon: IconEnum.map },
   { type: "graphs" as const, icon: IconEnum.graph },
   { type: "events" as const, icon: IconEnum.event },
+  { type: "images" as const, icon: IconEnum.image },
+];
+
+export const AvailableJournalEntryEntityTypesEnum: { type: GameJournalEntryEntityTypes; icon: AvailableIcons }[] = [
+  { type: "characters" as const, icon: IconEnum.character },
+  { type: "blueprint_instances" as const, icon: IconEnum.blueprint },
+  { type: "documents" as const, icon: IconEnum.document },
+  { type: "maps" as const, icon: IconEnum.map },
+  { type: "graphs" as const, icon: IconEnum.graph },
+  { type: "events" as const, icon: IconEnum.event },
+  { type: "images" as const, icon: IconEnum.image },
 ];

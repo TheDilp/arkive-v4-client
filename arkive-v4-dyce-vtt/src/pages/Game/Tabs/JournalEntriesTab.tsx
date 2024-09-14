@@ -2,9 +2,9 @@ import { useSetAtom } from "jotai";
 import { useState } from "react";
 
 import { Button, Dropdown, Tabs } from "../../../../../components";
-import { AvailableManuscriptEntityTypesEnum, drawerAtom, getSingularEntityType, IconEnum } from "../../../../../utils";
+import { AvailableJournalEntryEntityTypesEnum, drawerAtom, getSingularEntityType, IconEnum } from "../../../../../utils";
 
-const tabs = AvailableManuscriptEntityTypesEnum.map((item) => ({ id: item.type, icon: item.icon, label: "" }));
+const tabs = AvailableJournalEntryEntityTypesEnum.map((item) => ({ id: item.type, icon: item.icon, label: "" }));
 
 export function JournalEntriesTab() {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -22,33 +22,28 @@ export function JournalEntriesTab() {
               id: "new",
               title: "New",
               icon: IconEnum.add,
-              onClick: () =>
-                setDrawer((prev) => ({
-                  ...prev,
-                  title: `Create new ${getSingularEntityType(tabs[selectedTab].id)}`,
-                  size: "3xl",
-                  type: tabs[selectedTab].id,
-                  data: {},
-                  exceptions: {
-                    globalCreate: true,
-                  },
-                })),
+              onClick: () => {
+                setDrawer((prev) => {
+                  if (tabs[selectedTab].id !== "images")
+                    return {
+                      ...prev,
+                      title: `Create new ${getSingularEntityType(tabs[selectedTab].id)}`,
+                      size: "3xl",
+                      type: tabs[selectedTab].id,
+                      data: {},
+                      exceptions: {
+                        globalCreate: true,
+                      },
+                    };
+                  return prev;
+                });
+              },
             },
             {
               id: "existing",
               title: "Existing",
               icon: IconEnum.search,
-              onClick: () =>
-                setDrawer((prev) => ({
-                  ...prev,
-                  title: `Add ${getSingularEntityType(tabs[selectedTab].id)}`,
-                  size: "3xl",
-                  type: tabs[selectedTab].id,
-                  data: {},
-                  exceptions: {
-                    globalCreate: true,
-                  },
-                })),
+              onClick: () => {},
             },
           ]}>
           <div className="h-8 w-8">

@@ -36,4 +36,11 @@ export type FlatManuscriptEntityType = {
   sort: number;
 };
 
-export type AvailableManuscriptEntityTypes = "characters" | "blueprint_instances" | "documents" | "maps" | "graphs" | "events";
+export type AvailableManuscriptEntityTypes =
+  | "characters"
+  | "blueprint_instances"
+  | "documents"
+  | "maps"
+  | "graphs"
+  | "events"
+  | "images";

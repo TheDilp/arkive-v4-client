@@ -55,7 +55,6 @@ export type GameJournalEntryEntityTypes =
   | "blueprint_instances"
   | "documents"
   | "maps"
-  | "map_pins"
   | "graphs"
   | "events"
   | "images";
