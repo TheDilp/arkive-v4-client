@@ -1,4 +1,5 @@
 import { CharacterType } from "./characterTypes";
+import { ProjectType } from "./projectTypes";
 
 export interface GameType {
   id: string;
@@ -9,6 +10,7 @@ export interface GameType {
   next_session_date: string;
   description: string;
   game_players: GamePlayerType[];
+  project: ProjectType;
 }
 
 export interface GamePlayerType {

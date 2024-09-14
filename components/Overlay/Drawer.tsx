@@ -36,7 +36,6 @@ import {
   GameDrawer,
   GatewayAccessDrawer,
   ImageDrawer,
-  JournalEntryDrawer,
   ManuscriptDrawer,
   ManyEdgesDrawer,
   ManyNodesDrawer,
@@ -251,7 +250,6 @@ export function Drawer() {
                 {drawer.type === "bulk_access" ? <BulkAccessDrawer data={drawer?.data} /> : null}
                 {drawer.type === "games" ? <GameDrawer data={drawer?.data} /> : null}
                 {drawer.type === "players" ? <PlayerDrawer data={drawer?.data} /> : null}
-                {drawer.type === "journal_entries" ? <JournalEntryDrawer data={drawer?.data} /> : null}
                 {drawer.type === "gateway_access" ? (
                   <GatewayAccessDrawer data={drawer?.data} exceptions={drawer?.exceptions} />
                 ) : null}

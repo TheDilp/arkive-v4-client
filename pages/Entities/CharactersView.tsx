@@ -256,7 +256,7 @@ function createColumns(
                             "",
                             row.original?.last_name
                           )}`,
-                          size: "2xl",
+                          size: "3xl",
                           type: "characters",
                         }));
                       },

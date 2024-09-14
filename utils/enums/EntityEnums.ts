@@ -256,8 +256,6 @@ export const AvailableManuscriptEntityTypesEnum: { type: AvailableManuscriptEnti
   { type: "blueprint_instances" as const, icon: IconEnum.blueprint },
   { type: "documents" as const, icon: IconEnum.document },
   { type: "maps" as const, icon: IconEnum.map },
-  { type: "map_pins" as const, icon: IconEnum.map_pin },
   { type: "graphs" as const, icon: IconEnum.graph },
   { type: "events" as const, icon: IconEnum.event },
-  { type: "images" as const, icon: IconEnum.image },
 ];

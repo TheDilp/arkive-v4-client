@@ -15,7 +15,6 @@ export const userSettingsAtom = atom(() => {
 export const isProjectOwnerAtom = atom((get) => {
   const owner_id = get(projectAtom)?.owner_id;
   const user_id = get(userAtom)?.id;
-
   if (owner_id && user_id) return owner_id === user_id;
   return false;
 });

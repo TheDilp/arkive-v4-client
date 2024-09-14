@@ -27,7 +27,6 @@ export * from "./GameDrawer";
 export * from "./GatewayAccessDrawer";
 export * from "./GraphDrawer";
 export * from "./ImageDrawer";
-export * from "./JournalEntryDrawer";
 export * from "./ManuscriptDrawer";
 export * from "./ManyEdgesDrawer";
 export * from "./ManyNodesDrawer";
