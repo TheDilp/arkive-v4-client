@@ -2,7 +2,7 @@ import { AvailableIcons } from "../../../utils";
 
 export type TabType = {
   id: string;
-  label: string;
+  label?: string;
   icon?: AvailableIcons | null;
   hasDivider?: boolean;
   isOwner?: boolean;

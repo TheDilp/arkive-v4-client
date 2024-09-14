@@ -77,7 +77,7 @@ export function Tabs({ tabs, selectedTab, onChange, isVertical, hasArrowNav }: T
               }}
               role="tab"
               tabIndex={0}>
-              <span className="truncate">{tab.label}</span>
+              {tab.label ? <span className="truncate">{tab.label}</span> : null}
               {tab?.icon ? <Icon icon={tab.icon} /> : null}
             </li>
             {tab.hasDivider ? <hr className={tabDivider()} /> : null}
