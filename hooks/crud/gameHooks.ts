@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { GamePlayerRoleType, GamePlayerType } from "../../types";
+import { GamePlayerType } from "../../types";
 import { FetchFunction, getEntityCRUDNotification, getServerUrl, IconEnum, useNotifications } from "../../utils";
 import { UpdatePlayerType } from "../../validation";
 
-export function useAddPlayer<InsertType extends { data: Omit<GamePlayerType, "id"> & { role: GamePlayerRoleType } }>() {
+export function useAddPlayer<InsertType extends { data: Omit<GamePlayerType, "id"> }>() {
   const createNotification = useNotifications();
   const queryClient = useQueryClient();
   return useMutation(

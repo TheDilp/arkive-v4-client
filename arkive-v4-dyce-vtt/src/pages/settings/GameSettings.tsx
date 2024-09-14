@@ -2,7 +2,6 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useSetAtom } from "jotai";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { capitalize } from "remirror";
 
 import { Avatar, Button, Dropdown, Skeleton, Table, Tabs } from "../../../../components";
 import { useBreakpoint, useGetEntity, useRemovePlayer, useTable } from "../../../../hooks";
@@ -64,16 +63,6 @@ const playersColumns = [
     cell: ({ row }) => row.original.nickname,
   }),
 
-  rolesColumnHelper.display({
-    id: "role",
-    header: "Role",
-    cell: ({ row }) => <div>{capitalize(row.original.role)}</div>,
-    maxSize: 4,
-    size: 4,
-    meta: {
-      centered: true,
-    },
-  }),
   rolesColumnHelper.display({
     id: "action",
     header: "Actions",

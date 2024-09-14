@@ -1,7 +1,5 @@
 import { CharacterType } from "./characterTypes";
 
-export type GamePlayerRoleType = "gamemaster" | "player";
-
 export interface GameType {
   id: string;
   title: string;
@@ -18,7 +16,6 @@ export interface GamePlayerType {
   game_id: string;
   nickname: string;
   password: string;
-  role: GamePlayerRoleType;
 }
 
 export type GamePermissionType = "none" | "view" | "read" | "own";

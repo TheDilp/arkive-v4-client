@@ -1,11 +1,10 @@
 import { useLayoutEffect, useState } from "react";
-import { capitalize } from "remirror";
 
 import { useAddPlayer, useGetSubEntity, useHandleChange, useToggledResetAtom, useUpdatePlayer } from "../../../hooks";
 import { GamePlayerType } from "../../../types";
-import { IconEnum, PlayerRoleEnum } from "../../../utils";
+import { IconEnum } from "../../../utils";
 import { InsertPlayerSchema, InsertPlayerType, UpdatePlayerSchema } from "../../../validation";
-import { Button, Input, Select } from "../../Form";
+import { Button, Input } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 
 type Props = {
@@ -54,17 +53,10 @@ export function PlayerDrawer({ data }: Props) {
           variant={!player?.password ? "error" : "primary"}
         />
       )}
-      <Select
-        label="Player role (required)"
-        name="role"
-        onChange={handleChange}
-        options={PlayerRoleEnum.map((opt) => ({ label: capitalize(opt), value: opt }))}
-        value={player?.role}
-        variant={!player?.role ? "error" : "primary"}
-      />
+
       <Button
         icon={data?.id ? IconEnum.edit : IconEnum.add}
-        isDisabled={!player.nickname || (!data?.id && !player.password) || !player.role}
+        isDisabled={!player.nickname || (!data?.id && !player.password)}
         label={data?.id ? "Update player" : "Add player"}
         onClick={() => {
           if (data?.id) {
