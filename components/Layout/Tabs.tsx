@@ -10,9 +10,6 @@ const TabsClasses = tv({
   slots: {
     base: "border-b border-zinc-500",
     tabsContainer: "h-8 font-lato flex max-w-full scrollbar-hidden relative flex-nowrap overflow-auto text-lg -mb-px",
-    tab: "px-2 transition-all font-lato flex items-center gap-x-2 text-white select-none",
-    tabSelected: "inline-block border-blue-500 border-b",
-    tabDisabled: "border-zinc-800 text-zinc-600 cursor-not-allowed",
     tabDivider: "border-b border-zinc-700",
   },
   variants: {
@@ -20,16 +17,31 @@ const TabsClasses = tv({
       true: {
         base: "border-none",
         tabsContainer: "flex-col h-fit gap-y-2 w-full",
-        tab: "p-1 px-2 justify-between text-base",
-        tabSelected: "bg-zinc-700 border-none rounded ",
       },
     },
   },
 });
 
+const TabClasses = tv({
+  base: "px-2 transition-all font-lato flex items-center flex-nowrap gap-x-2 text-white select-none border-b border-zinc-500",
+  variants: {
+    isSelected: {
+      true: "border-blue-500",
+    },
+    isDisabled: {
+      true: "border-zinc-800 text-zinc-600 cursor-not-allowed",
+      false: "cursor-pointer",
+    },
+    isVertical: {
+      true: "p-1 px-2 justify-between text-base",
+    },
+  },
+  compoundVariants: [{ isSelected: true, isVertical: true, class: "bg-zinc-700 border-none rounded" }],
+});
+
 export function Tabs({ tabs, selectedTab, onChange, isVertical, hasArrowNav }: TabsTypes) {
   const tabsContainerRef = useRef() as MutableRefObject<HTMLUListElement>;
-  const { base, tabDivider, tabsContainer, tab: tabClasses, tabSelected, tabDisabled } = TabsClasses({ isVertical });
+  const { base, tabDivider, tabsContainer } = TabsClasses({ isVertical });
 
   return (
     <div className={base()}>
@@ -51,7 +63,7 @@ export function Tabs({ tabs, selectedTab, onChange, isVertical, hasArrowNav }: T
         {tabs.map((tab, index) => (
           <Fragment key={tab.id}>
             <li
-              className={`${tabClasses()} ${index === selectedTab ? tabSelected() : ""} ${tab.isDisabled ? tabDisabled() : "cursor-pointer"} `}
+              className={TabClasses({ isSelected: index === selectedTab, isVertical, isDisabled: tab.isDisabled })}
               onClick={(e) => {
                 if (tab.isDisabled) return;
                 if (onChange && selectedTab !== index) onChange(tab, index);
