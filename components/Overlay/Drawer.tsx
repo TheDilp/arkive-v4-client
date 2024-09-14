@@ -125,7 +125,7 @@ export function Drawer() {
 
   // Close drawer if the location changes
   useEffect(() => {
-    // resetDrawer();
+    resetDrawer();
     setHasChangedData(false);
   }, [pathname]);
 
