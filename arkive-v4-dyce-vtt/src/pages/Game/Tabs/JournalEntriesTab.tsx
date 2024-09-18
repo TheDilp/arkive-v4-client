@@ -1,14 +1,20 @@
 import { useSetAtom } from "jotai";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 
 import { Button, Dropdown, Tabs } from "../../../../../components";
+import { CharacterType } from "../../../../../types";
 import { AvailableJournalEntryEntityTypesEnum, drawerAtom, getSingularEntityType, IconEnum } from "../../../../../utils";
+import { useAddCharacterToGame } from "../../../hooks";
 
 const tabs = AvailableJournalEntryEntityTypesEnum.map((item) => ({ id: item.type, icon: item.icon, label: "" }));
 
 export function JournalEntriesTab() {
+  const { game_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const setDrawer = useSetAtom(drawerAtom);
+  const { mutate: addToGame } = useAddCharacterToGame();
+
   return (
     <div className="flex flex-col items-end gap-y-2 px-2 py-4">
       <div className="w-full">
@@ -31,6 +37,11 @@ export function JournalEntriesTab() {
                       size: "3xl",
                       type: tabs[selectedTab].id,
                       data: {},
+                      actions: {
+                        onSuccessAction: (entity: CharacterType) => {
+                          if (game_id) addToGame({ game_id, related_id: entity?.id });
+                        },
+                      },
                       exceptions: {
                         globalCreate: true,
                       },
