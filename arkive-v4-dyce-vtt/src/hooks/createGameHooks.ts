@@ -8,7 +8,7 @@ export function useAddCharacterToGame() {
   const createNotification = useNotifications();
 
   return useMutation(
-    async (newItemValues: { game_id: string; related_id: string }) => {
+    async (newItemValues: { game_id: string; related_id: string; parent_id?: string }) => {
       const data = await FetchFunction({
         url: `${getServerUrl()}/games/add/character`,
         body: JSON.stringify({ data: newItemValues }),
