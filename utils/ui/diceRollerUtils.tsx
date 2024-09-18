@@ -32,7 +32,7 @@ export const Dice = IS_PUBLIC
         themeColor: DefaultTagColor,
         scale: 4,
         throwForce: 15,
-        externalThemes,
+        [import.meta.env.DEV ? "theme" : "externalThemes"]: import.meta.env.DEV ? "default" : externalThemes,
       }
     );
 
