@@ -33,7 +33,7 @@ const TabClasses = tv({
       false: "cursor-pointer",
     },
     isVertical: {
-      true: "p-1 px-2 justify-between text-base",
+      true: "p-1 px-2 justify-between text-base border-b-0",
     },
   },
   compoundVariants: [{ isSelected: true, isVertical: true, class: "bg-zinc-700 border-none rounded" }],
