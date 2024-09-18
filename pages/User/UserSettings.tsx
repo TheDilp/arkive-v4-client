@@ -65,7 +65,7 @@ export function UserSettings() {
         <div className="p-4">
           <Tabs
             onChange={(tab) => {
-              navigate(`/user_settings/${tab.label.toLowerCase().replace(" ", "_")}`);
+              navigate(`/user_settings/${tab?.label?.toLowerCase()?.replace(" ", "_")}`);
             }}
             selectedTab={selectedTab}
             tabs={tabs}

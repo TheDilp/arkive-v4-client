@@ -1051,7 +1051,7 @@ export function CharacterProfileView({
               hasArrowNav
               onChange={(tab, index) => {
                 if (!isPreview) {
-                  navigate(`/projects/${project_id}/characters/${item_id}/${tab.label.toLowerCase()}`);
+                  navigate(`/projects/${project_id}/characters/${item_id}/${tab?.label?.toLowerCase()}`);
                 }
                 setSelectedTab(index);
               }}
