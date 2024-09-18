@@ -64,6 +64,7 @@ export function CharacterCard({
   is_favorite,
 }: Pick<CharacterType, "id" | "full_name" | "portrait_id" | "is_favorite">) {
   const { project_id } = useParams();
+  const url = useImageURL(getAssetURL(project_id as string, "images", portrait_id));
   return (
     <Link
       className="animate-in fade-in group relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500"
@@ -79,7 +80,7 @@ export function CharacterCard({
       <div
         className="absolute z-0 flex h-full w-full flex-col items-center justify-end bg-zinc-950 bg-cover bg-top transition-all duration-300 group-hover:scale-125 group-hover:brightness-75 lg:bg-center"
         style={{
-          backgroundImage: portrait_id ? `url(${getAssetURL(project_id as string, "images", portrait_id)})` : "",
+          backgroundImage: portrait_id ? `url(${url})` : "",
         }}
       />
     </Link>
