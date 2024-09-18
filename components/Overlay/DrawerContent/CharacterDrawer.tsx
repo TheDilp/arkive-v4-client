@@ -20,6 +20,7 @@ import {
   CharacterRelatedType,
   CharacterRelationshipType,
   CharacterType,
+  DrawerAtomType,
   HandleChangePropsType,
   TabType,
   TagType,
@@ -189,9 +190,11 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
 
 export function CharacterDrawer({
   exceptions,
+  actions,
   data,
 }: {
   exceptions?: { mention?: boolean };
+  actions?: DrawerAtomType["actions"];
   data: {
     id?: string;
     preselectedTab?: number;
@@ -721,7 +724,12 @@ export function CharacterDrawer({
                 const parsedData = UpdateCharacterSchema.parse(dataToParse);
                 await update(parsedData, {
                   onSuccess: (res) => {
-                    if (res?.ok) resetDrawerAtom();
+                    if (res?.ok) {
+                      if (actions?.onSuccessAction) {
+                        actions?.onSuccessAction(parsedData);
+                      }
+                      resetDrawerAtom();
+                    }
                   },
                 });
               } else {
@@ -745,35 +753,40 @@ export function CharacterDrawer({
 
                 await create(parsedData, {
                   onSuccess: (res) => {
-                    if (res?.ok && createMention) {
-                      if (
-                        exceptions?.mention &&
-                        data?.getContext &&
-                        typeof data.range?.from === "number" &&
-                        typeof data.range?.to === "number" &&
-                        res?.data?.id
-                      ) {
-                        data.getContext.chain
-                          .delete({ from: Number(data.range.from), to: Number(data.range.to) })
-                          .createMentionAtom(
-                            {
-                              name: "characters",
-                              range: {
-                                from: data.range.from,
-                                cursor: data.range.to,
-                                to: data.range.to,
+                    if (res?.ok) {
+                      if (createMention) {
+                        if (
+                          exceptions?.mention &&
+                          data?.getContext &&
+                          typeof data.range?.from === "number" &&
+                          typeof data.range?.to === "number" &&
+                          res?.data?.id
+                        ) {
+                          data.getContext.chain
+                            .delete({ from: Number(data.range.from), to: Number(data.range.to) })
+                            .createMentionAtom(
+                              {
+                                name: "characters",
+                                range: {
+                                  from: data.range.from,
+                                  cursor: data.range.to,
+                                  to: data.range.to,
+                                },
                               },
-                            },
-                            {
-                              id: res?.data?.id,
-                              label: data?.title || "",
-                              name: "characters",
-                              icon: undefined,
-                              projectId: project_id,
-                              parent_id: undefined,
-                            }
-                          )
-                          .run();
+                              {
+                                id: res?.data?.id,
+                                label: data?.title || "",
+                                name: "characters",
+                                icon: undefined,
+                                projectId: project_id,
+                                parent_id: undefined,
+                              }
+                            )
+                            .run();
+                        }
+                      }
+                      if (actions?.onSuccessAction) {
+                        actions?.onSuccessAction({ id: res?.data?.id, ...parsedData.data });
                       }
                       resetDrawerAtom();
                       setSelectedTab(0);

@@ -195,7 +195,9 @@ export function Drawer() {
             ) : (
               <>
                 {drawer.type === "project" ? <ProjectDrawer /> : null}
-                {drawer.type === "characters" ? <CharacterDrawer data={drawer.data} exceptions={drawer?.exceptions} /> : null}
+                {drawer.type === "characters" ? (
+                  <CharacterDrawer actions={drawer?.actions} data={drawer.data} exceptions={drawer?.exceptions} />
+                ) : null}
                 {drawer.type === "character_fields_templates" ? <FieldTemplateDrawer data={drawer?.data} /> : null}
                 {drawer.type === "folder" ? <FolderDrawer data={drawer.data} /> : null}
                 {drawer.type === "documents" ? <DocumentDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}

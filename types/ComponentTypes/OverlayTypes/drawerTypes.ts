@@ -46,6 +46,9 @@ export type DrawerAtomType = {
   size?: DrawerSize;
   position?: DrawerPosition;
   exceptions?: DrawerExceptions;
+  actions?: {
+    onSuccessAction?: Function;
+  };
 } & (
   | { type: "images"; data: ImageType }
   | {
