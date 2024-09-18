@@ -11,7 +11,7 @@ import { useAddCharacterToGame } from "../../../hooks";
 import { useRemoveCharacterFromGame } from "../../../hooks/deleteGameHooks";
 
 export function CharacterTab() {
-  const { game_id } = useParams();
+  const { game_id, project_id } = useParams();
   const [importedCharacters, setImportedCharacters] = useState<GameCharacterType[]>([]);
   const [filter] = useState("");
   const setDialog = useSetAtom(dialogAtom);
@@ -24,7 +24,8 @@ export function CharacterTab() {
         and: [{ id: "game", field: "game", header_name: "Game", value: game_id as string, operator: "eq" }],
       },
     },
-    "characters"
+    "characters",
+    { enabled: !!project_id }
   );
 
   useEffect(() => {
