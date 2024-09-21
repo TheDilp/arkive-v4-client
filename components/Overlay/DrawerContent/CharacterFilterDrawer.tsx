@@ -2,7 +2,7 @@ import { useAtomValue } from "jotai";
 import { Fragment, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntities, useHandleChange, useTable } from "../../../hooks";
+import { useCreateEntity, useGetEntities, useHandleChange, useTable, useUpdateEntity } from "../../../hooks";
 import {
   AvailableEntityType,
   AvailableSubEntityType,
@@ -27,7 +27,7 @@ import {
   TextFilters,
   userAtom,
 } from "../../../utils";
-import { InsertFilterSchema } from "../../../validation";
+import { InsertFilterSchema, UpdateFilterType } from "../../../validation";
 import { createColumnHelper, EntityPreview, Table } from "../../DataDisplay";
 import { Button, Input, Search, Select, Title } from "../../Form";
 import { Collapsible, DrawerLayout } from "../../Layout";
@@ -695,7 +695,7 @@ export function CharacterFilterDrawer({
   const { project_id } = useParams();
   const user = useAtomValue(userAtom);
   const { dispatch } = data;
-  const [, tableDispatch] = useTable({});
+  const [{ orderBy }, tableDispatch] = useTable({ orderBy: [{ field: "is_favorite", sort: "asc" }] });
 
   const [filter, setFilter] = useState<Partial<FilterType>>({ type: "characters" });
   const [filters, setFilters] = useState<CharacterFilter[]>([]);
@@ -703,6 +703,7 @@ export function CharacterFilterDrawer({
   const { handleChange } = useHandleChange({ data: filters, setData: setFilters, ignoreDataChange: true });
 
   const { mutate: create, isLoading: isCreating } = useCreateEntity("filters");
+  const { mutate: update, isLoading: isUpdating } = useUpdateEntity<UpdateFilterType>("filters", project_id);
   const { data: existingTemplates, isInitialLoading } = useGetEntities<CharacterFieldTemplateType>(
     {
       data: {
@@ -717,7 +718,8 @@ export function CharacterFilterDrawer({
   );
   const { data: existingFilters, isInitialLoading: isInitialLoadingFilters } = useGetEntities<FilterType>(
     {
-      fields: ["id", "title", "content"],
+      fields: ["id", "title", "content", "is_favorite"],
+      orderBy,
     },
 
     "filters",
@@ -731,6 +733,14 @@ export function CharacterFilterDrawer({
       <DrawerLayout>
         <Table
           columns={filterColumns({ dispatch })}
+          config={{
+            hasFavorite: true,
+            setFavorite: (rowData: FilterType) => {
+              update({
+                data: { id: rowData.id, is_favorite: !rowData.is_favorite },
+              });
+            },
+          }}
           data={existingFilters?.data || []}
           dispatch={tableDispatch}
           type="filters"
@@ -740,8 +750,10 @@ export function CharacterFilterDrawer({
 
   return (
     <DrawerLayout>
-      <Collapsible label="Filter info">
-        <Input label="Name" name="title" onChange={handleFilterChange} value={filter?.title || ""} />
+      <Collapsible initialOpen label="Filter info">
+        <div className="flex flex-col gap-y-2 p-2">
+          <Input label="Name" name="title" onChange={handleFilterChange} value={filter?.title || ""} />
+        </div>
       </Collapsible>
       <ul className="flex flex-col gap-y-2">
         <li className="flex items-center justify-between">
@@ -915,7 +927,7 @@ export function CharacterFilterDrawer({
       <div className="flex items-center gap-x-2">
         <Button
           icon={IconEnum.filter}
-          isDisabled={isApplyDisabled(filters) || isCreating}
+          isDisabled={isApplyDisabled(filters) || isCreating || isUpdating}
           label="Apply filter"
           onClick={() => {
             const andFields = filters.flatMap((f) => f.fields.and);
@@ -929,7 +941,7 @@ export function CharacterFilterDrawer({
         />
         <Button
           icon={IconEnum.filter}
-          isDisabled={isApplyDisabled(filters) || isCreating}
+          isDisabled={isApplyDisabled(filters) || !filter.title || isCreating || isUpdating}
           label="Create & apply filter"
           onClick={() => {
             const parsed = InsertFilterSchema.parse({ data: { ...filter, content: JSON.stringify(filters) } });

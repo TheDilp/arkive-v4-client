@@ -4,6 +4,7 @@ export interface FilterType {
   title: string;
   owner_id: string;
   project_id: string;
+  is_favorite: boolean | null;
   content: Record<string, any>[];
   type: FilterTypes;
 }
