@@ -38,6 +38,7 @@ type DrawerExceptions = {
   isReadOnly?: boolean;
   globalCreate?: boolean;
   gatewayConfiguration?: boolean;
+  existingFilter?: boolean;
   mention?: boolean;
 };
 
