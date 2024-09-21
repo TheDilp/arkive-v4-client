@@ -1,5 +1,6 @@
 import { RemirrorJSON } from "remirror";
 
+import { RequestFilterType } from "../CRUD";
 import {
   BlueprintInstanceType,
   CharacterLocationType,
@@ -128,3 +129,25 @@ export interface CharacterType {
   related_other?: CharacterRelatedType[];
   permissions?: EntityPermissionType[];
 }
+
+export type CharacterFilterField = {
+  id: string;
+  field_id: string;
+  field_type: string;
+  title: string;
+  options?: { id: string; value: string }[];
+  blueprint_id?: string;
+  filter: RequestFilterType;
+};
+
+export type CharacterFilter = {
+  id: string;
+  template: {
+    id: string;
+    title: string;
+  };
+  fields: {
+    and: CharacterFilterField[];
+    or: CharacterFilterField[];
+  };
+};

@@ -7,18 +7,18 @@ import {
   AvailableEntityType,
   AvailableSubEntityType,
   CharacterFieldTemplateType,
+  CharacterFilter,
+  CharacterFilterField,
   CharacterType,
   DrawerAtomType,
-  FieldTypes,
   FilterType,
   HandleChangePropsType,
-  RequestFilterType,
   SearchableEntities,
   TableDispatch,
 } from "../../../types";
 import {
+  applyCharacterFilter,
   getDefaultEntityIcon,
-  getFieldValueFromType,
   getSearchType,
   getSentenceCase,
   IconEnum,
@@ -36,27 +36,7 @@ import { Dropdown } from "../Dropdown";
 
 const nonFilterableEntities = ["textarea", "date", "random_table", "dice_roll"];
 const resourceEntities = ["documents", "maps", "events", "images", "tags"];
-type CharacterFilterField = {
-  id: string;
-  field_id: string;
-  field_type: string;
-  title: string;
-  options?: { id: string; value: string }[];
-  blueprint_id?: string;
-  filter: RequestFilterType;
-};
 
-type CharacterFilter = {
-  id: string;
-  template: {
-    id: string;
-    title: string;
-  };
-  fields: {
-    and: CharacterFilterField[];
-    or: CharacterFilterField[];
-  };
-};
 const columnHelper = createColumnHelper<FilterType>();
 function filterColumns({ dispatch }: { dispatch: TableDispatch<CharacterType> }) {
   return [
@@ -70,7 +50,7 @@ function filterColumns({ dispatch }: { dispatch: TableDispatch<CharacterType> })
           isIconOnly
           onClick={() => {
             try {
-              applyFilter(row.original.content as CharacterFilter[], dispatch);
+              applyCharacterFilter(row.original.content as CharacterFilter[], dispatch);
             } catch (error) {
               console.error(error);
             }
@@ -148,26 +128,6 @@ function filterColumns({ dispatch }: { dispatch: TableDispatch<CharacterType> })
       ),
     }),
   ];
-}
-
-function applyFilter(filters: CharacterFilter[], dispatch: TableDispatch<CharacterType>) {
-  const andFields = filters.flatMap((f) => f.fields.and);
-  const orFields = filters.flatMap((f) => f.fields.or);
-
-  const and = andFields.map(formatCharacterFilter);
-  const or = orFields.map(formatCharacterFilter);
-  dispatch({ type: "setRelationFilters", payload: { and, or } });
-}
-
-function formatCharacterFilter(field: CharacterFilterField): RequestFilterType {
-  return {
-    id: field.field_id || field.field_type,
-    field: getFieldValueFromType(field.field_type as FieldTypes) || field.field_type || "",
-    operator: field.filter.operator,
-    header_name: field?.filter?.header_name || field.title,
-    value: field.filter.value,
-    relationalData: { character_field_id: field.field_id, label: field?.filter?.relationalData?.label },
-  };
 }
 
 function isApplyDisabled(filters: CharacterFilter[]) {
@@ -929,14 +889,7 @@ export function CharacterFilterDrawer({
           icon={IconEnum.filter}
           isDisabled={isApplyDisabled(filters) || isCreating || isUpdating}
           label="Apply filter"
-          onClick={() => {
-            const andFields = filters.flatMap((f) => f.fields.and);
-            const orFields = filters.flatMap((f) => f.fields.or);
-
-            const and = andFields.map(formatCharacterFilter);
-            const or = orFields.map(formatCharacterFilter);
-            dispatch({ type: "setRelationFilters", payload: { and, or } });
-          }}
+          onClick={() => applyCharacterFilter(filters, dispatch)}
           variant="info"
         />
         <Button
@@ -946,14 +899,7 @@ export function CharacterFilterDrawer({
           onClick={() => {
             const parsed = InsertFilterSchema.parse({ data: { ...filter, content: JSON.stringify(filters) } });
             create(parsed, {
-              onSuccess: () => {
-                const andFields = filters.flatMap((f) => f.fields.and);
-                const orFields = filters.flatMap((f) => f.fields.or);
-
-                const and = andFields.map(formatCharacterFilter);
-                const or = orFields.map(formatCharacterFilter);
-                dispatch({ type: "setRelationFilters", payload: { and, or } });
-              },
+              onSuccess: () => applyCharacterFilter(filters, dispatch),
             });
           }}
           variant="success"

@@ -29,10 +29,12 @@ import {
 } from "../../hooks";
 import {
   BulkUpdateType,
+  CharacterFilter,
   CharacterType,
   DeleteManyType,
   DialogAtomType,
   DrawerAtomType,
+  FilterType,
   TableDispatch,
   TableSelectedAction,
   TableSelectionType,
@@ -41,6 +43,7 @@ import {
   WebhookType,
 } from "../../types";
 import {
+  applyCharacterFilter,
   baseURLS,
   BooleanFilters,
   dialogAtom,
@@ -600,6 +603,34 @@ function CharacterViewHeader({
     };
   }, [localFilter]);
 
+  const { data: quickFilters, isLoading: isLoadingQuickFilters } = useGetEntities<FilterType>(
+    {
+      fields: ["id", "title", "content"],
+      filters: {
+        and: [
+          {
+            id: "favorite",
+            header_name: "Favorite",
+            field: "is_favorite",
+            operator: "eq",
+            value: true,
+          },
+        ],
+      },
+      orderBy: [
+        {
+          field: "title",
+          sort: "asc",
+        },
+      ],
+      pagination: {
+        limit: 30,
+        page: 0,
+      },
+    },
+    "filters"
+  );
+
   return (
     <div className="sticky top-0 flex h-12 max-h-12 min-h-[3rem] w-full items-center justify-end gap-x-2">
       <div className="mr-auto">
@@ -634,6 +665,17 @@ function CharacterViewHeader({
                   exceptions: { existingFilter: true },
                 }));
               },
+            },
+            {
+              id: "quick_filters",
+              title: "Favorite filters",
+              icon: IconEnum.star,
+              isDisabled: isLoadingQuickFilters,
+              subItems: (quickFilters?.data || []).map((filt) => ({
+                id: filt.id,
+                title: filt.title,
+                onClick: () => applyCharacterFilter(filt.content as CharacterFilter[], dispatch),
+              })),
             },
           ]}>
           <div className="h-11 w-11">
@@ -771,6 +813,7 @@ export function CharactersView() {
       enabled: view === "table" && !!permissions?.read_characters,
     }
   );
+
   const { mutateAsync: updatePublicMany } = useUpdateManyPublic("characters", project_id as string);
   const { mutate: updateMany } = useBulkUpdate(project_id as string, "characters");
 
@@ -812,6 +855,7 @@ export function CharactersView() {
       },
     }
   );
+
   const { mutate } = useUpdateEntity<{
     data: Partial<CharacterType>;
     relations: { is_favorite: boolean };
