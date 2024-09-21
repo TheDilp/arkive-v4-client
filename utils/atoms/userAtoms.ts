@@ -5,12 +5,6 @@ import { projectAtom } from ".";
 
 export const userAtom = atom<UserType | null>(null);
 export const userStatusAtom = atom<UserStatusType | null>(null);
-export const userSettingsAtom = atom(() => {
-  return {
-    show_image_folder_view: true,
-    show_image_table_view: true,
-  };
-});
 
 export const isProjectOwnerAtom = atom((get) => {
   const owner_id = get(projectAtom)?.owner_id;

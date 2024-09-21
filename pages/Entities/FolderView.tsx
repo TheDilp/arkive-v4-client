@@ -30,6 +30,7 @@ import {
   useTable,
   useUpdateEntity,
 } from "../../hooks";
+import { useImageURL } from "../../hooks/ui/useImageURL";
 import {
   AvailableEntityType,
   AvailableSubEntityType,
@@ -71,9 +72,9 @@ import {
   IconEnum,
   isProjectOwnerAtom,
   openPublicPage,
+  projectAtom,
   PublicEntities,
   userAtom,
-  userSettingsAtom,
 } from "../../utils";
 import { ProjectSettingsView } from "../Projects";
 import { AssetView } from "./AssetView";
@@ -435,7 +436,7 @@ function EntityItem({
   showContextMenu: (event: MouseEvent<HTMLDivElement, MouseEvent>, item_id: string) => void;
 }) {
   const { project_id } = useParams();
-
+  const imageUrl = useImageURL(getAssetURL(project_id as string, type === "maps" ? "map_images" : "images", image_id));
   return (
     <Link
       draggable
@@ -473,11 +474,7 @@ function EntityItem({
         }}>
         <div className="pointer-events-none h-24 w-24">
           {image_id && show_image ? (
-            <img
-              alt={title}
-              className="h-full w-full object-contain"
-              src={getAssetURL(project_id as string, type === "maps" ? "map_images" : "images", image_id)}
-            />
+            <img alt={title} className="h-full w-full object-contain" src={imageUrl} />
           ) : (
             <Icon fontSize={100} icon={is_folder ? IconEnum.folder : (icon as AvailableIcons) || getDefaultEntityIcon(type)} />
           )}
@@ -743,7 +740,7 @@ function FolderView() {
     undefined
   );
 
-  const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
+  const project = useAtomValue(projectAtom);
   const [{ selection, pagination, filters, relationFilters }, dispatch] = useTable<{ id: string; title: string }>({
     selection: [],
     pagination: { page: 0, limit: 10 },
@@ -1186,7 +1183,7 @@ function FolderView() {
                   ],
                 })
               }
-              show_image={show_image_folder_view}
+              show_image={project?.feature_flags?.show_image_grid_view}
               title={item.title}
               type={type as AvailableEntityType}
             />
@@ -1216,7 +1213,7 @@ function FolderView() {
               isProjectOwner,
               user?.id as string,
               user?.role?.id,
-              show_image_table_view
+              project?.feature_flags?.show_image_table_view
             )}
             config={{
               selectedActions,

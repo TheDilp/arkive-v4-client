@@ -183,6 +183,8 @@ export const MiscellaneousSettings = [
   "show_eras_in_timelines",
   "show_date_in_event_tooltip_in_calendar",
   "show_date_in_event_tooltip_in_timeline",
+  "show_image_grid_view",
+  "show_image_table_view",
 ];
 
 export const RolePermissionCodes = [
