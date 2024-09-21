@@ -1,13 +1,16 @@
+import { useAtomValue } from "jotai";
 import { Fragment, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetEntities, useHandleChange } from "../../../hooks";
+import { useCreateEntity, useGetEntities, useHandleChange, useTable } from "../../../hooks";
 import {
   AvailableEntityType,
   AvailableSubEntityType,
   CharacterFieldTemplateType,
   CharacterType,
+  DrawerAtomType,
   FieldTypes,
+  FilterType,
   HandleChangePropsType,
   RequestFilterType,
   SearchableEntities,
@@ -22,11 +25,13 @@ import {
   NumberFilters,
   relationFiltersList,
   TextFilters,
+  userAtom,
 } from "../../../utils";
-import { EntityPreview } from "../../DataDisplay";
+import { InsertFilterSchema } from "../../../validation";
+import { createColumnHelper, EntityPreview, Table } from "../../DataDisplay";
 import { Button, Input, Search, Select, Title } from "../../Form";
 import { Collapsible, DrawerLayout } from "../../Layout";
-import { Badge } from "../../Misc";
+import { Badge, Icon, Skeleton } from "../../Misc";
 import { Dropdown } from "../Dropdown";
 
 const nonFilterableEntities = ["textarea", "date", "random_table", "dice_roll"];
@@ -52,6 +57,107 @@ type CharacterFilter = {
     or: CharacterFilterField[];
   };
 };
+const columnHelper = createColumnHelper<FilterType>();
+function filterColumns({ dispatch }: { dispatch: TableDispatch<CharacterType> }) {
+  return [
+    columnHelper.display({
+      id: "apply",
+      header: () => <Icon icon={IconEnum.filter} />,
+      cell: ({ row }) => (
+        <Button
+          hasNoBackground
+          icon={IconEnum.check_circle}
+          isIconOnly
+          onClick={() => {
+            try {
+              applyFilter(row.original.content as CharacterFilter[], dispatch);
+            } catch (error) {
+              console.error(error);
+            }
+          }}
+        />
+      ),
+      maxSize: 3,
+      size: 3,
+      minSize: 3,
+      meta: {
+        centered: true,
+      },
+    }),
+
+    columnHelper.accessor("title", {
+      id: "title",
+      header: "Title",
+      cell: (info) => info.getValue(),
+      meta: {
+        sortable: true,
+        filterOptions: TextFilters,
+      },
+      size: 20,
+    }),
+
+    columnHelper.display({
+      id: "action",
+      header: "Actions",
+      meta: {
+        centered: true,
+      },
+      cell: () => (
+        <div className="flex items-center justify-center">
+          <Dropdown
+            allowedPlacements={["left", "left-start", "left-end"]}
+            items={[
+              {
+                id: "1",
+                title: "Edit filter",
+                icon: IconEnum.edit,
+
+                onClick: () => {
+                  // setDrawer((prev) => ({
+                  //   ...prev,
+                  //   data: row.original,
+                  //   title: "Edit tag",
+                  //   size: "lg",
+                  //   type: "edit_tag",
+                  // }));
+                },
+              },
+
+              {
+                id: "3",
+                title: "Delete filter",
+                icon: IconEnum.archive,
+
+                onClick: () => {
+                  // setDialog((prev) => ({
+                  //   ...prev,
+                  //   data: {
+                  //     ...row.original,
+                  //     entity_title: "tags",
+                  //   },
+                  //   title: "Arkive tag",
+                  //   size: "sm",
+                  //   type: "arkive_entity",
+                  // }));
+                },
+              },
+            ]}>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+          </Dropdown>
+        </div>
+      ),
+    }),
+  ];
+}
+
+function applyFilter(filters: CharacterFilter[], dispatch: TableDispatch<CharacterType>) {
+  const andFields = filters.flatMap((f) => f.fields.and);
+  const orFields = filters.flatMap((f) => f.fields.or);
+
+  const and = andFields.map(formatCharacterFilter);
+  const or = orFields.map(formatCharacterFilter);
+  dispatch({ type: "setRelationFilters", payload: { and, or } });
+}
 
 function formatCharacterFilter(field: CharacterFilterField): RequestFilterType {
   return {
@@ -307,7 +413,7 @@ function CharacterFieldsFiltersList({
   return filters.map((f, i) => {
     if (!resourceEntities.includes(f.id))
       return (
-        <li className="flex flex-col gap-x-1" key={f.id}>
+        <li key={f.id} className="flex flex-col gap-x-1">
           <Collapsible
             actions={[{ onClick: () => removeTemplate(f.id), variant: "error", hasNoBackground: true, icon: IconEnum.trash }]}
             initialOpen
@@ -495,7 +601,7 @@ function CharacterResourceFiltersList({
   return filters.map((f, i) => {
     if (resourceEntities.includes(f.id))
       return (
-        <li className="flex flex-col gap-x-1" key={f.id}>
+        <li key={f.id} className="flex flex-col gap-x-1">
           <Collapsible
             actions={[{ onClick: () => removeTemplate(f.id), variant: "error", hasNoBackground: true, icon: IconEnum.trash }]}
             icon={
@@ -579,10 +685,24 @@ function CharacterResourceFiltersList({
   });
 }
 
-export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatch<CharacterType> } }) {
+export function CharacterFilterDrawer({
+  data,
+  exceptions,
+}: {
+  data: { dispatch: TableDispatch<CharacterType> };
+  exceptions: DrawerAtomType["exceptions"];
+}) {
   const { project_id } = useParams();
+  const user = useAtomValue(userAtom);
   const { dispatch } = data;
+  const [, tableDispatch] = useTable({});
+
+  const [filter, setFilter] = useState<Partial<FilterType>>({ type: "characters" });
   const [filters, setFilters] = useState<CharacterFilter[]>([]);
+  const { handleChange: handleFilterChange } = useHandleChange({ data: filter, setData: setFilter });
+  const { handleChange } = useHandleChange({ data: filters, setData: setFilters, ignoreDataChange: true });
+
+  const { mutate: create, isLoading: isCreating } = useCreateEntity("filters");
   const { data: existingTemplates, isInitialLoading } = useGetEntities<CharacterFieldTemplateType>(
     {
       data: {
@@ -595,11 +715,37 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
     },
     "character_fields_templates"
   );
+  const { data: existingFilters, isInitialLoading: isInitialLoadingFilters } = useGetEntities<FilterType>(
+    {
+      fields: ["id", "title", "content"],
+      filters: {
+        and: [{ id: "user_id", field: "owner_id", header_name: "Owner", operator: "eq", value: user?.id as string }],
+      },
+    },
 
-  const { handleChange } = useHandleChange({ data: filters, setData: setFilters, ignoreDataChange: true });
+    "filters",
+    { enabled: !!user?.id && !!exceptions?.existingFilter }
+  );
+
+  if (isInitialLoadingFilters) return <Skeleton type="drawer_form" />;
+
+  if (exceptions?.existingFilter)
+    return (
+      <DrawerLayout>
+        <Table
+          columns={filterColumns({ dispatch })}
+          data={existingFilters?.data || []}
+          dispatch={tableDispatch}
+          type="filters"
+        />
+      </DrawerLayout>
+    );
 
   return (
     <DrawerLayout>
+      <Collapsible label="Filter info">
+        <Input label="Name" name="title" onChange={handleFilterChange} value={filter?.title || ""} />
+      </Collapsible>
       <ul className="flex flex-col gap-y-2">
         <li className="flex items-center justify-between">
           <div>Add filters for resources:</div>
@@ -769,10 +915,10 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
           }
         />
       </ul>
-      <div>
+      <div className="flex items-center gap-x-2">
         <Button
           icon={IconEnum.filter}
-          isDisabled={isApplyDisabled(filters)}
+          isDisabled={isApplyDisabled(filters) || isCreating}
           label="Apply filter"
           onClick={() => {
             const andFields = filters.flatMap((f) => f.fields.and);
@@ -781,6 +927,25 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
             const and = andFields.map(formatCharacterFilter);
             const or = orFields.map(formatCharacterFilter);
             dispatch({ type: "setRelationFilters", payload: { and, or } });
+          }}
+          variant="info"
+        />
+        <Button
+          icon={IconEnum.filter}
+          isDisabled={isApplyDisabled(filters) || isCreating}
+          label="Create & apply filter"
+          onClick={() => {
+            const parsed = InsertFilterSchema.parse({ data: { ...filter, content: JSON.stringify(filters) } });
+            create(parsed, {
+              onSuccess: () => {
+                const andFields = filters.flatMap((f) => f.fields.and);
+                const orFields = filters.flatMap((f) => f.fields.or);
+
+                const and = andFields.map(formatCharacterFilter);
+                const or = orFields.map(formatCharacterFilter);
+                dispatch({ type: "setRelationFilters", payload: { and, or } });
+              },
+            });
           }}
           variant="success"
         />

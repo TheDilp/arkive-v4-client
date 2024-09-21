@@ -603,22 +603,43 @@ function CharacterViewHeader({
   return (
     <div className="sticky top-0 flex h-12 max-h-12 min-h-[3rem] w-full items-center justify-end gap-x-2">
       <div className="mr-auto">
-        <div className="h-11 w-11">
-          <Button
-            icon={IconEnum.filter}
-            isIconOnly
-            onClick={() =>
-              setDrawer((prev) => ({
-                ...prev,
-                type: "character_filter",
-                data: { dispatch },
-                size: "xl",
-                title: "Character filter",
-              }))
-            }
-            tooltip="Filter characters"
-          />
-        </div>
+        <Dropdown
+          allowedPlacements={["right-start"]}
+          items={[
+            {
+              id: "new",
+              title: "New",
+              icon: IconEnum.add,
+              onClick: () => {
+                setDrawer((prev) => ({
+                  ...prev,
+                  type: "character_filter",
+                  data: { dispatch },
+                  size: "xl",
+                  title: "Create character filter",
+                }));
+              },
+            },
+            {
+              id: "existing",
+              title: "Existing",
+              icon: IconEnum.filter,
+              onClick: () => {
+                setDrawer((prev) => ({
+                  ...prev,
+                  type: "character_filter",
+                  data: { dispatch },
+                  size: "xl",
+                  title: "Character filters",
+                  exceptions: { existingFilter: true },
+                }));
+              },
+            },
+          ]}>
+          <div className="h-11 w-11">
+            <Button icon={IconEnum.filter} isIconOnly onClick={undefined} tooltip="Filter characters" />
+          </div>
+        </Dropdown>
       </div>
       <div className="w-52">
         <Input

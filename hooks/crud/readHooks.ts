@@ -2,7 +2,6 @@ import { useInfiniteQuery, useQuery, useQueryClient, UseQueryOptions } from "@ta
 import { useSetAtom } from "jotai";
 
 import {
-  AvailableDyceEntityType,
   AvailableEntityType,
   AvailableSubEntityType,
   IconCategories,
@@ -154,7 +153,7 @@ export function useGetSubEntity<EntityType>(
 
 export function useGetEntities<ReturnType>(
   request: RequestBodyType<ReturnType>,
-  type: AvailableEntityType | AvailableSubEntityType | AvailableDyceEntityType,
+  type: AvailableEntityType | AvailableSubEntityType,
   options?: UseQueryOptions<any> & {
     prefetch?: boolean;
     queryKeyOverwrite?: (string | number | Record<any, any>)[];

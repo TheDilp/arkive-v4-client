@@ -243,7 +243,9 @@ export function Drawer() {
                 {drawer.type === "mentioned_in_document" ? <MentionedInDocumentDrawer data={drawer?.data} /> : null}
                 {drawer.type === "mentioned_in" ? <MentionedInDrawer data={drawer?.data} /> : null}
                 {drawer.type === "webhooks" ? <WebhookDrawer data={drawer?.data} /> : null}
-                {drawer.type === "character_filter" ? <CharacterFilterDrawer data={drawer.data} /> : null}
+                {drawer.type === "character_filter" ? (
+                  <CharacterFilterDrawer data={drawer.data} exceptions={drawer?.exceptions} />
+                ) : null}
                 {drawer.type === "calendar_filter" ? <CalendarFilterDrawer data={drawer.data} /> : null}
                 {drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} /> : null}
                 {drawer.type === "bulk_tags" ? <BulkTagsDrawer data={drawer?.data} /> : null}

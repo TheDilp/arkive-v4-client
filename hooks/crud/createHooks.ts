@@ -62,9 +62,11 @@ export function useCreateProject<InsertType>() {
   );
 }
 
-export function useCreateEntity<
-  InsertType extends { data: { parent_id?: string | null; project_id: string }; relations?: { [key: string]: any } },
->(type: AvailableEntityType | AvailableDyceEntityType, isTemplate?: boolean, options?: { successNotification?: boolean }) {
+export function useCreateEntity<InsertType extends { data: { [key: string]: any }; relations?: { [key: string]: any } }>(
+  type: AvailableEntityType | AvailableDyceEntityType,
+  isTemplate?: boolean,
+  options?: { successNotification?: boolean }
+) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
