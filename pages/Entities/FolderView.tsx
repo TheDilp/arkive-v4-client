@@ -1119,7 +1119,7 @@ function FolderView() {
         </div>
 
         {(isInitialLoading || isInitialLoadingFolder) && view === "grid" ? (
-          <div className="mt-72 w-full">
+          <div className="w-full">
             <Skeleton entity_type={type as AvailableEntityType} type="folder_view" />
           </div>
         ) : null}
