@@ -718,9 +718,6 @@ export function CharacterFilterDrawer({
   const { data: existingFilters, isInitialLoading: isInitialLoadingFilters } = useGetEntities<FilterType>(
     {
       fields: ["id", "title", "content"],
-      filters: {
-        and: [{ id: "user_id", field: "owner_id", header_name: "Owner", operator: "eq", value: user?.id as string }],
-      },
     },
 
     "filters",
