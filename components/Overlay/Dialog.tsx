@@ -7,6 +7,7 @@ import { tv } from "tailwind-variants";
 import { dialogAtom, IconEnum } from "../../utils";
 import { Button } from "../Form/Button";
 import {
+  BrowseEntitiesDialog,
   DeleteEntityDialog,
   ExportGraphDialog,
   FamilyTreeDialog,
@@ -62,8 +63,16 @@ const DialogClasses = tv({
         imageUploadContainer: "h-[15rem] max-h-[15rem]",
         imagesList: "h-[15rem]",
       },
-      xl: {},
-      "2xl": {},
+      xl: {
+        base: "h-[50rem] lg:w-[60rem] w-full",
+        imageUploadContainer: "h-[20rem] max-h-[20rem]",
+        imagesList: "h-[20rem]",
+      },
+      "2xl": {
+        base: "h-[60rem] lg:w-[65rem] w-full",
+        imageUploadContainer: "h-[25rem] max-h-[25rem]",
+        imagesList: "h-[25rem]",
+      },
       "3xl": {},
       "4xl": {},
     },
@@ -141,6 +150,7 @@ export function Dialog() {
             <Button hasNoBackground icon={IconEnum.close} isIconOnly onClick={() => resetDialogAtom()} />
           </div>
         </div>
+        {dialog.type === "browse_entities" ? <BrowseEntitiesDialog data={dialog.data} /> : null}
         {dialog.type === "image_upload" ? <ImageUploadDialog size={"lg"} /> : null}
         {dialog.type === "restore_entity" ? <RestoreEntityDialog data={dialog.data} /> : null}
         {dialog.type === "arkive_entity" || dialog.type === "delete_entity" ? (

@@ -12,7 +12,7 @@ import {
   useListNavigation,
   useRole,
 } from "@floating-ui/react";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { forwardRef, HTMLProps, MutableRefObject, ReactNode, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
@@ -20,7 +20,7 @@ import { tv } from "tailwind-variants";
 import { useSearch } from "../../hooks";
 import { AllAvailableEntities } from "../../types";
 import { SearchType } from "../../types/ComponentTypes/FormTypes/searchTypes";
-import { AvailableIcons, IconEnum, userAtom } from "../../utils";
+import { AvailableIcons, dialogAtom, IconEnum, userAtom } from "../../utils";
 import { Avatar, Icon } from "..";
 import { Button } from ".";
 
@@ -203,6 +203,7 @@ export function Search({
 }: SearchType) {
   const { project_id } = useParams();
   const user = useAtomValue(userAtom);
+  const setDialog = useSetAtom(dialogAtom);
   const {
     base,
     input,
@@ -335,7 +336,22 @@ export function Search({
         })}>
         {hasBrowser ? (
           <div className="mr-2">
-            <Button hasNoBackground icon={IconEnum.folder} isIconOnly onClick={undefined} tooltip="Browse" />
+            <Button
+              hasNoBackground
+              icon={IconEnum.folder}
+              isIconOnly
+              onClick={() =>
+                setDialog((prev) => ({
+                  ...prev,
+                  title: "Browse",
+                  type: "browse_entities",
+                  data: { isMultiple, type: searchEntity, onChange, imageType },
+                  size: "2xl",
+                  isOverlay: true,
+                }))
+              }
+              tooltip="Browse"
+            />
           </div>
         ) : null}
         {(searchEntity === "images" || searchEntity === "map_images") && value && !isMultiple ? (

@@ -114,7 +114,7 @@ export function useGetImages<InsertType>(
       body: JSON.stringify(finalRequest),
       url: IS_GATEWAY
         ? `${getServerUrl()}/assets/${request?.data?.entity_type}/${request?.data?.access_id}`
-        : `${getServerUrl()}/assets/${project_id}/${type}`,
+        : `${getServerUrl()}/assets/${type}`,
     });
   }
   const configuredOptions = {
@@ -187,7 +187,7 @@ export function useGetImage(
       FetchFunction({
         method: "POST",
         body: JSON.stringify(request),
-        url: `${IS_PUBLIC ? baseURLS.basePublicServer : baseURLS.baseServer}/assets/${project_id}/${type}/${id}`,
+        url: `${IS_PUBLIC ? baseURLS.basePublicServer : baseURLS.baseServer}/assets/${type}/${id}`,
       }),
     {
       enabled: options?.enabled,
@@ -308,7 +308,7 @@ export function useGetInfiniteAssets<ReturnType>(
     return FetchFunction({
       method: "POST",
       body: JSON.stringify(finalRequest),
-      url: `${baseURLS.baseServer}/assets/${project_id}/${type.toLowerCase()}`,
+      url: `${baseURLS.baseServer}/assets/${type.toLowerCase()}`,
     });
   }
   const configuredOptions = {
@@ -335,7 +335,7 @@ export function useDeleteAsset<InsertType extends { data: { id: string } }>(proj
   const createNotification = useNotifications();
   return useMutation(
     async (vars: InsertType) =>
-      FetchFunction({ method: "DELETE", url: `${baseURLS.baseAssetServer}/assets/${project_id}/${type}/${vars.data.id}` }),
+      FetchFunction({ method: "DELETE", url: `${baseURLS.baseAssetServer}/assets/${type}/${vars.data.id}` }),
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries(["allEntities", project_id, "images"]);
