@@ -245,7 +245,7 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
           </div>
         </div>
       ) : null}
-      <div className="w-full flex-1 flex-col content-start gap-4 pt-0">
+      <div className="w-full flex-1 flex-col content-start gap-4 overflow-y-auto pt-0">
         {isLoading ? <Skeleton type="character_profile" /> : null}
 
         <div className="flex max-h-full flex-1 flex-col overflow-auto rounded-lg bg-zinc-950 p-4 lg:col-span-4">
