@@ -69,6 +69,7 @@ export interface SearchType extends BaseFormComponentType {
   isAutofocused?: boolean;
   isGlobal?: boolean;
   hasShownOption?: boolean;
+  hasBrowser?: boolean;
   isOptionsHidden?: boolean;
   isMultiple?: boolean;
   isFolders?: boolean;
@@ -110,4 +111,3 @@ export interface SearchType extends BaseFormComponentType {
     project_id?: string;
   }) => void;
 }
-

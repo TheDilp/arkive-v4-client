@@ -186,6 +186,7 @@ export function Search({
   value,
   hasShownOption,
   imageType,
+  hasBrowser,
   isOptionsHidden,
   isMultiple,
   isGlobal,
@@ -332,6 +333,11 @@ export function Search({
         {...getReferenceProps({
           ref: refs.setReference,
         })}>
+        {hasBrowser ? (
+          <div className="mr-2">
+            <Button hasNoBackground icon={IconEnum.folder} isIconOnly onClick={undefined} tooltip="Browse" />
+          </div>
+        ) : null}
         {(searchEntity === "images" || searchEntity === "map_images") && value && !isMultiple ? (
           <Avatar imageLoading="lazy" image_id={value as string} isTooltipDisabled label={label || ""} size="xs" />
         ) : null}
