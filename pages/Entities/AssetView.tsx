@@ -63,7 +63,6 @@ function createColumns(
   user: UserType | null,
   isProjectOwner: boolean,
   type: AssetType,
-  project_id: string,
   updatePublic: UseMutateAsyncFunction<
     any,
     unknown,
@@ -597,7 +596,6 @@ export function AssetView() {
               user,
               isProjectOwner,
               type,
-              project_id as string,
               updatePublicMany,
               permissions
             )}
