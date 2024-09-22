@@ -53,13 +53,13 @@ const DialogClasses = tv({
       "2xs": {},
       xs: {},
       sm: {
-        container: "h-[20rem] lg:w-[30rem] w-full",
+        base: "h-[20rem] lg:w-[30rem] w-full",
       },
       md: {
-        container: "h-[30rem] lg:w-[40rem] w-full",
+        base: "h-[30rem] lg:w-[40rem] w-full ",
       },
       lg: {
-        container: "h-[40rem] lg:w-[50rem] w-full",
+        base: "h-[40rem] lg:w-[50rem] w-full",
         imageUploadContainer: "h-[15rem] max-h-[15rem]",
         imagesList: "h-[15rem]",
       },
@@ -75,6 +75,10 @@ const DialogClasses = tv({
       },
       "3xl": {},
       "4xl": {},
+      full: {
+        container: "w-screen h-screen",
+        base: "h-[85vh] w-[85vw]",
+      },
     },
     isImageView: {
       true: {
@@ -85,7 +89,7 @@ const DialogClasses = tv({
     isOverlay: {
       true: {
         container: "w-screen h-screen lg:w-screen bg-black top-0 left-0 translate-x-0 translate-y-0 bg-opacity-80",
-        base: "h-[40rem] w-[50rem] absolute z-[1000] top-[50%] -translate-y-[50%] mx-auto relative",
+        base: "absolute z-[1000] top-[50%] -translate-y-[50%] mx-auto relative",
         titleContainer: "mb-4",
       },
       false: {

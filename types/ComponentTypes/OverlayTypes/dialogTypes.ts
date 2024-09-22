@@ -36,5 +36,5 @@ export interface DialogAtomType {
     label?: string;
     variant?: Variant;
   };
-  size?: Size;
+  size?: Size | "full";
 }
