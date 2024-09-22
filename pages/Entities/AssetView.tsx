@@ -85,6 +85,7 @@ function createColumns(
         <div className="flex w-full items-center justify-center">
           <Avatar
             hasShowImage
+            imageType={type}
             image_id={row.original?.id}
             isBordered
             isTooltipDisabled
