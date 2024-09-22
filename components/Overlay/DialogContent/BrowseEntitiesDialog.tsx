@@ -26,7 +26,7 @@ export function BrowseEntitiesDialog({
   const [filter, setFilter] = useState("");
   const [{ orderBy, pagination, filters }, dispatch] = useTable<{ full_name?: string; title?: string }>({
     orderBy: [getOrderBy(data.type)],
-    pagination: { limit: 24 },
+    pagination: { limit: 48 },
   });
 
   const {
@@ -42,6 +42,7 @@ export function BrowseEntitiesDialog({
         portrait: true,
         is_favorite: true,
       },
+      filters,
       fields: getEntityFields(data.type),
       orderBy,
       pagination,
@@ -66,9 +67,7 @@ export function BrowseEntitiesDialog({
     {
       permissions: true,
       fields: ["id", "title", "type"],
-      pagination: {
-        limit: 24,
-      },
+      pagination,
       filters,
       orderBy: [
         {
@@ -108,12 +107,12 @@ export function BrowseEntitiesDialog({
                 {
                   id: "quick_filter",
                   header_name: "title",
-                  field: "title",
+                  field: data.type === "characters" ? "full_name" : "title",
                   operator: "ilike",
                   value: filter,
                 },
               ],
-              field: "title",
+              field: data.type === "characters" ? "full_name" : "title",
             },
           });
         }
