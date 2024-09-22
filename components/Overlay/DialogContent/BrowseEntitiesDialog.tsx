@@ -8,11 +8,13 @@ import { AvailableIcons, dialogAtom, getEntityFields, IconEnum } from "../../../
 import { Image } from "../../DataDisplay";
 import { Button, Input } from "../../Form";
 
-function getOrderBy(type: AvailableEntityType): RequestOrderByType<{ full_name?: string; title?: string }> {
+function getOrderBy(
+  type: AvailableEntityType | "blueprint_instances"
+): RequestOrderByType<{ full_name?: string; title?: string }> {
   return { sort: "asc", field: type === "characters" ? "full_name" : "title" };
 }
 const cardClasses =
-  "animate-in fade-in relative col-span-1 flex h-[8rem] flex-col items-center justify-center cursor-pointer hover:border-blue-500 overflow-hidden rounded border-2 border-zinc-700 bg-cover shadow transition-all";
+  "text-xl [&>div>h2]:line-clamp-2 animate-in fade-in relative col-span-1 flex h-[8rem] flex-col items-center justify-center cursor-pointer hover:border-blue-500 overflow-hidden rounded border-2 border-zinc-700 bg-cover shadow transition-all";
 export function BrowseEntitiesDialog({
   data,
 }: {
@@ -20,8 +22,9 @@ export function BrowseEntitiesDialog({
     name: string;
     onChange: (props: OnSearchChangePropsType) => void;
     isMultiple?: boolean;
-    type: AvailableEntityType;
+    type: AvailableEntityType | "blueprint_instances";
     imageType: AssetType;
+    parent_id?: string;
   };
 }) {
   const { project_id } = useParams();
@@ -41,11 +44,14 @@ export function BrowseEntitiesDialog({
     {
       data: {
         project_id,
+        parent_id: data.parent_id,
       },
-      relations: {
-        portrait: true,
-        is_favorite: true,
-      },
+      relations:
+        data.type === "blueprint_instances"
+          ? {
+              blueprint: true,
+            }
+          : {},
       filters,
       fields: getEntityFields(data.type),
       orderBy,

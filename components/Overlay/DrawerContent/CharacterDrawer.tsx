@@ -476,6 +476,7 @@ export function CharacterDrawer({
                     {isOther ? (
                       <div className="flex flex-col gap-y-2 p-2">
                         <Search
+                          hasBrowser
                           isDisabled={!canCreateOrEdit}
                           name="related_other"
                           onChange={({ label, value, image }) => {
@@ -536,6 +537,7 @@ export function CharacterDrawer({
                     ) : (
                       <div className="flex flex-col gap-y-2 p-2">
                         <Search
+                          hasBrowser
                           isDisabled={!canCreateOrEdit}
                           label="Ascendants"
                           name="related_to"
@@ -596,6 +598,7 @@ export function CharacterDrawer({
                             ))}
                         </div>
                         <Search
+                          hasBrowser
                           isDisabled={!canCreateOrEdit}
                           label="Descendants"
                           name="related_from"
