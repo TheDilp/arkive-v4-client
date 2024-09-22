@@ -574,7 +574,7 @@ export function AssetView() {
             page.data.map((img: ImageType) => (
               <div
                 key={img.id}
-                className="animate-in fade-in relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500">
+                className="animate-in fade-in relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover text-4xl shadow transition-all duration-500">
                 <Image
                   hasTitle
                   image={{ title: img.title, project_id: img.project_id, type: "images", id: img.id }}
