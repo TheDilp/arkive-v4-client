@@ -346,7 +346,7 @@ export function Search({
                   title: "Browse",
                   type: "browse_entities",
                   data: { isMultiple, type: searchEntity, onChange, imageType },
-                  size: "2xl",
+                  size: "full",
                   isOverlay: true,
                 }))
               }
