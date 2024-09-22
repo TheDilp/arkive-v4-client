@@ -54,6 +54,17 @@ export type SearchResultType = {
   icon?: string;
 }[];
 
+export type OnSearchChangePropsType = {
+  name: string;
+  value: string;
+  label?: string;
+  color?: string;
+  image?: string;
+  parent_id?: string;
+  icon?: AvailableIcons;
+  type?: AllAvailableEntities;
+  project_id?: string;
+};
 export interface SearchType extends BaseFormComponentType {
   allowedPlacements?: PositionType;
   offset?: OffsetOptions;
@@ -90,24 +101,5 @@ export interface SearchType extends BaseFormComponentType {
     project_id?: string;
   }[];
   onSearch?: (result: any) => void;
-  onChange: ({
-    name,
-    value,
-    label,
-    image,
-    parent_id,
-    icon,
-    type,
-    project_id,
-  }: {
-    name: string;
-    value: string;
-    label?: string;
-    color?: string;
-    image?: string;
-    parent_id?: string;
-    icon?: AvailableIcons;
-    type?: AllAvailableEntities;
-    project_id?: string;
-  }) => void;
+  onChange: ({ name, value, label, image, parent_id, icon, type, project_id }: OnSearchChangePropsType) => void;
 }
