@@ -230,7 +230,7 @@ export function getDifferenceForCharacterFields(
     if (Array.isArray(originalField.value) || Array.isArray(field.value)) {
       return !isEqual(field.value, originalField.value);
     }
-
+    if (originalField?.characters?.length !== field?.characters?.length) return true;
     if (originalField?.blueprint_instances?.length !== field?.blueprint_instances?.length) return true;
     if (originalField?.events?.length !== field?.events?.length) return true;
     if (originalField?.documents?.length !== field?.documents?.length) return true;
@@ -247,6 +247,16 @@ export function getDifferenceForCharacterFields(
     if (originalField?.calendar?.end_day !== field?.calendar?.end_day) return true;
     if (originalField?.calendar?.end_month_id !== field?.calendar?.end_month_id) return true;
     if (originalField?.calendar?.end_year !== field?.calendar?.end_year) return true;
+
+    if (
+      !!originalField?.characters?.length &&
+      !!field?.characters?.length &&
+      originalField?.characters?.length === field?.characters?.length
+    ) {
+      return !field.characters.every((char) =>
+        originalField.characters.some((original_char) => original_char?.related_id === char?.related_id)
+      );
+    }
 
     if (
       !!originalField?.blueprint_instances?.length &&
