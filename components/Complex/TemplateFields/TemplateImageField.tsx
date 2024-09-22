@@ -42,6 +42,7 @@ export function TemplateImageField({
         {isDisabled || IS_GATEWAY ? null : (
           <div className="sticky top-0">
             <Search
+              hasBrowser
               isGlobal={isGlobal}
               isMultiple={fieldType === "images_multiple"}
               label={isCollapsible ? "" : title}

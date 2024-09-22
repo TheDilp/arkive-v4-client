@@ -45,6 +45,7 @@ export function TemplateCharacterField({
         {isDisabled || IS_GATEWAY ? null : (
           <div className="sticky top-0">
             <Search
+              hasBrowser
               isDisabled={isDisabled}
               isGlobal={isGlobal}
               isMultiple={fieldType === "characters_multiple"}

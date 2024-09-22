@@ -44,6 +44,7 @@ export function TemplateBlueprintField({
         {isDisabled || IS_GATEWAY ? null : (
           <div className="sticky top-0">
             <Search
+              hasBrowser
               isDisabled={isDisabled}
               isGlobal={isGlobal}
               isMultiple={fieldType === "blueprints_multiple"}

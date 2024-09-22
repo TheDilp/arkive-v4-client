@@ -44,6 +44,7 @@ export function ImageSelect({
             />
           ) : (
             <Search
+              hasBrowser
               helperText={helperText}
               imageType={type}
               isDisabled={isDisabled || (!permissions?.read_assets && !isIgnoringPermissions)}
