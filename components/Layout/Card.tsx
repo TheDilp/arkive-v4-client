@@ -57,11 +57,17 @@ export function ProjectGameCard({ id, project_id, title, image, feature_flags }:
   );
 }
 
-export function WikiProjectCard({ id, image_id, title, owner }: Pick<ProjectType, "id" | "title" | "image_id" | "owner">) {
+export function WikiProjectCard({
+  id,
+  image_id,
+  title,
+  description,
+  owner,
+}: Pick<ProjectType, "id" | "title" | "description" | "image_id" | "owner">) {
   const url = useImageURL(getAssetURL(id, "images", image_id));
   return (
     <Link
-      className="animate-in fade-in group relative col-span-1 flex h-[28rem] flex-col items-center justify-center rounded bg-zinc-950 bg-cover bg-center bg-no-repeat shadow transition-all duration-500"
+      className="animate-in fade-in group relative col-span-1 flex h-[28rem] flex-col items-center justify-center overflow-hidden rounded bg-zinc-950 bg-cover bg-center bg-no-repeat shadow transition-all duration-500"
       to={`/${id}/characters`}>
       <h2 className="absolute top-[20%] z-10 max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow transition-all">
         {title}
@@ -75,6 +81,10 @@ export function WikiProjectCard({ id, image_id, title, owner }: Pick<ProjectType
       />
       <div className="absolute bottom-2 right-2 z-20">
         <Avatar image_url={owner?.image} initials={getAvatarInitials(owner?.nickname || "")} label={owner?.nickname || ""} />
+      </div>
+
+      <div className="pointer-events-none absolute top-[28rem] z-30 line-clamp-[18] max-h-full w-full rounded border-zinc-500 bg-black bg-opacity-95 p-4 opacity-0 transition-all duration-500 group-hover:top-0 group-hover:border group-hover:opacity-100">
+        {description}
       </div>
     </Link>
   );

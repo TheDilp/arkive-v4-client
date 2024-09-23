@@ -11,6 +11,7 @@ export function Home() {
         {(data?.data || []).map((project) => (
           <WikiProjectCard
             key={project.id}
+            description={project.description}
             id={project.id}
             image_id={project.image_id}
             owner={project.owner}
