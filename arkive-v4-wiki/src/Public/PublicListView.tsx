@@ -51,7 +51,13 @@ function columns(entityType: "documents" | "maps" | "graphs" | "calendars" | "di
       header: "",
       cell: ({ row }) =>
         "image_id" in row.original && row.original?.image_id ? (
-          <Avatar image_id={row.original?.image_id as string | null | undefined} isBordered isTooltipDisabled size="sm" />
+          <Avatar
+            imageType={entityType === "maps" ? "map_images" : "images"}
+            image_id={row.original?.image_id as string | null | undefined}
+            isBordered
+            isTooltipDisabled
+            size="sm"
+          />
         ) : (
           <Icon
             fontSize={24}
@@ -228,6 +234,7 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
         />
       </div>
       <Table
+        key={type}
         columns={columns(type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints")}
         config={{
           getLink: (rowData: any) => getEntityLink(project_id as string, type, rowData.id, null),
@@ -235,7 +242,6 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
         data={base?.data || []}
         dispatch={dispatch}
         isLoading={isInitialLoading}
-        key={type}
         pagination={pagination}
         type={type as AvailableEntityType}
       />
