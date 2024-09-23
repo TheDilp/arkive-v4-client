@@ -235,8 +235,8 @@ export function AdditionalBlueprintFieldDisplay({
                 ? [
                     {
                       id: blueprint_field_data.images[0].related_id as string,
-                      image_id: blueprint_field_data?.images?.[0].image.id,
-                      title: blueprint_field_data?.images?.[0].image.title,
+                      image_id: blueprint_field_data?.images?.[0]?.image?.id,
+                      title: blueprint_field_data?.images?.[0]?.image?.title,
                       label: blueprint_field.title,
                       type: "images",
                     },
@@ -253,8 +253,8 @@ export function AdditionalBlueprintFieldDisplay({
               images={blueprint_field_data.images
                 .filter((img) => !!img.image)
                 .map((img) => ({
-                  id: img.image.id,
-                  title: img.image.title,
+                  id: img?.image?.id,
+                  title: img?.image?.title,
                   project_id: project_id as string,
                   type: "images",
                 }))}
