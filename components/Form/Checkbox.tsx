@@ -81,6 +81,7 @@ export function Checkbox({
   variant,
   isDisabled,
   isReadOnly,
+  allowedPlacements = ["top"],
   tooltip,
 }: CheckboxType) {
   const {
@@ -93,7 +94,7 @@ export function Checkbox({
     <div className={base()}>
       {label ? <div className={labelClasses()}>{label}</div> : null}
       <Tooltip
-        allowedPlacements={["top"]}
+        allowedPlacements={allowedPlacements}
         content={tooltip || null}
         delay={{ openDelay: 300 }}
         isClickable={false}
@@ -115,4 +116,3 @@ export function Checkbox({
     </div>
   );
 }
-
