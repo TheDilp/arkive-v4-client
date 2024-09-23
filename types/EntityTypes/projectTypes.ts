@@ -16,6 +16,7 @@ import { RoleType } from "./rolesTypes";
 export interface ProjectType {
   id: string;
   title: string;
+  description: string | null;
   owner_id: string;
   is_public: boolean | null;
   image_id: string | null;

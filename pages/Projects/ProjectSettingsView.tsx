@@ -16,6 +16,7 @@ import {
   Skeleton,
   Table,
   Tabs,
+  Textarea,
   Tooltip,
 } from "../../components";
 import {
@@ -496,7 +497,7 @@ export function ProjectSettingsView() {
     project_id as string,
     "projects",
     {
-      fields: ["id", "title", "image_id", "owner_id", "is_public"],
+      fields: ["id", "title", "image_id", "owner_id", "is_public", "description"],
       relations: {
         map_pin_types: true,
         character_relationship_types: true,
@@ -696,10 +697,24 @@ export function ProjectSettingsView() {
                   />
                 </div>
               </div>
-
+              <div className="h-56">
+                <Textarea
+                  label="Description (max 2500 characters)"
+                  maxLength={2500}
+                  name="description"
+                  onChange={handleChange}
+                  value={project?.description || ""}
+                />
+              </div>
               <div className="flex flex-nowrap items-center justify-between pt-2">
                 <span>Public:</span>
-                <Checkbox name="is_public" onChange={handleChange} value={!!project?.is_public} />
+                <Checkbox
+                  allowedPlacements={["left"]}
+                  name="is_public"
+                  onChange={handleChange}
+                  tooltip="Marking a project as public will make it appear on the Arkive's wiki homepage and be viewable by all."
+                  value={!!project?.is_public}
+                />
               </div>
 
               {isProjectOwner ? (
