@@ -4,6 +4,7 @@ import { useLayoutEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import { moduleAtom } from "../../utils";
+import { Home } from "./Home";
 import { PublicEntitiesView, PublicLayout, PublicListView } from "./Public";
 
 const queryClient = new QueryClient({
@@ -24,6 +25,7 @@ function App() {
     <main className="h-screen max-h-screen w-screen overflow-hidden bg-black">
       <QueryClientProvider client={queryClient}>
         <Routes>
+          <Route element={<Home />} path="/" />
           <Route element={<PublicLayout />} path=":project_id/*">
             <Route element={<PublicListView />} path=":type" />
             <Route element={<PublicEntitiesView />} path=":type/:item_id/*" />
