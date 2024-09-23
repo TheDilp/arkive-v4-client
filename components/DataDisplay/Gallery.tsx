@@ -1,6 +1,7 @@
 import { tv } from "tailwind-variants";
 
 import { GalleryType, Size } from "../../types";
+import { Alert } from "../Misc";
 import { Image } from "./Image";
 
 const GalleryClasses = tv({
@@ -62,6 +63,9 @@ function getRowSize(size: Size): number {
 export function Gallery({ images, isOpenable, columns = 4, size = "md", type }: GalleryType) {
   const { container, base } = GalleryClasses({ columns });
   const rowSize = getRowSize(size);
+  if (images.length === 0) {
+    return <Alert label="There is no content." />;
+  }
   return (
     <div className={container()}>
       <div
