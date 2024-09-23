@@ -58,8 +58,8 @@ export function TemplateCharacterField({
                       related_id: value,
                       character: {
                         id: value,
-                        title: label,
-                        image,
+                        full_name: label,
+                        portrait_id: image,
                       },
                     },
                   })
