@@ -44,7 +44,6 @@ export function ImageSelect({
             />
           ) : (
             <Search
-              hasBrowser
               helperText={helperText}
               imageType={type}
               isDisabled={isDisabled || (!permissions?.read_assets && !isIgnoringPermissions)}
@@ -52,6 +51,13 @@ export function ImageSelect({
               limit={25}
               manual_project_id={manual_project_id}
               name={name}
+              onBrowserChange={(props) => {
+                const itemsToChange: { name: string; value: string }[] = props.map(({ value }) => ({
+                  name,
+                  value,
+                }));
+                if (itemsToChange?.[0]) onChange(itemsToChange[0]);
+              }}
               onChange={onChange}
               placeholder="Search images"
               searchEntity={type === "map_images" ? "map_images" : "images"}

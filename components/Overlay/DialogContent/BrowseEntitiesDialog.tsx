@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 import { useGetInfiniteAssets, useGetInfiniteEntities, useTable } from "../../../hooks";
 import { AssetType, AvailableEntityType, OnSearchChangePropsType, RequestOrderByType } from "../../../types";
-import { AvailableIcons, dialogAtom, getEntityFields, IconEnum } from "../../../utils";
+import { dialogAtom, getEntityFields, IconEnum } from "../../../utils";
 import { Image } from "../../DataDisplay";
 import { Button, Input } from "../../Form";
 
@@ -14,22 +14,23 @@ function getOrderBy(
   return { sort: "asc", field: type === "characters" ? "full_name" : "title" };
 }
 const cardClasses =
-  "text-xl [&>div>h2]:line-clamp-2 animate-in fade-in relative col-span-1 flex h-[8rem] flex-col items-center justify-center cursor-pointer hover:border-blue-500 overflow-hidden rounded border-2 border-zinc-700 bg-cover shadow transition-all";
+  "text-xl [&>div>h2]:line-clamp-2 [&>div>h2]:z-20 animate-in fade-in relative col-span-1 flex h-[8rem] flex-col items-center justify-center cursor-pointer hover:border-blue-500 overflow-hidden rounded border-2 border-zinc-700 bg-cover shadow transition-all";
 export function BrowseEntitiesDialog({
   data,
 }: {
   data: {
     name: string;
-    onChange: (props: OnSearchChangePropsType) => void;
+    onChange: (props: OnSearchChangePropsType[]) => void;
     isMultiple?: boolean;
     type: AvailableEntityType | "blueprint_instances";
     imageType: AssetType;
     parent_id?: string;
+    selected: string[] | undefined;
   };
 }) {
   const { project_id } = useParams();
   const resetDialog = useResetAtom(dialogAtom);
-  const [selection, setSelection] = useState<string[]>([]);
+  const [selection, setSelection] = useState<string[]>(data.selected || []);
   const [filter, setFilter] = useState("");
   const [{ orderBy, pagination, filters }, dispatch] = useTable<{ full_name?: string; title?: string }>({
     orderBy: [getOrderBy(data.type)],
@@ -209,36 +210,34 @@ export function BrowseEntitiesDialog({
               .filter((entity) => selection.includes(entity.id));
 
             if (data.type === "characters") {
-              for (let index = 0; index < selected.length; index++) {
-                data.onChange({
-                  name: data.name,
-                  value: selected[index].id,
-                  label: selected[index].full_name,
-                  image: selected[index]?.portrait_id,
-                  type: "characters",
-                });
-              }
+              const formatted = selected.map((item) => ({
+                name: data.name,
+                value: item.id,
+                label: item.full_name,
+                image: item?.portrait_id,
+                type: "characters" as const,
+              }));
+              data.onChange(formatted);
             } else if (data.type === "images") {
               for (let index = 0; index < selected.length; index++) {
-                data.onChange({
+                const formatted = selected.map((item) => ({
                   name: data.name,
-                  value: selected[index].id,
-                  label: selected[index].title,
-                  image: selected[index]?.id,
-                  type: "images",
-                });
+                  value: item.id,
+                  label: item.title,
+                  image: item?.id,
+                  type: "images" as const,
+                }));
+                data.onChange(formatted);
               }
             } else {
-              for (let index = 0; index < selected.length; index++) {
-                data.onChange({
-                  name: data.name,
-                  value: selected[index].id,
-                  label: selected[index].title,
-                  image: selected[index]?.image,
-                  icon: selected[index]?.icon as AvailableIcons | undefined,
-                  type: data.type,
-                });
-              }
+              const formatted = selected.map((item) => ({
+                name: data.name,
+                value: item.id,
+                label: item.title,
+                image: item?.image,
+                type: "images" as const,
+              }));
+              data.onChange(formatted);
             }
             resetDialog();
           }}

@@ -80,7 +80,6 @@ export interface SearchType extends BaseFormComponentType {
   isAutofocused?: boolean;
   isGlobal?: boolean;
   hasShownOption?: boolean;
-  hasBrowser?: boolean;
   isOptionsHidden?: boolean;
   isMultiple?: boolean;
   isFolders?: boolean;
@@ -102,4 +101,5 @@ export interface SearchType extends BaseFormComponentType {
   }[];
   onSearch?: (result: any) => void;
   onChange: ({ name, value, label, image, parent_id, icon, type, project_id }: OnSearchChangePropsType) => void;
+  onBrowserChange?: (props: OnSearchChangePropsType[]) => void;
 }

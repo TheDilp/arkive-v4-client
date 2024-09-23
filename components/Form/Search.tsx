@@ -186,7 +186,6 @@ export function Search({
   value,
   hasShownOption,
   imageType,
-  hasBrowser,
   isOptionsHidden,
   isMultiple,
   isGlobal,
@@ -194,9 +193,10 @@ export function Search({
   limit,
   offset: offsetProp,
   hasNoBackground,
-  onChange,
   manualResults,
   onSearch,
+  onBrowserChange,
+  onChange,
   size,
   parent_id,
   manual_project_id,
@@ -334,7 +334,7 @@ export function Search({
         {...getReferenceProps({
           ref: refs.setReference,
         })}>
-        {hasBrowser ? (
+        {onBrowserChange ? (
           <div className="mr-2">
             <Button
               hasNoBackground
@@ -345,7 +345,7 @@ export function Search({
                   ...prev,
                   title: "Browse",
                   type: "browse_entities",
-                  data: { isMultiple, type: searchEntity, onChange, imageType, parent_id },
+                  data: { isMultiple, type: searchEntity, onChange: onBrowserChange, imageType, parent_id, selected: value },
                   size: "full",
                   isOverlay: true,
                 }))

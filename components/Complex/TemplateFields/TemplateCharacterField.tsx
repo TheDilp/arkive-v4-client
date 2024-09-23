@@ -45,12 +45,28 @@ export function TemplateCharacterField({
         {isDisabled || IS_GATEWAY ? null : (
           <div className="sticky top-0">
             <Search
-              hasBrowser
               isDisabled={isDisabled}
               isGlobal={isGlobal}
               isMultiple={fieldType === "characters_multiple"}
               label={title}
               name={name}
+              onBrowserChange={(props) => {
+                const itemsToChange: { name: string; value: string | Record<string, any> }[] = props.map(
+                  ({ value, label, image }, index) => ({
+                    name: `${name}.characters[${fieldType.includes("single") ? 0 : index || 0}]`,
+                    value: {
+                      related_id: value,
+                      character: {
+                        id: value,
+                        title: label,
+                        image,
+                      },
+                    },
+                  })
+                );
+                itemsToChange.push({ name: `${name}.id`, value: id });
+                handleChange(itemsToChange);
+              }}
               onChange={({ value, label, image }) => {
                 if ((currentValue || [])?.some((character) => character.related_id === value)) {
                   handleChange([

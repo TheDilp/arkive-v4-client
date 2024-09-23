@@ -22,6 +22,8 @@ import {
   CharacterType,
   DrawerAtomType,
   HandleChangePropsType,
+  NotificationType,
+  OnSearchChangePropsType,
   TabType,
   TagType,
   UserHasPermissionsType,
@@ -186,6 +188,53 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
     tabs.push({ id: "6", label: "Access", icon: IconEnum.permissions });
   }
   return tabs;
+}
+
+function changeRelationship({
+  name,
+  item,
+  handleChange,
+  createNotification,
+  character,
+  relation_type_id,
+}: {
+  name: "related_to" | "related_from" | "related_other";
+  character: Partial<CharacterType> | null;
+  item: OnSearchChangePropsType;
+  relation_type_id: string;
+  handleChange: (props: HandleChangePropsType) => void;
+  createNotification: (notification: Omit<NotificationType, "id">) => void;
+}) {
+  const { value, label, image } = item;
+  if (character?.id && character.id === value) {
+    createNotification({
+      title: "Cannot add a character to themselves.",
+      variant: "warning",
+      timer: 2,
+      icon: IconEnum.info_circle,
+    });
+    return;
+  }
+
+  if (value && label) {
+    if ((character?.[name] || [])?.some((item) => item.id === value)) {
+      handleChange({
+        name,
+        value: (character?.[name] || [] || []).filter((t) => t.id !== value),
+      });
+      return;
+    }
+    handleChange({
+      name,
+      value: (character?.[name] || []).concat({
+        id: value,
+        full_name: label,
+        portrait: image ? { id: image, title: "" } : null,
+        relation_type_id,
+        character_relationship_id: "",
+      }),
+    });
+  }
 }
 
 export function CharacterDrawer({
@@ -476,43 +525,36 @@ export function CharacterDrawer({
                     {isOther ? (
                       <div className="flex flex-col gap-y-2 p-2">
                         <Search
-                          hasBrowser
                           isDisabled={!canCreateOrEdit}
+                          isMultiple
                           name="related_other"
-                          onChange={({ label, value, image }) => {
-                            if (character?.id && character.id === value) {
-                              createNotification({
-                                title: "Cannot add a character to themselves.",
-                                variant: "warning",
-                                timer: 2,
-                                icon: IconEnum.info_circle,
-                              });
-                              return;
-                            }
-                            if (character?.related_other?.some((ro) => ro.id === value && ro.relation_type_id === rg.id)) {
-                              createNotification({
-                                title: "Cannot add a character to the same group twice.",
-                                variant: "warning",
-                                timer: 2,
-                                icon: IconEnum.info_circle,
-                              });
-                              return;
-                            }
-                            if (value && label) {
-                              handleChange({
-                                name: "related_other",
-                                value: (character?.related_other || []).concat({
-                                  id: value,
-                                  full_name: label,
-                                  portrait: image ? { id: image, title: "" } : null,
+                          onBrowserChange={(props) => {
+                            handleChange({
+                              name: "related_other",
+                              value: props
+                                .filter((item) => item.value !== character?.id)
+                                .map((item) => ({
+                                  id: item.value,
+                                  full_name: item.label,
+                                  portrait: item.image ? { id: item.image, title: "" } : null,
                                   relation_type_id: rg.id,
                                   character_relationship_id: "",
-                                }),
-                              });
-                            }
+                                })),
+                            });
                           }}
+                          onChange={(item) =>
+                            changeRelationship({
+                              name: "related_other",
+                              item,
+                              handleChange,
+                              createNotification,
+                              character,
+                              relation_type_id: rg.id,
+                            })
+                          }
                           placeholder="Press enter to search characters"
                           searchEntity="characters"
+                          value={(character?.related_other || []).map((c) => c.id)}
                         />
 
                         <div className="flex flex-col gap-y-2">
@@ -537,45 +579,37 @@ export function CharacterDrawer({
                     ) : (
                       <div className="flex flex-col gap-y-2 p-2">
                         <Search
-                          hasBrowser
                           isDisabled={!canCreateOrEdit}
+                          isMultiple
                           label="Ascendants"
                           name="related_to"
-                          onChange={({ value, image, label }) => {
-                            if (character?.id && character.id === value) {
-                              createNotification({
-                                title: "Cannot add a character to themselves.",
-                                variant: "warning",
-                                timer: 2,
-                                icon: IconEnum.info_circle,
-                              });
-                              return;
-                            }
-                            if (character?.related_to?.some((ro) => ro.id === value && ro.relation_type_id === rg.id)) {
-                              createNotification({
-                                title: "Cannot add a character to the same group twice.",
-                                variant: "warning",
-                                timer: 2,
-                                icon: IconEnum.info_circle,
-                              });
-                              return;
-                            }
-
-                            if (value && label) {
-                              handleChange({
-                                name: "related_to",
-                                value: (character?.related_to || []).concat({
-                                  id: value,
-                                  full_name: label,
-                                  portrait: image ? { id: image, title: "" } : null,
+                          onBrowserChange={(props) => {
+                            handleChange({
+                              name: "related_to",
+                              value: props
+                                .filter((item) => item.value !== character?.id)
+                                .map((item) => ({
+                                  id: item.value,
+                                  full_name: item.label,
+                                  portrait: item.image ? { id: item.image, title: "" } : null,
                                   relation_type_id: rg.id,
                                   character_relationship_id: "",
-                                }),
-                              });
-                            }
+                                })),
+                            });
                           }}
+                          onChange={(item) =>
+                            changeRelationship({
+                              name: "related_to",
+                              item,
+                              handleChange,
+                              createNotification,
+                              character,
+                              relation_type_id: rg.id,
+                            })
+                          }
                           placeholder="Press enter to search characters"
                           searchEntity="characters"
+                          value={(character?.related_to || []).map((c) => c.id)}
                         />
                         <div className="flex flex-col gap-y-2">
                           {character?.related_to
@@ -598,44 +632,37 @@ export function CharacterDrawer({
                             ))}
                         </div>
                         <Search
-                          hasBrowser
                           isDisabled={!canCreateOrEdit}
+                          isMultiple
                           label="Descendants"
                           name="related_from"
-                          onChange={({ label, value, image }) => {
-                            if (character?.id && character.id === value) {
-                              createNotification({
-                                title: "Cannot add a character to themselves.",
-                                variant: "warning",
-                                timer: 2,
-                                icon: IconEnum.info_circle,
-                              });
-                              return;
-                            }
-                            if (character?.related_from?.some((ro) => ro.id === value && ro.relation_type_id === rg.id)) {
-                              createNotification({
-                                title: "Cannot add a character to the same group twice.",
-                                variant: "warning",
-                                timer: 2,
-                                icon: IconEnum.info_circle,
-                              });
-                              return;
-                            }
-                            if (value && label) {
-                              handleChange({
-                                name: "related_from",
-                                value: (character?.related_from || []).concat({
-                                  id: value,
-                                  full_name: label,
-                                  portrait: image ? { id: image, title: "" } : null,
+                          onBrowserChange={(props) => {
+                            handleChange({
+                              name: "related_from",
+                              value: props
+                                .filter((item) => item.value !== character?.id)
+                                .map((item) => ({
+                                  id: item.value,
+                                  full_name: item.label,
+                                  portrait: item.image ? { id: item.image, title: "" } : null,
                                   relation_type_id: rg.id,
                                   character_relationship_id: "",
-                                }),
-                              });
-                            }
+                                })),
+                            });
                           }}
+                          onChange={(item) =>
+                            changeRelationship({
+                              name: "related_from",
+                              item,
+                              handleChange,
+                              createNotification,
+                              character,
+                              relation_type_id: rg.id,
+                            })
+                          }
                           placeholder="Press enter to search characters"
                           searchEntity="characters"
+                          value={(character?.related_from || []).map((c) => c.id)}
                         />
                         <div className="flex flex-col gap-y-2">
                           {character?.related_from

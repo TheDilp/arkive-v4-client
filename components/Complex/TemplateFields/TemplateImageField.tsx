@@ -42,11 +42,27 @@ export function TemplateImageField({
         {isDisabled || IS_GATEWAY ? null : (
           <div className="sticky top-0">
             <Search
-              hasBrowser
               isGlobal={isGlobal}
               isMultiple={fieldType === "images_multiple"}
               label={isCollapsible ? "" : title}
               name={name}
+              onBrowserChange={(props) => {
+                const itemsToChange: { name: string; value: string | Record<string, any> }[] = props.map(
+                  ({ value, label }, index) => ({
+                    name: `${name}.images[${fieldType.includes("single") ? 0 : index || 0}]`,
+                    value: {
+                      related_id: value,
+                      image: {
+                        id: value,
+                        title: label,
+                        image: value,
+                      },
+                    },
+                  })
+                );
+                itemsToChange.push({ name: `${name}.id`, value: id });
+                handleChange(itemsToChange);
+              }}
               onChange={({ value, label }) => {
                 if ((currentValue || [])?.some((image) => image.related_id === value)) {
                   handleChange([

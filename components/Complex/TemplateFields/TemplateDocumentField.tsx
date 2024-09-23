@@ -42,11 +42,27 @@ export function TemplateDocumentField({
         {isDisabled || IS_GATEWAY ? null : (
           <div className="sticky top-0">
             <Search
-              hasBrowser
               isDisabled={isDisabled}
               isGlobal={isGlobal}
               label={isCollapsible ? "" : title}
               name={name}
+              onBrowserChange={(props) => {
+                const itemsToChange: { name: string; value: string | Record<string, any> }[] = props.map(
+                  ({ value, label, image }, index) => ({
+                    name: `${name}.documents[${fieldType.includes("single") ? 0 : index || 0}]`,
+                    value: {
+                      related_id: value,
+                      document: {
+                        id: value,
+                        title: label,
+                        image,
+                      },
+                    },
+                  })
+                );
+                itemsToChange.push({ name: `${name}.id`, value: id });
+                handleChange(itemsToChange);
+              }}
               onChange={({ value, label, icon }) => {
                 if ((currentValue || [])?.some((doc) => doc.related_id === value)) {
                   handleChange([
