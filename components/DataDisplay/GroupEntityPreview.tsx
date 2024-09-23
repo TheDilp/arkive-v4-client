@@ -31,7 +31,7 @@ export function GroupEntityPreview({ items, field_label }: Props) {
               image_id={item?.image_id}
               link={item.link || getEntityLink(project_id as string, item.type, item.id, item.parent_id)}
               previewAction={
-                items.length
+                items.length && ((item?.image_id && item.type === "images") || item.type !== "images")
                   ? () => {
                       setDrawer((prev) => ({
                         ...prev,
