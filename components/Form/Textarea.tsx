@@ -95,6 +95,7 @@ export function Textarea({
   isResizable = false,
   isDisabled,
   hasNoBackground,
+  maxLength,
 }: TextareaType) {
   const {
     base,
@@ -109,6 +110,7 @@ export function Textarea({
       <textarea
         className={textarea()}
         disabled={isDisabled}
+        maxLength={maxLength}
         name={name}
         onChange={(e) => onChange(e.target)}
         placeholder={placeholder}
@@ -118,4 +120,3 @@ export function Textarea({
     </div>
   );
 }
-
