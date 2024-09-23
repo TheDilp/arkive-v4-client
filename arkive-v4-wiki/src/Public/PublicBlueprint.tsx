@@ -1,6 +1,6 @@
 import { Navigate, useParams } from "react-router-dom";
 
-import { AdditionalBlueprintFieldDisplay, Collapsible, Skeleton } from "../../../components";
+import { AdditionalBlueprintFieldDisplay, Skeleton } from "../../../components";
 import { useGetEntity, useGetSubEntity } from "../../../hooks";
 import { BlueprintInstanceType, BlueprintType } from "../../../types";
 import { IconEnum, useNotifications } from "../../../utils";
@@ -54,27 +54,25 @@ export function PublicBlueprint() {
   }
   return (
     <PublicEntityLayout title={blueprint_instance?.data?.title || ""}>
-      <div className="flex flex-col px-2">
-        <Collapsible icon={IconEnum.additional_fields} initialOpen label="Fields">
-          <div className="animate-in fade-in fill-mode-both flex flex-col gap-y-2 overflow-y-auto p-2">
-            {blueprint_instance?.data
-              ? blueprint_instance?.data?.blueprint_fields
-                  ?.toSorted((a, b) => a.sort - b.sort)
-                  .map((blueprint_field) => {
-                    const blueprintField = blueprint?.data?.blueprint_fields?.find((field) => field.id === blueprint_field.id);
-                    if (!blueprintField || !blueprint_field) return null;
-                    return (
-                      <AdditionalBlueprintFieldDisplay
-                        key={blueprint_field.id}
-                        blueprint_field={blueprintField}
-                        blueprint_field_data={blueprint_field}
-                        isPreview={!!item_id}
-                      />
-                    );
-                  })
-              : null}
-          </div>
-        </Collapsible>
+      <div className="flex max-h-full flex-col overflow-hidden px-2">
+        <div className="animate-in fade-in fill-mode-both flex max-h-full flex-col gap-y-2 overflow-y-auto p-2">
+          {blueprint_instance?.data
+            ? blueprint_instance?.data?.blueprint_fields
+                ?.toSorted((a, b) => a.sort - b.sort)
+                .map((blueprint_field) => {
+                  const blueprintField = blueprint?.data?.blueprint_fields?.find((field) => field.id === blueprint_field.id);
+                  if (!blueprintField || !blueprint_field) return null;
+                  return (
+                    <AdditionalBlueprintFieldDisplay
+                      key={blueprint_field.id}
+                      blueprint_field={blueprintField}
+                      blueprint_field_data={blueprint_field}
+                      isPreview={!!item_id}
+                    />
+                  );
+                })
+            : null}
+        </div>
       </div>
     </PublicEntityLayout>
   );
