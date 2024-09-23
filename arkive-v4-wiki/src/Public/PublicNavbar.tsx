@@ -47,13 +47,15 @@ export function PublicNavbar() {
   return (
     <div className="mb-4 flex max-h-24 flex-col items-center justify-between gap-x-2 text-lg lg:flex-row">
       <div className="flex items-center gap-x-2 self-start">
-        <div className="aspect-square max-w-20 overflow-hidden lg:max-w-14">
-          <img
-            alt="Logo"
-            className="relative -left-1 aspect-square min-w-14 object-contain"
-            src={project?.data?.image_id ? imageUrl : "/Logo.webp"}
-          />
-        </div>
+        <Link to="/">
+          <div className="aspect-square max-w-20 overflow-hidden lg:max-w-14">
+            <img
+              alt="Logo"
+              className="relative -left-1 aspect-square min-w-14 object-contain"
+              src={project?.data?.image_id ? imageUrl : "/Logo.webp"}
+            />
+          </div>
+        </Link>
         <div className="flex flex-col items-start">
           <h2 className="line-clamp-1 flex-1 font-merriweather text-2xl font-bold lg:text-xl">{project?.data?.title}</h2>
           <nav className="hidden text-base md:block">
