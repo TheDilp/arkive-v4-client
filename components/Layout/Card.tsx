@@ -2,7 +2,7 @@ import ls from "localstorage-slim";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { useImageURL } from "../../hooks/ui/useImageURL";
-import { BaseCardType, CharacterType, ProjectGameCardType } from "../../types";
+import { BaseCardType, CharacterType, ProjectGameCardType, ProjectType } from "../../types";
 import { getAssetURL, IconEnum, projectCardNavItems } from "../../utils";
 import { Avatar, Icon } from "../Misc";
 import { Tooltip } from "../Overlay/Tooltip";
@@ -51,6 +51,26 @@ export function ProjectGameCard({ id, project_id, title, image, feature_flags }:
         className="absolute z-0 flex h-full w-full flex-col items-center justify-end bg-cover bg-center bg-no-repeat transition-all group-hover:brightness-75"
         style={{
           backgroundImage: image ? `url(${url})` : "",
+        }}
+      />
+    </Link>
+  );
+}
+
+export function WikiProjectCard({ id, image_id, title }: Pick<ProjectType, "id" | "title" | "image_id">) {
+  const url = useImageURL(getAssetURL(id, "images", image_id));
+  return (
+    <Link
+      className="animate-in fade-in group relative col-span-1 flex h-[28rem] flex-col items-center justify-center rounded bg-zinc-950 bg-cover bg-center bg-no-repeat shadow transition-all duration-500"
+      to={`/${id}/characters`}>
+      <h2 className="absolute top-[20%] z-10 max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow transition-all">
+        {title}
+      </h2>
+
+      <div
+        className="absolute z-0 flex h-full w-full flex-col items-center justify-end bg-cover bg-center bg-no-repeat transition-all group-hover:brightness-75"
+        style={{
+          backgroundImage: image_id ? `url(${url})` : "",
         }}
       />
     </Link>
