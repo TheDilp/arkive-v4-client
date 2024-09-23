@@ -529,17 +529,23 @@ export function CharacterDrawer({
                           isMultiple
                           name="related_other"
                           onBrowserChange={(props) => {
+                            const temp = (character?.related_other || [])
+                              .filter((item) => item.relation_type_id !== rg.id)
+                              .concat(
+                                props
+                                  .filter((item) => item.value !== character?.id)
+                                  .map((item) => ({
+                                    id: item.value,
+                                    full_name: item.label || "",
+                                    portrait: item.image ? { id: item.image, title: "" } : null,
+                                    relation_type_id: rg.id,
+                                    character_relationship_id: "",
+                                  }))
+                              );
+
                             handleChange({
                               name: "related_other",
-                              value: props
-                                .filter((item) => item.value !== character?.id)
-                                .map((item) => ({
-                                  id: item.value,
-                                  full_name: item.label,
-                                  portrait: item.image ? { id: item.image, title: "" } : null,
-                                  relation_type_id: rg.id,
-                                  character_relationship_id: "",
-                                })),
+                              value: temp,
                             });
                           }}
                           onChange={(item) =>
@@ -554,7 +560,7 @@ export function CharacterDrawer({
                           }
                           placeholder="Press enter to search characters"
                           searchEntity="characters"
-                          value={(character?.related_other || []).map((c) => c.id)}
+                          value={(character?.related_other || []).filter((c) => c.relation_type_id === rg.id).map((c) => c.id)}
                         />
 
                         <div className="flex flex-col gap-y-2">
@@ -584,17 +590,23 @@ export function CharacterDrawer({
                           label="Ascendants"
                           name="related_to"
                           onBrowserChange={(props) => {
+                            const temp = (character?.related_to || [])
+                              .filter((item) => item.relation_type_id !== rg.id)
+                              .concat(
+                                props
+                                  .filter((item) => item.value !== character?.id)
+                                  .map((item) => ({
+                                    id: item.value,
+                                    full_name: item.label || "",
+                                    portrait: item.image ? { id: item.image, title: "" } : null,
+                                    relation_type_id: rg.id,
+                                    character_relationship_id: "",
+                                  }))
+                              );
+
                             handleChange({
                               name: "related_to",
-                              value: props
-                                .filter((item) => item.value !== character?.id)
-                                .map((item) => ({
-                                  id: item.value,
-                                  full_name: item.label,
-                                  portrait: item.image ? { id: item.image, title: "" } : null,
-                                  relation_type_id: rg.id,
-                                  character_relationship_id: "",
-                                })),
+                              value: temp,
                             });
                           }}
                           onChange={(item) =>
@@ -609,7 +621,7 @@ export function CharacterDrawer({
                           }
                           placeholder="Press enter to search characters"
                           searchEntity="characters"
-                          value={(character?.related_to || []).map((c) => c.id)}
+                          value={(character?.related_to || []).filter((c) => c.relation_type_id === rg.id).map((c) => c.id)}
                         />
                         <div className="flex flex-col gap-y-2">
                           {character?.related_to
@@ -637,17 +649,23 @@ export function CharacterDrawer({
                           label="Descendants"
                           name="related_from"
                           onBrowserChange={(props) => {
+                            const temp = (character?.related_from || [])
+                              .filter((item) => item.relation_type_id !== rg.id)
+                              .concat(
+                                props
+                                  .filter((item) => item.value !== character?.id)
+                                  .map((item) => ({
+                                    id: item.value,
+                                    full_name: item.label || "",
+                                    portrait: item.image ? { id: item.image, title: "" } : null,
+                                    relation_type_id: rg.id,
+                                    character_relationship_id: "",
+                                  }))
+                              );
+
                             handleChange({
                               name: "related_from",
-                              value: props
-                                .filter((item) => item.value !== character?.id)
-                                .map((item) => ({
-                                  id: item.value,
-                                  full_name: item.label,
-                                  portrait: item.image ? { id: item.image, title: "" } : null,
-                                  relation_type_id: rg.id,
-                                  character_relationship_id: "",
-                                })),
+                              value: temp,
                             });
                           }}
                           onChange={(item) =>
@@ -662,7 +680,7 @@ export function CharacterDrawer({
                           }
                           placeholder="Press enter to search characters"
                           searchEntity="characters"
-                          value={(character?.related_from || []).map((c) => c.id)}
+                          value={(character?.related_from || []).filter((c) => c.relation_type_id === rg.id).map((c) => c.id)}
                         />
                         <div className="flex flex-col gap-y-2">
                           {character?.related_from
