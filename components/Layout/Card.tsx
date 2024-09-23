@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { useImageURL } from "../../hooks/ui/useImageURL";
 import { BaseCardType, CharacterType, ProjectGameCardType, ProjectType } from "../../types";
-import { getAssetURL, IconEnum, projectCardNavItems } from "../../utils";
+import { getAssetURL, getAvatarInitials, IconEnum, projectCardNavItems } from "../../utils";
 import { Avatar, Icon } from "../Misc";
 import { Tooltip } from "../Overlay/Tooltip";
 
@@ -57,7 +57,7 @@ export function ProjectGameCard({ id, project_id, title, image, feature_flags }:
   );
 }
 
-export function WikiProjectCard({ id, image_id, title }: Pick<ProjectType, "id" | "title" | "image_id">) {
+export function WikiProjectCard({ id, image_id, title, owner }: Pick<ProjectType, "id" | "title" | "image_id" | "owner">) {
   const url = useImageURL(getAssetURL(id, "images", image_id));
   return (
     <Link
@@ -73,6 +73,9 @@ export function WikiProjectCard({ id, image_id, title }: Pick<ProjectType, "id" 
           backgroundImage: image_id ? `url(${url})` : "",
         }}
       />
+      <div className="absolute bottom-2 right-2 z-20">
+        <Avatar image_url={owner?.image} initials={getAvatarInitials(owner?.nickname || "")} label={owner?.nickname || ""} />
+      </div>
     </Link>
   );
 }

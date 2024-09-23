@@ -9,7 +9,13 @@ export function Home() {
     <div className="flex h-screen max-h-screen w-screen flex-col p-4">
       <div className="grid grid-cols-4 gap-4">
         {(data?.data || []).map((project) => (
-          <WikiProjectCard key={project.id} id={project.id} image_id={project.image_id} title={project.title} />
+          <WikiProjectCard
+            key={project.id}
+            id={project.id}
+            image_id={project.image_id}
+            owner={project.owner}
+            title={project.title}
+          />
         ))}
       </div>
     </div>
