@@ -56,7 +56,7 @@ export function PublicBlueprint() {
     <PublicEntityLayout title={blueprint_instance?.data?.title || ""}>
       <div className="flex flex-col px-2">
         <Collapsible icon={IconEnum.additional_fields} initialOpen label="Fields">
-          <div className="animate-in fade-in fill-mode-both flex max-h-96 flex-col gap-y-2 overflow-y-auto p-2">
+          <div className="animate-in fade-in fill-mode-both flex flex-col gap-y-2 overflow-y-auto p-2">
             {blueprint_instance?.data
               ? blueprint_instance?.data?.blueprint_fields
                   ?.toSorted((a, b) => a.sort - b.sort)
@@ -65,10 +65,10 @@ export function PublicBlueprint() {
                     if (!blueprintField || !blueprint_field) return null;
                     return (
                       <AdditionalBlueprintFieldDisplay
+                        key={blueprint_field.id}
                         blueprint_field={blueprintField}
                         blueprint_field_data={blueprint_field}
                         isPreview={!!item_id}
-                        key={blueprint_field.id}
                       />
                     );
                   })
