@@ -17,6 +17,7 @@ export interface ProjectType {
   id: string;
   title: string;
   owner_id: string;
+  is_public: boolean | null;
   image_id: string | null;
   owner?: UserType;
   images?: ImageType[];

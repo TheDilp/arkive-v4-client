@@ -13,6 +13,7 @@ export const UpdateProjectSchema = z.object({
       .string()
       .transform((value) => value.trim())
       .optional(),
+    is_public: z.boolean().nullable().optional(),
     image_id: z.string().optional().nullable(),
     default_dice_color: z.string().optional().nullable(),
   }),

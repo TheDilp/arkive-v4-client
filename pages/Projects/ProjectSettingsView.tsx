@@ -496,7 +496,7 @@ export function ProjectSettingsView() {
     project_id as string,
     "projects",
     {
-      fields: ["id", "title", "image_id", "owner_id"],
+      fields: ["id", "title", "image_id", "owner_id", "is_public"],
       relations: {
         map_pin_types: true,
         character_relationship_types: true,
@@ -699,7 +699,7 @@ export function ProjectSettingsView() {
 
               <div className="flex flex-nowrap items-center justify-between pt-2">
                 <span>Public:</span>
-                <Checkbox name="show_image_table_view" onChange={handleChange} value={false} />
+                <Checkbox name="is_public" onChange={handleChange} value={!!project?.is_public} />
               </div>
 
               {isProjectOwner ? (
