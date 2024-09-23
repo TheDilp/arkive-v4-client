@@ -1,14 +1,12 @@
 import { Core } from "cytoscape";
 import { useAtomValue } from "jotai";
 import { useLayoutEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 
 import { NodeType } from "../../../types";
-import { getAssetURL, IconEnum, nodesAtom } from "../../../utils";
-import { EntityPreview, Image } from "../../DataDisplay";
+import { IconEnum, nodesAtom } from "../../../utils";
+import { EntityPreview } from "../../DataDisplay";
 import { Input } from "../../Form";
 import { DrawerLayout } from "../../Layout";
-import { Avatar } from "../../Misc";
 
 type Props = {
   data: {
@@ -17,7 +15,6 @@ type Props = {
 };
 
 export function NodeSearchDrawer({ data }: Props) {
-  const { project_id } = useParams();
   const nodes = useAtomValue(nodesAtom);
   const [value, setValue] = useState("");
 
@@ -43,7 +40,6 @@ export function NodeSearchDrawer({ data }: Props) {
     if (!value) {
       setFoundNodes([]);
     }
-    console.log(data?.cy);
     return () => {
       clearTimeout(timeout);
     };
