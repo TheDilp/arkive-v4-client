@@ -286,7 +286,7 @@ export function useGetInfiniteEntities<ReturnType>(
     return FetchFunction({
       method: "POST",
       body: JSON.stringify(finalRequest),
-      url: `${baseURLS.baseServer}/${type.toLowerCase()}`,
+      url: `${getServerUrl()}/${type.toLowerCase()}`,
     });
   }
   const configuredOptions = {
