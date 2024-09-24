@@ -1,49 +1,13 @@
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, createColumnHelper, Icon, Input, Table } from "../../../components";
-import { useGetEntities, useTable } from "../../../hooks";
+import { Avatar, CharacterCard, createColumnHelper, Icon, Input, Table } from "../../../components";
+import { useGetEntities, useGetInfiniteEntities, useTable } from "../../../hooks";
 import { AvailableEntityType, BaseEntityType, CharacterType } from "../../../types";
-import { getAvatarInitials, getDefaultEntityIcon, getEntityFields, getEntityLink, IconEnum } from "../../../utils";
+import { getDefaultEntityIcon, getEntityFields, getEntityLink, IconEnum } from "../../../utils";
 
-const characterColumnHelper = createColumnHelper<CharacterType>();
 const columnHelper = createColumnHelper<BaseEntityType>();
 
-const characterColumns = [
-  characterColumnHelper.display({
-    id: "portrait_id",
-    header: "Portrait",
-    cell: ({ row }) => (
-      <div className="flex w-full items-center justify-center">
-        <Avatar
-          hasShowImage
-          image_id={row.original?.portrait?.id}
-          initials={getAvatarInitials(row.original.full_name)}
-          isBordered
-          isTooltipDisabled
-          label={row.original.full_name}
-          size="md"
-        />
-      </div>
-    ),
-    meta: {
-      pinned: true,
-      noLink: true,
-      centered: true,
-    },
-    minSize: 4.5,
-    maxSize: 4.5,
-  }),
-  characterColumnHelper.accessor("full_name", {
-    id: "full_name",
-    header: "Full name",
-    cell: (info) => info.getValue(),
-    meta: {
-      sortable: true,
-    },
-    minSize: 12,
-  }),
-];
 function columns(entityType: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints") {
   return [
     columnHelper.display({
@@ -83,27 +47,35 @@ function columns(entityType: "documents" | "maps" | "graphs" | "calendars" | "di
 function PublicCharacterList() {
   const { project_id } = useParams();
   const [filter, setFilter] = useState("");
-  const [{ orderBy, filters, pagination }, dispatch] = useTable({
+  const [{ orderBy, filters }, dispatch] = useTable({
     orderBy: [{ field: "full_name", sort: "asc" }],
-    pagination: { limit: 10, page: 0 },
     selection: {},
   });
 
-  const { data, isLoading } = useGetEntities<CharacterType>(
+  const {
+    data: cardData,
+    isFetching,
+    fetchNextPage,
+  } = useGetInfiniteEntities<CharacterType>(
     {
-      data: { project_id: project_id as string },
-      relations: {
-        portrait: true,
+      data: {
+        project_id,
+      },
+
+      fields: ["id", "full_name", "age", "owner_id", "portrait_id"],
+      filters,
+      pagination: {
+        limit: 25,
       },
       orderBy,
-      filters,
-      pagination,
-      fields: ["id", "full_name", "portrait_id"],
     },
     "characters",
     {
-      staleTime: 60 * 1000,
-      prefetch: true,
+      keepPreviousData: true,
+      getNextPageParam: (_, allPages) => {
+        if (allPages[allPages.length - 1]?.data?.length < 10) return undefined;
+        return allPages.length;
+      },
     }
   );
 
@@ -137,7 +109,7 @@ function PublicCharacterList() {
   }, [filter, dispatch]);
 
   return (
-    <div className="flex flex-col gap-y-2 p-2">
+    <div className="flex max-h-full flex-col gap-y-2 overflow-hidden p-2">
       <div className="w-full lg:ml-auto lg:w-52">
         <Input
           isClearable
@@ -148,19 +120,30 @@ function PublicCharacterList() {
           value={filter}
         />
       </div>
-      <Table
-        columns={characterColumns}
-        config={{
-          orderBy,
-          filters,
-          getLink: (rowData: any) => getEntityLink(project_id as string, "characters", rowData.id, null),
-        }}
-        data={data?.data || []}
-        dispatch={dispatch}
-        isLoading={isLoading}
-        pagination={pagination}
-        type="characters"
-      />
+      <div
+        className="grid grid-cols-1 gap-4 overflow-y-auto p-4 pb-36 md:grid-cols-2 lg:grid-cols-4"
+        onScroll={(e) => {
+          const { currentTarget } = e;
+          if (currentTarget) {
+            // @ts-ignore
+            const scrollFetchMarker = currentTarget.scrollHeight - currentTarget.scrollTop - currentTarget.clientHeight <= 1250;
+            if (scrollFetchMarker && !isFetching) {
+              fetchNextPage();
+            }
+          }
+        }}>
+        {(cardData?.pages || [])?.map((page) =>
+          page.data.map((char: CharacterType) => (
+            <CharacterCard
+              key={char.id}
+              full_name={char.full_name}
+              id={char?.id}
+              is_favorite={char?.is_favorite}
+              portrait_id={char?.portrait_id}
+            />
+          ))
+        )}
+      </div>
     </div>
   );
 }
