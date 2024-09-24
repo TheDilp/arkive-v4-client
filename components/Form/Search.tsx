@@ -345,7 +345,7 @@ export function Search({
                   ...prev,
                   title: "Browse",
                   type: "browse_entities",
-                  data: { isMultiple, type: searchEntity, onChange: onBrowserChange, imageType, parent_id, selected: value },
+                  data: { isMultiple, type: searchEntity, onChange: onBrowserChange, imageType, parent_id },
                   size: "full",
                   isOverlay: true,
                 }))

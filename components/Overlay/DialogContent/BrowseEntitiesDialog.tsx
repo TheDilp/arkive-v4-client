@@ -25,12 +25,11 @@ export function BrowseEntitiesDialog({
     type: AvailableEntityType | "blueprint_instances";
     imageType: AssetType;
     parent_id?: string;
-    selected: string[] | undefined;
   };
 }) {
   const { project_id } = useParams();
   const resetDialog = useResetAtom(dialogAtom);
-  const [selection, setSelection] = useState<string[]>(data.selected || []);
+  const [selection, setSelection] = useState<string[]>([]);
   const [filter, setFilter] = useState("");
   const [{ orderBy, pagination, filters }, dispatch] = useTable<{ full_name?: string; title?: string }>({
     orderBy: [getOrderBy(data.type)],
