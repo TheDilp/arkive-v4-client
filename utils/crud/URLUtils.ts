@@ -37,7 +37,7 @@ export function getSearchURL(
   if (type === "by_tags") {
     parts.push("all/tags");
   } else if (type === "all") {
-    parts.push("projects");
+    parts.push("");
   } else {
     parts.push(entityType);
   }
