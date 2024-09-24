@@ -1,9 +1,9 @@
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, CharacterCard, createColumnHelper, Icon, Input, Table } from "../../../components";
-import { useGetEntities, useGetInfiniteEntities, useTable } from "../../../hooks";
-import { AvailableEntityType, BaseEntityType, CharacterType } from "../../../types";
+import { Avatar, CharacterCard, createColumnHelper, Icon, Image, Input, Table } from "../../../components";
+import { useGetEntities, useGetInfiniteAssets, useGetInfiniteEntities, useTable } from "../../../hooks";
+import { AvailableEntityType, BaseEntityType, CharacterType, ImageType } from "../../../types";
 import { getDefaultEntityIcon, getEntityFields, getEntityLink, IconEnum } from "../../../utils";
 
 const columnHelper = createColumnHelper<BaseEntityType>();
@@ -44,7 +44,7 @@ function columns(entityType: "documents" | "maps" | "graphs" | "calendars" | "di
   ];
 }
 
-function PublicCharacterList() {
+function PublicCharacterView() {
   const { project_id } = useParams();
   const [filter, setFilter] = useState("");
   const [{ orderBy, filters }, dispatch] = useTable({
@@ -147,6 +147,105 @@ function PublicCharacterList() {
     </div>
   );
 }
+function PublicAssetView() {
+  const { project_id } = useParams();
+  const [filter, setFilter] = useState("");
+  const [{ orderBy, filters }, dispatch] = useTable({
+    orderBy: [{ field: "title", sort: "asc" }],
+    selection: {},
+  });
+
+  const {
+    data: infiniteAssets,
+    isFetching,
+    fetchNextPage,
+  } = useGetInfiniteAssets<ImageType>(
+    {
+      filters,
+      permissions: true,
+      fields: ["id", "title", "type"],
+      pagination: {
+        limit: 25,
+      },
+      orderBy,
+    },
+    "all",
+    project_id,
+    {
+      keepPreviousData: true,
+      getNextPageParam: (_, allPages) => {
+        if (allPages[allPages.length - 1]?.data?.length < 10) return undefined;
+        return allPages.length;
+      },
+    }
+  );
+
+  useLayoutEffect(() => {
+    if (!filter) {
+      dispatch({
+        type: "clearAllFilters",
+      });
+    }
+    if (filter.length >= 3) {
+      const timeout = setTimeout(() => {
+        if (filter) {
+          dispatch({
+            type: "clearAllFilters",
+          });
+          dispatch({
+            type: "setFilter",
+            payload: {
+              and: [{ id: "quick_filter", header_name: "quick_filter", field: "title", operator: "ilike", value: filter }],
+              field: "title",
+            },
+          });
+        }
+      }, 500);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    return () => {};
+  }, [filter, dispatch]);
+
+  return (
+    <div className="flex max-h-full flex-col gap-y-2 overflow-hidden p-2">
+      <div className="w-full lg:ml-auto lg:w-52">
+        <Input
+          isClearable
+          name="quick_filter"
+          onChange={({ value }) => setFilter(value as string)}
+          placeholder="Quick search by title"
+          type="search"
+          value={filter}
+        />
+      </div>
+      <div
+        className="grid grid-cols-1 gap-4 overflow-y-auto p-4 pb-36 md:grid-cols-2 lg:grid-cols-4"
+        onScroll={(e) => {
+          const { currentTarget } = e;
+          if (currentTarget) {
+            // @ts-ignore
+            const scrollFetchMarker = currentTarget.scrollHeight - currentTarget.scrollTop - currentTarget.clientHeight <= 1250;
+            if (scrollFetchMarker && !isFetching) {
+              fetchNextPage();
+            }
+          }
+        }}>
+        {(infiniteAssets?.pages || [])?.map((page) =>
+          page.data.map((img: ImageType) => (
+            <div
+              key={img.id}
+              className="animate-in fade-in relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover text-4xl shadow transition-all duration-500">
+              <Image hasTitle image={img} isLazyLoading isOpenable type={img.type} />
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
 
 function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints" }) {
   const { project_id } = useParams();
@@ -234,6 +333,7 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
 
 export function PublicListView() {
   const { type } = useParams();
-  if (type === "characters") return <PublicCharacterList />;
+  if (type === "characters") return <PublicCharacterView />;
+  if (type === "gallery") return <PublicAssetView />;
   return <PublicEntitiesList type={type as "documents"} />;
 }

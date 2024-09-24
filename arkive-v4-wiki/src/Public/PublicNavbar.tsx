@@ -8,7 +8,17 @@ import { useImageURL } from "../../../hooks/ui/useImageURL";
 import { AllAvailableEntities, AvailableEntityType, ProjectType } from "../../../types";
 import { getAssetURL, getDefaultEntityIcon, getEntityLink, IconEnum } from "../../../utils";
 
-const navItems = ["manuscripts", "characters", "blueprints", "documents", "maps", "graphs", "calendars", "dictionaries"];
+const navItems = [
+  "manuscripts",
+  "characters",
+  "blueprints",
+  "documents",
+  "maps",
+  "graphs",
+  "calendars",
+  "dictionaries",
+  "gallery",
+];
 
 export function PublicNavbar() {
   const [search, setSearch] = useState<string | null>("");
