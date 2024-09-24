@@ -1,4 +1,4 @@
-import { PositionType, Size } from "../../baseTypes";
+import { AssetType, PositionType, Size } from "../../baseTypes";
 
 export type AvatarShape = "circle" | "rounded" | "square";
 export interface AvatarType {
@@ -15,5 +15,5 @@ export interface AvatarType {
   hasShowImage?: boolean;
   shape?: AvatarShape;
   size?: Size;
-  imageType?: "images" | "map_images";
+  imageType?: AssetType;
 }
