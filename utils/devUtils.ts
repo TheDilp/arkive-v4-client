@@ -1,3 +1,5 @@
+import ls from "localstorage-slim";
+
 function toNumber(p: string): number {
   return Number(p);
 }
@@ -12,4 +14,14 @@ export function semverCompare(a: string, b: string): boolean {
   if (a_params[2] > b_params[2]) return true;
   if (a_params[2] < b_params[2]) return false;
   return false;
+}
+
+export function clearLS(keys: string[]) {
+  if (keys.length === 0) {
+    ls.clear();
+    return;
+  }
+  for (let index = 0; index < keys.length; index++) {
+    ls.remove(keys[index]);
+  }
 }

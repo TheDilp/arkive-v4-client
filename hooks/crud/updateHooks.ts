@@ -18,6 +18,7 @@ import {
 } from "../../types";
 import {
   baseURLS,
+  clearLS,
   Dice,
   FetchFunction,
   getEntityCRUDNotification,
@@ -857,7 +858,7 @@ export function useUpdateAuthStatus() {
 
     if (res.status >= 400) {
       setLoggedIn(false);
-      ls.clear();
+      clearLS(["asset_view", "characters_view", "default_dice_color", "module"]);
       setUserStatus({
         status: "unauthenticated",
         user_id: "",
@@ -896,7 +897,7 @@ export function useSignout() {
     },
     {
       onSettled: () => {
-        ls.clear();
+        clearLS(["asset_view", "characters_view", "default_dice_color", "module"]);
         queryClient.refetchQueries(["auth_status"]);
       },
     }
