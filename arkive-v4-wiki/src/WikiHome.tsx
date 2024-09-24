@@ -2,7 +2,7 @@ import { WikiProjectCard } from "../../components";
 import { useGetInfiniteEntities } from "../../hooks";
 import { ProjectType } from "../../types";
 
-export function Home() {
+export function WikiHome() {
   const { data: cardData } = useGetInfiniteEntities<ProjectType>(
     {
       data: {
