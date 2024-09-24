@@ -59,11 +59,7 @@ export function PublicNavbar() {
       <div className="flex items-center gap-x-2 self-start">
         <Link to="/">
           <div className="aspect-square max-w-20 overflow-hidden lg:max-w-14">
-            <img
-              alt="Logo"
-              className="relative -left-1 aspect-square min-w-14 object-contain"
-              src={project?.data?.image_id ? imageUrl : "/Logo.webp"}
-            />
+            <img alt="Logo" className="relative -left-1 aspect-square min-w-14 object-contain" src={imageUrl || "/Logo.webp"} />
           </div>
         </Link>
         <div className="flex flex-col items-start">
