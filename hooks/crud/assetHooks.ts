@@ -308,7 +308,7 @@ export function useGetInfiniteAssets<ReturnType>(
     return FetchFunction({
       method: "POST",
       body: JSON.stringify(finalRequest),
-      url: `${baseURLS.baseServer}/assets/${type.toLowerCase()}`,
+      url: `${getServerUrl()}/assets/${type.toLowerCase()}`,
     });
   }
   const configuredOptions = {
