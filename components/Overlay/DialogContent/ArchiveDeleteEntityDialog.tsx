@@ -31,11 +31,14 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
     <div className="flex h-full flex-col justify-between">
       <div className="text-center text-lg">
         Are you sure you want to {action === "delete" ? <span className="text-red-600">PERMANENTLY</span> : ""} {action} this{" "}
-        {getSingularEntityType(data?.entity_title) || "entity"} {data?.is_folder ? "folder" : ""} - &quot;
-        {data?.entity_title === "characters"
-          ? getCharacterFullName(data?.first_name || "", data?.last_name || "")
-          : data?.title}
-        &quot; ?
+        {getSingularEntityType(data?.entity_title) || "entity"} {data?.is_folder ? "folder" : ""} -
+        <div className="truncate">
+          &quot;
+          {data?.entity_title === "characters"
+            ? getCharacterFullName(data?.first_name || "", data?.last_name || "")
+            : data?.title}
+          &quot; ?
+        </div>
         {data?.entity_title === "blueprints" && action !== "arkive" ? (
           <p className="text-center text-red-600">Deleting a blueprint will also delete all of its fields and instances.</p>
         ) : null}
