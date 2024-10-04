@@ -335,7 +335,7 @@ export function useDeleteAsset<InsertType extends { data: { id: string } }>(proj
   const createNotification = useNotifications();
   return useMutation(
     async (vars: InsertType) =>
-      FetchFunction({ method: "DELETE", url: `${baseURLS.baseAssetServer}/assets/${type}/${vars.data.id}` }),
+      FetchFunction({ method: "DELETE", url: `${baseURLS.baseAssetServer}/assets/${project_id}/${type}/${vars.data.id}` }),
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries(["allEntities", project_id, "images"]);
