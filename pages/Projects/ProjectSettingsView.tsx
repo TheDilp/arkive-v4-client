@@ -25,6 +25,7 @@ import {
   useDeleteEntity,
   useGetEntities,
   useGetEntity,
+  useGetProjectAPIKey,
   useHandleChange,
   useKickMember,
   useTable,
@@ -55,6 +56,7 @@ import {
   IconEnum,
   isProjectOwnerAtom,
   MiscellaneousSettings,
+  useNotifications,
   userAtom,
   UserNotificationEntities,
   UserSidebarEntitiesEnabled,
@@ -474,6 +476,7 @@ export function ProjectSettingsView() {
   const { project_id } = useParams();
   const queryClient = useQueryClient();
   const { isLg } = useBreakpoint();
+  const createNotification = useNotifications();
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState(0);
@@ -515,7 +518,7 @@ export function ProjectSettingsView() {
   );
   const { mutate: assignRole } = useAssignRole();
   const { mutate: updateUser } = useUpdateUser(user?.id as string);
-
+  const { mutateAsync: getAPIKey } = useGetProjectAPIKey();
   const { data: roles } = useGetEntities<RoleType>(
     {
       data: { project_id },
@@ -697,7 +700,7 @@ export function ProjectSettingsView() {
                   />
                 </div>
               </div>
-              <div className="h-56">
+              <div className="h-80">
                 <Textarea
                   label="Description (max 2500 characters)"
                   maxLength={2500}
@@ -706,7 +709,7 @@ export function ProjectSettingsView() {
                   value={project?.description || ""}
                 />
               </div>
-              <div className="flex flex-nowrap items-center justify-between pt-2">
+              <div className="flex flex-nowrap items-center justify-between">
                 <span>Public:</span>
                 <Checkbox
                   allowedPlacements={["left"]}
@@ -715,6 +718,32 @@ export function ProjectSettingsView() {
                   tooltip="Marking a project as public will make it appear on the Arkive's wiki homepage and be viewable by all."
                   value={!!project?.is_public}
                 />
+              </div>
+
+              <div className="flex flex-nowrap items-center justify-between">
+                <span>API Key:</span>
+                <div>
+                  <Button
+                    icon={IconEnum.api_key}
+                    label="Show API key"
+                    onClick={async () => {
+                      const p = await (getAPIKey() as Promise<{ data: string }>);
+                      if (p.data) {
+                        createNotification({
+                          title: "API Key",
+                          hasNoTruncate: true,
+                          description: "Do not share the API Key for your project with anyone.",
+                          timer: 60,
+                          variant: "info",
+                          actions: [
+                            { label: "Copy", icon: IconEnum.copy, onClick: () => window.navigator.clipboard.writeText(p.data) },
+                          ],
+                        });
+                      }
+                    }}
+                    variant="info"
+                  />
+                </div>
               </div>
 
               {isProjectOwner ? (

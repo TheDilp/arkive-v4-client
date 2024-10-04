@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 
 import {
@@ -28,6 +28,8 @@ import {
   useNotifications,
   userStatusAtom,
 } from "../../utils";
+
+//#region projects
 
 export function useGetAllProjects(request: RequestBodyType<ProjectType>, options?: UseQueryOptions) {
   return useQuery<{ data: ProjectType[] }>(
@@ -61,6 +63,16 @@ export function useGetProjectDashboard(project_id: string, enabledEntities: stri
   );
 }
 
+export function useGetProjectAPIKey() {
+  return useMutation(async () =>
+    FetchFunction({
+      url: `${baseURLS.baseServer}/projects/api_key`,
+      method: "GET",
+    })
+  );
+}
+
+//#endregion projects
 export function useGetUser(
   request: RequestBodyType<UserType> & {
     data: { id: string; project_id?: string | undefined };
