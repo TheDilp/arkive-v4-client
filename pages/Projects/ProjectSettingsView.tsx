@@ -28,6 +28,7 @@ import {
   useGetProjectAPIKey,
   useHandleChange,
   useKickMember,
+  useResetProjectAPIKey,
   useTable,
   useUpdateEntity,
   useUpdateUser,
@@ -518,6 +519,15 @@ export function ProjectSettingsView() {
   );
   const { mutate: assignRole } = useAssignRole();
   const { mutate: updateUser } = useUpdateUser(user?.id as string);
+  const { mutate: resetAPIKey } = useResetProjectAPIKey({
+    onSuccess: () =>
+      createNotification({
+        title: "API Key successfully reset.",
+        hasNoTruncate: true,
+        timer: 10,
+        variant: "success",
+      }),
+  });
   const { mutateAsync: getAPIKey } = useGetProjectAPIKey();
   const { data: roles } = useGetEntities<RoleType>(
     {
@@ -709,6 +719,8 @@ export function ProjectSettingsView() {
                   value={project?.description || ""}
                 />
               </div>
+              <hr className="border-zinc-700" />
+
               <div className="flex flex-nowrap items-center justify-between">
                 <span>Public:</span>
                 <Checkbox
@@ -719,10 +731,10 @@ export function ProjectSettingsView() {
                   value={!!project?.is_public}
                 />
               </div>
-
+              <hr className="border-zinc-700" />
               <div className="flex flex-nowrap items-center justify-between">
                 <span>API Key:</span>
-                <div>
+                <div className="flex items-center gap-x-2">
                   <Button
                     icon={IconEnum.api_key}
                     label="Show API key"
@@ -733,7 +745,7 @@ export function ProjectSettingsView() {
                           title: "API Key",
                           hasNoTruncate: true,
                           description: "Do not share the API Key for your project with anyone.",
-                          timer: 60,
+                          timer: 15,
                           variant: "info",
                           actions: [
                             { label: "Copy", icon: IconEnum.copy, onClick: () => window.navigator.clipboard.writeText(p.data) },
@@ -743,6 +755,15 @@ export function ProjectSettingsView() {
                     }}
                     variant="info"
                   />
+                  <div>
+                    <Button
+                      icon={IconEnum.api_key_reset}
+                      label="Reset API key"
+                      onClick={resetAPIKey}
+                      tooltip="If you believe your API key has been compromised, please reset it. Any application or extension using the API key will stop working until you update your key."
+                      variant="error-bordered"
+                    />
+                  </div>
                 </div>
               </div>
 

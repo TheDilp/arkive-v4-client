@@ -1,4 +1,11 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
+import {
+  MutationOptions,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 
 import {
@@ -69,6 +76,16 @@ export function useGetProjectAPIKey() {
       url: `${baseURLS.baseServer}/projects/api_key`,
       method: "GET",
     })
+  );
+}
+export function useResetProjectAPIKey(options: MutationOptions) {
+  return useMutation(
+    async () =>
+      FetchFunction({
+        url: `${baseURLS.baseServer}/projects/api_key/reset`,
+        method: "GET",
+      }),
+    options
   );
 }
 
