@@ -31,7 +31,7 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
     <div className="flex h-full flex-col justify-between">
       <div className="text-center text-lg">
         Are you sure you want to {action === "delete" ? <span className="text-red-600">PERMANENTLY</span> : ""} {action} this{" "}
-        {getSingularEntityType(data?.entity_title) || "entity"} {data?.is_folder ? "folder" : ""} -
+        {getSingularEntityType(data?.entity_title) || "entity"} {data?.is_folder ? "folder" : ""}
         <div className="truncate">
           &quot;
           {data?.entity_title === "characters"
