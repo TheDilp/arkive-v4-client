@@ -5,8 +5,9 @@ import { EditorComponent, Remirror, useRemirror, useRemirrorContext } from "@rem
 import { QueryClient, UseMutateFunction, useQueryClient } from "@tanstack/react-query";
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
-import { MouseEvent, useEffect, useState } from "react";
+import { MouseEvent, MutableRefObject, useEffect, useRef, useState } from "react";
 import { Navigate, useBlocker, useParams } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
 import { RemirrorJSON } from "remirror";
 
 import { Button, Icon, MentionDropdownComponent, Menubar, Skeleton, SlashMenu } from "../../components";
@@ -368,8 +369,13 @@ function DocumentViewEditor({
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   const drawer = useAtomValue(drawerAtom);
-
   const mentionPosition = useAtomValue(mentionPositionAtom);
+  const editorRef = useRef() as MutableRefObject<HTMLDivElement>;
+
+  const handlePrint = useReactToPrint({
+    contentRef: editorRef,
+    documentTitle: title,
+  });
 
   const { mutate: updateDocument, isLoading: isMutating } = useUpdateEntity<{
     data: { id: string; content: string | undefined };
@@ -430,10 +436,10 @@ function DocumentViewEditor({
   }, [editorData]);
 
   return (
-    <div className="grid h-[calc(100%-4rem)] w-full grid-cols-6 items-start justify-start">
+    <div className="documentView grid h-[calc(100%-4rem)] w-full grid-cols-6 items-start justify-start">
       <div className={"col-span-1 h-full max-h-full"}>
         <ul
-          className={`h-full rounded-l p-2 ${uiOptions.outline ? "bg-zinc-900" : "w-[4.5rem] overflow-hidden rounded-r"} transition-all`}>
+          className={`h-full rounded-l p-2 ${uiOptions.outline ? "bg-zinc-900" : "w-[4.5rem] overflow-hidden rounded-r"} documentViewOutline transition-all`}>
           <li className="relative mb-2 mr-auto flex w-full items-center justify-between">
             <div className="absolute top-0 w-14">
               <Button
@@ -462,7 +468,7 @@ function DocumentViewEditor({
           ))}
         </ul>
       </div>
-      <div className="col-span-4 h-full max-h-full overflow-hidden">
+      <div ref={editorRef} className="col-span-4 h-full max-h-full overflow-hidden">
         <div className="h-full w-full rounded-t bg-zinc-800">
           {mentionPosition ? (
             <div
@@ -496,6 +502,7 @@ function DocumentViewEditor({
               id="editor">
               {can_update ? (
                 <Menubar
+                  handlePrint={handlePrint}
                   hasChanges={!!changedData}
                   icon={icon ?? undefined}
                   id={id || ""}

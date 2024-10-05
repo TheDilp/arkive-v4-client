@@ -1,6 +1,7 @@
 import { ReactFrameworkOutput, Remirror, useActive, useChainedCommands, useRemirrorContext } from "@remirror/react";
 import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch, useMemo } from "react";
+import { UseReactToPrintFn } from "react-to-print";
 import { ActiveFromExtensions, AnyExtension, ChainedFromExtensions } from "remirror";
 
 import { DialogAtomType, DrawerAtomType, DropdownItemType, Size, Variant } from "../../../types";
@@ -28,7 +29,7 @@ function menuBarItems({
   icon,
   isEditorMenubar,
   isTemplate,
-  // webhooks,
+  handlePrint,
 }: {
   active: ActiveFromExtensions<Remirror.Extensions>;
   chain: ChainedFromExtensions<AnyExtension | Remirror.Extensions>;
@@ -40,6 +41,7 @@ function menuBarItems({
   icon?: AvailableIcons;
   isEditorMenubar?: boolean;
   isTemplate?: boolean;
+  handlePrint: UseReactToPrintFn;
   // createPDF: CreatePDFType;
   // webhooks: WebhookType[];
 }) {
@@ -347,7 +349,6 @@ function menuBarItems({
       onClick: () => chain?.insertHorizontalRule()?.run(),
       tooltip: "Divider",
     },
-
     {
       id: "secret",
       icon: active.secret() ? IconEnum.eye_slash : IconEnum.eye,
@@ -355,6 +356,7 @@ function menuBarItems({
       onClick: () => chain?.toggleSecret({ secret: true, classNames: "secretBlock" })?.run(),
       tooltip: "Secret block",
     },
+    { id: "print", icon: IconEnum.blueprint, onClick: handlePrint, tooltip: "Print page" },
   ];
 
   if (!IS_GATEWAY) {
@@ -438,43 +440,15 @@ function menuBarItems({
     });
   }
 
-  // if (!isTemplate) {
-  //   options.push({
-  //     id: "pdf",
-  //     title: "PDF actions",
-  //     icon: IconEnum.pdf,
-  //     tooltip: "PDF actions",
-  //     subItems: [
-  //       {
-  //         id: "download_pdf",
-  //         title: "Download PDF",
-  //         icon: IconEnum.pdf_download,
-  //         onClick: () => {
-  //           const htmlString = getContext?.helpers?.getHTML();
-  //           if (title && htmlString) createPDF({ data: { title, body: htmlString } });
-  //         },
-  //       },
-  //       {
-  //         id: "send_pdf_to_discord",
-  //         title: "Send PDF to Discord",
-  //         icon: IconEnum.discord,
-  //         allowedPlacements: ["left-start", "right-start"],
-  //         subItems: webhooks.map((hook) => ({
-  //           id: hook.id,
-  //           title: hook.title,
-  //           onClick: () => {},
-  //           // FetchFunction({
-  //           //   url: `${baseURLS.baseServer}/webhooks/send/${hook.id}`,
-  //           //   body: JSON.stringify({
-  //           //     data: { id, body: getContext?.helpers?.getHTML(), type: "document_pdf" },
-  //           //   }),
-  //           //   method: "POST",
-  //           // }),
-  //         })),
-  //       },
-  //     ],
-  //   });
-  // }
+  if (!isTemplate) {
+    options.push({
+      id: "pdf",
+      title: "Print content",
+      icon: IconEnum.print,
+      onClick: handlePrint,
+      tooltip: "Print the content of this document",
+    });
+  }
 
   return options;
 }
@@ -488,6 +462,7 @@ export function Menubar({
   isTemplate,
   isMutating,
   hasChanges,
+  handlePrint,
 }: {
   size: Size;
   title?: string;
@@ -497,6 +472,7 @@ export function Menubar({
   isMutating: boolean;
   isEditorMenubar?: boolean;
   hasChanges?: boolean;
+  handlePrint: UseReactToPrintFn;
 }) {
   const chain = useChainedCommands();
   const getContext = useRemirrorContext();
@@ -519,6 +495,7 @@ export function Menubar({
         icon,
         isEditorMenubar,
         isTemplate,
+        handlePrint,
       }),
     [chain, isEditorMenubar, id, title]
   );
