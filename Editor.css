@@ -484,3 +484,24 @@
     @apply flex justify-center text-center !important;
   }
 }
+
+@media print {
+  @page {
+    margin: 0;
+  }
+  body {
+    @apply invisible;
+    .tableOfContentsList {
+      @apply hidden;
+    }
+    .remirror-editor.ProseMirror blockquote p {
+      @apply text-black !important;
+    }
+    * {
+      @apply text-black no-underline !important;
+    }
+  }
+  .remirror-editor-wrapper {
+    @apply visible static left-0 top-0 w-full pb-24 text-black !important;
+  }
+}
