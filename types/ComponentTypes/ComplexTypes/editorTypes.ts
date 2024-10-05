@@ -12,10 +12,12 @@ export interface EditorType {
   onChangePlainText?: ({ name, value }: { name: string; value: string }) => void;
   isReadOnly?: boolean;
   isDisabled?: boolean;
+  isPrintable?: boolean;
   isOutsideControlled?: boolean;
   isFullHeight?: boolean;
   customPlaceholder?: string;
   menubarSize?: Size;
+  title?: string;
   setContext?: Dispatch<SetStateAction<ReactFrameworkOutput<Remirror.Extensions> | undefined>>;
   hooks?: any;
 }
