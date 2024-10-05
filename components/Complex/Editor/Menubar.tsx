@@ -41,7 +41,7 @@ function menuBarItems({
   icon?: AvailableIcons;
   isEditorMenubar?: boolean;
   isTemplate?: boolean;
-  handlePrint: UseReactToPrintFn;
+  handlePrint: UseReactToPrintFn | undefined;
   // createPDF: CreatePDFType;
   // webhooks: WebhookType[];
 }) {
@@ -440,7 +440,7 @@ function menuBarItems({
     });
   }
 
-  if (!isTemplate) {
+  if (!isTemplate && !!handlePrint) {
     options.push({
       id: "pdf",
       title: "Print content",
@@ -472,7 +472,7 @@ export function Menubar({
   isMutating: boolean;
   isEditorMenubar?: boolean;
   hasChanges?: boolean;
-  handlePrint: UseReactToPrintFn;
+  handlePrint: UseReactToPrintFn | undefined;
 }) {
   const chain = useChainedCommands();
   const getContext = useRemirrorContext();
