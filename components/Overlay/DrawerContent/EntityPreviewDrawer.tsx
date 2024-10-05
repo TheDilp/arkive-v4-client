@@ -103,7 +103,7 @@ function EventPreviewDrawer({ id, parent_id }: { id?: string; parent_id?: string
   return <EventDrawer data={{ id, parent_id, isReadOnly: true }} exceptions={{}} />;
 }
 function ImagePreviewDrawer({ id, type, project_id }: { id: string; type: AssetType; project_id: string }) {
-  const { data, isFetching } = useGetImage(id, project_id, type, { fields: [] });
+  const { data, isFetching } = useGetImage(id, project_id, type, { fields: ["id", "title", "type"] });
   if (data?.data)
     return (
       <div className="flex h-96 max-h-full items-center justify-center">

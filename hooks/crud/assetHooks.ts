@@ -187,7 +187,7 @@ export function useGetImage(
       FetchFunction({
         method: "POST",
         body: JSON.stringify(request),
-        url: `${IS_PUBLIC ? baseURLS.basePublicServer : baseURLS.baseServer}/assets/${type}/${id}`,
+        url: `${IS_PUBLIC ? baseURLS.basePublicServer : baseURLS.baseServer}/assets/${IS_PUBLIC ? `${project_id}/` : ""}${type}/${id}`,
       }),
     {
       enabled: options?.enabled,
