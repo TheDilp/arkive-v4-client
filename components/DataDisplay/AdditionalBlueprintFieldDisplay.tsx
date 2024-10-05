@@ -227,7 +227,7 @@ export function AdditionalBlueprintFieldDisplay({
               }))}
           />
         ) : null}
-        {blueprint_field.field_type === "images_single" ? (
+        {blueprint_field.field_type === "images_single" && blueprint_field_data?.images?.[0]?.image ? (
           <GroupEntityPreview
             field_label={blueprint_field.title}
             items={
