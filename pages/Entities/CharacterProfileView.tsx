@@ -896,6 +896,7 @@ export function CharacterProfileView({
         ],
         type: "characters",
       });
+      setCharacter(existingCharacter?.data);
     }
   }, [existingCharacter?.data]);
   function showRelationshipTree() {
@@ -966,12 +967,6 @@ export function CharacterProfileView({
   useEffect(() => {
     setSelectedTab(getCharacterProfileTabFromType(type));
   }, [type]);
-
-  useLayoutEffect(() => {
-    if (existingCharacter?.data && !character) {
-      setCharacter(existingCharacter?.data);
-    }
-  }, [existingCharacter]);
 
   const formattedRelationships: FormattedRelationship[] = Object.entries(groupBy(relationships, "id")).map(([key, value]) => {
     return {
