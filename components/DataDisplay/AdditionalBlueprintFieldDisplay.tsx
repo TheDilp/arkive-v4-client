@@ -157,7 +157,7 @@ export function AdditionalBlueprintFieldDisplay({
         {blueprint_field.field_type === "textarea" ? (
           <>
             <span className="mb-2 border-b border-zinc-700 text-sm text-zinc-300">{blueprint_field.title}</span>
-            <div className="rounded-md bg-zinc-900">
+            <div className="rounded-md bg-zinc-900 [&>div]:p-0">
               {isRemirrorJSON(value) ? <StaticRender content={(value || {}) as any} /> : <Alert label="There is no content." />}
             </div>
           </>
