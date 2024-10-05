@@ -503,5 +503,9 @@
   }
   .remirror-editor-wrapper {
     @apply visible static left-0 top-0 w-full pb-24 text-black !important;
+
+    .remirror-is-empty {
+      @apply hidden;
+    }
   }
 }
