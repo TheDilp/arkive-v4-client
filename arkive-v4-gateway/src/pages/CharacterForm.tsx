@@ -69,7 +69,13 @@ function NameSection({
       <Input label="Age" name="age" onChange={handleChange} type="number" value={age || ""} />
       <div className="col-span-4 flex h-[30rem] flex-col">
         <span className="text-sm text-zinc-300">Biography</span>
-        <Editor initialContent={biography || undefined} isFullHeight name="biography" onChange={handleChange} />
+        <Editor
+          initialContent={biography || undefined}
+          isFullHeight
+          name="biography"
+          onChange={handleChange}
+          title={"Biography"}
+        />
       </div>
     </SectionLayout>
   );

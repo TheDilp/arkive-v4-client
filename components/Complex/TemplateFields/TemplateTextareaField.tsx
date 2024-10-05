@@ -32,6 +32,7 @@ export function TemplateTextareaField({
         <Editor
           initialContent={currentValue as any}
           isDisabled={isDisabled}
+          isPrintable
           name={name}
           onChange={({ value }) =>
             handleChange([
@@ -39,6 +40,7 @@ export function TemplateTextareaField({
               { name: `${name}.value`, value },
             ])
           }
+          title={title}
         />
       </div>
     </TemplateFieldContainer>

@@ -486,8 +486,10 @@ export function CharacterDrawer({
           initialContent={character?.biography || undefined}
           isDisabled={!canCreateOrEdit}
           isFullHeight
+          isPrintable
           name="biography"
           onChange={handleChange}
+          title={`${character?.full_name} - Biography`}
         />
       ) : null}
       {tabs[selectedTab].id === "3" ? (

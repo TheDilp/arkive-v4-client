@@ -205,7 +205,7 @@ export function DocumentFromTemplate({ data }: Props) {
         <div className={`flex max-h-[80%] flex-col gap-y-2 overflow-auto ${tabs[selectedTab].id === "1" ? "" : "hidden"}`}>
           {(template.template_fields || []).map((f, idx) => (
             <Collapsible key={f.id} label={getSentenceCase(f.key)} variant={getMatchFieldVariant(f)}>
-              <div className="flex max-h-[80%] flex-col gap-y-2 overflow-auto p-2" key={f.id}>
+              <div key={f.id} className="flex max-h-[80%] flex-col gap-y-2 overflow-auto p-2">
                 <MatchField
                   additional_data={f?.additional_data}
                   allMatches={template?.template_fields || []}

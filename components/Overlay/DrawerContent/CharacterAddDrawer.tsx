@@ -28,7 +28,7 @@ export function CharacterAddDrawer({ data }: Props) {
   const { mutateAsync: addToCharacter, isLoading: isMutating } = useAddToEntity<AddToCharacterType>(
     data.id,
     "characters",
-    project_id as string,
+    project_id as string
   );
   const { mutateAsync: createDocument, isLoading: isCreating } = useCreateEntity<{
     data: Pick<DocumentType, "id" | "title" | "project_id" | "content">;
@@ -60,7 +60,7 @@ export function CharacterAddDrawer({ data }: Props) {
       {data?.type === "tags" ? (
         <div className="flex flex-wrap">
           {items.map((i) => (
-            <div className="w-fit" key={i.value}>
+            <div key={i.value} className="w-fit">
               <Badge customColor={i?.color} label={i.label} />
             </div>
           ))}
@@ -68,11 +68,11 @@ export function CharacterAddDrawer({ data }: Props) {
       ) : (
         items.map((i) => (
           <EntityPreview
+            key={i.value}
             clearAction={(id) => setItems((prev) => (prev || []).filter((item) => item.value !== id))}
             icon={data?.type === "documents" ? IconEnum.document : IconEnum.image}
             id={i.value}
             image_id={data?.type === "images" ? i.value : i?.image}
-            key={i.value}
             title={i.label}
             type={data?.type}
           />
@@ -117,7 +117,7 @@ export function CharacterAddDrawer({ data }: Props) {
                   deleteDocument({ data: { id } });
                   resetDrawer();
                 },
-              },
+              }
             );
           }
         }}

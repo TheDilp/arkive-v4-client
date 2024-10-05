@@ -1236,6 +1236,7 @@ export function CharacterProfileView({
                       initialContent={character?.biography || undefined}
                       isDisabled={!canUpdate}
                       isFullHeight
+                      isPrintable
                       name="biography"
                       onChange={handleChange}
                     />
