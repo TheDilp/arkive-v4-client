@@ -76,11 +76,7 @@ function typeMap(project_id: string, content: RemirrorJSON) {
       );
     },
     doc: Doc,
-    hardBreak: () => (
-      <p className="ProseMirror-staticTrailingBreak my-0">
-        <br />
-      </p>
-    ),
+    hardBreak: () => <br />,
     heading: (args: any) => {
       return (
         <div id={args?.node?.attrs?.id} style={{ textAlign: args?.node?.attrs?.nodetextalignment || "left" }}>
