@@ -28,7 +28,7 @@ export const Dice = IS_PUBLIC
   : new DiceBox(
       "#dice-box", // target DOM element to inject the canvas for rendering
       {
-        assetPath: "/public/assets/",
+        assetPath: import.meta.env.DEV ? "/public/assets/" : "/assets/",
         themeColor: DefaultTagColor,
         scale: 4,
         throwForce: 15,
