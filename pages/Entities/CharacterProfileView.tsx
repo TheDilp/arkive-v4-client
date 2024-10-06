@@ -66,7 +66,6 @@ import {
   drawerAtom,
   enabledEntitiesAtom,
   FetchFunction,
-  getAssetURL,
   getAvatarInitials,
   getCharacterFullName,
   getCharacterProfileTabFromType,
@@ -471,34 +470,34 @@ function eventsTableColumns(
     }),
   ];
 }
-function locationsTableColumns(project_id: string) {
-  return [
-    locationsColumnHelper.display({
-      id: "image_id",
-      header: "Image",
-      cell: ({ row }) => (
-        <div className="flex w-full items-center justify-center">
-          <Avatar
-            image_id={getAssetURL(project_id, "map_images", row.original.image_id)}
-            isTooltipDisabled
-            label={row.original.title}
-            size="sm"
-          />
-        </div>
-      ),
-      minSize: 5,
-      maxSize: 5,
-      meta: {
-        centered: true,
-      },
-    }),
-    locationsColumnHelper.display({
-      id: "title",
-      header: "Title",
-      cell: ({ row }) => <div className="w-full max-w-full truncate">{row.original.title}</div>,
-    }),
-  ];
-}
+const locationsTableColumns = [
+  locationsColumnHelper.display({
+    id: "image_id",
+    header: "Image",
+    cell: ({ row }) => (
+      <div className="flex w-full items-center justify-center">
+        <Avatar
+          imageType="map_images"
+          image_id={row.original.image_id}
+          isTooltipDisabled
+          label={row.original.title}
+          size="sm"
+        />
+      </div>
+    ),
+    minSize: 5,
+    maxSize: 5,
+    meta: {
+      centered: true,
+    },
+  }),
+  locationsColumnHelper.display({
+    id: "title",
+    header: "Title",
+    cell: ({ row }) => <div className="w-full max-w-full truncate">{row.original.title}</div>,
+  }),
+];
+
 function assetTableColumns(
   downloadImages: UseMutateAsyncFunction<
     {
@@ -1370,7 +1369,7 @@ export function CharacterProfileView({
                     <div className="animate-in fade-in fill-mode-both mt-2">
                       {existingCharacter?.data?.locations?.length ? (
                         <Table
-                          columns={locationsTableColumns(project_id as string)}
+                          columns={locationsTableColumns}
                           config={{
                             expandable: true,
                             hasNoHeaderGap: true,
