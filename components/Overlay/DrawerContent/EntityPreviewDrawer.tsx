@@ -1,11 +1,12 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useSetAtom } from "jotai";
+import { useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import { useGetEntity, useGetImage } from "../../../hooks";
 import { CalendarView, CharacterProfileView, DictionaryView, MapView } from "../../../pages/Entities";
 import { BlueprintProfileView } from "../../../pages/Entities/BlueprintProfileView";
-import { AssetType, AvailableEntityType, AvailableSubEntityType, DocumentType, GraphType, MapType } from "../../../types";
-import { getEntityLink, getSingularEntityType, IconEnum } from "../../../utils";
+import { AssetType, AvailableEntityType, DocumentType, GraphType, MapType } from "../../../types";
+import { drawerAtom, getSingularEntityType, IconEnum, openEntityEditDrawer } from "../../../utils";
 import { StaticRender } from "../../Complex";
 import { Graph, Image } from "../../DataDisplay";
 import { Button, Title } from "../../Form";
@@ -106,7 +107,8 @@ function ImagePreviewDrawer({ id, type, project_id }: { id: string; type: AssetT
   const { data, isFetching } = useGetImage(id, project_id, type, { fields: ["id", "title", "type"] });
   if (data?.data)
     return (
-      <div className="flex h-96 max-h-full items-center justify-center">
+      <div className="flex max-h-full max-w-full flex-col items-center justify-center gap-y-2">
+        <h2 className="font-merriweather text-2xl">{data?.data?.title}</h2>
         <Image image={data?.data} objectFit="contain" type={type} />
       </div>
     );
@@ -117,22 +119,26 @@ function ImagePreviewDrawer({ id, type, project_id }: { id: string; type: AssetT
 export function EntityPreviewDrawer({
   data,
 }: {
-  data:
-    | {
-        id: string;
-        parent_id?: string;
-        entity_type: Omit<AvailableEntityType, "images"> | AvailableSubEntityType;
-        isViewOnly?: boolean;
-      }
-    | {
-        id: string;
-        entity_type: "images";
-        image_type?: AssetType;
-        isViewOnly?: boolean;
-      };
+  data: {
+    id: string;
+    parent_id?: string;
+    entity_type:
+      | "characters"
+      | "documents"
+      | "blueprint_instances"
+      | "maps"
+      | "map_pins"
+      | "graphs"
+      | "calendars"
+      | "events"
+      | "dictionaries"
+      | "images";
+    image_type?: AssetType;
+    isViewOnly?: boolean;
+  };
 }) {
   const { project_id } = useParams();
-  const navigate = useNavigate();
+  const setDrawer = useSetAtom(drawerAtom);
   return (
     <DrawerLayout>
       <div className="flex-1 overflow-y-auto">
@@ -160,16 +166,9 @@ export function EntityPreviewDrawer({
           <Button
             icon={IconEnum.edit}
             label={`Edit ${getSingularEntityType(data.entity_type as AvailableEntityType).toLowerCase()}`}
-            onClick={() =>
-              navigate(
-                getEntityLink(
-                  project_id as string,
-                  data.entity_type as AvailableEntityType,
-                  data.id,
-                  "parent_id" in data ? data?.parent_id || "" : ""
-                )
-              )
-            }
+            onClick={() => {
+              openEntityEditDrawer(data?.id, data?.entity_type, setDrawer);
+            }}
             variant="info"
           />
         </div>

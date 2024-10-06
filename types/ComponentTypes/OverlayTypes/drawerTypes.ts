@@ -10,7 +10,6 @@ import {
   AvailableSubEntityType,
   CharacterType,
   EntitiesWithFolders,
-  ImageType,
   MapPinType,
   MessageType,
   PermissionCodeType,
@@ -51,7 +50,6 @@ export type DrawerAtomType = {
     onSuccessAction?: Function;
   };
 } & (
-  | { type: "images"; data: ImageType }
   | {
       type:
         | "characters"
@@ -66,7 +64,8 @@ export type DrawerAtomType = {
         | "random_table_option"
         | "character_relationship_types"
         | "map_pin_types"
-        | "manuscripts";
+        | "manuscripts"
+        | "images";
       data: {
         id?: string;
         project_id?: string;
@@ -82,7 +81,7 @@ export type DrawerAtomType = {
   | { type: "many_nodes" | "many_edges"; data: { ids: string[]; parent_id: string } }
   | { type: "random_table_options"; data: { parent_id: string } }
   | { type: "folder"; data: { id?: string; type: EntitiesWithFolders } }
-  | { type: "map_pins"; data: { lat: number; lng: number } & Partial<MapPinType> }
+  | { type: "map_pins"; data: ({ lat: number; lng: number } & Partial<MapPinType>) | { id: string } }
   | { type: "map_character_placement"; data: { lat: number; lng: number; map_id: string } }
   | { type: "tags"; data: TagType | { project_id: string } }
   | {
@@ -153,17 +152,22 @@ export type DrawerAtomType = {
     }
   | {
       type: "entity_preview";
-      data:
-        | {
-            id: string;
-            parent_id?: string;
-            entity_type: Omit<AvailableEntityType, "images"> | AvailableSubEntityType;
-          }
-        | {
-            id: string;
-            entity_type: "images";
-            image_type: AssetType;
-          };
+      data: {
+        id: string;
+        parent_id?: string;
+        entity_type:
+          | "characters"
+          | "blueprint_instances"
+          | "documents"
+          | "maps"
+          | "map_pins"
+          | "graphs"
+          | "calendars"
+          | "events"
+          | "dictionaries"
+          | "images";
+        image_type?: AssetType;
+      };
     }
   | { type: "project" | "invite_to_project" | "nodes_from_characters" | "nodes_from_images" | null; data: null }
   | { type: "webhooks" | "roles"; data: { id?: string } }

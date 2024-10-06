@@ -11,7 +11,7 @@ import { DrawerLayout, Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
 
 type Props = {
-  data: ImageType;
+  data: { id: string };
 };
 
 function getTabs(permissions: UserHasPermissionsType): TabType[] {

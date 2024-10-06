@@ -1,3 +1,5 @@
+import { SetStateAction } from "jotai";
+import { Dispatch } from "react";
 import { isEqual, isRemirrorJSON } from "remirror";
 import { tv } from "tailwind-variants";
 
@@ -9,12 +11,13 @@ import {
   BlueprintInstanceType,
   CharacterCharacterFieldType,
   CharacterType,
+  DrawerAtomType,
   FieldTypes,
   RandomTableOptionType,
   SearchableEntities,
 } from "../../types";
 import { ManuscriptType } from "../../types/EntityTypes/manuscriptTypes";
-import { AvailableIcons, getDayOrdinal, IconEnum } from "..";
+import { AvailableIcons, getDayOrdinal, getSingularEntityType, IconEnum } from "..";
 
 export function getDefaultEntityIcon(
   type: AvailableEntityType | AvailableSubEntityType | SearchableEntities | null
@@ -475,4 +478,22 @@ export function checkIfFieldHasValue(field: CharacterCharacterFieldType): boolea
   if (field?.random_table?.option_id) return true;
 
   return false;
+}
+
+export function openEntityEditDrawer(
+  id: string,
+  type:
+    | "characters"
+    | "documents"
+    | "blueprint_instances"
+    | "maps"
+    | "map_pins"
+    | "graphs"
+    | "calendars"
+    | "events"
+    | "dictionaries"
+    | "images",
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>
+) {
+  setDrawer((prev) => ({ ...prev, title: `Edit ${getSingularEntityType(type)}`, data: { id }, type }));
 }
