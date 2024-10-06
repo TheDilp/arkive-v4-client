@@ -8,10 +8,10 @@ import { EntityPermission } from "../../Complex/EntityPermission";
 import { ImagePreview } from "../../DataDisplay";
 import { Button, ImageUpload, Input, TagInput } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
-import { Skeleton } from "../../Misc";
+import { Alert, Skeleton } from "../../Misc";
 
 type Props = {
-  data: { id: string };
+  data: { id?: string };
 };
 
 function getTabs(permissions: UserHasPermissionsType): TabType[] {
@@ -35,13 +35,19 @@ export function ImageDrawer({ data }: Props) {
 
   const resetDrawer = useToggledResetAtom();
 
-  const { data: imageData, isInitialLoading } = useGetImage(data?.id, project_id as string, "images", {
-    fields: ["id", "title", "is_public", "owner_id", "type"],
-    relations: {
-      tags: true,
+  const { data: imageData, isInitialLoading } = useGetImage(
+    data?.id || "",
+    project_id as string,
+    "images",
+    {
+      fields: ["id", "title", "is_public", "owner_id", "type"],
+      relations: {
+        tags: true,
+      },
+      permissions: true,
     },
-    permissions: true,
-  });
+    { enabled: !!data?.id }
+  );
 
   useEffect(() => {
     if (imageData?.data) {
@@ -50,7 +56,7 @@ export function ImageDrawer({ data }: Props) {
   }, [imageData]);
 
   const { handleChange } = useHandleChange({ data: image, setData: setImage });
-  const { mutateAsync: update, isLoading: isMutating } = useUpdateImage(data.id, project_id, image?.type || "images");
+  const { mutateAsync: update, isLoading: isMutating } = useUpdateImage(data.id || "", project_id, image?.type || "images");
 
   const permissions = useHasPermissions(["read_assets", "update_assets", "read_tags"], image?.owner_id);
 
@@ -70,6 +76,10 @@ export function ImageDrawer({ data }: Props) {
   }, [replacementImage]);
 
   if (isInitialLoading) return <Skeleton type="drawer_form" />;
+
+  if (!data?.id || !imageData?.data) {
+    return <Alert label="Could not get image data." variant="error" />;
+  }
 
   return (
     <DrawerLayout>

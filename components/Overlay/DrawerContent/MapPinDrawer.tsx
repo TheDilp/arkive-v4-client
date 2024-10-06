@@ -22,7 +22,7 @@ import { Skeleton } from "../../Misc";
 import { ColorPicker, IconPicker } from "..";
 
 type Props = {
-  data: { id?: string; lat: number; lng: number };
+  data: { id?: string; lat?: number; lng?: number };
   exceptions?: {
     characterPin?: boolean;
   };
