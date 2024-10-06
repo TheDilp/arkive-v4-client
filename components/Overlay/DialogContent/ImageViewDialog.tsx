@@ -13,7 +13,7 @@ export function ImageViewDialog({
   const image_url = useImageURL(
     data?.image_id ? getAssetURL((data?.manual_project_id || project_id) as string, data?.image_type, data?.image_id) : null
   );
-
+  if (!data?.image_id || (!data?.url && !image_url)) return null;
   return (
     <div className="flex h-full w-full select-none flex-col items-center justify-center gap-y-2">
       <img
