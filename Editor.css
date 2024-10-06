@@ -507,5 +507,33 @@
     .remirror-is-empty {
       @apply hidden;
     }
+    .spoiler {
+      @apply cursor-pointer bg-black px-0 text-black transition-none;
+
+      &::selection {
+        @apply text-black;
+      }
+
+      .mention-atom-node-view-wrapper {
+        @apply text-black;
+
+        a {
+          @apply transition-none;
+        }
+        .characterMentionImage {
+          div {
+            @apply bg-transparent transition-none;
+          }
+        }
+      }
+      .characterMentionImage {
+        div {
+          @apply bg-transparent transition-none;
+        }
+        img {
+          @apply opacity-0 transition-none;
+        }
+      }
+    }
   }
 }
