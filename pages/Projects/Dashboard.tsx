@@ -64,7 +64,12 @@ function createEntityStats(reff: MutableRefObject<HTMLDivElement>, data: Record<
   const height = reff.current.clientHeight;
 
   // Create SVG container
-  const svg = d3.select(reff.current).append("svg").attr("width", width).attr("height", height).append("g");
+  const svg = d3
+    .select(reff.current)
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height + 10)
+    .append("g");
 
   const entitiesToShow = Object.entries(data).filter(([entity]) => mainEntities.includes(entity));
 
@@ -78,7 +83,7 @@ function createEntityStats(reff: MutableRefObject<HTMLDivElement>, data: Record<
     .scaleLinear()
     .domain([0, Math.max(...entitiesToShow.map(([, count]) => count))])
     .nice()
-    .range([height - 10, 10]);
+    .range([height, 10]);
 
   const yAxis = d3
     .axisRight(y)
@@ -112,7 +117,7 @@ function createEntityStats(reff: MutableRefObject<HTMLDivElement>, data: Record<
     .append("rect")
     .attr("class", (d) => getBarColor(d[0] as AllAvailableEntities))
     .attr("x", (d) => x(`${getSentenceCase(d[0])} (${d[1]})` || "") || "")
-    .attr("y", (d) => y(d[1]) - 10)
+    .attr("y", (d) => y(d[1]))
     .attr("width", x.bandwidth())
     .attr("height", (d) => height - y(d[1]));
 
