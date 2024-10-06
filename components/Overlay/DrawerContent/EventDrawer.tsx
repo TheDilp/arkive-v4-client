@@ -18,6 +18,7 @@ import {
   EventStateType,
   EventType,
   onChangeValue,
+  PreviewableEntities,
   TabType,
   UserHasPermissionsType,
 } from "../../../types";
@@ -518,7 +519,7 @@ export function EventDrawer({ data, exceptions }: Props) {
                             setDrawer((prev) => ({
                               ...prev,
                               title: "Preview",
-                              data: { id: event?.document?.id as string, entity_type: "documents" },
+                              data: { id: event?.document?.id as string, entity_type: "documents" as PreviewableEntities },
                               type: "entity_preview",
                               size: "half",
                             }))

@@ -56,6 +56,7 @@ import {
   FormattedRelationship,
   ImageType,
   MapType,
+  PreviewableEntities,
   UserHasPermissionsType,
   WebhookType,
 } from "../../types";
@@ -338,7 +339,7 @@ function documentsTableColumns(
                     ...prev,
                     data: {
                       id: row.original.id,
-                      entity_type: "documents",
+                      entity_type: "documents" as PreviewableEntities,
                     },
                     title: "Preview document",
                     type: "entity_preview",

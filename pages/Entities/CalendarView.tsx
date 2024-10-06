@@ -25,7 +25,7 @@ import {
   useHasPermissions,
   useNavbarTitle,
 } from "../../hooks";
-import { DrawerAtomType, UserHasPermissionsType, UserType } from "../../types";
+import { DrawerAtomType, PreviewableEntities, UserHasPermissionsType, UserType } from "../../types";
 import { CalendarFilters, CalendarType, CurrentDateType, EventType, MonthType } from "../../types/EntityTypes/calendarTypes";
 import {
   contextMenuAtom,
@@ -268,7 +268,7 @@ function CalendarRangeEvents({
                                   title: "Preview document",
                                   type: "entity_preview",
                                   size: "lg",
-                                  data: { id: event.document_id as string, entity_type: "documents" },
+                                  data: { id: event.document_id as string, entity_type: "documents" as PreviewableEntities },
                                 })),
                             },
                           ]
@@ -298,7 +298,7 @@ function CalendarRangeEvents({
                                   title: "Preview document",
                                   type: "entity_preview",
                                   size: "lg",
-                                  data: { id: event.document_id as string, entity_type: "documents" },
+                                  data: { id: event.document_id as string, entity_type: "documents" as PreviewableEntities },
                                 })),
                             },
                             {

@@ -238,7 +238,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
           <div className="flex flex-wrap gap-2">
             {document?.alter_names?.length
               ? document.alter_names.map((alter_name) => (
-                  <div className="w-fit" key={alter_name.title}>
+                  <div key={alter_name.title} className="w-fit">
                     <Badge
                       clearAction={
                         canCreateOrEdit
@@ -352,7 +352,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
               {(providedDroppable) => (
                 <div className="flex w-full flex-col" {...providedDroppable.droppableProps} ref={providedDroppable.innerRef}>
                   {(document?.template_fields || [])?.map((f, idx) => (
-                    <Draggable draggableId={f.id || f.key + idx} index={idx} key={f.id}>
+                    <Draggable key={f.id} draggableId={f.id || f.key + idx} index={idx}>
                       {(providedDraggable) => (
                         <div
                           className="my-1 flex w-full flex-nowrap gap-x-2"
@@ -379,8 +379,8 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                               isIgnoringOpenChanges
                               label={getSentenceCase(f.key) || "New key"}>
                               <div
-                                className="flex max-h-[80%] max-w-full flex-col gap-y-2 overflow-auto overflow-x-auto p-2"
-                                key={f.id}>
+                                key={f.id}
+                                className="flex max-h-[80%] max-w-full flex-col gap-y-2 overflow-auto overflow-x-auto p-2">
                                 <MatchField
                                   additional_data={f.additional_data}
                                   allMatches={document?.template_fields || []}

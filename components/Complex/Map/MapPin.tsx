@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 
 import { useUpdateMapSubEntity } from "../../../hooks";
 import { useImageURL } from "../../../hooks/ui/useImageURL";
-import { DropdownItemType, MapPinType } from "../../../types";
+import { DropdownItemType, MapPinType, PreviewableEntities } from "../../../types";
 import { contextMenuAtom, dialogAtom, drawerAtom, getAssetURL, IconEnum } from "../../../utils";
 
 export function MapPin({
@@ -107,7 +107,7 @@ export function MapPin({
                   ...prev,
                   data: {
                     id: doc_id,
-                    entity_type: "documents",
+                    entity_type: "documents" as PreviewableEntities,
                   },
                   title: "Preview document",
                   size: "half",
