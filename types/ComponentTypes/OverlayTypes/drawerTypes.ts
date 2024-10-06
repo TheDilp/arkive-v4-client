@@ -167,6 +167,7 @@ export type DrawerAtomType = {
           | "dictionaries"
           | "images";
         image_type?: AssetType;
+        isViewOnly?: boolean;
       };
     }
   | { type: "project" | "invite_to_project" | "nodes_from_characters" | "nodes_from_images" | null; data: null }

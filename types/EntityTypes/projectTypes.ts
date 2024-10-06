@@ -1,16 +1,13 @@
 import { UserType } from "../userTypes";
 import { BlueprintInstanceType } from "./blueprintInstanceTypes";
-import { BlueprintType } from "./blueprintTypes";
 import { CalendarType, EventType } from "./calendarTypes";
 import { CharacterRelationshipType } from "./characterRelationshipTypes";
 import { CharacterType } from "./characterTypes";
-import { ConversationType } from "./conversationTypes";
 import { DictionaryType } from "./dictionaryTypes";
 import { DocumentType } from "./documentTypes";
 import { GraphType } from "./graphTypes";
 import { ImageType } from "./imageTypes";
 import { MapPinTypesType, MapType } from "./mapTypes";
-import { RandomTableType } from "./randomTableTypes";
 import { RoleType } from "./rolesTypes";
 
 export interface ProjectType {
@@ -31,14 +28,11 @@ export interface ProjectType {
 
 export type ProjectDashboardType = [
   { name: "characters"; result: (Pick<CharacterType, "id" | "portrait_id"> & { title: string })[] },
-  { name: "blueprints"; result: Pick<BlueprintType, "id" | "title" | "icon">[] },
   { name: "blueprint_instances"; result: Pick<BlueprintInstanceType, "id" | "title" | "parent_id">[] },
   { name: "documents"; result: Pick<DocumentType, "id" | "title" | "icon">[] },
   { name: "maps"; result: Pick<MapType, "id" | "title">[] },
   { name: "graphs"; result: Pick<GraphType, "id" | "title">[] },
   { name: "calendars"; result: Pick<CalendarType, "id" | "title">[] },
   { name: "events"; result: Pick<EventType, "id" | "title" | "parent_id">[] },
-  { name: "random_tables"; result: Pick<RandomTableType, "id" | "title" | "parent_id">[] },
-  { name: "conversations"; result: Pick<ConversationType, "id" | "title">[] },
   { name: "dictionaries"; result: Pick<DictionaryType, "id" | "title">[] },
 ];
