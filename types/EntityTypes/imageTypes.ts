@@ -5,6 +5,7 @@ import { TagType } from "./tagTypes";
 export interface ImageType {
   id: string;
   title: string;
+  description?: string | null;
   project_id: string;
   owner_id: string;
   permissions: EntityPermissionType[];

@@ -6,7 +6,7 @@ import { ImageType, TabType, UserHasPermissionsType } from "../../../types";
 import { createOrEditPermission, getPreviewImageURLs, IconEnum } from "../../../utils";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { ImagePreview } from "../../DataDisplay";
-import { Button, ImageUpload, Input, TagInput } from "../../Form";
+import { Button, ImageUpload, Input, TagInput, Textarea } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 
@@ -86,7 +86,10 @@ export function ImageDrawer({ data }: Props) {
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {tabs[selectedTab].id === "1" ? (
         <>
-          <Input name="title" onChange={handleChange} value={image?.title || ""} />
+          <Input label="Title" name="title" onChange={handleChange} value={image?.title || ""} />
+          <div className="h-24">
+            <Textarea label="Description" name="description" onChange={handleChange} value={image?.description || ""} />
+          </div>
           {replacementImage.length ? (
             imageUrls.map((img) => (
               <ImagePreview
