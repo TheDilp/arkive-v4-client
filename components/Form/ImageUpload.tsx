@@ -31,7 +31,7 @@ export function ImageUpload({ images, onChange, isDisabled, isMultiple = true }:
                 }
                 if (count > 0) {
                   createNotification({
-                    title: `${count} ${count === 1 ? "image" : "images"} cannot be uploaded due to size (max 100 MB).`,
+                    title: `${count} ${count === 1 ? "image" : "images"} cannot be uploaded due to size (max 20 MB).`,
                     hasNoTruncate: true,
                     variant: "warning",
                     icon: IconEnum.warning,
@@ -59,7 +59,7 @@ export function ImageUpload({ images, onChange, isDisabled, isMultiple = true }:
             <span className="font-semibold">Click to upload</span> or drag and drop
           </p>
           <span className="text-xs text-zinc-500 dark:text-zinc-400">Image files are converted to the WEBP format.</span>
-          <span className="text-xs text-zinc-500 dark:text-zinc-400">Maximum image size is 100 MB.</span>
+          <span className="text-xs text-zinc-500 dark:text-zinc-400">Maximum image size is 20 MB.</span>
         </div>
         <input
           accept="image/*"
@@ -72,14 +72,14 @@ export function ImageUpload({ images, onChange, isDisabled, isMultiple = true }:
               const files = Array.from(e.target.files);
               let count = 0;
               for (let index = 0; index < files.length; index += 1) {
-                if (files[index].size > 100 * 1024 * 1024) {
+                if (files[index].size > 20 * 1024 * 1024) {
                   files.splice(index, 1);
                   count += 1;
                 }
               }
               if (count > 0) {
                 createNotification({
-                  title: `${count} ${count === 1 ? "image" : "images"} cannot be uploaded due to size (max 100 MB).`,
+                  title: `${count} ${count === 1 ? "image" : "images"} cannot be uploaded due to size (max 20 MB).`,
                   hasNoTruncate: true,
                   variant: "warning",
                   icon: IconEnum.warning,
@@ -143,14 +143,14 @@ export function AvatarUpload({
               const files = Array.from(e.target.files);
               let count = 0;
               for (let index = 0; index < files.length; index += 1) {
-                if (files[index].size > 100 * 1024 * 1024) {
+                if (files[index].size > 20 * 1024 * 1024) {
                   files.splice(index, 1);
                   count += 1;
                 }
               }
               if (count > 0) {
                 createNotification({
-                  title: `${count} ${count === 1 ? "image" : "images"} cannot be uploaded due to size (max 100 MB).`,
+                  title: `${count} ${count === 1 ? "image" : "images"} cannot be uploaded due to size (max 20 MB).`,
                   hasNoTruncate: true,
                   variant: "warning",
                   icon: IconEnum.warning,
