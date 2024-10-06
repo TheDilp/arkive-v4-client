@@ -13,6 +13,7 @@ import {
   MapPinType,
   MessageType,
   PermissionCodeType,
+  PreviewableEntities,
   TagType,
 } from "../../EntityTypes";
 import { TableDispatch } from "../DataDisplayTypes";
@@ -155,17 +156,7 @@ export type DrawerAtomType = {
       data: {
         id: string;
         parent_id?: string;
-        entity_type:
-          | "characters"
-          | "blueprint_instances"
-          | "documents"
-          | "maps"
-          | "map_pins"
-          | "graphs"
-          | "calendars"
-          | "events"
-          | "dictionaries"
-          | "images";
+        entity_type: PreviewableEntities;
         image_type?: AssetType;
         isViewOnly?: boolean;
       };

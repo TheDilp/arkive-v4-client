@@ -117,3 +117,14 @@ export type SearchableMentionEntities =
 export type EntitiesWithFolders = "documents" | "maps" | "graphs" | "dictionaries" | "calendars" | "random_tables";
 
 export type AllAvailableEntities = AvailableEntityType | AvailableSubEntityType;
+
+export type PreviewableEntities =
+  | "characters"
+  | "blueprint_instances"
+  | "maps"
+  | "map_pins"
+  | "graphs"
+  | "calendars"
+  | "events"
+  | "dictionaries"
+  | "images";

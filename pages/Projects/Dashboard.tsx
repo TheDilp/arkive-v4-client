@@ -6,7 +6,7 @@ import { clamp } from "remirror";
 
 import { Alert, EntityPreview, Icon, Select } from "../../components";
 import { useBreakpoint, useGetProjectDashboard, useGetStats, useNavbarTitle } from "../../hooks";
-import { AllAvailableEntities, AvailableEntityType, AvailableSubEntityType } from "../../types";
+import { AllAvailableEntities, AvailableEntityType, AvailableSubEntityType, PreviewableEntities } from "../../types";
 import {
   capitalizeFirstLetter,
   drawerAtom,
@@ -335,7 +335,7 @@ export function Dashboard() {
                           data: {
                             id: r.id,
                             parent_id: "parent_id" in r ? (r?.parent_id ?? undefined) : undefined,
-                            entity_type: d.name,
+                            entity_type: d.name as PreviewableEntities,
                             isViewOnly: d.name === "events",
                           },
                           type: "entity_preview",

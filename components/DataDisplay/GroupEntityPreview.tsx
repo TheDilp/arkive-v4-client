@@ -1,7 +1,7 @@
 import { useSetAtom } from "jotai";
 import { useParams } from "react-router-dom";
 
-import { AvailableEntityType, ItemPreviewType } from "../../types";
+import { ItemPreviewType, PreviewableEntities } from "../../types";
 import { drawerAtom, getEntityLink } from "../../utils";
 import { Alert } from "../Misc";
 import { EntityPreview } from "./EntityPreview";
@@ -39,7 +39,7 @@ export function GroupEntityPreview({ items, field_label }: Props) {
                         data:
                           item.type === "images"
                             ? { id: item.id, entity_type: "images", image_type: "images" }
-                            : { id: item.id, parent_id: item.parent_id, entity_type: item.type as AvailableEntityType },
+                            : { id: item.id, parent_id: item.parent_id, entity_type: item.type as PreviewableEntities },
                         type: "entity_preview",
                         size: "half",
                       }));
