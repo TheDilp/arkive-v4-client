@@ -90,6 +90,7 @@ function DropdownComponent({ allowedPlacements = [], children, items, isReferenc
         apply({ rects, elements }) {
           Object.assign(elements?.floating?.style, {
             minWidth: "fit-content",
+            width: `${rects.reference.width}px`,
             maxWidth: isReferenceMaxSize ? `${rects.reference.width}px` : "",
           });
         },
