@@ -120,6 +120,7 @@ export function EntitiesView() {
                             data: {
                               type: "blueprint_instances",
                               gateway_type: "create",
+                              parent_id: item_id,
                             },
                             type: "gateway_access",
                           })),

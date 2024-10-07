@@ -189,6 +189,7 @@ export type DrawerAtomType = {
         configuration_id?: string;
         type: "characters" | "blueprint_instances";
         gateway_type?: "create" | "update";
+        parent_id?: string;
       };
     }
   | { type: "node_search"; data: { cy: Core } }

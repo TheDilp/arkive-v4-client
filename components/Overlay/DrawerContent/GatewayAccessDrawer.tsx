@@ -15,6 +15,7 @@ import {
   useUpdateEntity,
 } from "../../../hooks";
 import {
+  BlueprintType,
   CharacterFieldTemplateType,
   CharacterType,
   DrawerAtomType,
@@ -51,6 +52,7 @@ type Props = {
     configuration_id?: string;
     gateway_type?: "create" | "update";
     type: "characters" | "blueprint_instances";
+    parent_id?: string;
   };
   exceptions: DrawerAtomType["exceptions"];
 };
@@ -267,17 +269,27 @@ function EntitiesAccess({
   gateway_type,
   configuration_id,
   selection,
+  blueprint_field_types,
+  type,
   setSelection,
 }: {
   gateway_type?: "create" | "update";
   configuration_id?: string;
+  blueprint_field_types: string[];
+  type: Props["data"]["type"];
   selection: Record<AvailableGatewayEntites, string[]>;
   setSelection: Dispatch<SetStateAction<Record<AvailableGatewayEntites, string[]>>>;
 }) {
   const { project_id } = useParams();
 
-  const tabs: TabType[] =
-    gateway_type === "create" ? [{ id: "tags", label: "Tags", icon: IconEnum.tags }, ...entityTabs] : entityTabs;
+  const tabs: TabType[] = (
+    gateway_type === "create" ? [{ id: "tags", label: "Tags", icon: IconEnum.tags }, ...entityTabs] : entityTabs
+  ).filter(
+    (tab) =>
+      blueprint_field_types.includes(tab.id) ||
+      tab.id === "tags" ||
+      (blueprint_field_types.includes("locations") && tab.id === "map_pins")
+  );
 
   const [selectedTab, setSelectedTab] = useState(0);
   const entityType = tabs[selectedTab].id as AvailableGatewayEntites;
@@ -463,56 +475,62 @@ function EntitiesAccess({
             label="Tags"
             tags={tags}
           />
+          {type === "characters" ? (
+            <>
+              <Title isDrawerTitle label="Addtional field templates (based on selected tags)" size="lg" />
 
-          <Title isDrawerTitle label="Addtional field templates (based on selected tags)" size="lg" />
-
-          {templates?.data?.length ? (
-            (templates?.data || []).map((t) => {
-              const otherFields = t.character_fields.filter((f) => !f.section_id);
-              return (
-                <Collapsible key={t.id} label={t.title} size="sm">
-                  <div className="flex flex-col gap-y-2 p-1.5">
-                    {t.character_fields_sections.map((section) => {
-                      return (
-                        <Collapsible key={section.id} label={section.title}>
-                          <div className="flex flex-col gap-y-1 p-2">
-                            {t.character_fields
-                              .filter((f) => f.section_id === section.id)
-                              .map((field) => (
-                                <div key={field.id} className="flex flex-nowrap justify-between border-b border-zinc-700">
-                                  <span>
-                                    <Badge label={field.title} variant="info" />
-                                  </span>
-                                  <span>{getSentenceCase(field.field_type)}</span>
-                                </div>
-                              ))}
-                          </div>
-                        </Collapsible>
-                      );
-                    })}
-                    {otherFields.length ? (
-                      <Collapsible label={"Other"}>
-                        <div className="flex flex-col gap-y-1 p-2">
-                          {t.character_fields
-                            .filter((f) => f.section_id === null)
-                            .map((field) => (
-                              <div key={field.id} className="flex flex-nowrap justify-between border-b border-zinc-700">
-                                <span>
-                                  <Badge label={field.title} variant="info" />
-                                </span>
-                                <span>{getSentenceCase(field.field_type)}</span>
+              {templates?.data?.length ? (
+                (templates?.data || []).map((t) => {
+                  const otherFields = t.character_fields.filter((f) => !f.section_id);
+                  return (
+                    <Collapsible key={t.id} label={t.title} size="sm">
+                      <div className="flex flex-col gap-y-2 p-1.5">
+                        {t.character_fields_sections.map((section) => {
+                          return (
+                            <Collapsible key={section.id} label={section.title}>
+                              <div className="flex flex-col gap-y-1 p-2">
+                                {t.character_fields
+                                  .filter((f) => f.section_id === section.id)
+                                  .map((field) => (
+                                    <div key={field.id} className="flex flex-nowrap justify-between border-b border-zinc-700">
+                                      <span>
+                                        <Badge label={field.title} variant="info" />
+                                      </span>
+                                      <span>{getSentenceCase(field.field_type)}</span>
+                                    </div>
+                                  ))}
                               </div>
-                            ))}
-                        </div>
-                      </Collapsible>
-                    ) : null}
-                  </div>
-                </Collapsible>
-              );
-            })
-          ) : (
-            <Alert label="There are no additional field templates associated with the selected tags." variant="info-bordered" />
-          )}
+                            </Collapsible>
+                          );
+                        })}
+                        {otherFields.length ? (
+                          <Collapsible label={"Other"}>
+                            <div className="flex flex-col gap-y-1 p-2">
+                              {t.character_fields
+                                .filter((f) => f.section_id === null)
+                                .map((field) => (
+                                  <div key={field.id} className="flex flex-nowrap justify-between border-b border-zinc-700">
+                                    <span>
+                                      <Badge label={field.title} variant="info" />
+                                    </span>
+                                    <span>{getSentenceCase(field.field_type)}</span>
+                                  </div>
+                                ))}
+                            </div>
+                          </Collapsible>
+                        ) : null}
+                      </div>
+                    </Collapsible>
+                  );
+                })
+              ) : (
+                <Alert
+                  label="There are no additional field templates associated with the selected tags."
+                  variant="info-bordered"
+                />
+              )}
+            </>
+          ) : null}
         </div>
       ) : (
         <Table
@@ -601,6 +619,33 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
     { enabled: !!data.configuration_id }
   );
 
+  const { data: blueprint } = useGetEntity<BlueprintType>(
+    data?.parent_id,
+    "blueprints",
+    {
+      data: { id: data?.parent_id },
+      fields: ["id", "title"],
+      relations: {
+        blueprint_fields: true,
+      },
+    },
+    {
+      enabled: !!data?.parent_id && data?.type === "blueprint_instances",
+    }
+  );
+
+  const blueprint_field_types = blueprint?.data?.blueprint_fields?.reduce((prev, curr) => {
+    if (!prev.includes(curr.field_type)) {
+      if (curr.field_type.includes("_single")) {
+        prev.push(curr.field_type.replace("_single", ""));
+      }
+      if (curr.field_type.includes("_multiple")) {
+        prev.push(curr.field_type.replace("_multiple", ""));
+      }
+    }
+    return prev;
+  }, [] as string[]);
+
   const { mutate: create, isLoading: isCreating } = useCreateEntity<InsertGatewayConfigurationType>("gateway_configurations");
   const { mutate: update, isLoading: isUpdating } = useUpdateEntity<UpdateGatewayConfigurationType>(
     "gateway_configurations",
@@ -688,7 +733,7 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
         </div>
       ) : (
         <>
-          {data?.entity_id ? null : (
+          {data?.entity_id || data?.type === "blueprint_instances" ? null : (
             <div className="grid grid-cols-2 gap-x-2">
               <Input
                 label="First name"
@@ -708,11 +753,30 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
                     label="Locked"
                     name="is_locked"
                     onChange={handleChange}
-                    tooltip="If checked the user won't be able to edit these properties"
+                    tooltip="If checked the user won't be able to edit the name of this character"
                     value={createConfig.is_locked}
                   />
                 </span>
               </div>
+            </div>
+          )}
+          {data?.entity_id || data?.type === "characters" ? null : (
+            <div className="flex items-center gap-x-2">
+              <Input
+                label="Title"
+                name="title"
+                onChange={handleChange}
+                value={"title" in createConfig ? createConfig?.title : createConfig?.first_name}
+              />
+              <span className="self-end pb-2">
+                <Checkbox
+                  label="Locked"
+                  name="is_locked"
+                  onChange={handleChange}
+                  tooltip="If checked the user won't be able to edit the title of the blueprint instance"
+                  value={createConfig.is_locked}
+                />
+              </span>
             </div>
           )}
 
@@ -729,10 +793,12 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
 
             {(configId && selection) || !data?.entity_id ? (
               <EntitiesAccess
+                blueprint_field_types={blueprint_field_types || []}
                 configuration_id={data?.configuration_id}
                 gateway_type={data?.gateway_type}
                 selection={selection}
                 setSelection={setSelection}
+                type={data?.type}
               />
             ) : null}
           </div>
