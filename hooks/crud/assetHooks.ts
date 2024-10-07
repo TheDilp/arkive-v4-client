@@ -196,7 +196,7 @@ export function useGetImage(
 }
 export function useUpdateImage<
   InsertType extends {
-    data: { title: string; owner_id?: string; file?: File };
+    data: { title: ImageType["title"]; description?: ImageType["description"]; owner_id?: ImageType["owner_id"]; file?: File };
     relations: { tags: { id: string }[] };
     permissions?: EntityPermissionType[];
   },
@@ -210,6 +210,9 @@ export function useUpdateImage<
 
       if (updateValues?.data?.title) {
         formData.append("title", updateValues.data.title);
+      }
+      if (updateValues?.data?.description) {
+        formData.append("description", updateValues.data.description);
       }
 
       if (updateValues?.data?.owner_id) {

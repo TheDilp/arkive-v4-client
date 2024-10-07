@@ -40,7 +40,7 @@ export function ImageDrawer({ data }: Props) {
     project_id as string,
     "images",
     {
-      fields: ["id", "title", "is_public", "owner_id", "type"],
+      fields: ["id", "title", "is_public", "description", "owner_id", "type"],
       relations: {
         tags: true,
       },
@@ -142,7 +142,12 @@ export function ImageDrawer({ data }: Props) {
           if (image?.title)
             await update(
               {
-                data: { title: image.title, owner_id: image.owner_id, file: replacementImage[0] },
+                data: {
+                  title: image.title,
+                  description: image?.description,
+                  owner_id: image.owner_id,
+                  file: replacementImage[0],
+                },
                 relations: { tags: image.tags.map((t) => ({ id: t.id })) },
                 permissions: image?.permissions || [],
               },
