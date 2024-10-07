@@ -3,7 +3,7 @@ import ls from "localstorage-slim";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Breadcrumbs, Button, Graph, Input, Select } from "../../components";
+import { Breadcrumbs, Button, Dropdown, Graph, Input, Select } from "../../components";
 import { useHasPermissions } from "../../hooks";
 import { AvailableEntityType, DrawerContentCreateNewType } from "../../types";
 import {
@@ -92,21 +92,49 @@ export function EntitiesView() {
               </div>
               {type === "blueprints" ? (
                 <div className="w-52">
-                  <Button
-                    icon={IconEnum.add}
-                    isDisabled={!navbarTitle || !permissions?.create_blueprint_instances}
-                    isLoading={!navbarTitle}
-                    label={navbarTitle ? `Create ${navbarTitle.split("|").at(-1)}` : ""}
-                    onClick={() =>
-                      setDrawer((prev) => ({
-                        ...prev,
-                        data: {},
-                        title: `Create new ${navbarTitle.split("|").at(-1)}`,
-                        type: "blueprint_instances",
-                        size: "lg",
-                      }))
-                    }
-                  />
+                  <Dropdown
+                    isReferenceMaxSize
+                    items={[
+                      {
+                        id: "new_blueprint_instance",
+                        title: `Create ${navbarTitle.split("|").at(-1)}`,
+                        icon: IconEnum.add,
+                        onClick: () =>
+                          setDrawer((prev) => ({
+                            ...prev,
+                            data: {},
+                            title: `Create ${navbarTitle.split("|").at(-1)}`,
+                            type: "blueprint_instances",
+                            size: "lg",
+                          })),
+                      },
+                      {
+                        id: "gateway",
+                        title: "Create gateway access",
+                        icon: IconEnum.gateway,
+                        onClick: () =>
+                          setDrawer((prev) => ({
+                            ...prev,
+                            size: "half",
+                            title: "Grant edit access",
+                            data: {
+                              type: "blueprint_instances",
+                              gateway_type: "create",
+                            },
+                            type: "gateway_access",
+                          })),
+                      },
+                    ]}>
+                    <div className="w-52">
+                      <Button
+                        icon={IconEnum.add}
+                        isDisabled={!navbarTitle || !permissions?.create_blueprint_instances}
+                        isLoading={!navbarTitle}
+                        label={navbarTitle ? `Create ${navbarTitle.split("|").at(-1)}` : ""}
+                        onClick={undefined}
+                      />
+                    </div>
+                  </Dropdown>
                 </div>
               ) : null}
             </div>
