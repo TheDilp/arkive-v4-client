@@ -748,7 +748,7 @@ function CharacterViewHeader({
                 setDrawer((prev) => ({
                   ...prev,
                   size: "half",
-                  title: "Grant edit access",
+                  title: "Grant create access",
                   data: {
                     type: "characters",
                     gateway_type: "create",
