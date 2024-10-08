@@ -293,7 +293,7 @@ function TableColumnFilter<T>({
   return (
     <div className={columnFilterContainer()}>
       <h4 className={columnFilterTitle()}>
-        {getSentenceCase(typeof columnHeader === "string" ? columnHeader : "" || "")}{" "}
+        {getSentenceCase(typeof columnHeader === "string" ? columnHeader : "")}{" "}
         {columnHeader && typeof columnHeader === "string" ? "filters" : ""}
       </h4>
       {isAndDisabled ? null : (
