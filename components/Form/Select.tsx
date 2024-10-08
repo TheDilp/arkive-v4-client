@@ -566,6 +566,7 @@ export function Select({
                         isPreview
                         isTooltipDisabled
                         label={label || ""}
+                        manual_project_id={opt?.project_id || null}
                         shape={opt?.image?.shape}
                         size="xs"
                       />
