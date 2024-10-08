@@ -8,11 +8,11 @@ import { Avatar, Icon } from "../Misc";
 
 const EntityPreviewClasses = tv({
   slots: {
-    container: "flex flex-col min-h-fit",
+    container: "flex flex-col min-h-fit max-w-full",
     label: "block min-h-[20px] truncate text-sm text-zinc-300",
     base: "flex items-center gap-x-1 rounded p-2",
     link: "flex max-h-10 mr-auto items-center gap-x-1 rounded p-2 ",
-    linkTitle: "truncate",
+    linkTitle: "truncate max-w-56",
     action: "w-min min-w-[2rem]",
     otherAction: "w-min",
   },
@@ -73,7 +73,7 @@ export function EntityPreview({
   icon,
   image_id,
   label,
-  hasNoBackground,
+  hasNoBackground = false,
   otherActionIcon,
   manual_project_id,
   variant = "secondary",
@@ -91,7 +91,6 @@ export function EntityPreview({
     action: actionClasses,
     otherAction: otherActionClasses,
   } = EntityPreviewClasses({ hasNoBackground, variant, size, hasLink: !!link });
-
   return (
     <div className={container()}>
       {label ? <div className={labelClasses()}>{label}</div> : null}
@@ -112,7 +111,7 @@ export function EntityPreview({
           </span>
         ) : null}
         <Link className={linkClasses()} to={link || "#"}>
-          <span className={linkTitle()}>{title}</span>
+          <span className={linkTitle()}>{title} </span>
         </Link>
         {previewAction ? (
           <span className={actionClasses()} tabIndex={0}>
