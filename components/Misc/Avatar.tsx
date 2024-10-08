@@ -121,7 +121,7 @@ export function Avatar({
               if (hasShowImage)
                 setDialog((prev) => ({
                   ...prev,
-                  data: { image_id, url: image_url, image_type: imageType },
+                  data: { image_id, url: image_url, manual_project_id: manual_project_id || project_id, image_type: imageType },
                   type: "image_view",
                   title: "Image view",
                 }));
