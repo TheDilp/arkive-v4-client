@@ -82,7 +82,7 @@ export function TemplateEventField({
           </div>
         )}
 
-        {!IS_GATEWAY ? null : (
+        {!IS_GATEWAY || !isDisabled ? null : (
           <Select
             isClearable
             isMultiple={fieldType === "events_multiple"}
@@ -163,6 +163,25 @@ export function TemplateEventField({
                     })),
                   },
                 ]);
+              } else {
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.events`,
+                    value: [
+                      {
+                        related_id: value,
+                        event: {
+                          id: value,
+                          title: label,
+                          icon,
+                          parent_id: parent_id,
+                          project_id: projectId,
+                        },
+                      },
+                    ],
+                  },
+                ]);
               }
             }}
             options={presetOptions.map((opt) => ({
@@ -172,32 +191,33 @@ export function TemplateEventField({
             value={(currentValue || []).map((c) => c.related_id)}
           />
         )}
-
-        <div className={IS_GATEWAY ? "grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-y-2"}>
-          {(currentValue || [])?.map((val) => {
-            return (
-              <EntityPreview
-                key={val?.event.id}
-                clearAction={
-                  isDisabled
-                    ? undefined
-                    : (instance_id) => {
-                        handleChange([
-                          {
-                            name: `${name}.events`,
-                            value: currentValue.filter((c) => c.related_id !== instance_id),
-                          },
-                        ]);
-                      }
-                }
-                id={val?.event?.id}
-                link={getEntityLink(project_id as string, "events", id, val?.event.parent_id)}
-                title={val?.event.title}
-                type="events"
-              />
-            );
-          })}
-        </div>
+        {fieldType === "events_multiple" ? (
+          <div className={IS_GATEWAY ? "grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-y-2"}>
+            {(currentValue || [])?.map((val) => {
+              return (
+                <EntityPreview
+                  key={val?.event.id}
+                  clearAction={
+                    isDisabled
+                      ? undefined
+                      : (instance_id) => {
+                          handleChange([
+                            {
+                              name: `${name}.events`,
+                              value: currentValue.filter((c) => c.related_id !== instance_id),
+                            },
+                          ]);
+                        }
+                  }
+                  id={val?.event?.id}
+                  link={getEntityLink(project_id as string, "events", id, val?.event.parent_id)}
+                  title={val?.event.title}
+                  type="events"
+                />
+              );
+            })}
+          </div>
+        ) : null}
       </div>
     </TemplateFieldContainer>
   );

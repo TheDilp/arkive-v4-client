@@ -99,13 +99,13 @@ export function TemplateCharacterField({
             />
           </div>
         )}
-        {isDisabled || !IS_GATEWAY ? null : (
+        {IS_GATEWAY && !isDisabled ? (
           <Select
             isClearable
             isMultiple={fieldType === "characters_multiple"}
             label={title}
             name={name}
-            onChange={({ value, label, icon }) => {
+            onChange={({ value, label, image }) => {
               if (fieldType === "characters_multiple" && (!value || value?.length === 0)) {
                 handleChange([
                   { name: `${name}.id`, value: id },
@@ -136,12 +136,13 @@ export function TemplateCharacterField({
                         related_id: opt.value,
                         character: {
                           id: opt.value,
-                          title: opt.label,
-                          icon: opt?.icon,
+                          full_name: opt?.label,
+                          portrait_id: opt?.image,
                         },
                       })),
                     },
                   ]);
+                  return;
                 } else {
                   handleChange([
                     { name: `${name}.id`, value: id },
@@ -151,8 +152,8 @@ export function TemplateCharacterField({
                         related_id: value,
                         character: {
                           id: value,
-                          title: label,
-                          icon,
+                          full_name: label,
+                          portrait_id: image?.id,
                         },
                       },
                     },
@@ -170,10 +171,27 @@ export function TemplateCharacterField({
                       related_id: opt.value,
                       character: {
                         id: opt.value,
-                        title: opt.label,
-                        icon: opt?.icon,
+                        full_name: opt.label,
+                        portrait_id: opt?.image,
                       },
                     })),
+                  },
+                ]);
+              } else {
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.characters`,
+                    value: [
+                      {
+                        related_id: value,
+                        character: {
+                          id: value,
+                          full_name: label,
+                          portrait_id: image?.id,
+                        },
+                      },
+                    ],
                   },
                 ]);
               }
@@ -185,33 +203,36 @@ export function TemplateCharacterField({
                   ? { id: opt.image, shape: "circle", link: getAssetURL(projectId, "images", opt.image) }
                   : undefined,
             }))}
-            value={(currentValue || []).map((c) => c.related_id)}
+            value={
+              fieldType === "characters_single" ? currentValue?.[0]?.related_id : (currentValue || []).map((c) => c.related_id)
+            }
           />
-        )}
-
-        <div className={IS_GATEWAY ? "grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-y-2"}>
-          {(currentValue || [])?.map((val) => {
-            return (
-              <EntityPreview
-                key={val?.character?.id}
-                clearAction={(char_id) => {
-                  handleChange([
-                    {
-                      name: `${name}.characters`,
-                      value: currentValue.filter((c) => c.related_id !== char_id),
-                    },
-                  ]);
-                }}
-                id={val?.character?.id}
-                image_id={val?.character?.portrait_id}
-                link={getEntityLink(projectId || "", "characters", id, undefined)}
-                manual_project_id={projectId}
-                title={val?.character?.full_name || ""}
-                type="characters"
-              />
-            );
-          })}
-        </div>
+        ) : null}
+        {fieldType === "characters_multiple" ? (
+          <div className={IS_GATEWAY ? "grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-y-2"}>
+            {(currentValue || [])?.map((val) => {
+              return (
+                <EntityPreview
+                  key={val?.character?.id}
+                  clearAction={(char_id) => {
+                    handleChange([
+                      {
+                        name: `${name}.characters`,
+                        value: currentValue.filter((c) => c.related_id !== char_id),
+                      },
+                    ]);
+                  }}
+                  id={val?.character?.id}
+                  image_id={val?.character?.portrait_id}
+                  link={IS_GATEWAY ? undefined : getEntityLink(projectId || "", "characters", id, undefined)}
+                  manual_project_id={projectId}
+                  title={val?.character?.full_name || ""}
+                  type="characters"
+                />
+              );
+            })}
+          </div>
+        ) : null}
       </div>
     </TemplateFieldContainer>
   );

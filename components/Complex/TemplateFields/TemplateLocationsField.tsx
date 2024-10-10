@@ -80,7 +80,7 @@ export function TemplateLocationsField({
           </div>
         )}
 
-        {!IS_GATEWAY ? null : (
+        {IS_GATEWAY && !isDisabled ? (
           <Select
             isClearable
             isMultiple={fieldType === "locations_multiple"}
@@ -157,6 +157,23 @@ export function TemplateLocationsField({
                     })),
                   },
                 ]);
+              } else {
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.map_pins`,
+                    value: [
+                      {
+                        related_id: value,
+                        map_pin: {
+                          id: value,
+                          title: label,
+                          icon,
+                        },
+                      },
+                    ],
+                  },
+                ]);
               }
             }}
             options={presetOptions.map((opt) => ({
@@ -166,36 +183,43 @@ export function TemplateLocationsField({
                   ? { id: opt.image, shape: "circle", link: getAssetURL(projectId, "images", opt.image) }
                   : undefined,
             }))}
-            value={(currentValue || []).map((c) => c.related_id)}
+            value={
+              fieldType === "locations_multiple" ? (currentValue || []).map((c) => c.related_id) : currentValue?.[0]?.related_id
+            }
           />
-        )}
+        ) : null}
 
-        <div className={IS_GATEWAY ? "grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-y-2"}>
-          {(currentValue || [])?.map((val) => {
-            return (
-              <EntityPreview
-                key={val.map_pin?.id}
-                clearAction={
-                  isDisabled
-                    ? undefined
-                    : (doc_id) => {
-                        handleChange([
-                          {
-                            name: `${name}.map_pins`,
-                            value: currentValue.filter((c) => c.related_id !== doc_id),
-                          },
-                        ]);
-                      }
-                }
-                icon={val?.map_pin?.icon || ""}
-                id={val?.map_pin?.id}
-                link={getEntityLink(project_id as string, "map_pins", id, undefined)}
-                title={val?.map_pin?.title || ""}
-                type="map_pins"
-              />
-            );
-          })}
-        </div>
+        {fieldType === "locations_multiple" ? (
+          <div
+            className={
+              IS_GATEWAY ? "grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-y-2 overflow-hidden"
+            }>
+            {(currentValue || [])?.map((val) => {
+              return (
+                <EntityPreview
+                  key={val.map_pin?.id}
+                  clearAction={
+                    isDisabled
+                      ? undefined
+                      : (doc_id) => {
+                          handleChange([
+                            {
+                              name: `${name}.map_pins`,
+                              value: currentValue.filter((c) => c.related_id !== doc_id),
+                            },
+                          ]);
+                        }
+                  }
+                  icon={val?.map_pin?.icon || ""}
+                  id={val?.map_pin?.id}
+                  link={getEntityLink(project_id as string, "map_pins", id, undefined)}
+                  title={val?.map_pin?.title || ""}
+                  type="map_pins"
+                />
+              );
+            })}
+          </div>
+        ) : null}
       </div>
     </TemplateFieldContainer>
   );

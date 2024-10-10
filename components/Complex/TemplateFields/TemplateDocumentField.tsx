@@ -172,6 +172,23 @@ export function TemplateDocumentField({
                     })),
                   },
                 ]);
+              } else {
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.documents`,
+                    value: [
+                      {
+                        related_id: value,
+                        document: {
+                          id: value,
+                          title: label,
+                          icon: icon,
+                        },
+                      },
+                    ],
+                  },
+                ]);
               }
             }}
             options={presetOptions.map((opt) => ({

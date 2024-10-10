@@ -36,6 +36,7 @@ export function TemplateImageField({
 }: Props) {
   const { project_id } = useParams();
   const projectId = project_id || presetOptions?.[0]?.project_id;
+
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <div className="flex max-h-96 flex-col gap-y-2 overflow-y-auto">
@@ -95,13 +96,13 @@ export function TemplateImageField({
           </div>
         )}
 
-        {!IS_GATEWAY ? null : (
+        {IS_GATEWAY && !isDisabled ? (
           <Select
             isClearable
             isMultiple={fieldType === "images_multiple"}
             label={title}
             name={name}
-            onChange={({ value, label, icon }) => {
+            onChange={({ value, label }) => {
               if (fieldType === "images_multiple" && (!value || value?.length === 0)) {
                 handleChange([
                   { name: `${name}.id`, value: id },
@@ -110,15 +111,16 @@ export function TemplateImageField({
                     value: [],
                   },
                 ]);
+
                 return;
               }
 
               if (
-                (currentValue || [])?.some((doc) => {
+                (currentValue || [])?.some((img) => {
                   if (fieldType === "images_multiple") {
-                    return value?.includes(doc.related_id);
+                    return value?.includes(img.related_id);
                   }
-                  return doc.related_id === value;
+                  return img.related_id === value;
                 })
               ) {
                 if (fieldType === "images_multiple") {
@@ -133,7 +135,6 @@ export function TemplateImageField({
                         image: {
                           id: opt.value,
                           title: opt.label,
-                          icon: opt?.icon,
                         },
                       })),
                     },
@@ -148,7 +149,6 @@ export function TemplateImageField({
                         image: {
                           id: value,
                           title: label,
-                          icon,
                         },
                       },
                     },
@@ -167,9 +167,24 @@ export function TemplateImageField({
                       image: {
                         id: opt.value,
                         title: opt.label,
-                        icon: opt?.icon,
                       },
                     })),
+                  },
+                ]);
+              } else {
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.images`,
+                    value: [
+                      {
+                        related_id: value,
+                        image: {
+                          id: value,
+                          title: label,
+                        },
+                      },
+                    ],
                   },
                 ]);
               }
@@ -181,35 +196,43 @@ export function TemplateImageField({
                   ? { id: opt.value, shape: "circle", link: getAssetURL(projectId, "images", opt.value) }
                   : undefined,
             }))}
-            value={(currentValue || []).map((c) => c.related_id)}
+            value={
+              fieldType === "images_multiple" ? (currentValue || []).map((c) => c.related_id) : currentValue?.[0]?.related_id
+            }
           />
-        )}
+        ) : null}
 
-        <div className={IS_GATEWAY ? "grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-y-2"}>
-          {(currentValue || [])?.map((val) => {
-            return (
-              <EntityPreview
-                key={val.image.id}
-                clearAction={
-                  isDisabled
-                    ? undefined
-                    : (char_id) => {
-                        handleChange([
-                          {
-                            name: `${name}.images`,
-                            value: currentValue.filter((c) => c.related_id !== char_id),
-                          },
-                        ]);
-                      }
-                }
-                id={val.image?.id}
-                image_id={val.image?.id}
-                title={val.image?.title}
-                type="images"
-              />
-            );
-          })}
-        </div>
+        {fieldType === "images_multiple" ? (
+          <div
+            className={
+              IS_GATEWAY ? "grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-y-2 overflow-hidden"
+            }>
+            {(currentValue || [])?.map((val) => {
+              return (
+                <EntityPreview
+                  key={val.image.id}
+                  clearAction={
+                    isDisabled
+                      ? undefined
+                      : (char_id) => {
+                          handleChange([
+                            {
+                              name: `${name}.images`,
+                              value: currentValue.filter((c) => c.related_id !== char_id),
+                            },
+                          ]);
+                        }
+                  }
+                  id={val.image?.id}
+                  image_id={val.image?.id}
+                  manual_project_id={projectId}
+                  title={val.image?.title}
+                  type="images"
+                />
+              );
+            })}
+          </div>
+        ) : null}
       </div>
     </TemplateFieldContainer>
   );
