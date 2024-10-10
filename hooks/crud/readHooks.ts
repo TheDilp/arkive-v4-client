@@ -136,7 +136,7 @@ export function useGetEntity<EntityType>(
         body: JSON.stringify(body),
         url: `${getServerUrl()}/${type.toLowerCase()}/${id}`,
       });
-      if (!data?.role_access && !IS_PUBLIC) {
+      if (!data?.role_access && !IS_PUBLIC && !IS_GATEWAY) {
         createNotification({
           title: `Your current role in this project does not have permission to view this ${getSingularEntityType(type)}.`,
           timer: 5,
@@ -511,13 +511,17 @@ export function useGetGatewayOptions(
   request: {
     data: { access_id: string; entity_type: "characters" | "blueprint_instances" };
   },
-  type: "characters" | "",
+  type: "characters" | "blueprint_instances",
   options?: UseQueryOptions<any> & {
     queryKeyConcat?: string[];
   }
 ) {
   return useQuery<{
-    data: { create_config: CreateConfigType | undefined; project_id: string; entities: GatewayConfigOptionType[] };
+    data: {
+      create_config: CreateConfigType | undefined;
+      project_id: string;
+      entities: GatewayConfigOptionType[];
+    };
   }>(["gateway", "options", type].concat(options?.queryKeyConcat || []), async () => {
     if (type) {
       return FetchFunction({

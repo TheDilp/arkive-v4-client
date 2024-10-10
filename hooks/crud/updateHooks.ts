@@ -912,10 +912,9 @@ export function useAccessGateway() {
         url: `${baseURLS.baseServer.replace("/api/v1", "")}/gateway/access/${type}/${access_id}/${code}`,
         method: "GET",
       }),
-
     {
-      onSuccess: ({ ok }, code) => {
-        if (ok) {
+      onSuccess: (data, code) => {
+        if (data?.ok) {
           ls.set("code", code, { encrypt: true });
         }
       },

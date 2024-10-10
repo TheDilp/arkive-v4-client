@@ -137,7 +137,7 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
   return useMutation(
     async (updateItemValues: InsertType) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/${type.toLowerCase()}/create`,
+        url: `${getServerUrl()}/${type.toLowerCase()}/create`,
         body: JSON.stringify(updateItemValues),
         method: "POST",
       });
@@ -405,6 +405,7 @@ export function useGrantGatewayAccess() {
         | {
             gateway_type: "create";
             create_config: CreateConfigType;
+            parent_id?: string;
           }
       );
     }) =>
