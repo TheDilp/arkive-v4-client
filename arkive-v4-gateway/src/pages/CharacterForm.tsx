@@ -12,7 +12,7 @@ import {
   useUpdateEntity,
 } from "../../../hooks";
 import { CharacterFieldTemplateType, CharacterFieldType, CharacterType, HandleChangePropsType } from "../../../types";
-import { CreateConfigType, GatewayEntityType } from "../../../types/EntityTypes/gatewayTypes";
+import { CreateConfigType } from "../../../types/EntityTypes/gatewayTypes";
 import {
   dialogAtom,
   getCharacterFullName,
@@ -96,24 +96,9 @@ function geNextSection(sections: { id: string; title: string }[], section_id: st
   return idx;
 }
 
-function getInitialCreateData(create_config: CreateConfigType | undefined, entity_type: GatewayEntityType, project_id: string) {
-  if (!create_config) return {};
-  if (create_config.is_locked) {
-    if ("first_name" in create_config)
-      return { first_name: create_config.first_name, last_name: create_config.last_name, project_id };
-    else return { title: create_config.title, project_id };
-  } else {
-    if (entity_type === "characters")
-      return {
-        first_name: create_config.first_name || "",
-        last_name: create_config.last_name || "",
-        project_id,
-      };
-    return {
-      title: create_config.title || "",
-      project_id,
-    };
-  }
+function getInitialCreateData(create_config: CreateConfigType | undefined, project_id: string) {
+  if (!create_config || !("first_name" in create_config)) return {};
+  return { first_name: create_config.first_name, last_name: create_config.last_name, project_id };
 }
 
 export function CharacterForm() {
@@ -126,9 +111,7 @@ export function CharacterForm() {
     "characters"
   );
   const [character, setCharacter] = useState<Partial<CharacterType>>(
-    data?.data?.create_config
-      ? getInitialCreateData(data?.data?.create_config, type as GatewayEntityType, data?.data?.project_id)
-      : {}
+    data?.data?.create_config ? getInitialCreateData(data?.data?.create_config, data?.data?.project_id) : {}
   );
   const { handleChange, changedData, resetChanges } = useHandleChange({ data: character, setData: setCharacter });
 
@@ -209,7 +192,7 @@ export function CharacterForm() {
     } else {
       setCharacter(
         data?.data?.create_config
-          ? getInitialCreateData(data?.data?.create_config, type as GatewayEntityType, data?.data?.project_id)
+          ? getInitialCreateData(data?.data?.create_config, data?.data?.project_id)
           : { project_id: data?.data?.project_id }
       );
     }
