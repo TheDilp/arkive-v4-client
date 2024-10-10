@@ -11,7 +11,9 @@ export function ImageViewDialog({
   const { project_id } = useParams();
 
   const image_url = useImageURL(
-    data?.image_id ? getAssetURL((data?.manual_project_id || project_id) as string, data?.image_type, data?.image_id) : null
+    data?.image_id && !data?.url
+      ? getAssetURL((data?.manual_project_id || project_id) as string, data?.image_type, data?.image_id)
+      : null
   );
   if (!data?.image_id || (!data?.url && !image_url)) return null;
   return (
@@ -23,7 +25,7 @@ export function ImageViewDialog({
           e.preventDefault();
           e.stopPropagation();
         }}
-        src={image_url || data?.url}
+        src={data?.url || image_url}
       />
       <h4 className="bottom-0 h-fit font-merriweather text-4xl text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
         {data.title}
