@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SetStateAction } from "jotai";
 import ls from "localstorage-slim";
-import { createContext, Dispatch, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, Dispatch, ReactNode, useContext, useEffect, useLayoutEffect, useState } from "react";
 import { Outlet, Route, Routes, useNavigate, useParams } from "react-router-dom";
 
 import { Button, Input, NotificationContainer } from "../../components";
@@ -28,6 +28,10 @@ const AccessContext = createContext<AccessStateType & { setAccessState: Dispatch
 function AccessContextWrapper({ children }: { children: ReactNode }) {
   const [accessState, setAccessState] = useState<AccessStateType>({ access: false, code: undefined });
 
+  useLayoutEffect(() => {
+    ls.set("module", "editor");
+  }, []);
+
   return (
     <AccessContext.Provider value={{ access: accessState.access, code: accessState.code, setAccessState }}>
       {children}
@@ -50,8 +54,13 @@ function CodeInput() {
 
   useEffect(() => {
     if (access && type && access_id) {
-      if (entity_id) navigate(`/${type}/${access_id}/update/${entity_id}/name`);
-      else navigate(`/${type}/${access_id}/create/name`);
+      if (entity_id) {
+        if (type === "characters") navigate(`/${type}/${access_id}/update/${entity_id}/name`);
+        if (type === "blueprint_instances") navigate(`/${type}/${access_id}/update/${entity_id}/title`);
+      } else {
+        if (type === "characters") navigate(`/${type}/${access_id}/create/name`);
+        if (type === "blueprint_instances") navigate(`/${type}/${access_id}/create/title`);
+      }
     }
   }, [access]);
 

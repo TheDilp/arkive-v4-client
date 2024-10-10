@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { useParams } from "react-router-dom";
 
 import { Dialog, IndeterminateProgressBar } from "../../../components";
+import { BlueprintInstanceForm } from "./BlueprintInstanceForm";
 import { CharacterForm } from "./CharacterForm";
 
 function FormLayout({ children }: { children: ReactNode }) {
@@ -29,6 +30,7 @@ export default function GatewayForm() {
     <FormLayout>
       <Dialog />
       {type === "characters" ? <CharacterForm /> : null}
+      {type === "blueprint_instances" ? <BlueprintInstanceForm /> : null}
     </FormLayout>
   );
 }
