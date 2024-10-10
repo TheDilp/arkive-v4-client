@@ -439,7 +439,10 @@ export function Select({
             {!!value && !Array.isArray(value) && selectedItem?.image ? (
               <Avatar
                 image_id={selectedItem?.image?.id}
-                label={selectedItem?.label}
+                isPreview
+                isTooltipDisabled
+                label={label || ""}
+                manual_project_id={selectedItem?.project_id || null}
                 shape={selectedItem?.image?.shape}
                 size="xs"
               />
