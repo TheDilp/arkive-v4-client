@@ -1,3 +1,5 @@
+import { tv } from "tailwind-variants";
+
 import {
   BlueprintFieldType,
   BlueprintInstanceBlueprintFieldType,
@@ -23,6 +25,27 @@ import {
   TemplateTextareaField,
 } from "../Complex";
 
+const classes = tv({
+  base: "select-none",
+  variants: {
+    type: {
+      characters: "grid-cols-1 md:grid-cols-2 lg:grid-cols-4",
+    },
+    isDrawer: {
+      true: "flex flex-col gap-y-2 pt-2",
+      false: "grid gap-x-2 gap-y-4 lg:gap-x-4",
+    },
+    compoundVariants: [
+      {
+        isDrawer: false,
+        type: "blueprint_instances",
+        isGateway: false,
+        class: "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
+      },
+    ],
+  },
+});
+
 export function RelatedEntityForm({
   fields = [],
   fields_data = [],
@@ -44,18 +67,24 @@ export function RelatedEntityForm({
   if (!fields.length) return null;
   return (
     <div className="flex flex-col first:mt-0">
-      <div
-        className={`${isDrawer ? "flex flex-col gap-y-2 pt-2" : "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4"} select-none`}>
+      <div className={classes({ isDrawer, type, isGateway: IS_GATEWAY })}>
         {fields.map((template_field) => {
           const templateValueKey = getFieldValueFromType(template_field.field_type);
           if (!templateValueKey) return null;
           const presetOptions =
             options && templateValueKey
-              ? options?.filter((opt) => opt.entity_type === templateValueKey && opt.parent_id === template_field.blueprint_id)
+              ? options?.filter(
+                  (opt) =>
+                    opt.entity_type === templateValueKey &&
+                    ((opt.entity_type === "blueprint_instances" && opt.parent_id === template_field.blueprint_id) ||
+                      opt.entity_type !== "blueprint_instances")
+                )
               : null;
+
           const templateValueIndex = fields_data.findIndex((f) => f.id === template_field.id);
 
           const baseName = `${type === "characters" ? "character_fields" : "blueprint_fields"}[${templateValueIndex < 0 ? fields_data.length : templateValueIndex}]`;
+
           if (template_field.field_type === "text" || template_field.field_type === "number") {
             return (
               <TemplateInputField
