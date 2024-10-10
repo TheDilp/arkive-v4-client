@@ -72,7 +72,9 @@ const columnHelper = createColumnHelper<{
   title: string;
   full_name: string;
   icon?: string;
-  blueprint?: { icon?: string };
+  map?: { id: string; title: string; image_id: string };
+  blueprint?: { title: string; icon?: string };
+  calendar?: { title: string; icon?: string };
 }>();
 
 function getColumns(type: AvailableGatewayEntites, selection: string[] = [], setSelection: (id: string | string[]) => void) {
@@ -146,7 +148,7 @@ function getColumns(type: AvailableGatewayEntites, selection: string[] = [], set
         header: "",
         cell: ({ row }) => (
           <div className="flex w-full items-center justify-center">
-            <Avatar hasShowImage image_id={row.original?.portrait_id} isBordered isTooltipDisabled size="sm" />
+            <Avatar hasShowImage image_id={row.original?.id} isBordered isTooltipDisabled size="sm" />
           </div>
         ),
         meta: {
@@ -171,7 +173,7 @@ function getColumns(type: AvailableGatewayEntites, selection: string[] = [], set
           ) : (
             ""
           )}
-          {`${row.original.full_name || row.original.title}`}
+          {`${row.original.full_name || row.original.title} ${type === "map_pins" ? `(${row?.original?.map?.title})` : ""}`}
         </span>
       ),
       meta: {
@@ -288,7 +290,8 @@ function EntitiesAccess({
     (tab) =>
       blueprint_field_types.includes(tab.id) ||
       tab.id === "tags" ||
-      (blueprint_field_types.includes("locations") && tab.id === "map_pins")
+      (blueprint_field_types.includes("locations") && tab.id === "map_pins") ||
+      type === "characters"
   );
 
   const [selectedTab, setSelectedTab] = useState(0);
@@ -315,8 +318,13 @@ function EntitiesAccess({
       },
       relations: {
         blueprint: entityType === "blueprint_instances",
+        map: entityType === "map_pins",
+        calendar: entityType === "events",
       },
-      filters,
+      filters:
+        entityType === "map_pins"
+          ? { and: [{ id: "title", field: "title", header_name: "Title", value: null, operator: "is not" }] }
+          : {},
       orderBy: getOrderBy(entityType, orderBy) as RequestOrderByType<any>[],
       pagination,
       fields: getEntityFields(entityType as AvailableGatewayEntites),
@@ -333,10 +341,9 @@ function EntitiesAccess({
     "images",
     {
       filters,
-      orderBy,
+      orderBy: [{ field: "title", sort: "asc" }],
       fields: ["id", "title"],
       pagination,
-      permissions: true,
     },
     { enabled: entityType === "images", prefetch: false }
   );
@@ -584,6 +591,7 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
     first_name: "",
     last_name: "",
     title: "",
+    parent_id: data?.parent_id,
   });
   const [title, setTitle] = useState("");
   const [selection, setSelection] = useState<Record<AvailableGatewayEntites, string[]>>({
