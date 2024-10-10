@@ -39,10 +39,11 @@ export interface GatewayConfigOptionType {
 export type CreateConfigType =
   | ({
       is_locked: true;
-    } & ({ first_name: string; last_name: string } | { title: string }))
+    } & ({ first_name: string; last_name: string; parent_id?: string } | { title: string; parent_id?: string }))
   | {
       is_locked: false;
       first_name?: string;
       last_name?: string;
       title?: string;
+      parent_id?: string;
     };
