@@ -48,10 +48,6 @@ export function GameLayout() {
   const { data: permissions } = useGetEntities<PermissionType>(
     {
       fields: ["id", "title", "code"],
-      orderBy: [
-        { field: "parent_category", sort: "asc" },
-        { field: "title", sort: "asc" },
-      ],
     },
     "permissions",
     {
