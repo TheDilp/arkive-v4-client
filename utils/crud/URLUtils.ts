@@ -31,7 +31,7 @@ export function getSearchURL(
     parts.push("global");
   }
 
-  if (project_id && !IS_DYCE_VTT) {
+  if (project_id) {
     parts.push(project_id);
   }
   if (type === "by_tags") {
