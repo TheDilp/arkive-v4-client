@@ -10,10 +10,10 @@ import { JournalEntriesTab } from "./Tabs/JournalEntriesTab";
 type GameDrawerType = "roll_history" | "characters" | "journal" | "music" | null;
 
 const sections: { tooltip: string; id: GameDrawerType; icon: AvailableIcons }[] = [
-  { id: "roll_history", tooltip: "Roll history", icon: IconEnum.random_table },
-  { id: "characters", tooltip: "Characters", icon: IconEnum.character },
-  { id: "journal", tooltip: "Journal", icon: IconEnum.info_circle },
-  { id: "music", tooltip: "Music", icon: IconEnum.music },
+  { id: "roll_history", tooltip: "Roll history (CTRL + 1)", icon: IconEnum.random_table },
+  { id: "characters", tooltip: "Player characters (CTRL + 2)", icon: IconEnum.character },
+  { id: "journal", tooltip: "Journal (CTRL + 3)", icon: IconEnum.info_circle },
+  { id: "music", tooltip: "Music (CTRL + 4)", icon: IconEnum.music },
 ];
 
 function RollHistory() {
