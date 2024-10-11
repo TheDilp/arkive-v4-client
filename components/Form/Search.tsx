@@ -38,7 +38,7 @@ const SearchClasses = tv({
     helperText: "text-xs truncate block",
     buttonContainer: "w-10 [&>button]:rounded-l-none [&>button]:shadow-none h-full",
     optionsContainer:
-      "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-56 bg-zinc-700 text-white rounded shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
+      "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-56 bg-zinc-700 text-white rounded shadow-md focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
   },
   variants: {
     variant: {
@@ -131,14 +131,16 @@ const SearchItem = tv({
     "focus-visible:outline-none",
     "focus-visible:ring-0",
     "hover:cursor-pointer",
+    "border-b",
+    "border-x",
+    "border-zinc-600",
     // "hover:bg-zinc-500",
     "flex",
     "items-center",
     "justify-start",
-    "border-zinc-700",
-    "border-b",
+    // "border-zinc-700",
     "first:border-t",
-    "last:border-b-0",
+    // "last:border-b-0",
     "gap-x-2",
   ],
   variants: {
