@@ -23,6 +23,9 @@ export function CharacterTab() {
       relationFilters: {
         and: [{ id: "game", field: "game", header_name: "Game", value: game_id as string, operator: "eq" }],
       },
+      relations: {
+        game_permissions: true,
+      },
     },
     "characters",
     { enabled: !!project_id }
