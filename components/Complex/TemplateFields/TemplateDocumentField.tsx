@@ -49,7 +49,7 @@ export function TemplateDocumentField({
               onBrowserChange={(props) => {
                 const itemsToChange: { name: string; value: string | Record<string, any> }[] = props.map(
                   ({ value, label, image }, index) => ({
-                    name: `${name}.documents[${fieldType.includes("single") ? 0 : index || 0}]`,
+                    name: `${name}.documents[${fieldType?.includes("single") ? 0 : index || 0}]`,
                     value: {
                       related_id: value,
                       document: {
@@ -77,7 +77,7 @@ export function TemplateDocumentField({
                 handleChange([
                   { name: `${name}.id`, value: id },
                   {
-                    name: `${name}.documents[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
+                    name: `${name}.documents[${fieldType?.includes("single") ? 0 : currentValue?.length || 0}]`,
                     value: {
                       related_id: value,
                       document: {

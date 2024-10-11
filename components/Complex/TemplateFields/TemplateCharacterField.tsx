@@ -53,7 +53,7 @@ export function TemplateCharacterField({
               onBrowserChange={(props) => {
                 const itemsToChange: { name: string; value: string | Record<string, any> }[] = props.map(
                   ({ value, label, image }, index) => ({
-                    name: `${name}.characters[${fieldType.includes("single") ? 0 : index || 0}]`,
+                    name: `${name}.characters[${fieldType?.includes("single") ? 0 : index || 0}]`,
                     value: {
                       related_id: value,
                       character: {
@@ -81,7 +81,7 @@ export function TemplateCharacterField({
                 handleChange([
                   { name: `${name}.id`, value: id },
                   {
-                    name: `${name}.characters[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
+                    name: `${name}.characters[${fieldType?.includes("single") ? 0 : currentValue?.length || 0}]`,
                     value: {
                       related_id: value,
                       character: {

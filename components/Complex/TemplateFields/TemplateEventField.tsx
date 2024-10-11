@@ -61,7 +61,7 @@ export function TemplateEventField({
                 handleChange([
                   { name: `${name}.id`, value: id },
                   {
-                    name: `${name}.events[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
+                    name: `${name}.events[${fieldType?.includes("single") ? 0 : currentValue?.length || 0}]`,
                     value: {
                       related_id: value,
                       event: {

@@ -110,7 +110,7 @@ export function AdditionalBlueprintFieldDisplay({
   const selectMultipleFormatted =
     blueprint_field.field_type === "select_multiple"
       ? blueprint_field?.options
-          ?.filter((opt) => (value as string[]).includes(opt.id))
+          ?.filter((opt) => (value as string[])?.includes(opt.id))
           .map((opt) => opt.value)
           ?.join(", ") || ""
       : "";

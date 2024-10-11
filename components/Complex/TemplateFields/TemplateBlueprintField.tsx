@@ -52,7 +52,7 @@ export function TemplateBlueprintField({
               onBrowserChange={(props) => {
                 const itemsToChange: { name: string; value: string | Record<string, any> }[] = props.map(
                   ({ value, label }, index) => ({
-                    name: `${name}.blueprint_instances[${fieldType.includes("single") ? 0 : index || 0}]`,
+                    name: `${name}.blueprint_instances[${fieldType?.includes("single") ? 0 : index || 0}]`,
                     value: {
                       related_id: value,
                       blueprint_instance: {

@@ -349,7 +349,7 @@ function EntityWithRelatedRow({
                   label="Replace with"
                   name={`template_fields[${idx}].related`}
                   onChange={({ value: newValue }) => {
-                    if (related.includes(newValue))
+                    if (related?.includes(newValue))
                       handleChange({ name: `template_fields[${idx}].related`, value: related.filter((v) => v !== newValue) });
                     else handleChange({ name: `template_fields[${idx}].related`, value: related.concat(newValue) });
                   }}
@@ -400,7 +400,7 @@ function EntityWithRelatedRow({
               label="Replace with"
               name={`template_fields[${idx}].related`}
               onChange={({ value: newValue, label }) => {
-                if (related.includes(newValue))
+                if (related?.includes(newValue))
                   handleChange([
                     { name: `template_fields[${idx}].related`, value: related.filter((v) => v !== newValue) },
                     { name: `template_fields[${idx}].additional_data`, value: null },
@@ -431,13 +431,13 @@ function EntityWithRelatedRow({
         <div className="flex w-full flex-col gap-y-2">
           {selectedEntities.map((ent) => (
             <EntityPreview
+              key={ent.value}
               clearAction={() =>
                 handleChange({ name: `template_fields[${idx}].related`, value: related.filter((v) => v !== ent.value) })
               }
               icon={ent.icon || parent?.data?.icon || ""}
               id={ent.value}
               image_id={entity_type === "images" ? ent.value : ent.image}
-              key={ent.value}
               title={ent.label}
               type={entity_type as AvailableEntityType}
             />
