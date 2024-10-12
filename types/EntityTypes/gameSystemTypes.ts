@@ -1,6 +1,6 @@
 import { JsonObject } from "remirror";
 
-export interface GameSystem {
+export interface GameSystemType {
   id: string;
   title: string;
   code: string;

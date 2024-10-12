@@ -5,6 +5,7 @@ import { CharacterRelationshipType } from "./characterRelationshipTypes";
 import { CharacterType } from "./characterTypes";
 import { DictionaryType } from "./dictionaryTypes";
 import { DocumentType } from "./documentTypes";
+import { GameSystemType } from "./gameSystemTypes";
 import { GraphType } from "./graphTypes";
 import { ImageType } from "./imageTypes";
 import { MapPinTypesType, MapType } from "./mapTypes";
@@ -25,6 +26,7 @@ export interface ProjectType {
   roles: RoleType[];
   feature_flags?: Record<string, boolean> | null;
   game_system_id: string | null;
+  game_system?: GameSystemType;
 }
 
 export type ProjectDashboardType = [

@@ -39,7 +39,7 @@ import {
   CharacterRelationshipType,
   DialogAtomType,
   DrawerAtomType,
-  GameSystem,
+  GameSystemType,
   MapPinTypesType,
   ProjectType,
   RoleType,
@@ -552,7 +552,7 @@ export function ProjectSettingsView() {
     "gateway_configurations",
     { enabled: !!user?.id && isProjectOwner && finalTabs?.[selectedTab]?.id === "gateway_configuration" }
   );
-  const { data: gameSystems } = useGetEntities<GameSystem>({ fields: ["id", "title", "code"] }, "game_systems", {
+  const { data: gameSystems } = useGetEntities<GameSystemType>({ fields: ["id", "title", "code"] }, "game_systems", {
     enabled: tabs[selectedTab].id === "integrations",
   });
   const { mutateAsync: deleteProject } = useDeleteEntity("projects", project?.id || "", false);
