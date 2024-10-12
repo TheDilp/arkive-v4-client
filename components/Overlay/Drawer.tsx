@@ -33,7 +33,6 @@ import {
   EventDrawer,
   EventManagementDrawer,
   FieldTemplateDrawer,
-  GameDrawer,
   GatewayAccessDrawer,
   ImageDrawer,
   ManuscriptDrawer,
@@ -49,7 +48,6 @@ import {
   NodeDrawer,
   NodeFromDrawer,
   NodeSearchDrawer,
-  PlayerDrawer,
   ProjectDrawer,
   RandomTableDrawer,
   RandomTableOptionDrawer,
@@ -252,8 +250,6 @@ export function Drawer() {
                 {drawer.type === "bulk_folder" ? <BulkFolderDrawer data={drawer?.data} /> : null}
                 {drawer.type === "roles" ? <RolesAndPermissionsDrawer data={drawer?.data} /> : null}
                 {drawer.type === "bulk_access" ? <BulkAccessDrawer data={drawer?.data} /> : null}
-                {drawer.type === "games" ? <GameDrawer data={drawer?.data} /> : null}
-                {drawer.type === "players" ? <PlayerDrawer data={drawer?.data} /> : null}
                 {drawer.type === "gateway_access" ? (
                   <GatewayAccessDrawer data={drawer?.data} exceptions={drawer?.exceptions} />
                 ) : null}
