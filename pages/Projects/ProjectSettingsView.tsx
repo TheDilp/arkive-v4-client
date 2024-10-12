@@ -856,7 +856,28 @@ export function ProjectSettingsView() {
                   <Select
                     name="game_system_id"
                     onChange={({ value }) => {
-                      updateProject({ data: { game_system_id: value as string, id: project_id as string } });
+                      if (value === projectData?.data?.game_system_id && !!projectData?.data?.game_system_id) return;
+                      if (value !== projectData?.data?.game_system_id) {
+                        setDialog((prev) => ({
+                          ...prev,
+                          title: "Change game system",
+                          isOverlay: true,
+                          confirm: {
+                            variant: "primary",
+                            icon: IconEnum.save,
+                            action: () =>
+                              updateProject({ data: { game_system_id: value as string, id: project_id as string } }),
+                          },
+                          cancel: {
+                            variant: "info",
+                            action: () => {},
+                          },
+                          description:
+                            "Are you sure you want to change the game system for this project? All Arkive data for Foundry will be lost. (Foundry data and the base Arkive data will not be affected.)",
+                        }));
+                      } else {
+                        updateProject({ data: { game_system_id: value as string, id: project_id as string } });
+                      }
                     }}
                     options={(gameSystems?.data || []).map((sys) => ({ label: sys.title, value: sys.id }))}
                     value={projectData?.data?.game_system_id}
