@@ -42,12 +42,9 @@ export function AuthWrapper() {
       if (!loggedIn && !pathname.endsWith("/auth/login")) {
         if (module === "editor") {
           document.location = `${import.meta.env.VITE_HOME}/arkive/sign-in`;
-        } else if (module === "dyce_vtt") {
-          document.location = `${import.meta.env.VITE_HOME}/dyce/sign-in`;
         }
       } else if (loggedIn && (pathname.includes("auth/") || pathname === "/")) {
         if (module === "editor") navigate("/projects");
-        if (module === "dyce_vtt") navigate("/games");
       }
     }
   }, [loggedIn, pathname, userStatus?.status, isUpdatingStatus, isIdle]);

@@ -1,11 +1,11 @@
 import { atom } from "jotai";
 import { atomWithReset, atomWithStorage } from "jotai/utils";
 
-import { ContextMenuAtomType, DialogAtomType, DrawerAtomType, NotificationType } from "../../types";
+import { AvailableModuleType, ContextMenuAtomType, DialogAtomType, DrawerAtomType, NotificationType } from "../../types";
 import { BreadCrumbsType as BreadcrumbsType } from "../../types/ComponentTypes/LayoutTypes/breadcrumbsTypes";
 import { projectAtom } from "./dataAtoms";
 
-export const moduleAtom = atomWithStorage<"editor" | "wiki" | "gateway" | "dyce_vtt" | null>("module", null);
+export const moduleAtom = atomWithStorage<AvailableModuleType>("module", null);
 export const navbarTitleAtom = atom<string>("");
 export const breadcrumbsAtom = atom<BreadcrumbsType>({ items: [], type: null });
 export const drawerAtom = atomWithReset<DrawerAtomType>({ size: "md", title: "", position: "right", data: null, type: null });

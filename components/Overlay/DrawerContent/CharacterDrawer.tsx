@@ -173,14 +173,6 @@ function AdditionalFieldsTab({
 // #endregion tabs
 
 function getTabs(permissions: UserHasPermissionsType, id: string | undefined): TabType[] {
-  if (IS_DYCE_VTT) {
-    return [
-      { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-      { id: "2", label: "Biography", icon: IconEnum.biography },
-      { id: "4", label: "Tags", icon: IconEnum.tags },
-      { id: "5", label: "Additional fields", icon: IconEnum.additional_fields },
-    ];
-  }
   const tabs: TabType[] = [
     { id: "1", label: "Basic info", icon: IconEnum.info_circle },
     { id: "2", label: "Biography", icon: IconEnum.biography },

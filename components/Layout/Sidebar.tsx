@@ -10,7 +10,6 @@ import {
   enabledEntitiesAtom,
   getSidebarLink,
   isProjectOwnerAtom,
-  moduleAtom,
   projectFeatureFlagsAtom,
 } from "../../utils";
 import { Icon, Skeleton, Tooltip } from "../";
@@ -48,7 +47,6 @@ const alwaysEnabledItems = ["/", "settings", "tags", "assets"];
 export function Sidebar({ isLoading, items, isUsingPermissions }: SidebarType) {
   const { pathname } = useLocation();
   const { project_id, type } = useParams();
-  const module = useAtomValue(moduleAtom);
   const { isLg } = useBreakpoint();
   const featureFlags = useAtomValue(projectFeatureFlagsAtom);
   const userPermissions = useAtomValue(currentUserPermissionsAtom);
@@ -79,14 +77,8 @@ export function Sidebar({ isLoading, items, isUsingPermissions }: SidebarType) {
       <nav className={nav()}>
         <ul className={list()}>
           <li className={sidebarLogo()}>
-            <Link className="cursor-pointer" to={`/${module === "dyce_vtt" ? "games" : "projects"}`}>
-              <img
-                alt="Arkive Logo"
-                className="h-12"
-                height={module === "dyce_vtt" ? 64 : 48}
-                src="/Logo.webp"
-                width={module === "dyce_vtt" ? 48 : 64}
-              />
+            <Link className="cursor-pointer" to={"/projects"}>
+              <img alt="Arkive Logo" className="h-12" height={48} src="/Logo.webp" width={64} />
             </Link>
           </li>
           {isLoading
@@ -94,6 +86,7 @@ export function Sidebar({ isLoading, items, isUsingPermissions }: SidebarType) {
             : finalSidebarItems.map((item) => {
                 return (
                   <Link
+                    key={item.icon}
                     className={SidebarItemClasses({
                       isSelected:
                         (item.navigate === "characters" && pathname.includes("characters")) ||
@@ -102,7 +95,6 @@ export function Sidebar({ isLoading, items, isUsingPermissions }: SidebarType) {
                       isSettings: item.navigate.includes("settings"),
                       isDisabled: item?.isDisabled,
                     })}
-                    key={item.icon}
                     onClick={item?.onClick}
                     to={item.onClick ? "#" : getSidebarLink(item.navigate, project_id as string, item?.isDisabled)}>
                     <Tooltip

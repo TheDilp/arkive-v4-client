@@ -9,7 +9,7 @@ export function useNavbarTitle(title: string, enabled: boolean) {
   const projectData = useAtomValue(projectAtom);
   useEffect(() => {
     if (module) {
-      const coreTitle = module === "dyce_vtt" ? "Dyce VTT" : "The Arkive";
+      const coreTitle = "The Arkive";
       if (projectData?.title && title && enabled) {
         setNavbarTitleAtom(`${projectData?.title} | ${title || ""}`);
         document.title = `${title?.split("|")?.at(-1) || coreTitle}`;
