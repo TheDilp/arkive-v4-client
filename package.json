@@ -83,12 +83,10 @@
   "private": true,
   "scripts": {
     "build:editor": "cd arkive-v4-editor && tsc -b && vite build --config ../vite.config.ts",
-    "build:dyce": "cd arkive-v4-dyce-vtt && tsc -b && vite build --config ../vite.config.ts",
     "build:wiki": "cd arkive-v4-wiki && tsc -b && vite build --config ../vite.config.ts",
     "build:gateway": "cd arkive-v4-gateway && tsc -b && vite build --config ../vite.config.ts",
     "build": "concurrently \"bun run build:editor\" \"bun run build:wiki\" \"bun run build:gateway\" \"bun run build:dyce\"",
     "start:editor": "cd arkive-v4-editor && vite --port 5173 --config ../vite.config.ts",
-    "start:dyce": "cd arkive-v4-dyce-vtt && vite --port 5175 --config ../vite.config.ts",
     "start:wiki": "cd arkive-v4-wiki && vite --port 5177 --config ../vite.config.ts",
     "start:gateway": "cd arkive-v4-gateway && vite --port 5179 --config ../vite.config.ts",
     "start": "concurrently --kill-others \"bun run start:wiki\" \"bun run start:editor\" \"bun run start:dyce\"",
