@@ -123,6 +123,7 @@ export interface CharacterType {
   documents?: Pick<DocumentType, "id" | "title" | "icon">[];
   tags?: Omit<TagType, "owner_id" | "permissions">[];
   events?: EventType[];
+  game_data?: any;
 
   related_to?: CharacterRelatedType[];
   related_from?: CharacterRelatedType[];

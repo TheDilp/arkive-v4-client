@@ -71,6 +71,7 @@ const InputClasses = tv({
       },
       md: { inputContainer: "h-10" },
       lg: {
+        label: "text-base",
         inputContainer: "h-12 text-2xl",
       },
       xl: { inputContainer: "h-14" },

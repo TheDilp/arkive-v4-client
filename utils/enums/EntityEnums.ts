@@ -262,3 +262,293 @@ export const AvailableManuscriptEntityTypesEnum: { type: AvailableManuscriptEnti
   { type: "events" as const, icon: IconEnum.event },
   { type: "images" as const, icon: IconEnum.image },
 ];
+
+export const DefaultCharacterDnD5EGameData = {
+  abilities: {
+    str: {
+      value: 10,
+      proficient: 0,
+      max: null,
+      bonuses: {
+        check: "",
+        save: "",
+      },
+    },
+    dex: {
+      value: 10,
+      proficient: 0,
+      max: null,
+      bonuses: {
+        check: "",
+        save: "",
+      },
+    },
+    con: {
+      value: 10,
+      proficient: 0,
+      max: null,
+      bonuses: {
+        check: "",
+        save: "",
+      },
+    },
+    int: {
+      value: 10,
+      proficient: 0,
+      max: null,
+      bonuses: {
+        check: "",
+        save: "",
+      },
+    },
+    wis: {
+      value: 10,
+      proficient: 0,
+      max: null,
+      bonuses: {
+        check: "",
+        save: "",
+      },
+    },
+    cha: {
+      value: 10,
+      proficient: 0,
+      max: null,
+      bonuses: {
+        check: "",
+        save: "",
+      },
+    },
+  },
+  currency: {
+    pp: 0,
+    gp: 0,
+    ep: 0,
+    sp: 0,
+    cp: 0,
+  },
+  skills: {
+    acr: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+    ani: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+    arc: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+    ath: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+    dec: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+    his: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+    ins: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+    itm: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+    inv: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+    med: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+    nat: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+    prc: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+    prf: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+    per: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+    rel: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+    slt: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+    ste: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+    sur: {
+      value: 0,
+      bonuses: {
+        check: "",
+        passive: "",
+      },
+    },
+  },
+  attributes: {
+    init: {
+      ability: "dex",
+      bonus: "",
+    },
+    movement: {
+      burrow: null,
+      climb: null,
+      fly: null,
+      swim: null,
+      walk: null,
+      units: null,
+      hover: false,
+    },
+
+    senses: {
+      darkvision: null,
+      blindsight: null,
+      tremorsense: null,
+      truesight: null,
+      units: null,
+      special: "",
+    },
+    spellcasting: "int",
+
+    ac: {
+      flat: null,
+      calc: "default",
+    },
+    hp: {
+      value: 0,
+      max: null,
+    },
+    death: {
+      ability: "",
+      roll: {
+        min: null,
+        max: null,
+        mode: 0,
+      },
+      success: 0,
+      failure: 0,
+    },
+  },
+  details: {
+    alignment: "",
+    race: null,
+    background: null,
+    originalClass: "",
+    xp: {
+      value: 0,
+    },
+    appearance: "",
+    trait: "",
+    ideal: "",
+    bond: "",
+    flaw: "",
+  },
+  traits: {
+    size: "med",
+    di: {
+      bypasses: [],
+      value: [],
+      custom: "",
+    },
+    dr: {
+      bypasses: [],
+      value: [],
+      custom: "",
+    },
+    dv: {
+      bypasses: [],
+      value: [],
+      custom: "",
+    },
+    dm: {
+      amount: {},
+      bypasses: [],
+    },
+    ci: {
+      value: [],
+      custom: "",
+    },
+    languages: {
+      value: [],
+      custom: "",
+    },
+    weaponProf: {
+      value: [],
+      custom: "",
+    },
+    armorProf: {
+      value: [],
+      custom: "",
+    },
+  },
+};

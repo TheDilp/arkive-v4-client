@@ -86,6 +86,7 @@ export const InsertCharacterSchema = z.object({
 export const UpdateCharacterSchema = z.object({
   data: z.object({
     id: z.string().optional(),
+
     first_name: z
       .string()
       .transform((value) => value.trim())
@@ -104,6 +105,7 @@ export const UpdateCharacterSchema = z.object({
     age: z.number().nullable().optional(),
     owner_id: z.string().optional(),
     is_public: z.boolean().nullable().optional(),
+    game_data: z.any().optional().nullable(),
     portrait_id: z
       .string()
       .nullable()

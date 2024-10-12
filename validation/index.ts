@@ -9,6 +9,7 @@ export * from "./dictionaries";
 export * from "./document";
 export * from "./fieldTemplates";
 export * from "./filters";
+export * from "./game_systems";
 export * from "./gateway_configuration";
 export * from "./graphs";
 export * from "./manuscripts";

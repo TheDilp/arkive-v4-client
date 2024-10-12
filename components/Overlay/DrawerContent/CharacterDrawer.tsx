@@ -1,9 +1,11 @@
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAtomValue } from "jotai";
 import groupBy from "lodash.groupby";
 import omit from "lodash.omit";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { deepMerge } from "remirror";
 
 import {
   useCreateEntity,
@@ -21,6 +23,7 @@ import {
   CharacterRelationshipType,
   CharacterType,
   DrawerAtomType,
+  GameSystemType,
   HandleChangePropsType,
   NotificationType,
   OnSearchChangePropsType,
@@ -28,10 +31,24 @@ import {
   TagType,
   UserHasPermissionsType,
 } from "../../../types";
-import { createOrEditPermission, getDifferenceForCharacterFields, IconEnum, useNotifications } from "../../../utils";
-import { InsertCharacterSchema, InsertCharacterType, UpdateCharacterSchema, UpdateCharacterType } from "../../../validation";
+import {
+  createOrEditPermission,
+  DefaultCharacterDnD5EGameData,
+  gameSystemAtom,
+  getDifferenceForCharacterFields,
+  IconEnum,
+  useNotifications,
+} from "../../../utils";
+import {
+  DnD5ECharacterGameDataSchema,
+  InsertCharacterSchema,
+  InsertCharacterType,
+  UpdateCharacterSchema,
+  UpdateCharacterType,
+} from "../../../validation";
 import { DrawerLayout, Dropdown, Editor, EntityPreview, ImagePreview, Skeleton } from "../..";
 import { EntityPermission } from "../../Complex/EntityPermission";
+import { DnD5E } from "../../Complex/GameSystems";
 import { ImageSelect } from "../../Complex/ImageSelect";
 import { Button, Checkbox, Input, RelatedEntityForm, Search, TagInput } from "../../Form";
 import { Collapsible } from "../../Layout/Collapsible";
@@ -170,22 +187,35 @@ function AdditionalFieldsTab({
     </ul>
   );
 }
+function GameSystemTab({
+  game_data,
+  handleChange,
+}: Pick<CharacterType, "game_data"> & {
+  handleChange: (props: HandleChangePropsType) => void;
+}) {
+  const gameSystem = useAtomValue(gameSystemAtom);
+  if (gameSystem?.code === "dnd5e") return <DnD5E game_data={game_data} handleChange={handleChange} />;
+  return null;
+}
 // #endregion tabs
 
-function getTabs(permissions: UserHasPermissionsType, id: string | undefined): TabType[] {
+function getTabs(permissions: UserHasPermissionsType, id: string | undefined, gameSystem?: GameSystemType): TabType[] {
   const tabs: TabType[] = [
-    { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-    { id: "2", label: "Biography", icon: IconEnum.biography },
-    { id: "3", label: "Relationships", icon: IconEnum.family_tree },
+    { id: "basic_info", label: "Basic info", icon: IconEnum.info_circle },
+    { id: "biography", label: "Biography", icon: IconEnum.biography },
   ];
+  if (gameSystem) {
+    tabs.push({ id: "game_system", label: gameSystem.title, icon: IconEnum.d20 });
+  }
+  tabs.push({ id: "relationships", label: "Relationships", icon: IconEnum.family_tree });
   if (permissions?.read_tags) {
-    tabs.push({ id: "4", label: "Tags", icon: IconEnum.tags });
+    tabs.push({ id: "tags", label: "Tags", icon: IconEnum.tags });
   }
   if (permissions?.read_character_fields_templates) {
-    tabs.push({ id: "5", label: "Additional fields", icon: IconEnum.additional_fields });
+    tabs.push({ id: "additional_fields", label: "Additional fields", icon: IconEnum.additional_fields });
   }
   if (permissions?.is_owner || !id) {
-    tabs.push({ id: "6", label: "Access", icon: IconEnum.permissions });
+    tabs.push({ id: "access", label: "Access", icon: IconEnum.permissions });
   }
   return tabs;
 }
@@ -258,6 +288,7 @@ export function CharacterDrawer({
   const resetDrawerAtom = useToggledResetAtom();
   const createNotification = useNotifications();
   const queryClient = useQueryClient();
+  const gameSystem = useAtomValue(gameSystemAtom);
 
   const {
     data: existingCharacter,
@@ -269,7 +300,18 @@ export function CharacterDrawer({
     {
       relations: { character_fields: true, relationships: true, portrait: true, is_favorite: true, tags: true },
       permissions: true,
-      fields: ["id", "first_name", "last_name", "nickname", "biography", "age", "portrait_id", "is_public", "owner_id"],
+      fields: [
+        "id",
+        "first_name",
+        "last_name",
+        "nickname",
+        "biography",
+        "age",
+        "portrait_id",
+        "is_public",
+        "owner_id",
+        "game_data",
+      ],
     },
     {
       enabled: !!data?.id,
@@ -280,7 +322,7 @@ export function CharacterDrawer({
     ["read_characters", "create_characters", "update_characters", "read_tags", "read_character_fields_templates"],
     existingCharacter?.data?.owner_id
   );
-  const tabs = getTabs(permissions, data?.id);
+  const tabs = getTabs(permissions, data?.id, gameSystem);
   const [character, setCharacter] = useState<Partial<CharacterType> | null>(
     data.title
       ? {
@@ -376,7 +418,7 @@ export function CharacterDrawer({
   return (
     <DrawerLayout>
       <Tabs hasArrowNav onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
-      {tabs[selectedTab].id === "1" ? (
+      {tabs[selectedTab].id === "basic_info" ? (
         <>
           <div className="flex w-full flex-col gap-2 lg:flex-row lg:flex-nowrap lg:items-center">
             <div className="w-full lg:w-1/2">
@@ -481,7 +523,7 @@ export function CharacterDrawer({
           </ul>
         </>
       ) : null}
-      {tabs[selectedTab].id === "2" ? (
+      {tabs[selectedTab].id === "biography" ? (
         <Editor
           initialContent={character?.biography || undefined}
           isDisabled={!canCreateOrEdit}
@@ -492,7 +534,10 @@ export function CharacterDrawer({
           title={`${character?.full_name} - Biography`}
         />
       ) : null}
-      {tabs[selectedTab].id === "3" ? (
+      {tabs[selectedTab].id === "game_system" ? (
+        <GameSystemTab game_data={character?.game_data} handleChange={handleChange} />
+      ) : null}
+      {tabs[selectedTab].id === "relationships" ? (
         <div className="flex flex-col gap-y-2 p-2">
           {canCreateOrEdit ? (
             <div className="flex flex-nowrap items-center justify-between">
@@ -713,7 +758,7 @@ export function CharacterDrawer({
           )}
         </div>
       ) : null}
-      {tabs[selectedTab].id === "4" && permissions?.read_tags ? (
+      {tabs[selectedTab].id === "tags" && permissions?.read_tags ? (
         <div className="flex flex-col gap-y-2">
           <TagInput
             handleChange={handleChange}
@@ -724,7 +769,7 @@ export function CharacterDrawer({
           />
         </div>
       ) : null}
-      {tabs[selectedTab].id === "5" && permissions?.read_character_fields_templates ? (
+      {tabs[selectedTab].id === "additional_fields" && permissions?.read_character_fields_templates ? (
         <AdditionalFieldsTab
           character_fields={character?.character_fields || []}
           handleChange={handleChange}
@@ -734,7 +779,7 @@ export function CharacterDrawer({
           templates={templates?.data || []}
         />
       ) : null}
-      {tabs[selectedTab].id === "6" && (permissions?.is_owner || !data?.id) ? (
+      {tabs[selectedTab].id === "access" && (permissions?.is_owner || !data?.id) ? (
         <EntityPermission
           handleChange={handleChange}
           owner_id={character?.owner_id}
@@ -757,7 +802,7 @@ export function CharacterDrawer({
             if (changedData || data?.title) {
               if (character?.id && existingCharacter?.data) {
                 const dataToParse = {
-                  data: character,
+                  data: omit(character, "game_data"),
                   permissions: character?.permissions,
                   relations: {
                     tags: character?.tags?.map((t) => ({ id: t.id })),
@@ -772,6 +817,13 @@ export function CharacterDrawer({
                   dataToParse.data.portrait_id = dataToParse.data.portrait.id;
                 }
                 const parsedData = UpdateCharacterSchema.parse(dataToParse);
+                let game_data = null;
+                if (gameSystem?.code === "dnd5e") {
+                  game_data = DnD5ECharacterGameDataSchema.parse(deepMerge(DefaultCharacterDnD5EGameData, character.game_data));
+                }
+                if (game_data) {
+                  parsedData.data.game_data = game_data;
+                }
                 await update(parsedData, {
                   onSuccess: (res) => {
                     if (res?.ok) {
