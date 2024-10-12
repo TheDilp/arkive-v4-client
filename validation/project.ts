@@ -26,6 +26,7 @@ export const UpdateProjectSchema = z.object({
     is_public: z.boolean().nullable().optional(),
     image_id: z.string().optional().nullable(),
     default_dice_color: z.string().optional().nullable(),
+    game_system_id: z.string().optional().nullable(),
   }),
   relations: z
     .object({

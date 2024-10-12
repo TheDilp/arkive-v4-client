@@ -53,8 +53,7 @@ export type AvailableEntityType =
   | "roles"
   | "permissions"
   | "gateway_configurations"
-  | "games"
-  | "journal_entries"
+  | "game_systems"
   | "filters";
 
 export type AvailableSubEntityType =

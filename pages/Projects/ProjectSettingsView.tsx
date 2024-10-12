@@ -13,6 +13,7 @@ import {
   Icon,
   ImageSelect,
   Input,
+  Select,
   Skeleton,
   Table,
   Tabs,
@@ -38,6 +39,7 @@ import {
   CharacterRelationshipType,
   DialogAtomType,
   DrawerAtomType,
+  GameSystem,
   MapPinTypesType,
   ProjectType,
   RoleType,
@@ -102,6 +104,7 @@ const tabs: TabType[] = [
   },
   { id: "members", label: "Members", icon: IconEnum.users, isOwner: true },
   { id: "roles_permissions", label: "Roles & permissions", icon: IconEnum.permissions, isOwner: true },
+  { id: "integrations", label: "Integrations", icon: IconEnum.integration, isOwner: true },
   { id: "gateway_configuration", label: "Gateway configuration", icon: IconEnum.gateway || IconEnum.character, isOwner: true },
   { id: "feature_settings", label: "Feature settings", icon: IconEnum.feature_flag, isOwner: false },
 ];
@@ -501,7 +504,7 @@ export function ProjectSettingsView() {
     project_id as string,
     "projects",
     {
-      fields: ["id", "title", "image_id", "owner_id", "is_public", "description"],
+      fields: ["id", "title", "image_id", "owner_id", "is_public", "description", "game_system_id"],
       relations: {
         map_pin_types: true,
         character_relationship_types: true,
@@ -549,6 +552,9 @@ export function ProjectSettingsView() {
     "gateway_configurations",
     { enabled: !!user?.id && isProjectOwner && finalTabs?.[selectedTab]?.id === "gateway_configuration" }
   );
+  const { data: gameSystems } = useGetEntities<GameSystem>({ fields: ["id", "title", "code"] }, "game_systems", {
+    enabled: tabs[selectedTab].id === "integrations",
+  });
   const { mutateAsync: deleteProject } = useDeleteEntity("projects", project?.id || "", false);
 
   useLayoutEffect(() => {
@@ -731,41 +737,6 @@ export function ProjectSettingsView() {
                   value={!!project?.is_public}
                 />
               </div>
-              <hr className="border-zinc-700" />
-              <div className="flex flex-nowrap items-center justify-between">
-                <span>API Key:</span>
-                <div className="flex items-center gap-x-2">
-                  <Button
-                    icon={IconEnum.api_key}
-                    label="Show API key"
-                    onClick={async () => {
-                      const p = await (getAPIKey() as Promise<{ data: string }>);
-                      if (p.data) {
-                        createNotification({
-                          title: "API Key",
-                          hasNoTruncate: true,
-                          description: "Do not share the API Key for your project with anyone.",
-                          timer: 15,
-                          variant: "info",
-                          actions: [
-                            { label: "Copy", icon: IconEnum.copy, onClick: () => window.navigator.clipboard.writeText(p.data) },
-                          ],
-                        });
-                      }
-                    }}
-                    variant="info"
-                  />
-                  <div>
-                    <Button
-                      icon={IconEnum.api_key_reset}
-                      label="Reset API key"
-                      onClick={resetAPIKey}
-                      tooltip="If you believe your API key has been compromised, please reset it. Any application or extension using the API key will stop working until you update your key."
-                      variant="error-bordered"
-                    />
-                  </div>
-                </div>
-              </div>
 
               {isProjectOwner ? (
                 <div>
@@ -877,7 +848,58 @@ export function ProjectSettingsView() {
               </div>
             </div>
           ) : null}
-
+          {finalTabs?.[selectedTab]?.id === "integrations" && isProjectOwner ? (
+            <div className="flex flex-col gap-y-2">
+              <div className="flex flex-nowrap items-center justify-between">
+                <span>Game System:</span>
+                <div className="w-56">
+                  <Select
+                    name="game_system_id"
+                    onChange={({ value }) => {
+                      updateProject({ data: { game_system_id: value as string, id: project_id as string } });
+                    }}
+                    options={(gameSystems?.data || []).map((sys) => ({ label: sys.title, value: sys.id }))}
+                    value={projectData?.data?.game_system_id}
+                  />
+                </div>
+              </div>
+              <hr className="border-zinc-700" />
+              <div className="flex flex-nowrap items-center justify-between">
+                <span>API Key:</span>
+                <div className="flex items-center gap-x-2">
+                  <Button
+                    icon={IconEnum.api_key}
+                    label="Show API key"
+                    onClick={async () => {
+                      const p = await (getAPIKey() as Promise<{ data: string }>);
+                      if (p.data) {
+                        createNotification({
+                          title: "API Key",
+                          hasNoTruncate: true,
+                          description: "Do not share the API Key for your project with anyone.",
+                          timer: 15,
+                          variant: "info",
+                          actions: [
+                            { label: "Copy", icon: IconEnum.copy, onClick: () => window.navigator.clipboard.writeText(p.data) },
+                          ],
+                        });
+                      }
+                    }}
+                    variant="info"
+                  />
+                  <div>
+                    <Button
+                      icon={IconEnum.api_key_reset}
+                      label="Reset API key"
+                      onClick={resetAPIKey}
+                      tooltip="If you believe your API key has been compromised, please reset it. Any application or extension using the API key will stop working until you update your key."
+                      variant="error-bordered"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
           {finalTabs?.[selectedTab]?.id === "gateway_configuration" && isProjectOwner ? (
             <div className="h-full">
               <div className="h-fit w-full">

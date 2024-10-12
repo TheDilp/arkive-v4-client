@@ -10,6 +10,7 @@ export * from "./documentTemplateTypes";
 export * from "./documentTypes";
 export * from "./fieldsTypes";
 export * from "./filterTypes";
+export * from "./gameSystemTypes";
 export * from "./gatewayTypes";
 export * from "./graphTypes";
 export * from "./imageTypes";

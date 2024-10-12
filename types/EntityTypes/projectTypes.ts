@@ -24,6 +24,7 @@ export interface ProjectType {
   members: UserType[];
   roles: RoleType[];
   feature_flags?: Record<string, boolean> | null;
+  game_system_id: string | null;
 }
 
 export type ProjectDashboardType = [
