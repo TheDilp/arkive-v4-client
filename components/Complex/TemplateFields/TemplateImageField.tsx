@@ -39,7 +39,7 @@ export function TemplateImageField({
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <div className="flex max-h-96 flex-col gap-y-2 overflow-y-auto">
-        {isDisabled || IS_GATEWAY ? null : (
+        {isDisabled || IS_GATEWAY || (currentValue?.length === 1 && fieldType === "images_single") ? null : (
           <div className="sticky top-0">
             <Search
               imageType="images"
@@ -62,6 +62,7 @@ export function TemplateImageField({
                   })
                 );
                 itemsToChange.push({ name: `${name}.id`, value: id });
+
                 handleChange(itemsToChange);
               }}
               onChange={({ value, label }) => {
@@ -91,10 +92,33 @@ export function TemplateImageField({
               }}
               placeholder="Type at least 2 characters"
               searchEntity="images"
-              value={fieldType === "images_multiple" ? (currentValue || [])?.map((t) => t.related_id) : undefined}
+              value={
+                fieldType === "images_multiple" ? (currentValue || [])?.map((t) => t.related_id) : currentValue?.[0]?.related_id
+              }
             />
           </div>
         )}
+        {currentValue?.length === 1 && fieldType === "images_single" && !IS_GATEWAY ? (
+          <EntityPreview
+            clearAction={
+              isDisabled
+                ? undefined
+                : (char_id) => {
+                    handleChange([
+                      {
+                        name: `${name}.images`,
+                        value: currentValue.filter((c) => c.related_id !== char_id),
+                      },
+                    ]);
+                  }
+            }
+            id={currentValue?.[0].related_id}
+            image_id={currentValue?.[0].related_id}
+            manual_project_id={project_id}
+            title={currentValue?.[0]?.image?.title || ""}
+            type="images"
+          />
+        ) : null}
 
         {IS_GATEWAY && !isDisabled ? (
           <Select
@@ -201,7 +225,6 @@ export function TemplateImageField({
             }
           />
         ) : null}
-
         {fieldType === "images_multiple" ? (
           <div
             className={

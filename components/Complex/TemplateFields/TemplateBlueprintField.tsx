@@ -159,6 +159,26 @@ export function TemplateBlueprintField({
             />
           </div>
         )}
+        {currentValue?.length === 1 && fieldType === "blueprints_single" && !IS_GATEWAY ? (
+          <EntityPreview
+            clearAction={
+              isDisabled
+                ? undefined
+                : (char_id) => {
+                    handleChange([
+                      {
+                        name: `${name}.blueprint_instances`,
+                        value: currentValue.filter((c) => c.related_id !== char_id),
+                      },
+                    ]);
+                  }
+            }
+            id={currentValue?.[0].related_id}
+            manual_project_id={project_id}
+            title={currentValue?.[0]?.blueprint_instance?.title || ""}
+            type="blueprint_instances"
+          />
+        ) : null}
         {!IS_GATEWAY && !isDisabled ? null : (
           <Select
             hasSearch

@@ -82,6 +82,28 @@ export function TemplateEventField({
           </div>
         )}
 
+        {currentValue?.length === 1 && fieldType === "events_single" && !IS_GATEWAY ? (
+          <EntityPreview
+            clearAction={
+              isDisabled
+                ? undefined
+                : (char_id) => {
+                    handleChange([
+                      {
+                        name: `${name}.events`,
+                        value: currentValue.filter((c) => c.related_id !== char_id),
+                      },
+                    ]);
+                  }
+            }
+            id={currentValue?.[0].related_id}
+            image_id={currentValue?.[0].related_id}
+            manual_project_id={project_id}
+            title={currentValue?.[0]?.event?.title || ""}
+            type="events"
+          />
+        ) : null}
+
         {!IS_GATEWAY || !isDisabled ? null : (
           <Select
             isClearable

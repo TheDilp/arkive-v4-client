@@ -80,6 +80,28 @@ export function TemplateLocationsField({
           </div>
         )}
 
+        {currentValue?.length === 1 && fieldType === "locations_single" && !IS_GATEWAY ? (
+          <EntityPreview
+            clearAction={
+              isDisabled
+                ? undefined
+                : (char_id) => {
+                    handleChange([
+                      {
+                        name: `${name}.map_pins`,
+                        value: currentValue.filter((c) => c.related_id !== char_id),
+                      },
+                    ]);
+                  }
+            }
+            id={currentValue?.[0].related_id}
+            image_id={currentValue?.[0].related_id}
+            manual_project_id={project_id}
+            title={currentValue?.[0]?.map_pin?.title || ""}
+            type="map_pins"
+          />
+        ) : null}
+
         {IS_GATEWAY && !isDisabled ? (
           <Select
             isClearable
