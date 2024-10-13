@@ -26,6 +26,7 @@ import {
   hasActionPermission,
   IconEnum,
   isProjectOwnerAtom,
+  openPublicPage,
   TextFilters,
   userAtom,
 } from "../../utils";
@@ -40,7 +41,8 @@ function createColumns(
   isProjectOwner: boolean,
   permissions: UserHasPermissionsType,
   user_id: string,
-  user_role_id: string | undefined
+  user_role_id: string | undefined,
+  project_id: string | undefined
 ) {
   return [
     columnHelper.display({
@@ -191,6 +193,7 @@ function createColumns(
                         }));
                       },
                     },
+
                     {
                       id: "send_to_discord",
                       title: "Send to Discord",
@@ -208,6 +211,13 @@ function createColumns(
                             method: "POST",
                           }),
                       })),
+                    },
+                    {
+                      id: "view_public",
+                      title: "View public page",
+                      icon: IconEnum.public,
+                      onClick: () => openPublicPage(`/${project_id}/manuscripts/${row.original.id}`),
+                      isDisabled: !row.original.is_public,
                     },
                     {
                       id: "2",
@@ -268,7 +278,8 @@ export function ManuscriptView() {
     isProjectOwner,
     permissions,
     user?.id as string,
-    user?.role?.id
+    user?.role?.id,
+    project_id
   );
   const [{ selection, orderBy, filters, pagination }, dispatch] = useTable({
     selection: {},

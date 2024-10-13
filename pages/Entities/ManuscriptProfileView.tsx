@@ -40,7 +40,7 @@ function ManuscriptEntityLink({ entity }: { entity: ManuscriptEntityType }) {
           navigate(`${IS_PUBLIC ? "" : "/projects"}/${project_id}/manuscripts/${item_id}/${entity.related_id}`);
           setType(entity.type);
         }}>
-        <Icon icon={getDefaultEntityIcon(entity?.type)} />
+        <Icon icon={entity?.icon || getDefaultEntityIcon(entity?.type)} />
         <div className="line-clamp-1">{entity?.title}</div>
       </span>
     </li>
@@ -55,16 +55,23 @@ function getTabs(entities: ManuscriptEntityType[]): TabType[] {
   }));
 }
 
-export function ManuscriptProfileView() {
+export function ManuscriptProfileView({ data }: { data?: ManuscriptType }) {
   const { isMd } = useBreakpoint();
   const { project_id, item_id, subitem_id } = useParams();
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState(0);
   const [type, setType] = useState<AvailableManuscriptEntityTypes | null>(null);
-  const { data: existingManuscript } = useGetEntity<ManuscriptType>(item_id, "manuscripts", {
-    fields: ["id", "owner_id", "title"],
-    relations: { entities: true },
-  });
+  const { data: existingManuscript } = useGetEntity<ManuscriptType>(
+    item_id,
+    "manuscripts",
+    {
+      fields: ["id", "owner_id", "title"],
+      relations: { entities: true },
+    },
+    {
+      enabled: !data,
+    }
+  );
   const setDrawer = useSetAtom(drawerAtom);
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
@@ -74,7 +81,7 @@ export function ManuscriptProfileView() {
   );
   const user = useAtomValue(userAtom);
 
-  const manuscriptTree = buildManuscript(existingManuscript?.data);
+  const manuscriptTree = buildManuscript(existingManuscript?.data || data);
 
   const canUpdate = hasActionPermission(
     isProjectOwner,
@@ -88,11 +95,30 @@ export function ManuscriptProfileView() {
   useLayoutEffect(() => {
     if (existingManuscript?.data) {
       setBreadcrumbs({
-        items: [{ id: existingManuscript.data.id, title: existingManuscript.data.title, is_folder: false, parent_id: null }],
+        items: [
+          {
+            id: existingManuscript?.data?.id,
+            title: existingManuscript?.data?.title,
+            is_folder: false,
+            parent_id: null,
+          },
+        ],
+        type: "manuscripts",
+      });
+    } else if (data) {
+      setBreadcrumbs({
+        items: [
+          {
+            id: data?.id,
+            title: data?.title,
+            is_folder: false,
+            parent_id: null,
+          },
+        ],
         type: "manuscripts",
       });
     }
-  }, [existingManuscript?.data]);
+  }, [existingManuscript?.data, data]);
 
   useLayoutEffect(() => {
     if (manuscriptTree.length && subitem_id) {
@@ -104,7 +130,9 @@ export function ManuscriptProfileView() {
     } else if (manuscriptTree.length && manuscriptTree?.[0]) {
       setType(manuscriptTree[0].type);
       setSelectedTab(0);
-      navigate(`/projects/${project_id}/manuscripts/${existingManuscript?.data?.id}/${manuscriptTree[0].related_id}`);
+      navigate(
+        `${IS_PUBLIC ? "" : "/projects"}/${project_id}/manuscripts/${existingManuscript?.data?.id || data?.id}/${manuscriptTree[0].related_id}`
+      );
     }
   }, [subitem_id, manuscriptTree]);
 
@@ -148,7 +176,9 @@ export function ManuscriptProfileView() {
       </div>
       <div className="grid h-full grid-cols-12 gap-x-2 gap-y-2 overflow-hidden rounded-b lg:content-stretch lg:gap-y-0">
         <div className="col-span-3 hidden h-full flex-col rounded bg-zinc-800 p-2 lg:flex">
-          {IS_PUBLIC ? null : <h2 className="text-center text-2xl font-bold">{existingManuscript?.data?.title}</h2>}
+          {IS_PUBLIC ? null : (
+            <h2 className="text-center text-2xl font-bold">{existingManuscript?.data?.title || data?.title}</h2>
+          )}
           <TypeContext.Provider value={{ type, setType }}>
             <ul>
               {manuscriptTree?.length

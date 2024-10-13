@@ -1,3 +1,4 @@
+import { AvailableIcons } from "../../utils";
 import { EntityPermissionType } from "./baseEntityTypes";
 import { TagType } from "./tagTypes";
 
@@ -24,6 +25,7 @@ export type ManuscriptType = {
 export type ManuscriptEntityType = {
   id: string;
   title: string;
+  icon?: AvailableIcons | null;
   image_id?: string | null;
   related_id: string;
   type: AvailableManuscriptEntityTypes;
