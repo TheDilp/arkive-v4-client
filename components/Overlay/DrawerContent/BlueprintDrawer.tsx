@@ -147,7 +147,7 @@ function FieldRow({
             {(providedDroppable) => (
               <div className="flex flex-col" {...providedDroppable.droppableProps} ref={providedDroppable.innerRef}>
                 {options?.map((opt, optIndex) => (
-                  <Draggable draggableId={opt.id || opt.value + index} index={optIndex} key={opt.id}>
+                  <Draggable key={opt.id} draggableId={opt.id || opt.value + index} index={optIndex}>
                     {(provided, draggableSnapshot) => (
                       <div
                         className={`my-1 flex w-full flex-nowrap items-center gap-x-2 rounded px-1 ${
@@ -824,16 +824,16 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                   {blueprint.blueprint_fields?.length
                     ? blueprint.blueprint_fields.map((field, index) => (
                         <Draggable
+                          key={field.id}
                           draggableId={field.id || field.title + index}
                           index={index}
-                          isDragDisabled={!canCreateOrEdit}
-                          key={field.id}>
+                          isDragDisabled={!canCreateOrEdit}>
                           {(provided, draggableSnapshot) => (
                             <div
+                              ref={provided.innerRef}
                               className={`my-1 flex flex-nowrap items-center gap-x-2 ${
                                 draggableSnapshot.isDragging ? "rounded shadow-sm" : ""
                               }`}
-                              ref={provided.innerRef}
                               {...provided.draggableProps}
                               key={field.id}
                               style={{
@@ -924,7 +924,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
           handleChange={handleChange}
           owner_id={blueprint?.owner_id}
           permissions={blueprint?.permissions || []}
-          related_id={blueprint?.id || ""}
+          related_id={blueprint?.id || null}
           selectablePermissions={["read_blueprints", "update_blueprints", "delete_blueprints"]}
         />
       ) : null}

@@ -120,11 +120,11 @@ export function EntityPermission({ related_id, permissions, handleChange, select
           {members
             .filter((member) => member.id !== user?.id)
             .map((member) => (
-              <li className="flex flex-col" key={member.id}>
+              <li key={member.id} className="flex flex-col">
                 <Title isDrawerTitle label={member.email} size="lg" />
                 <div className="grid grid-cols-4">
                   {availablePermissions.map((p) => (
-                    <div className="flex flex-col items-center" key={p.id}>
+                    <div key={p.id} className="flex flex-col items-center">
                       <span>{p.title.split(" ").at(0) || ""}</span>
                       <Checkbox
                         name="permissions"
