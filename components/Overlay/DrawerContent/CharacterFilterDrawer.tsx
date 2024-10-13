@@ -1,9 +1,17 @@
 import { UseMutateFunction } from "@tanstack/react-query";
-import { useAtomValue } from "jotai";
-import { Fragment, useState } from "react";
+import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
+import { Dispatch, Fragment, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useDeleteEntity, useGetEntities, useHandleChange, useTable, useUpdateEntity } from "../../../hooks";
+import {
+  useCreateEntity,
+  useDeleteEntity,
+  useGetEntities,
+  useGetEntity,
+  useHandleChange,
+  useTable,
+  useUpdateEntity,
+} from "../../../hooks";
 import {
   AvailableEntityType,
   AvailableSubEntityType,
@@ -19,6 +27,7 @@ import {
 } from "../../../types";
 import {
   applyCharacterFilter,
+  drawerAtom,
   getDefaultEntityIcon,
   getSearchType,
   getSentenceCase,
@@ -28,7 +37,7 @@ import {
   TextFilters,
   userAtom,
 } from "../../../utils";
-import { InsertFilterSchema, UpdateFilterType } from "../../../validation";
+import { InsertFilterSchema, UpdateFilterSchema, UpdateFilterType } from "../../../validation";
 import { createColumnHelper, EntityPreview, Table } from "../../DataDisplay";
 import { Button, Input, Search, Select, Title } from "../../Form";
 import { Collapsible, DrawerLayout } from "../../Layout";
@@ -51,7 +60,15 @@ type deleteFilterType = UseMutateFunction<
 >;
 
 const columnHelper = createColumnHelper<FilterType>();
-function filterColumns({ dispatch, deleteFilter }: { dispatch: TableDispatch<CharacterType>; deleteFilter: deleteFilterType }) {
+function filterColumns({
+  dispatch,
+  deleteFilter,
+  setDrawer,
+}: {
+  dispatch: TableDispatch<CharacterType>;
+  deleteFilter: deleteFilterType;
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
+}) {
   return [
     columnHelper.display({
       id: "apply",
@@ -60,12 +77,15 @@ function filterColumns({ dispatch, deleteFilter }: { dispatch: TableDispatch<Cha
         <Button
           hasNoBackground
           icon={IconEnum.check_circle}
+          isDisabled={!dispatch}
           isIconOnly
           onClick={() => {
-            try {
-              applyCharacterFilter(row.original.content as CharacterFilter[], dispatch);
-            } catch (error) {
-              console.error(error);
+            if (dispatch) {
+              try {
+                applyCharacterFilter(row.original.content as CharacterFilter[], dispatch);
+              } catch (error) {
+                console.error(error);
+              }
             }
           }}
           tooltip="Apply filter"
@@ -107,13 +127,14 @@ function filterColumns({ dispatch, deleteFilter }: { dispatch: TableDispatch<Cha
                 icon: IconEnum.edit,
 
                 onClick: () => {
-                  // setDrawer((prev) => ({
-                  //   ...prev,
-                  //   data: row.original,
-                  //   title: "Edit tag",
-                  //   size: "lg",
-                  //   type: "edit_tag",
-                  // }));
+                  setDrawer((prev) => ({
+                    ...prev,
+                    exceptions: {},
+                    data: { id: row.original.id, dispatch },
+                    title: `Edit filter - ${row.original.title}`,
+                    size: "lg",
+                    type: "character_filter",
+                  }));
                 },
               },
 
@@ -652,14 +673,13 @@ export function CharacterFilterDrawer({
   data,
   exceptions,
 }: {
-  data: { dispatch: TableDispatch<CharacterType> };
+  data: { id?: string; dispatch: TableDispatch<CharacterType> };
   exceptions: DrawerAtomType["exceptions"];
 }) {
   const { project_id } = useParams();
   const user = useAtomValue(userAtom);
-  const { dispatch } = data;
+  const setDrawer = useSetAtom(drawerAtom);
   const [{ orderBy }, tableDispatch] = useTable({ orderBy: [{ field: "is_favorite", sort: "asc" }] });
-
   const [filter, setFilter] = useState<Partial<FilterType>>({ type: "characters" });
   const [filters, setFilters] = useState<CharacterFilter[]>([]);
   const { handleChange: handleFilterChange } = useHandleChange({ data: filter, setData: setFilter });
@@ -692,14 +712,28 @@ export function CharacterFilterDrawer({
     "filters",
     { enabled: !!user?.id && !!exceptions?.existingFilter }
   );
+  const { data: existingFilter } = useGetEntity<FilterType>(
+    "id" in data ? data?.id : undefined,
+    "filters",
+    { fields: ["id", "content", "type", "title"] },
+    {
+      enabled: !!data?.id,
+    }
+  );
 
+  useLayoutEffect(() => {
+    if (existingFilter?.data) {
+      setFilter({ id: existingFilter?.data?.id, title: existingFilter?.data?.title, type: existingFilter?.data?.type });
+      setFilters(existingFilter?.data?.content);
+    }
+  }, [existingFilter]);
   if (isInitialLoadingFilters) return <Skeleton type="drawer_form" />;
 
   if (exceptions?.existingFilter)
     return (
       <DrawerLayout>
         <Table
-          columns={filterColumns({ dispatch, deleteFilter })}
+          columns={filterColumns({ dispatch: data.dispatch, deleteFilter, setDrawer })}
           config={{
             hasFavorite: true,
             setFavorite: (rowData: FilterType) => {
@@ -744,7 +778,7 @@ export function CharacterFilterDrawer({
                     })
                   );
                 },
-                isDisabled: filters.some((f) => f.id === "documents"),
+                isDisabled: filters?.some((f) => f.id === "documents"),
               },
               {
                 id: "locations",
@@ -762,7 +796,7 @@ export function CharacterFilterDrawer({
                     })
                   );
                 },
-                isDisabled: filters.some((f) => f.id === "maps"),
+                isDisabled: filters?.some((f) => f.id === "maps"),
               },
               {
                 id: "events",
@@ -780,7 +814,7 @@ export function CharacterFilterDrawer({
                     })
                   );
                 },
-                isDisabled: filters.some((f) => f.id === "events"),
+                isDisabled: filters?.some((f) => f.id === "events"),
               },
               {
                 id: "images",
@@ -798,7 +832,7 @@ export function CharacterFilterDrawer({
                     })
                   );
                 },
-                isDisabled: filters.some((f) => f.id === "images"),
+                isDisabled: filters?.some((f) => f.id === "images"),
               },
               {
                 id: "tags",
@@ -816,7 +850,7 @@ export function CharacterFilterDrawer({
                     })
                   );
                 },
-                isDisabled: filters.some((f) => f.id === "tags"),
+                isDisabled: filters?.some((f) => f.id === "tags"),
               },
             ]}>
             <div className="h-8 w-8">
@@ -835,7 +869,7 @@ export function CharacterFilterDrawer({
           <Dropdown
             allowedPlacements={["left"]}
             items={(existingTemplates?.data || [])
-              ?.filter((temp) => !filters.some((f) => f.template.id === temp.id))
+              ?.filter((temp) => !filters?.some((f) => f.template.id === temp.id))
               ?.map((temp) => ({
                 id: temp.id,
                 title: temp.title,
@@ -896,18 +930,25 @@ export function CharacterFilterDrawer({
           icon={IconEnum.filter}
           isDisabled={isApplyDisabled(filters) || isCreating || isUpdating || isDeleting}
           label="Apply filter"
-          onClick={() => applyCharacterFilter(filters, dispatch)}
+          onClick={() => applyCharacterFilter(filters, data.dispatch)}
           variant="info"
         />
         <Button
           icon={IconEnum.filter}
           isDisabled={isApplyDisabled(filters) || !filter.title || isCreating || isUpdating || isDeleting}
-          label="Create & apply filter"
+          label={`${data?.id ? "Update" : "Create"} & apply filter`}
           onClick={() => {
-            const parsed = InsertFilterSchema.parse({ data: { ...filter, content: JSON.stringify(filters) } });
-            create(parsed, {
-              onSuccess: () => applyCharacterFilter(filters, dispatch),
-            });
+            if (data?.id) {
+              const parsed = UpdateFilterSchema.parse({ data: { ...filter, content: JSON.stringify(filters) } });
+              update(parsed, {
+                onSuccess: () => applyCharacterFilter(filters, data.dispatch),
+              });
+            } else {
+              const parsed = InsertFilterSchema.parse({ data: { ...filter, content: JSON.stringify(filters) } });
+              create(parsed, {
+                onSuccess: () => applyCharacterFilter(filters, data.dispatch),
+              });
+            }
           }}
           variant="success"
         />

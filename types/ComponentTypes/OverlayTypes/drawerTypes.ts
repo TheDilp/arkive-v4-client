@@ -163,7 +163,7 @@ export type DrawerAtomType = {
     }
   | { type: "project" | "invite_to_project" | "nodes_from_characters" | "nodes_from_images" | null; data: null }
   | { type: "webhooks" | "roles"; data: { id?: string } }
-  | { type: "character_filter"; data: { dispatch: TableDispatch<CharacterType> } }
+  | { type: "character_filter"; data: { id?: string; dispatch: TableDispatch<CharacterType> } }
   | {
       type: "calendar_filter";
       data: {
