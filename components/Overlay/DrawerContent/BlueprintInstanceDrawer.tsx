@@ -121,7 +121,7 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
       },
     },
     {
-      enabled: data?.title ? !!instance?.parent_id : (!exceptions?.globalCreate ?? true),
+      enabled: data?.title ? !!instance?.parent_id : !exceptions?.globalCreate,
       queryKeyConcat: ["instance_drawer"],
     }
   );
