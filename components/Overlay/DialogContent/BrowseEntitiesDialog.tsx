@@ -14,7 +14,7 @@ function getOrderBy(
   return { sort: "asc", field: type === "characters" ? "full_name" : "title" };
 }
 const cardClasses =
-  "text-xl [&>div>h2]:line-clamp-2 [&>div>h2]:z-20 animate-in fade-in relative col-span-1 flex h-[8rem] flex-col items-center justify-center cursor-pointer hover:border-blue-500 overflow-hidden rounded border-2 border-zinc-700 bg-cover shadow transition-all";
+  "text-xl [&>div>h2]:truncate [&>div>h2]:z-20 animate-in fade-in relative col-span-1 flex lg:h-[12rem] h-[8rem] flex-col items-center justify-center cursor-pointer hover:border-blue-500 overflow-hidden rounded border-2 border-zinc-700 bg-cover shadow transition-all";
 export function BrowseEntitiesDialog({
   data,
 }: {
@@ -143,7 +143,7 @@ export function BrowseEntitiesDialog({
         value={filter}
       />
       <div
-        className="grid grid-cols-1 gap-2 overflow-y-auto p-4 pb-36 md:grid-cols-2 lg:grid-cols-6"
+        className="grid grid-cols-1 gap-2 overflow-y-auto p-4 pb-36 md:grid-cols-2 lg:grid-cols-5"
         onScroll={(e) => {
           const { currentTarget } = e;
           if (currentTarget) {
@@ -180,7 +180,9 @@ export function BrowseEntitiesDialog({
                     else setSelection([entity.id]);
                   }
                 }}>
-                <div className={`absolute z-20 h-full w-full bg-blue-500 ${isSelected ? "opacity-50" : "opacity-0"}`} />
+                <div
+                  className={`absolute z-20 h-full w-full truncate bg-blue-500 ${isSelected ? "opacity-50" : "opacity-0"}`}
+                />
                 <Image
                   hasTitle
                   image={{
