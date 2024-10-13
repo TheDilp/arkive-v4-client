@@ -68,9 +68,9 @@ function ExpandedRowTagListWrapper({
             .sort(sortCharacters)
             .map((item) => (
               <EntityPreview
+                key={item.id}
                 id={item.id}
                 image_id={item.portrait_id}
-                key={item.id}
                 link={`/projects/${project_id}/characters/${item.id}/biography`}
                 title={item?.full_name || ""}
                 type="characters"
@@ -80,8 +80,8 @@ function ExpandedRowTagListWrapper({
       {type === "nodes" || type === "edges"
         ? data[type].map((item) => (
             <EntityPreview
-              id={item.id}
               key={item.id}
+              id={item.id}
               link={`/projects/${project_id}/graphs/${item.parent_id}/${item.id}`}
               title={item.label}
               type="graphs"
@@ -92,8 +92,8 @@ function ExpandedRowTagListWrapper({
       {type !== "characters" && type !== "nodes" && type !== "edges"
         ? data[type].map((item) => (
             <EntityPreview
-              id={item.id}
               key={item.id}
+              id={item.id}
               link={`/projects/${project_id}/${type}/${item.id}`}
               title={item.title}
               type={type}
@@ -135,7 +135,7 @@ function ExpandedTemplateFields({ templateId }: { templateId: string }) {
   return (
     <div className="flex min-h-[5rem] flex-col divide-y divide-zinc-700">
       {data?.data?.map((field) => (
-        <div className="flex flex-col py-2 font-lato" key={field.id}>
+        <div key={field.id} className="flex flex-col py-2 font-lato">
           <div className="flex gap-x-2">
             <span>{field.title}</span>
             <span className="ml-auto">
@@ -161,7 +161,7 @@ function ExpandedRandomOption({ random_table_suboptions }: { random_table_subopt
   return (
     <div className="flex flex-col gap-y-2">
       {random_table_suboptions?.map((suboption) => (
-        <div className="flex flex-col font-lato" key={suboption.id}>
+        <div key={suboption.id} className="flex flex-col font-lato">
           <div className="flex w-full max-w-full items-center gap-x-2">
             <span>
               <Badge label={getSentenceCase(suboption.title || "")} variant="info" />
@@ -183,7 +183,7 @@ function ExpandedRelationships({ relationships }: { relationships: FormattedRela
     <ul className="flex flex-wrap gap-2">
       {(relationships || []).map((rel) => {
         return (
-          <li className="w-min" key={`${rel.relation_title}${rel.relation_type_title}`}>
+          <li key={`${rel.relation_title}${rel.relation_type_title}`} className="w-min">
             <Badge
               label={
                 rel?.relation_title
