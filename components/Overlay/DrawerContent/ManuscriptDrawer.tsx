@@ -50,7 +50,7 @@ type EntityType = {
   id: string;
   image_id?: string | null;
   title: string;
-  icon?: string;
+  icon?: AvailableIcons | null;
   related_id: string;
   sort: number;
   type: AvailableManuscriptEntityTypes;
