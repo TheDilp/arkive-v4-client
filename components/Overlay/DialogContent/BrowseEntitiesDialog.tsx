@@ -86,10 +86,9 @@ export function BrowseEntitiesDialog({
         },
       ],
     },
-    data.imageType,
+    data.imageType || "images",
     project_id,
     {
-      enabled: data.type === "images",
       keepPreviousData: true,
       getNextPageParam: (_, allPages) => {
         if (allPages[allPages.length - 1]?.data?.length < 10) return undefined;
@@ -97,7 +96,6 @@ export function BrowseEntitiesDialog({
       },
     }
   );
-
   useLayoutEffect(() => {
     if (!filter) {
       dispatch({

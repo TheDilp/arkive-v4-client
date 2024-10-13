@@ -36,13 +36,13 @@ export function TemplateImageField({
 }: Props) {
   const { project_id } = useParams();
   const projectId = project_id || presetOptions?.[0]?.project_id;
-
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <div className="flex max-h-96 flex-col gap-y-2 overflow-y-auto">
         {isDisabled || IS_GATEWAY ? null : (
           <div className="sticky top-0">
             <Search
+              imageType="images"
               isGlobal={isGlobal}
               isMultiple={fieldType === "images_multiple"}
               label={isCollapsible ? "" : title}
