@@ -55,6 +55,7 @@ function filterColumns({ dispatch }: { dispatch: TableDispatch<CharacterType> })
               console.error(error);
             }
           }}
+          tooltip="Apply filter"
         />
       ),
       maxSize: 3,
