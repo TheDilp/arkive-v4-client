@@ -291,7 +291,7 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
                 </div>
               ) : (
                 <div
-                  className={`grid h-[calc(100%-3rem)] max-h-[calc(100%-3rem)] grid-cols-6 flex-col gap-2 overflow-auto ${IS_PUBLIC ? "" : "p-2"}`}>
+                  className={`grid h-[calc(100%-3rem)] max-h-[calc(100%-3rem)] grid-cols-6 flex-col gap-2 overflow-auto ${IS_PUBLIC || isViewOnly ? "" : "p-2"}`}>
                   {blueprintInstance
                     ? blueprintInstance?.blueprint_fields
                         ?.toSorted((a, b) => a.sort - b.sort)

@@ -40,7 +40,7 @@ function DocumentPreviewDrawer({ id }: { id: string }) {
       {existingDocument?.data?.content ? (
         <div className="flex h-full flex-col gap-y-2">
           <Title label={existingDocument?.data?.title} size="xl" />
-          <div className="h-[calc(92%)] max-h-full overflow-auto">
+          <div className="h-[calc(92%)] max-h-full overflow-auto [&>div]:p-0">
             <StaticRender content={existingDocument?.data?.content as RemirrorJSON} />
           </div>
         </div>
