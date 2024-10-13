@@ -28,7 +28,6 @@ export function TemplateTextareaField({
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <div className="col-span-1 flex max-h-[30rem] min-h-fit flex-col gap-x-2 gap-y-4 md:col-span-2 lg:col-span-4">
-        <span className="text-sm text-zinc-300">{title}</span>
         <Editor
           initialContent={currentValue as any}
           isDisabled={isDisabled}
@@ -40,7 +39,6 @@ export function TemplateTextareaField({
               { name: `${name}.value`, value },
             ])
           }
-          title={title}
         />
       </div>
     </TemplateFieldContainer>
