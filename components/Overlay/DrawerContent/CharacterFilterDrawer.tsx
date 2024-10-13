@@ -1,8 +1,9 @@
+import { UseMutateFunction } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
 import { Fragment, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntities, useHandleChange, useTable, useUpdateEntity } from "../../../hooks";
+import { useCreateEntity, useDeleteEntity, useGetEntities, useHandleChange, useTable, useUpdateEntity } from "../../../hooks";
 import {
   AvailableEntityType,
   AvailableSubEntityType,
@@ -37,8 +38,20 @@ import { Dropdown } from "../Dropdown";
 const nonFilterableEntities = ["textarea", "date", "random_table", "dice_roll"];
 const resourceEntities = ["documents", "maps", "events", "images", "tags"];
 
+type deleteFilterType = UseMutateFunction<
+  any,
+  unknown,
+  {
+    data: {
+      id: string;
+      parent_id?: string;
+    };
+  },
+  unknown
+>;
+
 const columnHelper = createColumnHelper<FilterType>();
-function filterColumns({ dispatch }: { dispatch: TableDispatch<CharacterType> }) {
+function filterColumns({ dispatch, deleteFilter }: { dispatch: TableDispatch<CharacterType>; deleteFilter: deleteFilterType }) {
   return [
     columnHelper.display({
       id: "apply",
@@ -83,7 +96,7 @@ function filterColumns({ dispatch }: { dispatch: TableDispatch<CharacterType> })
       meta: {
         centered: true,
       },
-      cell: () => (
+      cell: ({ row }) => (
         <div className="flex items-center justify-center">
           <Dropdown
             allowedPlacements={["left", "left-start", "left-end"]}
@@ -109,18 +122,7 @@ function filterColumns({ dispatch }: { dispatch: TableDispatch<CharacterType> })
                 title: "Delete filter",
                 icon: IconEnum.archive,
 
-                onClick: () => {
-                  // setDialog((prev) => ({
-                  //   ...prev,
-                  //   data: {
-                  //     ...row.original,
-                  //     entity_title: "tags",
-                  //   },
-                  //   title: "Arkive tag",
-                  //   size: "sm",
-                  //   type: "arkive_entity",
-                  // }));
-                },
+                onClick: () => deleteFilter({ data: { id: row.original.id } }),
               },
             ]}>
             <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
@@ -665,6 +667,7 @@ export function CharacterFilterDrawer({
 
   const { mutate: create, isLoading: isCreating } = useCreateEntity("filters");
   const { mutate: update, isLoading: isUpdating } = useUpdateEntity<UpdateFilterType>("filters", project_id);
+  const { mutate: deleteFilter, isLoading: isDeleting } = useDeleteEntity("filters", project_id as string, false);
   const { data: existingTemplates, isInitialLoading } = useGetEntities<CharacterFieldTemplateType>(
     {
       data: {
@@ -679,6 +682,9 @@ export function CharacterFilterDrawer({
   );
   const { data: existingFilters, isInitialLoading: isInitialLoadingFilters } = useGetEntities<FilterType>(
     {
+      data: {
+        project_id,
+      },
       fields: ["id", "title", "content", "is_favorite"],
       orderBy,
     },
@@ -693,7 +699,7 @@ export function CharacterFilterDrawer({
     return (
       <DrawerLayout>
         <Table
-          columns={filterColumns({ dispatch })}
+          columns={filterColumns({ dispatch, deleteFilter })}
           config={{
             hasFavorite: true,
             setFavorite: (rowData: FilterType) => {
@@ -888,14 +894,14 @@ export function CharacterFilterDrawer({
       <div className="flex items-center gap-x-2">
         <Button
           icon={IconEnum.filter}
-          isDisabled={isApplyDisabled(filters) || isCreating || isUpdating}
+          isDisabled={isApplyDisabled(filters) || isCreating || isUpdating || isDeleting}
           label="Apply filter"
           onClick={() => applyCharacterFilter(filters, dispatch)}
           variant="info"
         />
         <Button
           icon={IconEnum.filter}
-          isDisabled={isApplyDisabled(filters) || !filter.title || isCreating || isUpdating}
+          isDisabled={isApplyDisabled(filters) || !filter.title || isCreating || isUpdating || isDeleting}
           label="Create & apply filter"
           onClick={() => {
             const parsed = InsertFilterSchema.parse({ data: { ...filter, content: JSON.stringify(filters) } });
