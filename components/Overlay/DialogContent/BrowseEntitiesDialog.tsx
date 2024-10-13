@@ -4,9 +4,14 @@ import { useParams } from "react-router-dom";
 
 import { useGetInfiniteAssets, useGetInfiniteEntities, useTable } from "../../../hooks";
 import { AssetType, AvailableEntityType, OnSearchChangePropsType, RequestOrderByType } from "../../../types";
-import { dialogAtom, getEntityFields, IconEnum } from "../../../utils";
+import { AvailableIcons, dialogAtom, getEntityFields, IconEnum } from "../../../utils";
 import { Image } from "../../DataDisplay";
 import { Button, Input } from "../../Form";
+
+type BrowserEntityType = Record<"id" | "title" | "image" | "full_name" | "portrait_id", string> &
+  Record<"blueprint", { id: string; icon: AvailableIcons | undefined }> &
+  Record<"icon", AvailableIcons | undefined> &
+  Record<"type", AssetType>;
 
 function getOrderBy(
   type: AvailableEntityType | "blueprint_instances"
@@ -40,7 +45,7 @@ export function BrowseEntitiesDialog({
     data: cardData,
     isFetching: isFetchingEntities,
     fetchNextPage: fetchNextEntityPage,
-  } = useGetInfiniteEntities<Record<string, string>>(
+  } = useGetInfiniteEntities<BrowserEntityType>(
     {
       data: {
         project_id,
@@ -53,7 +58,7 @@ export function BrowseEntitiesDialog({
             }
           : {},
       filters,
-      fields: getEntityFields(data.type),
+      fields: getEntityFields(data.type) as (keyof BrowserEntityType)[],
       orderBy,
       pagination,
       permissions: true,
@@ -73,7 +78,7 @@ export function BrowseEntitiesDialog({
     data: infiniteAssets,
     isFetching,
     fetchNextPage,
-  } = useGetInfiniteAssets<Record<string, string>>(
+  } = useGetInfiniteAssets<BrowserEntityType>(
     {
       permissions: true,
       fields: ["id", "title", "type"],
@@ -156,7 +161,7 @@ export function BrowseEntitiesDialog({
           }
         }}>
         {((data.type === "images" ? infiniteAssets?.pages : cardData?.pages) || [])?.map((page) =>
-          page.data.map((entity: Record<string, string>) => {
+          page.data.map((entity) => {
             const isSelected = selection.includes(entity.id);
             return (
               <div
@@ -217,6 +222,17 @@ export function BrowseEntitiesDialog({
                 type: "characters" as const,
               }));
               data.onChange(formatted);
+            } else if (data.type === "blueprint_instances") {
+              for (let index = 0; index < selected.length; index++) {
+                const formatted = selected.map((item) => ({
+                  name: data.name,
+                  value: item.id,
+                  label: item.title,
+                  icon: item?.blueprint?.icon,
+                  type: "blueprint_instances" as const,
+                }));
+                data.onChange(formatted);
+              }
             } else if (data.type === "images") {
               for (let index = 0; index < selected.length; index++) {
                 const formatted = selected.map((item) => ({

@@ -50,6 +50,7 @@ type EntityType = {
   id: string;
   image_id?: string | null;
   title: string;
+  icon?: string;
   related_id: string;
   sort: number;
   type: AvailableManuscriptEntityTypes;
@@ -213,6 +214,18 @@ export function ManuscriptDrawer({ data }: Props) {
                                 <div className="flex-1">
                                   <Search
                                     name="related_id"
+                                    onBrowserChange={(props) => {
+                                      setEntities((prev) => {
+                                        const temp = [...prev];
+                                        props.forEach((item) => {
+                                          temp[index].title = item.label as string;
+                                          temp[index].related_id = item.value as string;
+                                          if (item?.image) temp[index].image_id = item.image;
+                                          if (item?.icon) temp[index].icon = item.icon;
+                                        });
+                                        return temp;
+                                      });
+                                    }}
                                     onChange={({ label, value, image }) => {
                                       setEntities((prev) => {
                                         const temp = [...prev];
@@ -248,7 +261,7 @@ export function ManuscriptDrawer({ data }: Props) {
                               <div className="flex-1">
                                 <EntityPreview
                                   clearAction={() => setEntities((prev) => prev.toSpliced(index, 1))}
-                                  icon={getDefaultEntityIcon(entity.type)}
+                                  icon={entity.icon || getDefaultEntityIcon(entity.type)}
                                   id={entity.related_id}
                                   image_id={entity.type === "images" ? entity.related_id : entity.image_id}
                                   title={entity.title}
