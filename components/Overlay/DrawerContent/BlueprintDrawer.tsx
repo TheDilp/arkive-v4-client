@@ -878,12 +878,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                                             }),
                                     },
                                   ]}
-                                  initialOpen={
-                                    (field.title === "New field" &&
-                                      field.field_type === "text" &&
-                                      index === (blueprint?.blueprint_fields?.length || 1) - 1) ||
-                                    areAllOpen
-                                  }
+                                  initialOpen
                                   label={field?.title}>
                                   <FieldRow
                                     blueprint={field?.blueprint}
