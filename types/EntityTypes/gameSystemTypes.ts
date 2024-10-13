@@ -6,8 +6,8 @@ export interface GameSystemType {
 }
 
 //#region dnd5e
-type DnD5eAbilities = "str" | "dex" | "con" | "int" | "wis" | "cha";
-type DnD5eSkills =
+export type DnD5eAbilities = "str" | "dex" | "con" | "int" | "wis" | "cha";
+export type DnD5eSkills =
   | "acr"
   | "ani"
   | "arc"

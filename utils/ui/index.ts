@@ -8,6 +8,7 @@ export * from "./documentUtils";
 export * from "./dragAndDropUtils";
 export * from "./editorUtils";
 export * from "./entityUtils";
+export * from "./gameSystemUtils";
 export * from "./generalUtils";
 export * from "./graphUtils";
 export * from "./linkUtils";

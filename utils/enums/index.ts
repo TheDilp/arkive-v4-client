@@ -2,6 +2,7 @@ export * from "./CalendarEnums";
 export * from "./ColorEnums";
 export * from "./EntityEnums";
 export * from "./FilterEnums";
+export * from "./GameSystemEnums";
 export * from "./GraphEnums";
 export * from "./IconEnums";
 export * from "./IconPickerEnums";
