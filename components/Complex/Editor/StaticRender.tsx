@@ -8,9 +8,7 @@ import { useGetImage } from "../../../hooks";
 import { useImageURL } from "../../../hooks/ui/useImageURL";
 import { deleteObjectPropsRecursive, dialogAtom, getAssetURL, IconEnum, useNotifications } from "../../../utils";
 import { Collapsible } from "../../Layout";
-import { BlueprintMention, DocumentMention, EventMention, GraphMention, MapMention, WordMention } from "./Extensions/Mention";
-import { CharacterMention } from "./Extensions/Mention/CharacterMention";
-import { MapPinMention } from "./Extensions/Mention/MapPinMention";
+import { Mention } from "./Extensions/Mention";
 import { TableOfContents, TOCHeadingType } from "./Extensions/TableOfContentsExtension";
 // import WordMention from "../Mention/WordMention";
 
@@ -163,21 +161,17 @@ function typeMap(project_id: string, content: RemirrorJSON) {
       if (props?.[0]?.node) {
         const { attrs } = props[0].node;
         if (attrs) {
-          const { id, label, alterid, icon, name: type, parentid } = attrs;
-          if (type === "characters") return <CharacterMention id={id} label={label} project_id={project_id} title={label} />;
-          if (type === "blueprint_instances")
-            return (
-              <BlueprintMention icon={icon} id={id} label={label} parent_id={parentid} project_id={project_id} title={label} />
-            );
-          if (type === "documents")
-            return <DocumentMention alterId={alterid} id={id} label={label} project_id={project_id} title={label} />;
-
-          if (type === "maps") return <MapMention id={id} label={label} project_id={project_id} />;
-          if (type === "map_pins") return <MapPinMention id={id} label={label} parent_id={parentid} project_id={project_id} />;
-          if (type === "graphs") return <GraphMention id={id} label={label} project_id={project_id} />;
-          if (type === "words") return <WordMention id={id} label={label} title={label} />;
-          if (type === "events")
-            return <EventMention id={id} label={label} parent_id={parentid} project_id={project_id} title={label} />;
+          const { id, label, alterName, title, projectId, icon, name: type, parentid } = attrs;
+          <Mention
+            alter_name={alterName}
+            icon={icon}
+            id={id}
+            label={label}
+            parent_id={parentid}
+            project_id={project_id || projectId}
+            title={title}
+            type={type}
+          />;
 
           return IS_PUBLIC ? (
             <span className="font-lato">{label}</span>
