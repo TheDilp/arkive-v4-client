@@ -140,7 +140,9 @@ export function DefaultEditorExtensions(
       priority: ExtensionPriority.Highest,
     }),
     new MarkdownExtension({}),
-    new AnnotationExtension<CustomAnnotation>({}),
+    new AnnotationExtension<CustomAnnotation>({
+      getStyle: () => "",
+    }),
     new SecretExtension({
       secret: true,
     }),
