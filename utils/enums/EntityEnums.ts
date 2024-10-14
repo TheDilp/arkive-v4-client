@@ -264,46 +264,59 @@ export const AvailableManuscriptEntityTypesEnum: { type: AvailableManuscriptEnti
   { type: "images" as const, icon: IconEnum.image },
 ];
 
-export const MentionEntityOptions: { label: string; value: SearchableMentionEntities; icon: AvailableIcons }[] = [
+export const MentionEntityOptions: {
+  label: string;
+  value: SearchableMentionEntities;
+  icon: AvailableIcons;
+  hasAlterNames: boolean;
+}[] = [
   {
     label: "Characters",
     value: "characters",
     icon: IconEnum.character,
+    hasAlterNames: true,
   },
   {
     label: "Blueprints",
     value: "blueprint_instances",
     icon: IconEnum.blueprint,
+    hasAlterNames: true,
   },
   {
     label: "Documents",
     value: "documents",
     icon: IconEnum.document,
+    hasAlterNames: true,
   },
   {
     label: "Maps",
     value: "maps",
     icon: IconEnum.map,
+    hasAlterNames: true,
   },
   {
     label: "Map pins",
     value: "map_pins",
     icon: IconEnum.map_pin,
+    hasAlterNames: true,
   },
   {
     label: "Graph",
     value: "graphs",
     icon: IconEnum.graph,
+    hasAlterNames: true,
   },
   {
     label: "Events",
     value: "events",
     icon: IconEnum.event,
+    hasAlterNames: true,
   },
   {
     label: "Words",
     value: "words",
     icon: IconEnum.word,
+    hasAlterNames: false,
   },
 ];
 
