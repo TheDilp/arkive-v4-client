@@ -20,6 +20,7 @@ export class CustomMentionExtension extends MentionAtomExtension {
     return {
       attrs: {
         alterId: { default: "" },
+        alterName: { default: "" },
         projectId: { default: "" },
         id: { default: "" },
         icon: { default: "" },
@@ -40,6 +41,7 @@ export class CustomMentionExtension extends MentionAtomExtension {
             ...extra.defaults(),
             id: { default: null },
             alterId: { default: null },
+            alterName: { default: null },
             projectId: { default: null },
             icon: { default: null },
             parentId: { default: null },
@@ -52,6 +54,7 @@ export class CustomMentionExtension extends MentionAtomExtension {
             const node = dom as HTMLAnchorElement;
             const id = node.getAttribute("data-id");
             const alterId = node.getAttribute("data-alterId");
+            const alterName = node.getAttribute("data-alterName");
             const projectId = node.getAttribute("data-projectId");
             const parentId = node.getAttribute("data-parentId");
             const icon = node.getAttribute("data-icon");
@@ -60,6 +63,7 @@ export class CustomMentionExtension extends MentionAtomExtension {
             return {
               id,
               alterId,
+              alterName,
               projectId,
               parentId,
               icon,
