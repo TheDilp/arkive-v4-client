@@ -18,7 +18,6 @@ import {
   baseURLS,
   breadcrumbsAtom,
   contextMenuAtom,
-  CustomAnnotation,
   DefaultEditorExtensions,
   DefaultTagColor,
   Dice,
@@ -415,7 +414,7 @@ function DocumentViewEditor({
 
   useEffect(() => {
     if (!drawer.type) {
-      const annotations = (getContext()?.helpers?.getAnnotations() || []).filter((a: CustomAnnotation) => a.type !== "mention");
+      const annotations = getContext()?.helpers?.getAnnotations() || [];
       getContext()?.commands.setAnnotations(annotations);
     }
   }, [drawer.type]);
