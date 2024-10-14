@@ -81,7 +81,7 @@ export function AlterNamesDrawer({ data }: Props) {
         isLoading={false}
         name="selectedEntity"
         onChange={({ value }) => setSelectedEntity(value as SearchableMentionEntities)}
-        options={MentionEntityOptions}
+        options={MentionEntityOptions.filter((ent) => ent.hasAlterNames)}
         value={selectedEntity}
       />
 

@@ -67,18 +67,8 @@ export function getEntityFields(type: AvailableEntityType | AvailableSubEntityTy
   if (type === "events") return ["title", "image_id", "is_public"];
   if (type === "words") return ["title", "description", "translation", "is_public"];
   const fields: string[] = IS_PUBLIC
-    ? ["id", "title", "icon", "owner_id"]
-    : ["id", "deleted_at", "title", "icon", "is_folder", "parent_id", "owner_id"];
-
-  if (
-    type === "documents" ||
-    type === "maps" ||
-    type === "graphs" ||
-    type === "calendars" ||
-    type === "dictionaries" ||
-    type === "random_tables"
-  )
-    fields.push("is_public");
+    ? ["id", "title", "icon", "owner_id", "is_public"]
+    : ["id", "deleted_at", "title", "icon", "is_folder", "parent_id", "owner_id", "is_public"];
 
   if (type === "documents" || type === "maps") fields.push("image_id");
 
