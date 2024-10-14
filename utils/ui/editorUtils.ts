@@ -42,7 +42,7 @@ import { IconEnum } from "../enums";
 import { Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
 
 export interface CustomAnnotation extends Annotation {
-  type: "mention" | "comment";
+  type: "mention";
 }
 
 const defaultMatchers = [
@@ -106,6 +106,7 @@ export function DefaultEditorExtensions(
     autoLinkRegex: DiceRollRegex,
     autoLink: true,
     selectTextOnClick: false,
+    priority: ExtensionPriority.Low,
   });
 
   // @ts-ignore
