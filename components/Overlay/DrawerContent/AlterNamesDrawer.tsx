@@ -3,6 +3,7 @@
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
+import groupBy from "lodash.groupby";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { findChildren, findElementAtPosition, NodeWithPosition } from "remirror";
 
@@ -16,6 +17,7 @@ import {
   mentionPositionAtom,
 } from "../../../utils";
 import { Button, Input, Select, Title } from "../../Form";
+import { Toggle } from "../../Form/Toggle";
 import { DrawerLayout } from "../../Layout";
 import { Alert } from "../../Misc";
 
@@ -27,7 +29,17 @@ type Props = {
   };
 };
 
-function AlterNameEdit({ node, getContext }: { node: NodeWithPosition; getContext: Props["data"]["getContext"] }) {
+function AlterNameEdit({
+  node,
+  getContext,
+  groupEdit,
+  groupNodePositions,
+}: {
+  node: NodeWithPosition;
+  getContext: Props["data"]["getContext"];
+  groupEdit: boolean;
+  groupNodePositions: number[];
+}) {
   const [alterName, setAlterName] = useState(node.node.attrs.alterName || "");
   return (
     <div className="flex items-end justify-between gap-x-2">
@@ -38,8 +50,15 @@ function AlterNameEdit({ node, getContext }: { node: NodeWithPosition; getContex
           isDisabled={!alterName}
           onClick={() => {
             const state = getContext.getState();
+            const { tr } = state;
+            if (groupEdit) {
+              for (let index = 0; index < groupNodePositions.length; index++) {
+                tr.setNodeAttribute(groupNodePositions[index], "alterName", alterName);
+              }
+            } else {
+              tr.setNodeAttribute(node.pos, "alterName", alterName);
+            }
 
-            const tr = state.tr.setNodeAttribute(node.pos, "alterName", alterName);
             if (tr.docChanged) {
               getContext.view.dispatch(tr);
             }
@@ -56,7 +75,11 @@ export function AlterNamesDrawer({ data }: Props) {
   const setMentionPosition = useSetAtom(mentionPositionAtom);
   const text = data?.getContext.helpers.getText();
   const [selectedEntity, setSelectedEntity] = useState<SearchableMentionEntities | null>(null);
+  const [groupEdit, setGroupEdit] = useState(false);
   const [mentions, setMentions] = useState<NodeWithPosition[]>([]);
+
+  const groupedMentions = groupEdit ? groupBy(mentions, (node) => node.node.attrs.id) : {};
+
   useEffect(() => {
     if (selectedEntity) {
       const temp = findChildren({
@@ -73,7 +96,6 @@ export function AlterNamesDrawer({ data }: Props) {
 
     data.getContext.commands.setAnnotations(annotations);
   }, [selectedEntity]);
-
   return (
     <DrawerLayout>
       <Select
@@ -85,8 +107,13 @@ export function AlterNamesDrawer({ data }: Props) {
         value={selectedEntity}
       />
 
+      <div className="flex items-center justify-between">
+        <span>Group edit mentions</span>
+        <Toggle name="groupEdit" onChange={() => setGroupEdit(!groupEdit)} value={groupEdit} />
+      </div>
+
       <ul className="flex max-h-full flex-col gap-y-2 overflow-y-auto">
-        {mentions?.length
+        {mentions?.length && !groupEdit
           ? mentions.map((mention, idx) => {
               const localMentionId = `${mention.node.attrs.id}-${idx}`;
               return (
@@ -118,7 +145,42 @@ export function AlterNamesDrawer({ data }: Props) {
                     }
                   }}>
                   <Title isDrawerTitle label={mention.node.attrs.label} />
-                  <AlterNameEdit getContext={data.getContext} node={mention} />
+                  <AlterNameEdit getContext={data.getContext} groupEdit={false} groupNodePositions={[]} node={mention} />
+                </li>
+              );
+            })
+          : null}
+
+        {groupEdit
+          ? Object.entries(groupedMentions).map(([id, mentionsInGroup]) => {
+              return (
+                <li
+                  // idx won't be changing
+                  key={id}
+                  className="flex cursor-pointer flex-col gap-y-2 hover:text-blue-300"
+                  onMouseOut={() => {
+                    data.getContext.commands.setAnnotations([]);
+                  }}
+                  onMouseOver={() => {
+                    data.getContext.commands.setAnnotations(
+                      mentionsInGroup.map((mentionItem, index) => ({
+                        id: `${id}-${index}`,
+                        from: mentionItem.pos,
+                        // Mentions only take up one space
+                        to: mentionItem.pos + 1,
+                        className: "annotation",
+                        // @ts-ignore
+                        type: "mention",
+                      }))
+                    );
+                  }}>
+                  <Title isDrawerTitle label={mentionsInGroup?.[0].node.attrs.label} />
+                  <AlterNameEdit
+                    getContext={data.getContext}
+                    groupEdit
+                    groupNodePositions={mentionsInGroup.map((m) => m.pos)}
+                    node={mentionsInGroup?.[0]}
+                  />
                 </li>
               );
             })
