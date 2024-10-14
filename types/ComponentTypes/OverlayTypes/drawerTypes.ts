@@ -1,6 +1,6 @@
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { Core } from "cytoscape";
-import { Dispatch, MouseEvent, SetStateAction } from "react";
+import { Dispatch, SetStateAction, SyntheticEvent } from "react";
 
 import { AvailableIcons } from "../../../utils";
 import { AssetType, Size } from "../../baseTypes";
@@ -196,7 +196,7 @@ export type DrawerAtomType = {
   | { type: "players"; data: { id?: string; game_id: string } }
 );
 
-export interface ContextMenuAtomType {
-  event: MouseEvent<HTMLDivElement, MouseEvent> | null;
+export interface ContextMenuAtomType<T> {
+  event: SyntheticEvent<T> | null;
   items: DropdownItemType[] | null;
 }
