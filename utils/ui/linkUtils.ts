@@ -45,7 +45,7 @@ export function getLinkToItem(project_id: string, type: string, id: string, is_f
   return `/projects/${project_id}/${type}/${is_folder ? "folder/" : ""}${id}`;
 }
 
-export function getMentionLink(id: string, type: string, project_id: string, is_public: boolean, parent_id?: string) {
+export function getMentionLink(id: string, type: string, project_id: string, is_public: boolean, parent_id?: string | null) {
   if (IS_PUBLIC && !is_public) return "#";
   return getEntityLink(project_id, type, id, parent_id);
 }

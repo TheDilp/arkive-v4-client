@@ -60,9 +60,12 @@ export function getParentEntityType(type: AvailableSubEntityType): AvailableEnti
 }
 
 export function getEntityFields(type: AvailableEntityType | AvailableSubEntityType): string[] {
-  if (type === "characters") return ["id", "full_name", "portrait_id"];
-  if (type === "blueprints") return ["id", "title", "icon"];
-  if (type === "blueprint_instances") return ["id", "title"];
+  if (type === "characters") return ["id", "full_name", "portrait_id", "is_public"];
+  if (type === "blueprints") return ["id", "title", "icon", "is_public"];
+  if (type === "blueprint_instances") return ["id", "title", "is_public"];
+  if (type === "map_pins") return ["title", "icon", "image_id", "is_public"];
+  if (type === "events") return ["title", "image_id", "is_public"];
+  if (type === "words") return ["title", "description", "translation", "is_public"];
   const fields: string[] = IS_PUBLIC
     ? ["id", "title", "icon", "owner_id"]
     : ["id", "deleted_at", "title", "icon", "is_folder", "parent_id", "owner_id"];

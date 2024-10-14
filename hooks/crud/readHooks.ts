@@ -16,6 +16,7 @@ import {
   NotificationEntityType,
   RequestBodyType,
   SearchableEntities,
+  SearchableMentionEntities,
   TagColorStatType,
   TagEntityStatType,
   UserStatusType,
@@ -113,7 +114,7 @@ export function useGetUser(
 
 export function useGetEntity<EntityType>(
   id: string | undefined,
-  type: AvailableEntityType,
+  type: AvailableEntityType | SearchableMentionEntities,
   body: RequestBodyType<EntityType>,
   options?: UseQueryOptions<any> & {
     queryKeyOverwrite?: string[];

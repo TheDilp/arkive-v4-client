@@ -1,10 +1,7 @@
 import { useParams } from "react-router-dom";
 
-import { DocumentMention, EventMention, GraphMention, MapMention, WordMention } from ".";
-import { BlueprintMention } from "./BlueprintMention";
-import { CharacterMention } from "./CharacterMention";
-import { MapPinMention } from "./MapPinMention";
 import { SearchableMentionEntities } from "../../../../../types";
+import { Mention } from "./Mention";
 
 type Props = {
   node: any;
@@ -18,45 +15,30 @@ export function MentionReactComponent({ node }: Props) {
       id,
       name,
       label,
-      alterId,
       icon,
       projectId,
-      type,
+      alterName: alter_name,
       parentId: parent_id,
     } = node.attrs as {
       id: string;
-      name: string;
+      name: SearchableMentionEntities;
       label: string;
-      alterId: string | null;
+      alterName: string | null;
       icon?: string;
-      parentId?: string;
-      projectId?: string;
-      type: SearchableMentionEntities;
+      parentId?: string | null;
+      projectId?: string | null;
     };
-
-    if (name === "characters") return <CharacterMention id={id} label={label} project_id={projectId || project_id} />;
-    if (name === "documents")
-      return <DocumentMention alterId={alterId} id={id} label={label} project_id={projectId || project_id} title={label} />;
-    if (name === "maps") return <MapMention id={id} label={label} project_id={projectId || project_id} />;
-    if (name === "map_pins")
-      return <MapPinMention id={id} label={label} parent_id={parent_id} project_id={projectId || project_id} />;
-    if (name === "graphs") return <GraphMention id={id} label={label} project_id={projectId || project_id} />;
-    if (name === "blueprint_instances")
-      return (
-        <BlueprintMention
-          icon={icon}
-          id={id}
-          label={label}
-          parent_id={parent_id}
-          project_id={projectId || project_id}
-          title={label}
-        />
-      );
-    if (name === "words") return <WordMention id={id} label={label} title={label} />;
-    if (name === "events")
-      return <EventMention id={id} label={label} parent_id={parent_id} project_id={projectId || project_id} title={label} />;
-
-    return <span>{label}</span>;
+    return (
+      <Mention
+        alter_name={alter_name}
+        icon={icon}
+        id={id}
+        label={label}
+        parent_id={parent_id}
+        project_id={projectId || project_id}
+        type={name}
+      />
+    );
   }
   return <span />;
 }
