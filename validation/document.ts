@@ -85,10 +85,7 @@ export const InsertDocumentSchema = z.object({
   relations: z
     .object({
       tags: z.object({ id: z.string() }).array().optional(),
-      alter_names: z
-        .object({ title: z.string().transform((value) => value.trim()) })
-        .array()
-        .optional(),
+
       template_fields: InsertDocumentTemplateFieldSchema.array().optional().nullable(),
     })
     .optional(),
@@ -113,12 +110,6 @@ export const UpdateDocumentSchema = z.object({
   }),
   relations: z
     .object({
-      alter_names: z
-        .object({
-          title: z.string().transform((value) => value.trim()),
-        })
-        .array()
-        .optional(),
       tags: z.object({ id: z.string() }).array().optional(),
       template_fields: UpdateDocumentTemplateFieldSchema.array().optional().nullable(),
     })

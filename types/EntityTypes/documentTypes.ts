@@ -2,13 +2,6 @@ import { RemirrorJSON } from "remirror";
 
 import { BaseEntityType, ImageType, TagType } from ".";
 
-interface AlterNameType {
-  id: string;
-  title: string;
-  parent_id: string;
-  project_id: string;
-}
-
 export type MatchType =
   | "characters"
   | "blueprint_instances"
@@ -61,7 +54,6 @@ export interface DocumentType extends BaseEntityType {
   is_template: boolean | null;
   properties: string | null;
   image_id?: string | null;
-  alter_names: AlterNameType[];
   tags: Omit<TagType, "owner_id" | "permissions">[];
   dice_color?: string | null;
   image: ImageType;

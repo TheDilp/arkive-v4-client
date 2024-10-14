@@ -31,7 +31,7 @@ import { EntityPermission } from "../../Complex/EntityPermission";
 import { ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, TagInput } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
-import { Badge, Icon, Skeleton } from "../../Misc";
+import { Icon, Skeleton } from "../../Misc";
 import { ColorPicker } from "../ColorPicker";
 import { IconPicker } from "../IconPicker";
 
@@ -149,9 +149,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
 
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateDocumentType>("documents", project_id as string);
 
-  const [alterNameInput, setAlterNameInput] = useState("");
   const tabs = getTabs(permissions, document?.is_template || exceptions?.createTemplate, data?.id);
-  const currentAlterNames = document?.alter_names?.map((alter_name) => alter_name.title);
 
   const { changedData, handleChange } = useHandleChange({ data: document, setData: setDocument });
 
@@ -203,60 +201,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
               title={document?.image?.title}
             />
           )}
-          {exceptions?.createTemplate ? null : (
-            <Input
-              helperText={exceptions?.createTemplate ? "Templates cannot use alternative names" : ""}
-              isDisabled={exceptions?.createTemplate || !canCreateOrEdit}
-              label="Alternative names"
-              name="alter_names"
-              onChange={({ value }) => setAlterNameInput(value as string)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && alterNameInput) {
-                  if (currentAlterNames?.includes(alterNameInput)) {
-                    createNotification({
-                      title: "Cannot add the same alternative name twice.",
-                      variant: "warning",
-                      icon: IconEnum.info_circle,
-                      timer: 3,
-                    });
-                  } else {
-                    handleChange({
-                      name: "alter_names",
-                      value: (document?.alter_names || []).concat({
-                        title: alterNameInput,
-                      }),
-                    });
-                    setAlterNameInput("");
-                  }
-                }
-              }}
-              placeholder={exceptions?.createTemplate ? "" : "Press enter to add an alternative name"}
-              value={alterNameInput}
-            />
-          )}
 
-          <div className="flex flex-wrap gap-2">
-            {document?.alter_names?.length
-              ? document.alter_names.map((alter_name) => (
-                  <div key={alter_name.title} className="w-fit">
-                    <Badge
-                      clearAction={
-                        canCreateOrEdit
-                          ? () => {
-                              handleChange({
-                                name: "alter_names",
-                                value: (document?.alter_names || []).filter((a_n) => a_n.title !== alter_name.title),
-                              });
-                            }
-                          : undefined
-                      }
-                      label={alter_name.title}
-                      size="lg"
-                    />
-                  </div>
-                ))
-              : null}
-          </div>
           <FolderSelect
             handleChange={handleChange}
             isDisabled={!canCreateOrEdit}
@@ -444,7 +389,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                   id: document.id,
                   parent_id: document.parent_id,
                 } as DocumentType;
-                const { alter_names, template_fields, tags, image, ...rest } = documentToUpdate;
+                const { template_fields, tags, image, ...rest } = documentToUpdate;
 
                 const dataToParse = {
                   data: { ...rest, image_id: image?.id },
@@ -455,9 +400,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                 if (tags) {
                   set(dataToParse, "relations.tags", tags);
                 }
-                if (alter_names) {
-                  set(dataToParse, "relations.alter_names", alter_names);
-                }
+
                 if (template_fields) {
                   set(
                     dataToParse,
@@ -486,7 +429,6 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                 const dataToParse = {
                   data: { ...document, image_id: document?.image?.id },
                   relations: {
-                    alter_names: (document?.alter_names || [])?.map((alter) => ({ title: alter?.title })),
                     tags: document?.tags,
                     template_fields: (document?.template_fields || []).map((f) => {
                       return { ...f, key: f.key.trim() };
