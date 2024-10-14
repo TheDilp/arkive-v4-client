@@ -52,6 +52,8 @@ export function AutomentionDrawer({ data }: Props) {
         .replaceAll(".", "")
         .replaceAll(/(\r\n|\n|\r)/giu, "  ")
         .trim();
+
+      if (!formattedText) return;
       return FetchFunction({
         method: "POST",
         body: JSON.stringify({
