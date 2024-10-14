@@ -19,6 +19,7 @@ import {
   getElementPosition,
   getRanges,
   IconEnum,
+  MentionEntityOptions,
   mentionPositionAtom,
 } from "../../../utils";
 import { Button, Checkbox, Select } from "../../Form";
@@ -34,49 +35,6 @@ type Props = {
 };
 type matchItem = { id: string; title: string; blueprint_title?: string; image_id?: string; icon?: string; parent_id?: string };
 type matchResult = FromToProps & matchItem;
-
-const MentionEntityOptions: { label: string; value: SearchableMentionEntities; icon: AvailableIcons }[] = [
-  {
-    label: "Characters",
-    value: "characters",
-    icon: IconEnum.character,
-  },
-  {
-    label: "Blueprints",
-    value: "blueprint_instances",
-    icon: IconEnum.blueprint,
-  },
-  {
-    label: "Documents",
-    value: "documents",
-    icon: IconEnum.document,
-  },
-  {
-    label: "Maps",
-    value: "maps",
-    icon: IconEnum.map,
-  },
-  {
-    label: "Map pins",
-    value: "map_pins",
-    icon: IconEnum.map_pin,
-  },
-  {
-    label: "Graph",
-    value: "graphs",
-    icon: IconEnum.graph,
-  },
-  {
-    label: "Events",
-    value: "events",
-    icon: IconEnum.event,
-  },
-  {
-    label: "Words",
-    value: "words",
-    icon: IconEnum.word,
-  },
-];
 
 export function AutomentionDrawer({ data }: Props) {
   const { project_id } = useParams();

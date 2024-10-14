@@ -1,3 +1,4 @@
+import { SearchableMentionEntities } from "../../types";
 import { AvailableManuscriptEntityTypes } from "../../types/EntityTypes/manuscriptTypes";
 import { AvailableIcons, IconEnum } from "./IconEnums";
 
@@ -261,6 +262,49 @@ export const AvailableManuscriptEntityTypesEnum: { type: AvailableManuscriptEnti
   { type: "graphs" as const, icon: IconEnum.graph },
   { type: "events" as const, icon: IconEnum.event },
   { type: "images" as const, icon: IconEnum.image },
+];
+
+export const MentionEntityOptions: { label: string; value: SearchableMentionEntities; icon: AvailableIcons }[] = [
+  {
+    label: "Characters",
+    value: "characters",
+    icon: IconEnum.character,
+  },
+  {
+    label: "Blueprints",
+    value: "blueprint_instances",
+    icon: IconEnum.blueprint,
+  },
+  {
+    label: "Documents",
+    value: "documents",
+    icon: IconEnum.document,
+  },
+  {
+    label: "Maps",
+    value: "maps",
+    icon: IconEnum.map,
+  },
+  {
+    label: "Map pins",
+    value: "map_pins",
+    icon: IconEnum.map_pin,
+  },
+  {
+    label: "Graph",
+    value: "graphs",
+    icon: IconEnum.graph,
+  },
+  {
+    label: "Events",
+    value: "events",
+    icon: IconEnum.event,
+  },
+  {
+    label: "Words",
+    value: "words",
+    icon: IconEnum.word,
+  },
 ];
 
 export const DefaultCharacterDnD5EGameData = {
