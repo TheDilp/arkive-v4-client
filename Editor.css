@@ -183,12 +183,6 @@
   .remirror-table-controller-wrapper {
     @apply hidden !important;
   }
-  .annotation {
-    @apply animate-pulse bg-transparent text-blue-400 !important;
-  }
-  .selectedAnnotation {
-    @apply animate-pulse bg-transparent text-green-400 !important;
-  }
 
   p {
     @apply text-base;
@@ -412,9 +406,17 @@
       }
     }
   }
+
   div:has(> .characterMentionImage) span {
     @apply flex h-[14px];
   }
+}
+
+.annotation {
+  @apply animate-pulse bg-transparent text-blue-400;
+}
+.selectedAnnotation {
+  @apply animate-pulse bg-transparent text-green-400;
 }
 
 .commandMenu {
