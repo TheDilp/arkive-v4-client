@@ -421,6 +421,20 @@ function menuBarItems({
       }
     );
   }
+  options.push({
+    id: "alter_names",
+    icon: IconEnum.alter_name,
+    tooltip: "Display mentions with alternative names",
+
+    onClick: () =>
+      setDrawer((prev) => ({
+        ...prev,
+        title: "Alternative names",
+        size: "xs",
+        type: "alter_names",
+        data: { getContext, title: title || "", id: id || "" },
+      })),
+  });
   if (isTemplate) {
     options.push({
       id: "template_maker",
