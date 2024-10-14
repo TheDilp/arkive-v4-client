@@ -7,7 +7,7 @@ import { DiceRollRegex } from "./diceRollerUtils";
 
 type matchItem = { id: string; title: string; blueprint_title?: string; image_id?: string; icon?: string; parent_id?: string };
 type matchResult = FromToProps & matchItem;
-type matchType = "automention" | "dice_roll";
+type matchType = "automention" | "dice_roll" | "alter_names";
 
 export const DocumentTemplateFieldRegex = /%\{([^%{}]*)\}%/g;
 
@@ -36,17 +36,27 @@ export function getRanges(
     }
     let tc = "";
     node.content.forEach((child) => {
-      if (child.type.name === "mentionAtom") {
-        const textContent = child.attrs.label;
-        if (textContent) {
-          // Must use as replacement for mentions as they
-          // take up space in text (in order to get correct pos of text)
-          tc += " ";
+      if (type === "alter_names") {
+        if (child.type.name === "mentionAtom") {
+          const textContent = child.attrs.label;
+          if (textContent) {
+            // take up space in text (in order to get correct pos of text)
+            tc += ` ${textContent}`;
+          }
         }
-      } else if (child.type.name === "image") {
-        tc += " ";
       } else {
-        tc = tc.concat(child.textContent);
+        if (child.type.name === "mentionAtom") {
+          const textContent = child.attrs.label;
+          if (textContent) {
+            // Must use as replacement for mentions as they
+            // take up space in text (in order to get correct pos of text)
+            tc += " ";
+          }
+        } else if (child.type.name === "image") {
+          tc += " ";
+        } else {
+          tc = tc.concat(child.textContent);
+        }
       }
     });
     const start = pos + 1;
