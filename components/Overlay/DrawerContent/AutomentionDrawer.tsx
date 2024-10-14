@@ -168,8 +168,8 @@ export function AutomentionDrawer({ data }: Props) {
               const idWithRange = `${potentialMatch.from}-${potentialMatch.id}-${potentialMatch.to}`;
               return (
                 <li
-                  className="flex cursor-pointer flex-nowrap items-center gap-x-2 hover:text-blue-300"
                   key={idWithRange}
+                  className="flex cursor-pointer flex-nowrap items-center gap-x-2 hover:text-blue-300"
                   onMouseOut={() => {
                     const highlighted = data.getContext.helpers.getAnnotations();
                     const notSelected = highlighted.filter(
