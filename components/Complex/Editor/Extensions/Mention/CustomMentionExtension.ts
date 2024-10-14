@@ -19,7 +19,6 @@ export class CustomMentionExtension extends MentionAtomExtension {
   createNodeSpec(extra: ApplySchemaAttributes, override: NodeSpecOverride): NodeExtensionSpec {
     return {
       attrs: {
-        alterId: { default: "" },
         alterName: { default: "" },
         projectId: { default: "" },
         id: { default: "" },
@@ -40,7 +39,6 @@ export class CustomMentionExtension extends MentionAtomExtension {
           attrs: {
             ...extra.defaults(),
             id: { default: null },
-            alterId: { default: null },
             alterName: { default: null },
             projectId: { default: null },
             icon: { default: null },
@@ -53,7 +51,6 @@ export class CustomMentionExtension extends MentionAtomExtension {
           getAttrs: (dom) => {
             const node = dom as HTMLAnchorElement;
             const id = node.getAttribute("data-id");
-            const alterId = node.getAttribute("data-alterId");
             const alterName = node.getAttribute("data-alterName");
             const projectId = node.getAttribute("data-projectId");
             const parentId = node.getAttribute("data-parentId");
@@ -62,7 +59,6 @@ export class CustomMentionExtension extends MentionAtomExtension {
             const label = node.getAttribute("data-label");
             return {
               id,
-              alterId,
               alterName,
               projectId,
               parentId,

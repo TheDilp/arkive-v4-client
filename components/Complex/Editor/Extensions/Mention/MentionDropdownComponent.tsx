@@ -15,7 +15,6 @@ export function MentionDropdownComponent() {
     {
       key: string;
       id: string;
-      alterId: string | null;
       label: string;
       displayLabel?: string;
       portrait_id?: string;
@@ -35,7 +34,6 @@ export function MentionDropdownComponent() {
       data: {
         key: string;
         id: string;
-        alterId: string | null;
         title: string;
         displayLabel?: string;
         parentId?: string;
@@ -75,7 +73,6 @@ export function MentionDropdownComponent() {
               id: item?.parentId || item.id,
               searchItem: item.translation,
               label: item.title,
-              alterId: null,
               icon: item?.icon,
               displayLabel: `${item.title} (${item.translation})`,
               projectId: project_id || item.project_id,
@@ -84,7 +81,6 @@ export function MentionDropdownComponent() {
           return {
             key: item.id,
             id: item?.parentId || item.id,
-            alterId: item?.alterId || null,
             label: item.title,
             icon: item?.icon,
             projectId: project_id || item.project_id,
@@ -129,7 +125,7 @@ export function MentionDropdownComponent() {
                   item,
                   index,
                 })}
-                key={`${item.key}_${item.alterId || "NO_ALTER_ID"}`}>
+                key={`${item.key}_${item.id || "NO_ALTER_ID"}`}>
                 {item?.portrait_id ? <Avatar image_id={item.portrait_id} label={item.label} size="xs" /> : null}
                 <span className="truncate">{item?.displayLabel || item.label}</span>
               </li>
