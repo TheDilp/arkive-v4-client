@@ -1,3 +1,4 @@
+export * from "./AlterNamesDrawer";
 export * from "./AutomentionDrawer";
 export * from "./BlueprintDrawer";
 export * from "./BlueprintInstanceDrawer";

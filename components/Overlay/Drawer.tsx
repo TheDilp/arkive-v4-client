@@ -9,6 +9,7 @@ import { dialogAtom, drawerAtom, hasChangedDataAtom, IconEnum } from "../../util
 import { FolderDrawer, GraphDrawer } from "..";
 import { Button } from "../Form";
 import {
+  AlterNamesDrawer,
   AutomentionDrawer,
   BlueprintDrawer,
   BlueprintInstanceDrawer,
@@ -230,6 +231,7 @@ export function Drawer() {
                 {drawer.type === "character_add" ? <CharacterAddDrawer data={drawer?.data} /> : null}
                 {drawer.type === "search" ? <SearchDrawer /> : null}
                 {drawer.type === "edit_tags" ? <EditTags data={drawer?.data || []} /> : null}
+                {drawer.type === "alter_names" ? <AlterNamesDrawer data={drawer?.data} /> : null}
                 {drawer.type === "images" ? <ImageDrawer data={drawer?.data} /> : null}
                 {drawer.type === "character_relationship_types" ? <CharacterRelationshipTypeDrawer /> : null}
                 {drawer.type === "map_pin_types" ? <MapPinTypeDrawer data={drawer?.data} /> : null}
