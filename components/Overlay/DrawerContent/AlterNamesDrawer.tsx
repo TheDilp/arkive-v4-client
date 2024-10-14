@@ -2,20 +2,12 @@
 
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useSetAtom } from "jotai";
-import { useResetAtom } from "jotai/utils";
 import groupBy from "lodash.groupby";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { findChildren, findElementAtPosition, NodeWithPosition } from "remirror";
 
 import { SearchableMentionEntities } from "../../../types";
-import {
-  CustomAnnotation,
-  drawerAtom,
-  getElementPosition,
-  IconEnum,
-  MentionEntityOptions,
-  mentionPositionAtom,
-} from "../../../utils";
+import { CustomAnnotation, getElementPosition, IconEnum, MentionEntityOptions, mentionPositionAtom } from "../../../utils";
 import { Button, Input, Select, Title } from "../../Form";
 import { Toggle } from "../../Form/Toggle";
 import { DrawerLayout } from "../../Layout";
@@ -47,7 +39,6 @@ function AlterNameEdit({
       <div className="mb-1 h-8 w-8">
         <Button
           icon={IconEnum.save}
-          isDisabled={!alterName}
           onClick={() => {
             const state = getContext.getState();
             const { tr } = state;
@@ -71,9 +62,7 @@ function AlterNameEdit({
 }
 
 export function AlterNamesDrawer({ data }: Props) {
-  const resetAtomDrawer = useResetAtom(drawerAtom);
   const setMentionPosition = useSetAtom(mentionPositionAtom);
-  const text = data?.getContext.helpers.getText();
   const [selectedEntity, setSelectedEntity] = useState<SearchableMentionEntities | null>(null);
   const [groupEdit, setGroupEdit] = useState(false);
   const [mentions, setMentions] = useState<NodeWithPosition[]>([]);
@@ -188,25 +177,6 @@ export function AlterNamesDrawer({ data }: Props) {
       </ul>
 
       {mentions && !mentions?.length ? <Alert label="No matches found." variant="info" /> : null}
-      <div className="flex flex-col gap-2 lg:flex-row lg:flex-nowrap">
-        <Button
-          icon={IconEnum.close}
-          label="Close"
-          onClick={() => {
-            const activeAnnotations = data.getContext.helpers.getAnnotations();
-            if (activeAnnotations.length)
-              data.getContext.commands.removeAnnotations(activeAnnotations.map((a: { id: string }) => a.id));
-            resetAtomDrawer();
-          }}
-        />
-        <Button
-          icon={IconEnum.mention}
-          isDisabled={!mentions?.length || !selectedEntity || !text.length}
-          label="Create mentions"
-          onClick={() => {}}
-          variant="info"
-        />
-      </div>
     </DrawerLayout>
   );
 }
