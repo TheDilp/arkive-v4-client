@@ -2,7 +2,7 @@ import { UseMutateFunction } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
-import { Dispatch, MouseEvent, useEffect, useLayoutEffect, useState } from "react";
+import { Dispatch, SyntheticEvent, useEffect, useLayoutEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import {
@@ -433,7 +433,7 @@ function EntityItem({
     unknown
   >;
 
-  showContextMenu: (event: MouseEvent<HTMLDivElement, MouseEvent>, item_id: string) => void;
+  showContextMenu: (event: SyntheticEvent<HTMLElement>, item_id: string) => void;
 }) {
   const { project_id } = useParams();
   const imageUrl = useImageURL(getAssetURL(project_id as string, type === "maps" ? "map_images" : "images", image_id));
@@ -1134,7 +1134,7 @@ function FolderView() {
               id={item.id}
               image_id={item?.image_id}
               is_folder={item?.is_folder ?? false}
-              showContextMenu={(event: MouseEvent<HTMLDivElement, MouseEvent>, id: string) =>
+              showContextMenu={(event: SyntheticEvent<HTMLElement>, id: string) =>
                 setContextMenuAtom({
                   event,
                   items: [
