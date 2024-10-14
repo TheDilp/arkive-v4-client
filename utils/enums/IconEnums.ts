@@ -8,6 +8,7 @@ export const IconEnum = {
   add_calendar: "ph:calendar-plus-light" as const,
   additional_fields: "ph:textbox" as const,
   additional_fields_sections: "ph:intersect" as const,
+  alter_name: "fluent:text-change-previous-24-regular" as const,
   api_key: "fluent:key-32-regular" as const,
   api_key_reset: "fluent:key-reset-20-filled" as const,
   archive: "ph:archive" as const,
