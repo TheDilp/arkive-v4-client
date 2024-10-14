@@ -1,7 +1,7 @@
 import { Doc, Heading, RemirrorRenderer, TextHandler } from "@remirror/react";
 import { useSetAtom } from "jotai";
 import { ComponentType, ReactElement } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import { useGetImage } from "../../../hooks";
@@ -162,23 +162,17 @@ function typeMap(project_id: string, content: RemirrorJSON) {
         const { attrs } = props[0].node;
         if (attrs) {
           const { id, label, alterName, title, projectId, icon, name: type, parentid } = attrs;
-          <Mention
-            alter_name={alterName}
-            icon={icon}
-            id={id}
-            label={label}
-            parent_id={parentid}
-            project_id={project_id || projectId}
-            title={title}
-            type={type}
-          />;
-
-          return IS_PUBLIC ? (
-            <span className="font-lato">{label}</span>
-          ) : (
-            <Link className="font-lato text-sm font-bold text-white underline" to={`../../${type}/${id}`}>
-              {label}
-            </Link>
+          return (
+            <Mention
+              alter_name={alterName}
+              icon={icon}
+              id={id}
+              label={label}
+              parent_id={parentid}
+              project_id={project_id || projectId}
+              title={title}
+              type={type}
+            />
           );
         }
       }

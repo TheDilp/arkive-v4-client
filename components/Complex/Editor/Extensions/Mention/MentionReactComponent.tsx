@@ -9,7 +9,6 @@ type Props = {
 
 export function MentionReactComponent({ node }: Props) {
   const { project_id } = useParams();
-
   if (node?.attrs) {
     const {
       id,
