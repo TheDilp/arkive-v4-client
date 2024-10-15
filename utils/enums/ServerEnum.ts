@@ -9,7 +9,7 @@ export const baseURLS = {
   baseWebsocketServer: `${
     import.meta.env.DEV
       ? `ws://localhost:${import.meta.env.VITE_SERVER_PORT}`
-      : "wss://arkive-v4-server-production.up.railway.app"
+      : import.meta.env.VITE_ARKIVE_EDITOR_SERVER.replace("https://", "wss://")
   }`,
   basePublicClient: import.meta.env.VITE_WIKI_CLIENT_URL,
   baseGatewayServer: `${
