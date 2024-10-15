@@ -51,6 +51,7 @@ export function ProjectLayout() {
         feature_flags: true,
         owner: true,
         game_system: true,
+        tags: true,
       },
     },
     { staleTime: 60 * 60 * 1 }

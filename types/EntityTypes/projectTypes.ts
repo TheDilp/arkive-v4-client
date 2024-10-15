@@ -10,6 +10,7 @@ import { GraphType } from "./graphTypes";
 import { ImageType } from "./imageTypes";
 import { MapPinTypesType, MapType } from "./mapTypes";
 import { RoleType } from "./rolesTypes";
+import { TagType } from "./tagTypes";
 
 export interface ProjectType {
   id: string;
@@ -27,6 +28,7 @@ export interface ProjectType {
   feature_flags?: Record<string, boolean> | null;
   game_system_id: string | null;
   game_system?: GameSystemType;
+  tags: TagType[];
 }
 
 export type ProjectDashboardType = [
