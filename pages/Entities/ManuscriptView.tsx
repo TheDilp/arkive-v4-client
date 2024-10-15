@@ -15,7 +15,18 @@ import {
   useTable,
   useUpdateManyPublic,
 } from "../../hooks";
-import { DialogAtomType, DrawerAtomType, UpdatePublicManyType, UserHasPermissionsType, WebhookType } from "../../types";
+import {
+  BulkUpdateType,
+  DeleteManyType,
+  DialogAtomType,
+  DrawerAtomType,
+  TableDispatch,
+  TableSelectedAction,
+  TableSelectionType,
+  UpdatePublicManyType,
+  UserHasPermissionsType,
+  WebhookType,
+} from "../../types";
 import { ManuscriptType } from "../../types/EntityTypes/manuscriptTypes";
 import {
   AvailableIcons,
@@ -254,6 +265,198 @@ function createColumns(
   ];
 }
 
+function getSelectedActions(
+  permissions: UserHasPermissionsType,
+  {
+    selection,
+    arkived,
+    updateMany,
+    resetDialogAtom,
+    deleteMany,
+    dispatch,
+    data,
+    setDrawer,
+    setDialog,
+  }: {
+    arkived: "active" | "arkive";
+    updateMany: BulkUpdateType;
+    deleteMany: DeleteManyType;
+    selection: TableSelectionType | undefined;
+    setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
+    setDialog: Dispatch<SetStateAction<DialogAtomType>>;
+    resetDialogAtom: () => unknown;
+    data: ManuscriptType[];
+    dispatch: TableDispatch<ManuscriptType>;
+  }
+) {
+  const selectedActions: TableSelectedAction[] = [];
+  if (permissions?.update_manuscripts) {
+    selectedActions.push(
+      {
+        icon: IconEnum.eye,
+        hasNoBackground: true,
+        isIconOnly: true,
+        tooltip: "Set public",
+        onClick: async () => {
+          const ids = Object.values(selection || {}).flatMap((id) => id);
+          const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
+          if (entitesNotFolders.length) {
+            updateMany({
+              data: ids.map((id) => ({ data: { id, is_public: true } })),
+            });
+            dispatch({ type: "clearSelection" });
+          }
+        },
+      },
+      {
+        icon: IconEnum.eye_slash,
+        hasNoBackground: true,
+        isIconOnly: true,
+        tooltip: "Set private",
+        onClick: async () => {
+          const ids = Object.values(selection || {}).flatMap((id) => id);
+          const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
+          if (entitesNotFolders.length) {
+            updateMany({
+              data: ids.map((id) => ({ data: { id, is_public: false } })),
+            });
+            dispatch({ type: "clearSelection" });
+          }
+        },
+      },
+      {
+        icon: IconEnum.tags,
+        hasNoBackground: true,
+        isIconOnly: true,
+        tooltip: "Add/remove tags",
+        onClick: () => {
+          const ids = Object.values(selection || {}).flatMap((id) => id);
+          const charactersWithTags = (data || [])
+            ?.filter((e) => ids.includes(e.id))
+            .map((e) => ({ id: e.id, tags: (e.tags || []).map((t) => t.id) }));
+
+          setDrawer((prev) => ({
+            ...prev,
+            size: "lg",
+            title: "Bulk edit tags",
+            type: "bulk_tags",
+            data: { items: charactersWithTags, dispatch, type: "manuscripts" },
+          }));
+        },
+      },
+      {
+        icon: IconEnum.permissions,
+        hasNoBackground: true,
+        isIconOnly: true,
+        tooltip: "Change access",
+        onClick: () => {
+          const ids = Object.values(selection || {}).flatMap((id) => id);
+
+          setDrawer((prev) => ({
+            ...prev,
+            size: "lg",
+            title: "Edit access",
+            type: "bulk_access",
+            data: {
+              ids,
+              selectablePermissions: ["read_manuscripts", "update_manuscripts", "delete_manuscripts"],
+              type: "manuscripts",
+            },
+          }));
+        },
+      }
+    );
+  }
+
+  if (permissions?.delete_manuscripts) {
+    if (arkived === "arkive") {
+      selectedActions.push({
+        icon: IconEnum.restore,
+        variant: "primary",
+        hasNoBackground: true,
+        isIconOnly: true,
+        tooltip: "Restore selected rows",
+        onClick: () => {
+          const ids = Object.values(selection || {}).flatMap((id) => id);
+          if (ids.length) {
+            setDialog((prev) => ({
+              ...prev,
+              title: "Restore many",
+              description: `Are you sure you want to restore ${ids.length} ${ids.length === 1 ? "manuscript" : "manuscripts"}?`,
+              isOverlay: true,
+              cancel: {
+                label: "Cancel",
+                variant: "primary",
+                action: resetDialogAtom,
+              },
+              confirm: {
+                label: "Restore",
+                icon: IconEnum.restore,
+                action: () => {
+                  updateMany(
+                    {
+                      data: ids.map((id) => ({
+                        data: { id, deleted_at: null },
+                      })),
+                    },
+                    {
+                      onSuccess: () => dispatch({ type: "clearSelection" }),
+                    }
+                  );
+                  dispatch({ type: "clearSelection" });
+                },
+                variant: "success",
+              },
+            }));
+          }
+        },
+      });
+    }
+    selectedActions.push({
+      icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
+      variant: arkived === "arkive" ? "error" : "primary",
+      hasNoBackground: true,
+      isIconOnly: true,
+      tooltip: `${arkived === "arkive" ? "Delete" : "Arkive"} selected rows`,
+      onClick: () => {
+        const ids = Object.values(selection || {}).flatMap((id) => id);
+        if (ids.length) {
+          setDialog((prev) => ({
+            ...prev,
+            title: `${arkived === "arkive" ? "Delete" : "Arkive"} many`,
+            description: `Are you sure you want to ${arkived === "arkive" ? "delete" : "arkive"} ${ids.length} ${
+              ids.length === 1 ? "character" : "characters"
+            }?`,
+            warning: arkived === "arkive" ? "This action cannot be undone." : undefined,
+            isOverlay: true,
+            cancel: {
+              label: "Cancel",
+              variant: "primary",
+              action: resetDialogAtom,
+            },
+            confirm: {
+              label: arkived === "arkive" ? "Delete" : "Arkive",
+              icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
+              action: () => {
+                deleteMany(
+                  { data: { ids } },
+                  {
+                    onSuccess: () => dispatch({ type: "clearSelection" }),
+                  }
+                );
+                dispatch({ type: "clearSelection" });
+              },
+              variant: "error",
+            },
+          }));
+        }
+      },
+    });
+  }
+
+  return selectedActions;
+}
+
 export function ManuscriptView() {
   const { project_id } = useParams();
   const { isMd } = useBreakpoint();
@@ -281,7 +484,7 @@ export function ManuscriptView() {
     user?.role?.id,
     project_id
   );
-  const [{ selection, orderBy, filters, pagination }, dispatch] = useTable({
+  const [{ selection, orderBy, filters, pagination }, dispatch] = useTable<ManuscriptType>({
     selection: {},
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
@@ -301,109 +504,17 @@ export function ManuscriptView() {
     },
     "manuscripts"
   );
-  const selectedActions = [
-    {
-      icon: IconEnum.permissions,
-      hasNoBackground: true,
-      isIconOnly: true,
-      tooltip: "Change access",
-      onClick: () => {
-        const ids = Object.values(selection || {}).flatMap((id) => id);
-
-        setDrawer((prev) => ({
-          ...prev,
-          size: "lg",
-          title: "Edit access",
-          type: "bulk_access",
-          data: {
-            ids,
-            selectablePermissions: ["create_manuscripts", "update_manuscripts", "delete_manuscripts"],
-            type: "manuscripts",
-          },
-        }));
-      },
-    },
-
-    ...(arkived === "arkive" && permissions?.delete_tags
-      ? [
-          {
-            icon: IconEnum.restore,
-            variant: "primary" as const,
-            hasNoBackground: true,
-            isIconOnly: true,
-            tooltip: "Restore selected rows",
-            onClick: () => {
-              const ids = Object.values(selection || {}).flatMap((id) => id);
-              if (ids.length) {
-                setDialog((prev) => ({
-                  ...prev,
-                  title: "Restore many",
-                  description: `Are you sure you want to restore ${ids.length} ${ids.length === 1 ? "manuscript" : "manuscripts"}?`,
-                  isOverlay: true,
-                  cancel: {
-                    label: "Cancel",
-                    variant: "primary",
-                    action: resetDialogAtom,
-                  },
-                  confirm: {
-                    label: "Restore",
-                    icon: IconEnum.restore,
-                    action: () => {
-                      updateMany(
-                        { data: ids.map((id) => ({ data: { id, deleted_at: null } })) },
-                        {
-                          onSuccess: () => dispatch({ type: "clearSelection" }),
-                        }
-                      );
-                      dispatch({ type: "clearSelection" });
-                    },
-                    variant: "success",
-                  },
-                }));
-              }
-            },
-          },
-        ]
-      : []),
-    {
-      icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
-      variant: arkived === "arkive" ? ("error" as const) : ("primary" as const),
-      hasNoBackground: true,
-      isIconOnly: true,
-      tooltip: `${arkived === "arkive" ? "Delete" : "Arkive"} selected rows`,
-      onClick: () => {
-        const ids = Object.values(selection || {}).flatMap((id) => id);
-        if (ids.length) {
-          setDialog((prev) => ({
-            ...prev,
-            title: `${arkived === "arkive" ? "Delete" : "Arkive"} many`,
-            description: `Are you sure you want to ${arkived === "arkive" ? "delete" : "arkive"} ${ids.length} ${
-              ids.length === 1 ? "manuscript" : "manuscripts"
-            }?`,
-            warning: arkived === "arkive" ? "This action cannot be undone." : undefined,
-            isOverlay: true,
-            cancel: {
-              label: "Cancel",
-              variant: "primary",
-              action: resetDialogAtom,
-            },
-            confirm: {
-              label: arkived === "arkive" ? "Delete" : "Arkive",
-              icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
-              action: async () =>
-                deleteMany(
-                  { data: { ids } },
-                  {
-                    onSuccess: () => dispatch({ type: "clearSelection" }),
-                  }
-                ),
-              variant: "error",
-            },
-          }));
-        }
-      },
-    },
-  ];
+  const selectedActions = getSelectedActions(permissions, {
+    deleteMany,
+    updateMany,
+    selection,
+    resetDialogAtom,
+    setDialog,
+    setDrawer,
+    data: data?.data || [],
+    dispatch,
+    arkived,
+  });
 
   useLayoutEffect(() => {
     if (!filter) {
