@@ -308,6 +308,7 @@ export function ManuscriptDrawer({ data }: Props) {
       ) : null}
       <div>
         <Button
+          icon={data?.id ? IconEnum.save : IconEnum.add}
           isDisabled={isCreating || isUpdating || isSaveDisabled(manuscript, entities)}
           isLoading={isCreating || isUpdating}
           label={data?.id ? "Update" : "Create"}
