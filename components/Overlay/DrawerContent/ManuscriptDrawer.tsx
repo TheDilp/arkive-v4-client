@@ -24,6 +24,7 @@ import {
   getDefaultEntityIcon,
   getSentenceCase,
   IconEnum,
+  sortEntitiesByTitle,
 } from "../../../utils";
 import {
   InsertManuscriptSchema,
@@ -110,7 +111,7 @@ export function ManuscriptDrawer({ data }: Props) {
   const { mutate: update, isLoading: isUpdating } = useUpdateEntity<UpdateManuscriptType>("manuscripts", project_id);
 
   useLayoutEffect(() => {
-    if (existingManuscript?.data && !manuscript?.id) {
+    if (existingManuscript?.data) {
       setManuscript(existingManuscript?.data);
 
       setEntities(buildManuscript(existingManuscript?.data));
@@ -156,29 +157,41 @@ export function ManuscriptDrawer({ data }: Props) {
 
           <div className="flex items-center justify-between">
             <span>Add:</span>
-            <Dropdown
-              allowedPlacements={["left-start", "left-end"]}
-              items={AvailableManuscriptEntityTypesEnum.map((entity) => ({
-                id: entity.type,
-                title: getSentenceCase(entity.type),
-                icon: entity.icon,
+            <span className="flex items-center gap-x-2">
+              <Dropdown
+                allowedPlacements={["left-start", "left-end"]}
+                items={AvailableManuscriptEntityTypesEnum.map((entity) => ({
+                  id: entity.type,
+                  title: getSentenceCase(entity.type),
+                  icon: entity.icon,
 
-                onClick: () =>
-                  setEntities((prev) =>
-                    prev.concat({
-                      title: "",
-                      related_id: "",
-                      image_id: "",
-                      id: crypto.randomUUID(),
-                      type: entity.type,
-                      sort: entities.length,
-                    })
-                  ),
-              }))}>
+                  onClick: () =>
+                    setEntities((prev) =>
+                      prev.concat({
+                        title: "",
+                        related_id: "",
+                        image_id: "",
+                        id: crypto.randomUUID(),
+                        type: entity.type,
+                        sort: entities.length,
+                      })
+                    ),
+                }))}>
+                <div className="h-8 w-8">
+                  <Button icon={IconEnum.add} isIconOnly onClick={undefined} variant="info" />
+                </div>
+              </Dropdown>
               <div className="h-8 w-8">
-                <Button icon={IconEnum.add} isIconOnly onClick={undefined} variant="info" />
+                <Button
+                  icon={IconEnum.sort_asc}
+                  onClick={() => {
+                    const temp = entities.toSorted(sortEntitiesByTitle).map((ent, idx) => ({ ...ent, sort: idx }));
+                    setEntities(temp);
+                  }}
+                  tooltip="Sort alphabetically"
+                />
               </div>
-            </Dropdown>
+            </span>
           </div>
 
           <DragDropContext
@@ -334,7 +347,12 @@ export function ManuscriptDrawer({ data }: Props) {
                   },
                   relations,
                 });
-                update(parsed);
+                update(parsed, {
+                  onSuccess: () => {
+                    resetChanges();
+                    resetDrawer();
+                  },
+                });
               } else {
                 const parsed = InsertManuscriptSchema.parse({
                   data: {
@@ -350,11 +368,11 @@ export function ManuscriptDrawer({ data }: Props) {
                     resetChanges();
                     setManuscript({});
                     setEntities([]);
+                    resetDrawer();
                   },
                 });
               }
             }
-            resetDrawer();
           }}
           variant="success"
         />
