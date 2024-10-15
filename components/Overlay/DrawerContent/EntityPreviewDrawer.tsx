@@ -18,7 +18,11 @@ function CharacterPreviewDrawer({ id, isViewOnly }: { id: string; isViewOnly?: b
   return <CharacterProfileView id={id} isPreview isViewOnly={isViewOnly} />;
 }
 function BlueprintPreviewDrawer({ id, parent_id, isViewOnly }: { id: string; parent_id?: string; isViewOnly?: boolean }) {
-  return <BlueprintProfileView id={id} isViewOnly={isViewOnly} parent_id={parent_id} />;
+  return (
+    <div className="h-[calc(100%-8rem)] [&>div]:max-h-[calc(100%-6rem)] [&>div]:min-h-0">
+      <BlueprintProfileView id={id} isViewOnly={isViewOnly} parent_id={parent_id} />
+    </div>
+  );
 }
 function DocumentPreviewDrawer({ id }: { id: string }) {
   const { data: existingDocument, isLoading } = useGetEntity<DocumentType>(
