@@ -105,7 +105,7 @@ function CalendarPreviewDrawer({ id, isViewOnly }: { id?: string; isViewOnly?: b
   return <CalendarView id={id} isViewOnly={isViewOnly} />;
 }
 function EventPreviewDrawer({ id, parent_id }: { id?: string; parent_id?: string }) {
-  return <EventDrawer data={{ id, parent_id, isReadOnly: true }} exceptions={{}} />;
+  return <EventDrawer data={{ id, parent_id, isReadOnly: true }} exceptions={{ globalCreate: true }} />;
 }
 function ImagePreviewDrawer({ id, type, project_id }: { id: string; type: AssetType; project_id: string }) {
   const { data, isFetching } = useGetImage(id, project_id, type, { fields: ["id", "title", "type"] });

@@ -285,7 +285,7 @@ export function EventDrawer({ data, exceptions }: Props) {
           ) : null}
           {exceptions?.globalCreate && event?.parent_id && calendar?.data ? (
             <EntityPreview
-              clearAction={() => handleChange({ name: "parent_id", value: null })}
+              clearAction={data?.isReadOnly ? undefined : () => handleChange({ name: "parent_id", value: null })}
               icon={calendar?.data?.icon || IconEnum.calendar}
               id={event?.parent_id}
               title={calendar?.data?.title}
