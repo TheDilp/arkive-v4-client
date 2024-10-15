@@ -98,6 +98,7 @@ export function EntityPreview({
         {image_id ? (
           <Avatar
             hasShowImage
+            imageType={type === "maps" ? "map_images" : "images"}
             image_id={image_id}
             isTooltipDisabled
             label={title}
