@@ -40,11 +40,9 @@ export function AuthWrapper() {
   useEffect(() => {
     if (!isUpdatingStatus && !isIdle) {
       if (!loggedIn && !pathname.endsWith("/auth/login")) {
-        if (module === "editor") {
-          document.location = `${import.meta.env.VITE_HOME}/arkive/sign-in`;
-        }
+        document.location = `${import.meta.env.VITE_HOME}/arkive/sign-in`;
       } else if (loggedIn && (pathname.includes("auth/") || pathname === "/")) {
-        if (module === "editor") navigate("/projects");
+        navigate("/projects");
       }
     }
   }, [loggedIn, pathname, userStatus?.status, isUpdatingStatus, isIdle]);
@@ -53,8 +51,10 @@ export function AuthWrapper() {
     reset();
     updateAuthStatus({ project_id: project_id === "undefined" || !project_id ? null : project_id, game_id: game_id ?? null });
   }, [project_id, game_id]);
+  if (userStatus?.status === "authenticated") return <Outlet />;
+
   if (
-    (userStatus?.status !== "authenticated" && userStatus?.status !== undefined) ||
+    (userStatus?.status === "unauthenticated" && userStatus?.status !== undefined) ||
     (isUpdatingStatus && !isIdle && !isSuccess) ||
     (project_id && !userStatus?.project_id && module === "editor")
   )
