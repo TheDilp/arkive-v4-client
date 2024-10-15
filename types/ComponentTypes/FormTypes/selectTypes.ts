@@ -18,6 +18,7 @@ export interface SelectType extends BaseFormComponentType {
   label?: string;
   helperText?: string;
   isMultiple?: boolean;
+  isTruncated?: boolean;
   isClearable?: boolean;
   hasSearch?: boolean;
   isExpandingToNewRow?: boolean;
