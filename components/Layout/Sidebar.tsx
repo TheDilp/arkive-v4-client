@@ -89,6 +89,7 @@ export function Sidebar({ isLoading, items, isUsingPermissions }: SidebarType) {
                     key={item.icon}
                     className={SidebarItemClasses({
                       isSelected:
+                        (item.navigate === "manuscripts" && pathname.includes("manuscripts")) ||
                         (item.navigate === "characters" && pathname.includes("characters")) ||
                         (item.navigate === "blueprints" && pathname.includes("blueprints")) ||
                         item.navigate === type,
