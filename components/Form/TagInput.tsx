@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 
 import { TagType, Variant } from "../../types";
 import { availableTagsAtom } from "../../utils";
-import { Badge } from "../Misc";
 import { Search } from "./Search";
 import { Select } from "./Select";
 
@@ -42,6 +41,7 @@ export function TagInput({
           hasSearch
           isDisabled={isDisabled}
           isMultiple={isMultiple}
+          isTruncated={false}
           label={componentLabel || ""}
           name="tags"
           onChange={({ value }) => {
@@ -95,27 +95,6 @@ export function TagInput({
           variant={variant || "primary"}
         />
       )}
-
-      <div className="flex flex-wrap gap-2">
-        {tags?.length
-          ? tags.map((tag) => (
-              <div key={tag.id} className="w-fit">
-                <Badge
-                  clearAction={
-                    isDisabled
-                      ? undefined
-                      : () => {
-                          handleChange({ name: "tags", value: (tags || []).filter((t) => t.id !== tag.id) });
-                        }
-                  }
-                  customColor={tag.color}
-                  label={tag.title}
-                  size="lg"
-                />
-              </div>
-            ))
-          : null}
-      </div>
     </div>
   );
 }
