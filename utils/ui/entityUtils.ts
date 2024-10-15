@@ -64,7 +64,7 @@ export function getEntityFields(type: AvailableEntityType | AvailableSubEntityTy
   if (type === "blueprints") return ["id", "title", "icon", "is_public"];
   if (type === "blueprint_instances") return ["id", "title", "is_public"];
   if (type === "map_pins") return ["title", "icon", "image_id", "is_public"];
-  if (type === "events") return ["title", "image_id", "is_public"];
+  if (type === "events") return ["id", "parent_id", "title", "image_id", "is_public"];
   if (type === "words") return ["title", "description", "translation", "is_public"];
   const fields: string[] = IS_PUBLIC
     ? ["id", "title", "icon", "owner_id", "is_public"]
