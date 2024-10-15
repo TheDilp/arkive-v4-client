@@ -66,7 +66,6 @@ export function TemplateDateField({
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <div className="col-span-2 flex flex-col gap-y-2">
-        <span className="block min-h-[20px] truncate border-b border-zinc-700 text-sm text-zinc-300">{title}</span>
         <div className="flex items-center justify-between gap-x-2">
           <Input
             isDisabled={isDisabled || typeof startMonthIdx !== "number"}
