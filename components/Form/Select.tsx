@@ -574,6 +574,7 @@ export function Select({
                         size="xs"
                       />
                     ) : null}
+                    {opt?.color ? <div className="h-4 w-4 rounded-full" style={{ backgroundColor: opt.color }} /> : null}
                     {opt?.icon && !opt?.image ? <Icon fontSize={20} icon={opt.icon} /> : null}
                     <span className="block truncate">{opt.label}</span>
                   </div>
