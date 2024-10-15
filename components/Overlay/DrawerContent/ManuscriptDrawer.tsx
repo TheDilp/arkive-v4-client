@@ -90,7 +90,7 @@ export function ManuscriptDrawer({ data }: Props) {
       fields: ["id", "icon", "title", "owner_id", "is_public"],
       relations: { entities: true, permissions: true, tags: true },
     },
-    { enabled: !!data?.id }
+    { queryKeyConcat: ["drawer"], enabled: !!data?.id }
   );
   const permissions = useHasPermissions(
     ["create_manuscripts", "update_manuscripts", "read_tags"],
