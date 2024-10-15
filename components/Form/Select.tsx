@@ -467,7 +467,7 @@ export function Select({
                     .filter((opt) => value.includes(opt.value))
                     .map((opt) => (
                       <div key={opt.value}>
-                        <Badge customColor={opt.color || DefaultTagColor} label={opt.label} />
+                        <Badge customColor={opt.color || DefaultTagColor} label={opt.label} size="lg" />
                       </div>
                     ))
                 : selectedItem?.label || displayText}
