@@ -279,6 +279,10 @@
 
   p:not(.ProseMirror-staticTrailingBreak) {
     @apply min-h-[1.5rem];
+
+    &:empty {
+      @apply min-h-[1rem];
+    }
   }
   a {
     @apply cursor-pointer hover:text-sky-100 !important;
