@@ -28,6 +28,7 @@ import {
 import { DrawerAtomType, PreviewableEntities, UserHasPermissionsType, UserType } from "../../types";
 import { CalendarFilters, CalendarType, CurrentDateType, EventType, MonthType } from "../../types/EntityTypes/calendarTypes";
 import {
+  breadcrumbsAtom,
   contextMenuAtom,
   DefaultTagColor,
   drawerAtom,
@@ -329,11 +330,13 @@ export function CalendarView({
   data,
   event_id,
   isCharacterCalendar,
+  isViewOnly,
 }: {
   id?: string;
   data?: CalendarType;
   event_id?: string;
   isCharacterCalendar?: boolean;
+  isViewOnly?: boolean;
 }) {
   const user = useAtomValue(userAtom);
   const featureFlags = useAtomValue(projectFeatureFlagsAtom);
@@ -342,7 +345,7 @@ export function CalendarView({
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const setDrawer = useSetAtom(drawerAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
-
+  const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
   const [date, setDate] = useState<CurrentDateType>({
     month: ls.get(`calendar_${id || item_id}_month`) ?? 0,
     year: ls.get(`calendar_${id || item_id}_year`) ?? 1,
@@ -379,6 +382,7 @@ export function CalendarView({
         eras: featureFlags?.show_eras_in_calendars || featureFlags?.show_eras_in_timelines || false,
         months: true,
         leap_days: true,
+        parents: true,
       },
       permissions: true,
     },
@@ -467,7 +471,7 @@ export function CalendarView({
     { enabled: event_id ? !!event_id : !!subitem_id }
   );
   const { mutate: deleteEvent } = useDeleteSubEntity("events", project_id as string, item_id);
-  useNavbarTitle(`Calendars | ${calendar?.title}`, !!calendar);
+  useNavbarTitle(`Calendars | ${calendar?.title}`, !!calendar && !isViewOnly);
 
   useLayoutEffect(() => {
     if (!firstRender.current) {
@@ -493,6 +497,12 @@ export function CalendarView({
       firstRender.current = false;
     };
   }, [date, view, range, filters]);
+
+  useLayoutEffect(() => {
+    if (existingCalendar?.data && !isViewOnly) {
+      setBreadcrumbs({ items: existingCalendar?.data?.parents || [], type: "calendars" });
+    }
+  }, [existingCalendar?.data]);
 
   useLayoutEffect(() => {
     if (subitem_id && subitemEvent?.data) {
