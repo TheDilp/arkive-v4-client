@@ -317,7 +317,7 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
             {IS_PUBLIC ? null : (
               <Collapsible
                 actions={
-                  isEditable
+                  isEditable || isViewOnly
                     ? []
                     : [
                         {
