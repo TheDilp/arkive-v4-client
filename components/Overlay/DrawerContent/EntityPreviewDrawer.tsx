@@ -19,7 +19,7 @@ function CharacterPreviewDrawer({ id, isViewOnly }: { id: string; isViewOnly?: b
 }
 function BlueprintPreviewDrawer({ id, parent_id, isViewOnly }: { id: string; parent_id?: string; isViewOnly?: boolean }) {
   return (
-    <div className="h-[calc(100%-8rem)] [&>div]:max-h-[calc(100%-6rem)] [&>div]:min-h-0">
+    <div className={IS_PUBLIC ? "h-[calc(100%-8rem)] [&>div]:max-h-[calc(100%-6rem)] [&>div]:min-h-0" : ""}>
       <BlueprintProfileView id={id} isViewOnly={isViewOnly} parent_id={parent_id} />
     </div>
   );
