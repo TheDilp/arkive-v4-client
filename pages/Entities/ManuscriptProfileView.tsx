@@ -25,7 +25,17 @@ const TypeContext = createContext<{
 function ManuscriptEntityPreview({ type }: { type: AvailableManuscriptEntityTypes }) {
   const { subitem_id } = useParams();
 
-  return <EntityPreviewDrawer data={{ id: subitem_id as string, parent_id: undefined, entity_type: type, isViewOnly: true }} />;
+  return type === "images" ? (
+    <div className="mx-auto w-96 max-w-96">
+      <EntityPreviewDrawer
+        data={{ id: subitem_id as string, parent_id: undefined, image_type: "images", entity_type: type, isViewOnly: true }}
+      />
+    </div>
+  ) : (
+    <EntityPreviewDrawer
+      data={{ id: subitem_id as string, parent_id: undefined, image_type: "images", entity_type: type, isViewOnly: true }}
+    />
+  );
 }
 function ManuscriptEntityLink({ entity }: { entity: ManuscriptEntityType }) {
   const { project_id, item_id, subitem_id } = useParams();
