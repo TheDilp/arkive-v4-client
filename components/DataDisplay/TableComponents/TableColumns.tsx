@@ -17,7 +17,7 @@ import {
   getDeletedAtParams,
   IconEnum,
   projectFeatureFlagsAtom,
-  sortTags,
+  sortEntitiesByTitle,
   TagFilters,
 } from "../../../utils";
 import { Alert, Avatar, Badge, Button, Card, Checkbox, Dropdown, EntityPreview, Tooltip } from "../..";
@@ -137,7 +137,9 @@ export function TagColumn<T>(hasTagsWarning?: boolean, dispatch?: TableDispatch<
     minSize: 12,
     maxSize: 12,
     cell: ({ row }) => {
-      const sortedTags = featureFlags?.sort_tags_alphabetically ? row.original?.tags?.sort(sortTags) : row.original?.tags;
+      const sortedTags = featureFlags?.sort_tags_alphabetically
+        ? row.original?.tags?.sort(sortEntitiesByTitle)
+        : row.original?.tags;
 
       return (
         <div className="flex w-full max-w-full items-center justify-center gap-x-2">

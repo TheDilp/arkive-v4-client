@@ -1,5 +1,3 @@
-import { TagType } from "../../types";
-
 export function sortCharactersByName(a: { full_name: string }, b: { full_name: string }) {
   if (a.full_name < b.full_name) return -1;
   if (a.full_name > b.full_name) return 1;
@@ -7,7 +5,7 @@ export function sortCharactersByName(a: { full_name: string }, b: { full_name: s
   return 0;
 }
 
-export function sortTags(a: TagType, b: TagType) {
+export function sortEntitiesByTitle(a: { title: string }, b: { title: string }) {
   if (a.title > b.title) return 1;
   if (a.title < b.title) return -1;
   return 0;
