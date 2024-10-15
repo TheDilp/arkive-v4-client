@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -27,7 +28,7 @@ function isDisabled(tags: Omit<TagType, "deleted_at"> | Omit<TagType, "deleted_a
 
 export function TagsDrawer() {
   const { project_id } = useParams();
-
+  const queryClient = useQueryClient();
   const permissions = useHasPermissions(["create_tags"], undefined);
   const tabs = [
     { id: "1", label: "Tags", icon: IconEnum.tags },
@@ -138,8 +139,9 @@ export function TagsDrawer() {
               { data: parsed.data, permissions: parsed.permissions },
               {
                 onSuccess: () => {
-                  resetDrawerAtom();
                   setTags([]);
+                  queryClient.invalidateQueries(["projects"]);
+                  resetDrawerAtom();
                 },
               }
             );

@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useResetAtom } from "jotai/utils";
 import { useParams } from "react-router-dom";
 
@@ -16,8 +17,9 @@ import { Button } from "../../Form";
 import { Avatar } from "../../Misc";
 
 export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any }; type: DialogContentType }) {
-  const action = type?.replace("_entity", "");
   const { project_id } = useParams();
+  const action = type?.replace("_entity", "");
+  const queryClient = useQueryClient();
   const resetDialogAtom = useResetAtom(dialogAtom);
   const createNotification = useNotifications();
   const { mutate: deleteEntity } = useDeleteEntity(
@@ -78,7 +80,16 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
               } else if (data?.entity_title && data?.parent_id && SubEntityEnum.includes(data?.entity_title)) {
                 deleteSubEntity({ data: { id: data?.id, parent_id: data?.parent_id as string } });
               } else if (AllEntities.includes(data?.entity_title)) {
-                deleteEntity({ data: { id: data?.id, parent_id: data?.parent_id as string } });
+                deleteEntity(
+                  { data: { id: data?.id, parent_id: data?.parent_id as string } },
+                  {
+                    onSuccess: () => {
+                      if (data?.entity_title === "tags") {
+                        queryClient.invalidateQueries(["projects"]);
+                      }
+                    },
+                  }
+                );
               }
 
               resetDialogAtom();

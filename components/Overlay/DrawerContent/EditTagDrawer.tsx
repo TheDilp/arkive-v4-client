@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -23,6 +24,7 @@ const tabs = [
 
 export function EditTagDrawer({ data }: Props) {
   const { project_id } = useParams();
+  const queryClient = useQueryClient();
   const { data: tagData, isInitialLoading } = useGetEntity<TagType>(data?.id, "tags", {
     fields: ["id", "title", "color", "owner_id"],
     permissions: true,
@@ -37,11 +39,18 @@ export function EditTagDrawer({ data }: Props) {
 
   function handleSave() {
     if (tag) {
-      update({
-        data: { id: data.id, title: tag?.title, color: tag?.color, owner_id: tag?.owner_id },
-        permissions: tag.permissions,
-      });
-      resetDrawer();
+      update(
+        {
+          data: { id: data.id, title: tag?.title, color: tag?.color, owner_id: tag?.owner_id },
+          permissions: tag.permissions,
+        },
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries(["projects"]);
+            resetDrawer();
+          },
+        }
+      );
     }
   }
 
