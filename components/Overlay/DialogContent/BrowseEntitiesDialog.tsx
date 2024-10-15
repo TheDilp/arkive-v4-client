@@ -8,7 +8,7 @@ import { AvailableIcons, dialogAtom, getEntityFields, IconEnum } from "../../../
 import { Image } from "../../DataDisplay";
 import { Button, Input } from "../../Form";
 
-type BrowserEntityType = Record<"id" | "title" | "image" | "full_name" | "portrait_id", string> &
+type BrowserEntityType = Record<"id" | "title" | "image" | "image_id" | "full_name" | "portrait_id", string> &
   Record<"blueprint", { id: string; icon: AvailableIcons | undefined }> &
   Record<"icon", AvailableIcons | undefined> &
   Record<"type", AssetType>;
@@ -194,7 +194,7 @@ export function BrowseEntitiesDialog({
                     title: entity?.full_name || entity?.title,
                     project_id: project_id as string,
                     type: data.imageType || (data.type === "maps" ? "map_images" : "images"),
-                    id: data.type === "images" ? entity.id : entity?.portrait_id || entity?.image,
+                    id: data.type === "images" ? entity.id : entity?.portrait_id || entity?.image_id || entity?.image,
                   }}
                   isLazyLoading
                   type={data.imageType || (data.type === "maps" ? "map_images" : "images")}
@@ -249,8 +249,8 @@ export function BrowseEntitiesDialog({
                 name: data.name,
                 value: item.id,
                 label: item.title,
-                image: item?.image,
-                type: "images" as const,
+                image: item?.image_id || item?.image,
+                type: data.type,
               }));
               data.onChange(formatted);
             }
