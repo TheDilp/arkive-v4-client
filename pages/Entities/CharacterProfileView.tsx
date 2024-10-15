@@ -851,7 +851,7 @@ export function CharacterProfileView({
     ...(existingCharacter?.data?.related_other || []),
   ].filter((r) => !!r);
 
-  useNavbarTitle(`Characters | ${existingCharacter?.data?.full_name}`, !!existingCharacter?.data);
+  useNavbarTitle(`Characters | ${existingCharacter?.data?.full_name}`, !!existingCharacter?.data && !isViewOnly);
 
   const [, dispatch] = useTable({});
 
@@ -889,7 +889,7 @@ export function CharacterProfileView({
     { enabled: selectedTab === 4 && !!existingCharacter?.data, queryKeyConcat: [item_id as string] }
   );
   useLayoutEffect(() => {
-    if (existingCharacter?.data) {
+    if (existingCharacter?.data && !isViewOnly) {
       setBreadcrumbs({
         items: [
           { id: existingCharacter?.data?.id, title: existingCharacter.data.full_name, is_folder: false, parent_id: null },

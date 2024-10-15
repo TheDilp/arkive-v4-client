@@ -199,7 +199,7 @@ function createColumns(
   return columns;
 }
 
-export function DictionaryView({ id }: { id?: string }) {
+export function DictionaryView({ id, isViewOnly }: { id?: string; isViewOnly?: boolean }) {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
   const [filter, setFilter] = useState("");
@@ -259,10 +259,10 @@ export function DictionaryView({ id }: { id?: string }) {
       queryKeyOverwrite: ["allEntities", project_id as string, "words", filters || "filters", pagination || "pagination"],
     }
   );
-  useNavbarTitle(`Dictionaries | ${data?.data?.title}`, !!data?.data?.title);
+  useNavbarTitle(`Dictionaries | ${data?.data?.title}`, !!data?.data?.title && !isViewOnly);
 
   useLayoutEffect(() => {
-    if (data?.data) {
+    if (data?.data && !isViewOnly) {
       setBreadcrumbs({
         items: [
           {

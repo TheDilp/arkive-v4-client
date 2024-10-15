@@ -98,11 +98,11 @@ function GraphPreviewDrawer({ id }: { id?: string }) {
     );
   if (!graph?.data) return <Alert label="Could not get graph." variant="error" />;
 }
-function DictionaryPreviewDrawer({ id }: { id?: string }) {
-  return <DictionaryView id={id} />;
+function DictionaryPreviewDrawer({ id, isViewOnly }: { id?: string; isViewOnly?: boolean }) {
+  return <DictionaryView id={id} isViewOnly={isViewOnly} />;
 }
-function CalendarPreviewDrawer({ id }: { id?: string }) {
-  return <CalendarView id={id} />;
+function CalendarPreviewDrawer({ id, isViewOnly }: { id?: string; isViewOnly?: boolean }) {
+  return <CalendarView id={id} isViewOnly={isViewOnly} />;
 }
 function EventPreviewDrawer({ id, parent_id }: { id?: string; parent_id?: string }) {
   return <EventDrawer data={{ id, parent_id, isReadOnly: true }} exceptions={{}} />;

@@ -142,7 +142,7 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
   }
 
   useLayoutEffect(() => {
-    if (blueprint?.data && existingBlueprintInstance?.data) {
+    if (blueprint?.data && existingBlueprintInstance?.data && !isViewOnly) {
       setBreadcrumbs({
         items: [
           { id: blueprint.data.id, title: blueprint.data.title, is_folder: false, parent_id: null },
@@ -167,7 +167,7 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
 
   useNavbarTitle(
     `Blueprints | ${blueprint?.data?.title} | ${existingBlueprintInstance?.data?.title}`,
-    !!blueprint?.data && !!existingBlueprintInstance?.data
+    !!blueprint?.data && !!existingBlueprintInstance?.data && !isViewOnly
   );
 
   if (isLoading) return <Skeleton type="character_profile" />;
