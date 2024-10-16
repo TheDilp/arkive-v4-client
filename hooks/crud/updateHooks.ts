@@ -843,7 +843,7 @@ export function useUpdateAuthStatus() {
   const setLoggedIn = useSetAtom(loggedInAtom);
   const setUserStatus = useSetAtom(userStatusAtom);
 
-  return useMutation(async (payload: { project_id: string | null; game_id: string | null }) => {
+  return useMutation(async (payload: { project_id: string | null }) => {
     const module = ls.get("module");
     const res = await fetch(`${baseURLS.baseAuthServer}/auth/status/update`, {
       // @ts-ignore

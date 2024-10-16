@@ -4,17 +4,17 @@ import { useEffect, useLayoutEffect } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { Spinner } from "../../components";
-import { useUpdateAuthStatus } from "../../hooks";
-import { IconEnum, loggedInAtom, moduleAtom, semverCompare, useNotifications, userStatusAtom } from "../../utils";
+import { useSignout, useUpdateAuthStatus } from "../../hooks";
+import { IconEnum, loggedInAtom, semverCompare, useNotifications, userStatusAtom } from "../../utils";
 
 export function AuthWrapper() {
-  const { project_id, game_id } = useParams();
+  const { project_id } = useParams();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const createNotification = useNotifications();
-  const { reset, mutate: updateAuthStatus, isLoading: isUpdatingStatus, isSuccess, isIdle } = useUpdateAuthStatus();
+  const { reset, mutate: updateAuthStatus, isLoading: isUpdatingStatus, isIdle } = useUpdateAuthStatus();
+  const { mutate: signOut } = useSignout();
 
-  const module = useAtomValue(moduleAtom);
   const loggedIn = useAtomValue(loggedInAtom);
   const userStatus = useAtomValue(userStatusAtom);
 
@@ -49,25 +49,18 @@ export function AuthWrapper() {
 
   useLayoutEffect(() => {
     reset();
-    updateAuthStatus({ project_id: project_id === "undefined" || !project_id ? null : project_id, game_id: game_id ?? null });
-  }, [project_id, game_id]);
+    updateAuthStatus({ project_id: project_id === "undefined" || !project_id ? null : project_id });
+  }, [project_id]);
+  if ((!userStatus && (isUpdatingStatus || isIdle)) || (!!userStatus && !!project_id && !userStatus?.project_id))
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-black">
+        <Spinner />
+      </div>
+    );
   if (userStatus?.status === "authenticated") return <Outlet />;
-
-  if (
-    (userStatus?.status === "unauthenticated" && userStatus?.status !== undefined) ||
-    (isUpdatingStatus && !isIdle && !isSuccess) ||
-    (project_id && !userStatus?.project_id && module === "editor")
-  )
-    if (userStatus?.status === "unauthenticated") {
-      document.location = import.meta.env.VITE_HOME;
-      return;
-    } else {
-      return (
-        <div className="flex h-screen w-screen items-center justify-center bg-black">
-          <Spinner />
-        </div>
-      );
-    }
-
-  return <Outlet />;
+  else {
+    signOut();
+    document.location = import.meta.env.VITE_HOME;
+    return null;
+  }
 }
