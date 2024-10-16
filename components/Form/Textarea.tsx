@@ -75,6 +75,12 @@ const TextareaClasses = tv({
         textarea: "resize-y",
       },
     },
+    isReadOnly: {
+      true: {
+        base: "cursor-not-allowed",
+        textarea: "cursor-not-allowed pointer-events-none",
+      },
+    },
     hasNoBackground: {
       true: {
         textarea: "bg-transparent bg-none text-white border-none",
@@ -94,6 +100,7 @@ export function Textarea({
   variant = "primary",
   isResizable = false,
   isDisabled,
+  isReadOnly,
   hasNoBackground,
   maxLength,
 }: TextareaType) {
@@ -102,14 +109,14 @@ export function Textarea({
     textarea,
     label: labelClasses,
     helperText: helperTextClasses,
-  } = TextareaClasses({ size, variant, isResizable, isDisabled, hasNoBackground });
+  } = TextareaClasses({ size, variant, isResizable, isDisabled, hasNoBackground, isReadOnly });
   return (
     <div className={base()}>
       {label ? <div className={labelClasses()}>{label}</div> : null}
 
       <textarea
         className={textarea()}
-        disabled={isDisabled}
+        disabled={isDisabled || isReadOnly}
         maxLength={maxLength}
         name={name}
         onChange={(e) => onChange(e.target)}
