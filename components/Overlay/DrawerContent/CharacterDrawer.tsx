@@ -5,7 +5,6 @@ import groupBy from "lodash.groupby";
 import omit from "lodash.omit";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { deepMerge } from "remirror";
 
 import {
   useCreateEntity,
@@ -33,19 +32,12 @@ import {
 } from "../../../types";
 import {
   createOrEditPermission,
-  DefaultCharacterDnD5EGameData,
   gameSystemAtom,
   getDifferenceForCharacterFields,
   IconEnum,
   useNotifications,
 } from "../../../utils";
-import {
-  DnD5ECharacterGameDataSchema,
-  InsertCharacterSchema,
-  InsertCharacterType,
-  UpdateCharacterSchema,
-  UpdateCharacterType,
-} from "../../../validation";
+import { InsertCharacterSchema, InsertCharacterType, UpdateCharacterSchema, UpdateCharacterType } from "../../../validation";
 import { DrawerLayout, Dropdown, Editor, EntityPreview, ImagePreview, Skeleton } from "../..";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { DnD5E } from "../../Complex/GameSystems";
@@ -817,13 +809,6 @@ export function CharacterDrawer({
                   dataToParse.data.portrait_id = dataToParse.data.portrait.id;
                 }
                 const parsedData = UpdateCharacterSchema.parse(dataToParse);
-                let game_data = null;
-                if (gameSystem?.code === "dnd5e") {
-                  game_data = DnD5ECharacterGameDataSchema.parse(deepMerge(DefaultCharacterDnD5EGameData, character.game_data));
-                }
-                if (game_data) {
-                  parsedData.data.game_data = game_data;
-                }
                 await update(parsedData, {
                   onSuccess: (res) => {
                     if (res?.ok) {
