@@ -20,7 +20,7 @@ const CheckboxClasses = tv({
         helperText: "text-zinc-300",
       },
       secondary: {
-        checkbox: "border-zinc-400",
+        checkbox: "border-zinc-600",
         label: "text-zinc-300",
         helperText: "text-zinc-300",
       },
@@ -31,7 +31,7 @@ const CheckboxClasses = tv({
         icon: "text-blue-200",
       },
       success: {
-        checkbox: "border-green-600 text-green-400",
+        checkbox: "border-green-400 text-green-400",
         label: "text-green-400",
         helperText: "text-green-400",
       },
