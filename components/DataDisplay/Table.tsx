@@ -901,7 +901,7 @@ export function Table<T>({ columns, data = [], config, isLoading, pagination, di
                         ]
                   }
                   size="sm"
-                  value={pagination?.limit?.toFixed() || "10"}
+                  value={pagination?.limit?.toFixed() || "20"}
                 />
               </div>
             </div>

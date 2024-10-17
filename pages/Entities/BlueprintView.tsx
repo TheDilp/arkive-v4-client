@@ -356,7 +356,7 @@ export function BlueprintView() {
   const { mutateAsync: deleteMany } = useDeleteMany("blueprints", arkived === "active", project_id);
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable<BlueprintType>({
     orderBy: [{ field: "title", sort: "asc" }],
-    pagination: { limit: 10, page: 0 },
+    pagination: { limit: 20, page: 0 },
     selection: {},
   });
 

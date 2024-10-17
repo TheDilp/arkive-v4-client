@@ -743,7 +743,7 @@ function FolderView() {
   const project = useAtomValue(projectAtom);
   const [{ selection, pagination, filters, relationFilters }, dispatch] = useTable<{ id: string; title: string }>({
     selection: [],
-    pagination: { page: 0, limit: 10 },
+    pagination: { page: 0, limit: 20 },
   });
   const [filter, setFilter] = useState("");
   const [view, setView] = useState<"table" | "grid">(ls.get(`${entityName}-table`) || "table");

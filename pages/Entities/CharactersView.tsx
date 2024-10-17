@@ -787,7 +787,7 @@ export function CharactersView() {
   );
   const [{ orderBy, filters, relationFilters, pagination, selection }, dispatch] = useTable<CharacterType>({
     orderBy: [{ field: "first_name", sort: "asc" }],
-    pagination: { limit: 10, page: 0 },
+    pagination: { limit: 20, page: 0 },
     selection: {},
   });
   const { data, isLoading } = useGetEntities<CharacterType>(

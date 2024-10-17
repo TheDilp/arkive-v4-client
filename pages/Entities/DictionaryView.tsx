@@ -220,7 +220,7 @@ export function DictionaryView({ id, isViewOnly }: { id?: string; isViewOnly?: b
 
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "title", sort: "asc" }],
-    pagination: { limit: 10, page: 0 },
+    pagination: { limit: 20, page: 0 },
     selection: {},
   });
 

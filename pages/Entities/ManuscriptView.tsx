@@ -487,7 +487,7 @@ export function ManuscriptView() {
   const [{ selection, orderBy, filters, pagination }, dispatch] = useTable<ManuscriptType>({
     selection: {},
     orderBy: [{ field: "title", sort: "asc" }],
-    pagination: { limit: 10, page: 0 },
+    pagination: { limit: 20, page: 0 },
   });
   const { data, isLoading } = useGetEntities<ManuscriptType>(
     {

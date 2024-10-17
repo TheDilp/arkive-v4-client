@@ -202,7 +202,7 @@ export function TagView() {
   const [{ selection, orderBy, filters, pagination }, dispatch] = useTable<TagType>({
     selection: {},
     orderBy: [{ field: "title", sort: "asc" }],
-    pagination: { limit: 10, page: 0 },
+    pagination: { limit: 20, page: 0 },
   });
   const { data, isLoading } = useGetEntities<TagType>(
     {

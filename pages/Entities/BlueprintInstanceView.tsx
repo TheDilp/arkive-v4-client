@@ -654,7 +654,7 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
   const [{ selection, pagination, orderBy, filters, relationFilters }, dispatch] = useTable<BlueprintInstanceType>({
     selection: {},
     orderBy: [{ field: "title", sort: "asc" }],
-    pagination: { page: 0, limit: 10 },
+    pagination: { page: 0, limit: 20 },
   });
 
   const { data: blueprint } = useGetEntity<BlueprintType>(item_id, "blueprints", {

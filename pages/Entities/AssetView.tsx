@@ -404,7 +404,7 @@ export function AssetView() {
   const [view, setView] = useState<"card" | "table">(ls.get("assets_view") || "table");
   const [{ orderBy, filters, relationFilters, selection, pagination }, dispatch] = useTable<ImageType>({
     orderBy: [{ field: "title", sort: "asc" }],
-    pagination: { limit: 10, page: 0 },
+    pagination: { limit: 20, page: 0 },
   });
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(["read_assets", "create_assets", "update_assets", "delete_assets"], undefined);
