@@ -39,7 +39,6 @@ function DnD5ESkill({
     />
   );
 }
-
 function ProgressBar({
   progress = 0,
   startAmount,
@@ -65,7 +64,6 @@ function ProgressBar({
     </div>
   );
 }
-
 const spellSlotTabs: TabType[] = [
   { id: "cantrips", label: "Cantrips" },
   { id: "first", label: "1st level" },
@@ -119,26 +117,27 @@ function Spells({
     <div className="flex flex-col gap-y-2 p-2">
       <Tabs hasArrowNav onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={spellSlotTabs} />
 
-      {spellSlots.map((slot, index) => (
-        <div key={slot + index} className="flex items-center justify-between">
-          <span>Spell slots:</span>
+      <div className="flex items-center justify-between">
+        <span>Spell slots:</span>
 
-          <div className="flex items-center gap-x-2">
-            {[...Array(currentSlots[`spell${index + 1}` as keyof DnD5ESystemDataType["spells"]]?.override || slot).keys()].map(
-              (k, i) => (
-                <Checkbox
-                  key={k}
-                  isReadOnly
-                  name=""
-                  onChange={() => {}}
-                  value={i < currentSlots[`spell${index + 1}` as keyof DnD5ESystemDataType["spells"]]?.value}
-                  variant="success"
-                />
-              )
-            )}
-          </div>
+        <div className="flex items-center gap-x-2">
+          {[
+            ...Array(
+              currentSlots[`spell${selectedTab + 1}` as keyof DnD5ESystemDataType["spells"]]?.override ||
+                spellSlots.at(selectedTab)
+            ).keys(),
+          ].map((k, i) => (
+            <Checkbox
+              key={k}
+              isReadOnly
+              name=""
+              onChange={() => {}}
+              value={i < currentSlots[`spell${selectedTab + 1}` as keyof DnD5ESystemDataType["spells"]]?.value}
+              variant="success"
+            />
+          ))}
         </div>
-      ))}
+      </div>
       <div className="flex max-h-96 flex-col gap-y-1 overflow-y-auto">
         {spells
           .filter((spell) => spell.level === selectedTab)
@@ -199,7 +198,10 @@ export function DnD5E({
   handleChange: (props: HandleChangePropsType) => void;
 }) {
   const levelData = getDnD5ECharacterLevelData(game_data.details.xp.value || 0);
-  const spellSlots = getSpellSlots("paladin", 2);
+  const spellSlots = getSpellSlots(
+    game_data.items.find((item) => item.type === "class")?.name?.toLowerCase() || null,
+    levelData.level
+  );
   return (
     <div className="flex flex-col gap-y-2">
       <div className="flex items-center justify-between">
@@ -357,7 +359,6 @@ export function DnD5E({
             })}
         />
       </Collapsible>
-
       <Collapsible label="Coin">
         <div className="grid grid-cols-1 gap-2 p-2 text-center md:grid-cols-2 lg:grid-cols-3 [&>div>div>input]:pl-4 [&>div>div>input]:text-center">
           <Input
@@ -414,8 +415,7 @@ export function DnD5E({
           </div>
         </div>
       </Collapsible>
-
-      <Collapsible initialOpen label="Details">
+      <Collapsible label="Details">
         <div className="grid grid-cols-1 gap-2 p-2 md:grid-cols-2">
           <div className="col-span-1 md:col-span-2">
             <Title isDrawerTitle label="Languages" size="lg" />
