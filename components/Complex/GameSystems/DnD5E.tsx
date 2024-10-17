@@ -14,6 +14,7 @@ import {
 } from "../../../utils";
 import { Button, Checkbox, Input, Textarea, Title } from "../../Form";
 import { Collapsible, Tabs } from "../../Layout";
+import { Alert } from "../../Misc";
 
 function DnD5ESkill({
   title,
@@ -194,9 +195,10 @@ export function DnD5E({
   game_data,
   handleChange,
 }: {
-  game_data: DnD5ESystemDataType;
+  game_data: DnD5ESystemDataType | undefined;
   handleChange: (props: HandleChangePropsType) => void;
 }) {
+  if (!game_data) return <Alert label="No game data available." variant="info-bordered" />;
   const levelData = getDnD5ECharacterLevelData(game_data.details.xp.value || 0);
   const spellSlots = getSpellSlots(
     game_data.items.find((item) => item.type === "class")?.name?.toLowerCase() || null,
