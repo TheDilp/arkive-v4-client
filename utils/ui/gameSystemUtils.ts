@@ -121,7 +121,8 @@ const thirdCasterSlots = [
 // Spell slots for Warlocks
 const pactCasterSlots = [[1], [2], [2], [2], [2], [2], [2], [2], [2], [2], [3], [3], [3], [3], [3], [3], [3], [3], [4], [4]];
 
-export function getSpellSlots(character_class: string, level: number): number[] {
+export function getSpellSlots(character_class: string | null, level: number): number[] {
+  if (!character_class) return [];
   const casterType = getCasterType(character_class);
   if (!casterType) return [];
   // Map caster type to correct slot table
