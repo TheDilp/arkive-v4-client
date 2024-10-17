@@ -10,3 +10,9 @@ export function sortEntitiesByTitle(a: { title: string }, b: { title: string }) 
   if (a.title < b.title) return -1;
   return 0;
 }
+
+export function sortEntitiesByName(a: { name: string }, b: { name: string }) {
+  if (a.name > b.name) return 1;
+  if (a.name < b.name) return -1;
+  return 0;
+}
