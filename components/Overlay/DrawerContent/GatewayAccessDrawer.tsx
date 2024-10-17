@@ -540,43 +540,48 @@ function EntitiesAccess({
           ) : null}
         </div>
       ) : (
-        <Table
-          columns={getColumns(
-            entityType as AvailableGatewayEntites,
-            Object.values(selection[entityType]).flat(),
-            (ids: string | string[]) => {
-              if (Array.isArray(ids)) {
-                let areAllSelected = true;
-                const temp = [...selection[entityType]];
-                for (let index = 0; index < ids.length; index++) {
-                  const idx = selection[entityType].findIndex((item) => item === ids[index]);
-                  if (idx === -1) {
-                    temp.push(ids[index]);
-                    if (areAllSelected) areAllSelected = false;
+        <div className="max-h-[80%]">
+          <Table
+            columns={getColumns(
+              entityType as AvailableGatewayEntites,
+              Object.values(selection[entityType]).flat(),
+              (ids: string | string[]) => {
+                if (Array.isArray(ids)) {
+                  let areAllSelected = true;
+                  const temp = [...selection[entityType]];
+                  for (let index = 0; index < ids.length; index++) {
+                    const idx = selection[entityType].findIndex((item) => item === ids[index]);
+                    if (idx === -1) {
+                      temp.push(ids[index]);
+                      if (areAllSelected) areAllSelected = false;
+                    }
                   }
-                }
-                if (areAllSelected) {
-                  setSelection((prev) => ({ ...prev, [entityType]: prev[entityType].filter((item) => !temp.includes(item)) }));
+                  if (areAllSelected) {
+                    setSelection((prev) => ({
+                      ...prev,
+                      [entityType]: prev[entityType].filter((item) => !temp.includes(item)),
+                    }));
+                  } else {
+                    setSelection((prev) => ({ ...prev, [entityType]: temp }));
+                  }
                 } else {
-                  setSelection((prev) => ({ ...prev, [entityType]: temp }));
-                }
-              } else {
-                const idx = selection[entityType].findIndex((item) => item === ids);
+                  const idx = selection[entityType].findIndex((item) => item === ids);
 
-                if (idx > -1) setSelection((prev) => ({ ...prev, [entityType]: prev[entityType].toSpliced(idx, 1) }));
-                else setSelection((prev) => ({ ...prev, [entityType]: prev[entityType].concat(ids) }));
+                  if (idx > -1) setSelection((prev) => ({ ...prev, [entityType]: prev[entityType].toSpliced(idx, 1) }));
+                  else setSelection((prev) => ({ ...prev, [entityType]: prev[entityType].concat(ids) }));
+                }
               }
-            }
-          )}
-          config={{
-            orderBy,
-            selection: { [0]: selection[entityType] },
-          }}
-          data={(entityType === "images" ? images?.data : entitiesData?.data) || []}
-          dispatch={dispatch}
-          pagination={pagination}
-          type={entityType as AvailableGatewayEntites}
-        />
+            )}
+            config={{
+              orderBy,
+              selection: { [0]: selection[entityType] },
+            }}
+            data={(entityType === "images" ? images?.data : entitiesData?.data) || []}
+            dispatch={dispatch}
+            pagination={pagination}
+            type={entityType as AvailableGatewayEntites}
+          />
+        </div>
       )}
     </div>
   );
