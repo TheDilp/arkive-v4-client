@@ -326,11 +326,11 @@ function DiceRoller() {
 function HistoryList({ history, closeTooltip }: { history: { label: string; link: string }[]; closeTooltip?: () => void }) {
   const navigate = useNavigate();
   return (
-    <ul className="flex flex-col gap-y-1 rounded bg-zinc-700 p-2 shadow">
+    <ul className="flex flex-col gap-y-1 divide-y divide-zinc-600 rounded bg-zinc-700 p-0 shadow">
       {history.map((link, i) => (
         <li
           key={(link.link + i).toString()}
-          className="cursor-pointer text-lg transition-all [&>button]:p-0 [&>button]:hover:text-blue-400">
+          className="cursor-pointer px-2 py-1 text-lg transition-all [&>button]:h-6 [&>button]:border-0 [&>button]:p-0 [&>button]:hover:text-blue-400">
           <Button
             hasNoBackground
             label={link.label}
