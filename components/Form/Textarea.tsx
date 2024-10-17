@@ -18,7 +18,7 @@ const TextareaClasses = tv({
         helperText: "text-zinc-300",
       },
       secondary: {
-        textarea: "border-zinc-400",
+        textarea: "border-zinc-600",
         label: "text-zinc-300",
         helperText: "text-zinc-300",
       },
