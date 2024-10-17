@@ -330,7 +330,7 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
                 icon={IconEnum.tags}
                 initialOpen={false}
                 label="Tags">
-                <div className={`flex flex-col p-2 ${isEditable ? "" : ""}`}>
+                <div className={`flex flex-col py-2 ${isEditable ? "" : ""}`}>
                   {blueprintInstance?.tags?.length && !isEditable ? (
                     <div className="animate-in fade-in fill-mode-both flex w-full flex-wrap gap-2">
                       {blueprintInstance.tags.map((tag) => (
