@@ -26,30 +26,51 @@ export type DnD5eSkills =
   | "slt"
   | "ste"
   | "sur";
-type DnD5ESkillData = {
-  value: number;
+type DnD5ESkillDataType = {
+  value: 0 | 1;
+  ability: DnD5eAbilities;
 };
-type DnD5ESkillType = Record<DnD5eSkills, DnD5ESkillData>;
-
-type DnD5ETraitsType = {
-  size: string;
+type DnD5EItemTypes =
+  | "class"
+  | "subclass"
+  | "race"
+  | "background"
+  | "spell"
+  | "feat"
+  | "weapon"
+  | "equipment"
+  | "container"
+  | "consumable"
+  | "loot"
+  | "tool";
+type DnD5EItemType = {
+  name: string;
+  type: DnD5EItemTypes;
+  level?: number;
+  is_prepared?: boolean;
+  equipped?: boolean;
+  quantity?: number;
 };
-
 type DnD5EDetailsType = {
-  xp: {
-    value: number;
-  };
   bond: string;
   flaw: string;
-  race: string | null;
   ideal: string;
   trait: string;
   alignment: string;
+  hair: string;
+  weight: string;
+  height: string;
+  eyes: string;
+  faith: string;
+  gender: string;
+  skin: string;
+  languages: string[];
+  custom_languages: string;
   appearance: string;
-  background: string | null;
-  originalClass: string;
+  xp: {
+    value: number;
+  };
 };
-
 type DnD5ECurrencyType = {
   cp: number;
   sp: number;
@@ -57,47 +78,32 @@ type DnD5ECurrencyType = {
   ep: number;
   pp: number;
 };
-
-type DnD5EAbilityData = { max: number | null; value: number; proficient: number };
-type DnD5EAbilityType = Record<DnD5eAbilities, DnD5EAbilityData>;
-
-type DnD5EAttributes = {
-  ac: {
-    flat: number | null;
-  };
-  hp: {
-    max: number | null;
-    value: number;
-  };
-  init: {
-    bonus: string;
-    ability: DnD5eAbilities;
-  };
-  senses: {
-    units: number | null;
-    special: "";
-    truesight: number | null;
-    blindsight: number | null;
-    darkvision: number | null;
-    tremorsense: number | null;
-  };
-  movement: {
-    fly: number | null;
-    swim: number | null;
-    walk: number | null;
-    climb: number | null;
-    hover: boolean;
-    units: string | null;
-    burrow: number | null;
-  };
+type DnD5eAbilitiesDataType = {
+  value: number;
+  proficient: 0 | 1;
 };
-
-export type DnD5ESystemType = {
-  skills: DnD5ESkillType;
-  traits: DnD5ETraitsType;
+type DnD5EAbilitiesType = Record<DnD5eAbilities, DnD5eAbilitiesDataType>;
+type DnD5ESpellsType = {
+  pact: { value: number; override: null | number };
+  spells1: { value: number; override: null | number };
+  spells2: { value: number; override: null | number };
+  spells3: { value: number; override: null | number };
+  spells4: { value: number; override: null | number };
+  spells5: { value: number; override: null | number };
+  spells6: { value: number; override: null | number };
+  spells7: { value: number; override: null | number };
+  spells8: { value: number; override: null | number };
+  spells9: { value: number; override: null | number };
+};
+export type DnD5ESystemDataType = {
+  abilities: DnD5EAbilitiesType;
   details: DnD5EDetailsType;
+  items: DnD5EItemType[];
+  skills: Record<DnD5eSkills, DnD5ESkillDataType>;
   currency: DnD5ECurrencyType;
-  abilities: DnD5EAbilityType;
-  attributes: DnD5EAttributes;
+  spells: DnD5ESpellsType;
 };
+
+// Define caster types
+export type CasterType = "full" | "half" | "third" | "pact";
 //#endregion dnd5e
