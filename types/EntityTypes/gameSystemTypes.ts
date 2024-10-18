@@ -44,6 +44,7 @@ type DnD5EItemTypes =
   | "loot"
   | "tool";
 type DnD5EItemType = {
+  id: string;
   name: string;
   type: DnD5EItemTypes;
   level?: number;
