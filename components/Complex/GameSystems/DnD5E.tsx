@@ -114,31 +114,36 @@ function Spells({
   spells: DnD5ESystemDataType["items"];
 }) {
   const [selectedTab, setSelectedTab] = useState(0);
+  const spellSlotsToShow =
+    // For the alternative skip if selected tab is 0
+    // since those are cantrips
+    currentSlots[`spell${selectedTab}` as keyof DnD5ESystemDataType["spells"]]?.override ||
+    (selectedTab > 0 ? spellSlots.at(selectedTab) : 0);
+
   return (
     <div className="flex flex-col gap-y-2 p-2">
       <Tabs hasArrowNav onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={spellSlotTabs} />
 
-      <div className="flex items-center justify-between">
-        <span>Spell slots:</span>
+      {spellSlotsToShow ? (
+        <div className="flex items-center justify-between">
+          <span>Spell slots:</span>
 
-        <div className="flex items-center gap-x-2">
-          {[
-            ...Array(
-              currentSlots[`spell${selectedTab + 1}` as keyof DnD5ESystemDataType["spells"]]?.override ||
-                spellSlots.at(selectedTab)
-            ).keys(),
-          ].map((k, i) => (
-            <Checkbox
-              key={k}
-              isReadOnly
-              name=""
-              onChange={() => {}}
-              value={i < currentSlots[`spell${selectedTab + 1}` as keyof DnD5ESystemDataType["spells"]]?.value}
-              variant="success"
-            />
-          ))}
+          <div className="flex items-center gap-x-2">
+            {[...Array(spellSlotsToShow).keys()].map((k, i) => (
+              <Checkbox
+                key={k}
+                isReadOnly
+                name=""
+                onChange={() => {}}
+                value={i < currentSlots[`spell${selectedTab}` as keyof DnD5ESystemDataType["spells"]]?.value}
+                variant={
+                  i < currentSlots[`spell${selectedTab}` as keyof DnD5ESystemDataType["spells"]]?.value ? "success" : "primary"
+                }
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      ) : null}
       <div className="flex max-h-96 flex-col gap-y-1 overflow-y-auto">
         {spells
           .filter((spell) => spell.level === selectedTab)
@@ -422,12 +427,12 @@ export function DnD5E({
           <div className="col-span-1 md:col-span-2">
             <Title isDrawerTitle label="Languages" size="lg" />
           </div>
-          {game_data.details.languages.map((lang) => (
+          {(game_data.details?.languages || []).map((lang) => (
             <div className="col-span-1">
               <Input isReadOnly name="" onChange={() => {}} value={capitalize(lang)} variant="secondary" />
             </div>
           ))}
-          {game_data.details.custom_languages.length ? (
+          {game_data.details?.custom_languages?.length ? (
             <>
               <div className="col-span-1 md:col-span-2">
                 <Title isDrawerTitle label="Custom languages" size="lg" />
