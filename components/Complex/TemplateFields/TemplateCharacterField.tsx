@@ -114,7 +114,7 @@ export function TemplateCharacterField({
                   }
             }
             id={currentValue?.[0].related_id}
-            image_id={currentValue?.[0].related_id}
+            image_id={currentValue?.[0].character?.portrait_id}
             manual_project_id={project_id}
             title={currentValue?.[0]?.character?.full_name || ""}
             type="characters"
