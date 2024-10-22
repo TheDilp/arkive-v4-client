@@ -55,7 +55,7 @@ const TableClasses = tv({
     row: "flex flex-1 min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato border-t border-r border-zinc-800",
     hasLinkRow: "cursor-pointer",
     hasRowAction: "cursor-pointer",
-    contentWrapper: "flex items-center truncate h-full",
+    contentWrapper: "w-full flex justify-start items-center truncate h-full",
     content: "flex flex-1 group-hover:bg-zinc-700 items-center px-2 border-zinc-800 border-r last:border-r-0 first:border-l",
     centeredContent: "flex items-center justify-center",
     paginationContainer:
@@ -845,7 +845,9 @@ export function Table<T>({ columns, data = [], config, isLoading, pagination, di
                             ? `${getPinnedOffset(pinned, cell.column.id) + (config?.hasSelect ? 2.75 : 0)}rem`
                             : "",
                         }}>
-                        <div className={contentWrapper()}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
+                        <div className={`${contentWrapper()} ${cell.column.id === "action" ? "justify-center" : ""}`}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </div>
                       </div>
                     ))}
                   </div>
