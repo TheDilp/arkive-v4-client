@@ -1,10 +1,11 @@
-import { ColumnDef } from "@tanstack/react-table";
+import { UseMutateFunction } from "@tanstack/react-query";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
-import { Dispatch, useEffect, useLayoutEffect } from "react";
+import { Dispatch, useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Table } from "../../components";
+import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Input, Table } from "../../components";
 import {
   CharacterColumn,
   EventColumn,
@@ -19,6 +20,7 @@ import {
   useHasPermissions,
   useNavbarTitle,
   useTable,
+  useUpdateSubEntity,
 } from "../../hooks";
 import {
   BlueprintInstanceType,
@@ -54,6 +56,7 @@ import {
   useNotifications,
   userAtom,
 } from "../../utils";
+import { UpdateBlueprintInstanceSchema } from "../../validation";
 
 const columnHelper = createColumnHelper<BlueprintInstanceType>();
 const centeredColumns = [
@@ -65,15 +68,220 @@ const centeredColumns = [
   "events_single",
   "boolean",
 ];
-const noLinkColumns = [
-  "images_single",
-  "images_multiple",
-  "locations_single",
-  "locations_multiple",
-  "events_single",
-  "events_multiple",
-  "dice_roll",
-];
+// const noLinkColumns = [
+//   "images_single",
+//   "images_multiple",
+//   "locations_single",
+//   "locations_multiple",
+//   "events_single",
+//   "events_multiple",
+//   "dice_roll",
+// ];
+
+type UpdateSingleType = UseMutateFunction<
+  any,
+  unknown,
+  {
+    [key: string]: any;
+  },
+  unknown
+>;
+
+function updateBlueprintValueField({
+  row,
+  value,
+  update,
+  setIsEditing,
+  field_id,
+}: {
+  row: Row<BlueprintInstanceType>;
+  value: string | number;
+  update: UpdateSingleType;
+  setIsEditing: Dispatch<SetStateAction<boolean>>;
+  field_id: string;
+}) {
+  const idx = row.original.blueprint_fields.findIndex((bp_field) => bp_field.id === field_id);
+
+  const updatedFields = [...row.original.blueprint_fields];
+  updatedFields[idx].value = value;
+
+  const dataToParse = {
+    data: {
+      id: row.original.id,
+      parent_id: row.original?.parent_id,
+    },
+    relations: {
+      blueprint_fields: updatedFields,
+    },
+  };
+  const parsedData = UpdateBlueprintInstanceSchema.parse(dataToParse);
+  update(parsedData, { onSuccess: () => setIsEditing(false) });
+}
+
+function Cell({
+  row,
+  field,
+  createNotification,
+  update,
+}: {
+  row: Row<BlueprintInstanceType>;
+  field: BlueprintType["blueprint_fields"][number];
+  update: UpdateSingleType;
+  createNotification: (notification: Omit<NotificationType, "id">) => void;
+}) {
+  const fieldData = row.original?.blueprint_fields?.find((instanceField) => instanceField?.id === field.id);
+  const [isEditing, setIsEditing] = useState(false);
+  const [value, setValue] = useState<string | number>(fieldData?.value as string | number);
+
+  if (field.field_type === "text" || field.field_type === "number") {
+    if (isEditing)
+      return (
+        <Input
+          isAutofocused
+          name=""
+          onBlur={() => updateBlueprintValueField({ row, value, update, setIsEditing, field_id: field.id })}
+          onChange={({ value: newValue }) => setValue(newValue as string | number)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") updateBlueprintValueField({ row, value, update, setIsEditing, field_id: field.id });
+          }}
+          type={field.field_type}
+          value={value}
+        />
+      );
+    return (
+      <div className="w-full cursor-text" onClick={() => setIsEditing(true)}>
+        {fieldData?.value || ""}
+      </div>
+    );
+  }
+  if (field.field_type === "boolean")
+    return (
+      <Checkbox
+        isReadOnly={!isEditing}
+        name="bool"
+        onChange={() => {}}
+        value={(fieldData?.value as boolean | undefined) ?? false}
+      />
+    );
+  if (field.field_type === "select" || field.field_type === "select_multiple") {
+    return (
+      (Array.isArray(fieldData?.value) ? fieldData?.value : [fieldData?.value])
+        ?.map((id) => {
+          const opt = field?.options?.find((o) => o.id === id);
+          return opt?.value || "";
+        })
+        .join(", ") ?? ""
+    );
+  }
+
+  if (field.field_type === "characters_single" || field.field_type === "characters_multiple") {
+    return <CharacterColumn characters={fieldData?.characters || []} isMultiple={field.field_type === "characters_multiple"} />;
+  }
+  if (field.field_type === "blueprints_single" || field.field_type === "blueprints_multiple") {
+    return (
+      <ShowMultipleWithBadge
+        isMultiple={field.field_type === "blueprints_multiple"}
+        titles={(fieldData?.blueprint_instances || []).map((instance) => instance.blueprint_instance.title)}
+      />
+    );
+  }
+  if (field.field_type === "documents_single" || field.field_type === "documents_multiple") {
+    return (
+      <ShowMultipleWithBadge
+        isMultiple={field.field_type === "documents_multiple"}
+        titles={(fieldData?.documents || []).map((doc) => doc.document.title)}
+      />
+    );
+  }
+  if (field.field_type === "locations_single" || field.field_type === "locations_multiple") {
+    return <LocationColumn isMultiple={field.field_type === "locations_multiple"} locations={fieldData?.map_pins || []} />;
+  }
+  if (field.field_type === "events_single" || field.field_type === "events_multiple") {
+    return <EventColumn isMultiple={field.field_type === "events_multiple"} locations={fieldData?.events || []} />;
+  }
+  if (field.field_type === "images_single" || field.field_type === "images_multiple") {
+    return (
+      <div className="flex w-full">
+        {fieldData?.images?.slice(0, field.field_type === "images_multiple" ? undefined : 1)?.map((image) => (
+          <div key={image.related_id} className="-ml-4 flex items-center first:ml-0 hover:z-10">
+            <Avatar
+              hasShowImage
+              image_id={image.related_id}
+              label={image.image.title}
+              size="sm"
+              tooltipAllowedPlacements={["left", "right"]}
+            />
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (field.field_type === "random_table") {
+    const randomTable = fieldData
+      ? field.random_table?.random_table_options?.find((opt) => opt?.id === fieldData?.random_table?.option_id)
+      : null;
+    const subOption =
+      randomTable && fieldData?.random_table?.suboption_id
+        ? randomTable.random_table_suboptions?.find((subOpt) => subOpt.id === fieldData?.random_table?.suboption_id)
+        : null;
+
+    return `${randomTable?.title ?? ""} ${subOption ? `(${subOption?.title})` : ""}`;
+  }
+
+  if (field.field_type === "date") {
+    const startMonthIdx =
+      field?.calendar && field.calendar.months.length
+        ? field.calendar.months.findIndex((m) => m.id === fieldData?.calendar?.start_month_id)
+        : null;
+    const endMonthIdx =
+      field?.calendar && field.calendar.months.length
+        ? field.calendar.months.findIndex((m) => m.id === fieldData?.calendar?.end_month_id)
+        : null;
+    const startDayOrdinal = fieldData?.calendar?.start_day ? getDayOrdinal(fieldData?.calendar.start_day) : null;
+    const endDayOrdinal = fieldData?.calendar?.end_day ? getDayOrdinal(fieldData?.calendar.end_day) : null;
+    return (
+      <span>
+        {fieldData?.calendar?.start_day || ""}
+        <sup>{startDayOrdinal} </sup>
+        {typeof startMonthIdx === "number" ? field.calendar?.months[startMonthIdx]?.title : ""}{" "}
+        {fieldData?.calendar?.start_year || ""}
+        {fieldData?.calendar?.end_day ? (
+          <>
+            {" "}
+            - {fieldData?.calendar?.end_day}
+            <sup>{endDayOrdinal} </sup>
+          </>
+        ) : (
+          ""
+        )}
+        {typeof endMonthIdx === "number" ? field.calendar?.months[endMonthIdx]?.title || "" : ""}{" "}
+        {fieldData?.calendar?.end_year || ""}
+      </span>
+    );
+  }
+  if (field.field_type === "dice_roll" && field?.formula) {
+    return (
+      <div className="flex items-center gap-x-2 [&>button]:px-0">
+        <span>{(fieldData?.value as number) || ""}</span>
+        (
+        <Button
+          hasNoBackground
+          icon={IconEnum.d20}
+          iconPos="left"
+          isDisabled={!field.formula}
+          label={field.formula || ""}
+          onClick={async () => {
+            if (field?.formula && field.formula.match(DiceRollRegex))
+              await rollDiceWithNotification(createNotification, field.formula, true);
+          }}
+        />
+        )
+      </div>
+    );
+  }
+
+  return "";
+}
 
 function createColumns(
   blueprint_fields: BlueprintType["blueprint_fields"],
@@ -83,6 +291,7 @@ function createColumns(
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   createNotification: (notification: Omit<NotificationType, "id">) => void,
   updateMany: BulkUpdateType,
+  updateSingle: UpdateSingleType,
   webhooks: WebhookType[],
   permissions: UserHasPermissionsType,
   isProjectOwner: boolean,
@@ -115,148 +324,10 @@ function createColumns(
         columnHelper.display({
           id: field.id,
           header: field.title,
-          cell: ({ row }) => {
-            const fieldData = row.original?.blueprint_fields?.find((instanceField) => instanceField?.id === field.id);
-
-            if (field.field_type === "text" || field.field_type === "number") return fieldData?.value || "";
-            if (field.field_type === "boolean")
-              return (
-                <Checkbox
-                  isReadOnly
-                  name="bool"
-                  onChange={() => {}}
-                  value={(fieldData?.value as boolean | undefined) ?? false}
-                />
-              );
-            if (field.field_type === "select" || field.field_type === "select_multiple") {
-              return (
-                (Array.isArray(fieldData?.value) ? fieldData?.value : [fieldData?.value])
-                  ?.map((id) => {
-                    const opt = field?.options?.find((o) => o.id === id);
-                    return opt?.value || "";
-                  })
-                  .join(", ") ?? ""
-              );
-            }
-
-            if (field.field_type === "characters_single" || field.field_type === "characters_multiple") {
-              return (
-                <CharacterColumn
-                  characters={fieldData?.characters || []}
-                  isMultiple={field.field_type === "characters_multiple"}
-                />
-              );
-            }
-            if (field.field_type === "blueprints_single" || field.field_type === "blueprints_multiple") {
-              return (
-                <ShowMultipleWithBadge
-                  isMultiple={field.field_type === "blueprints_multiple"}
-                  titles={(fieldData?.blueprint_instances || []).map((instance) => instance.blueprint_instance.title)}
-                />
-              );
-            }
-            if (field.field_type === "documents_single" || field.field_type === "documents_multiple") {
-              return (
-                <ShowMultipleWithBadge
-                  isMultiple={field.field_type === "documents_multiple"}
-                  titles={(fieldData?.documents || []).map((doc) => doc.document.title)}
-                />
-              );
-            }
-            if (field.field_type === "locations_single" || field.field_type === "locations_multiple") {
-              return (
-                <LocationColumn isMultiple={field.field_type === "locations_multiple"} locations={fieldData?.map_pins || []} />
-              );
-            }
-            if (field.field_type === "events_single" || field.field_type === "events_multiple") {
-              return <EventColumn isMultiple={field.field_type === "events_multiple"} locations={fieldData?.events || []} />;
-            }
-            if (field.field_type === "images_single" || field.field_type === "images_multiple") {
-              return (
-                <div className="flex w-full">
-                  {fieldData?.images?.slice(0, field.field_type === "images_multiple" ? undefined : 1)?.map((image) => (
-                    <div className="-ml-4 flex items-center first:ml-0 hover:z-10">
-                      <Avatar
-                        hasShowImage
-                        image_id={image.related_id}
-                        label={image.image.title}
-                        size="sm"
-                        tooltipAllowedPlacements={["left", "right"]}
-                      />
-                    </div>
-                  ))}
-                </div>
-              );
-            }
-            if (field.field_type === "random_table") {
-              const randomTable = fieldData
-                ? field.random_table?.random_table_options?.find((opt) => opt?.id === fieldData?.random_table?.option_id)
-                : null;
-              const subOption =
-                randomTable && fieldData?.random_table?.suboption_id
-                  ? randomTable.random_table_suboptions?.find((subOpt) => subOpt.id === fieldData?.random_table?.suboption_id)
-                  : null;
-
-              return `${randomTable?.title ?? ""} ${subOption ? `(${subOption?.title})` : ""}`;
-            }
-
-            if (field.field_type === "date") {
-              const startMonthIdx =
-                field?.calendar && field.calendar.months.length
-                  ? field.calendar.months.findIndex((m) => m.id === fieldData?.calendar?.start_month_id)
-                  : null;
-              const endMonthIdx =
-                field?.calendar && field.calendar.months.length
-                  ? field.calendar.months.findIndex((m) => m.id === fieldData?.calendar?.end_month_id)
-                  : null;
-              const startDayOrdinal = fieldData?.calendar?.start_day ? getDayOrdinal(fieldData?.calendar.start_day) : null;
-              const endDayOrdinal = fieldData?.calendar?.end_day ? getDayOrdinal(fieldData?.calendar.end_day) : null;
-              return (
-                <span>
-                  {fieldData?.calendar?.start_day || ""}
-                  <sup>{startDayOrdinal} </sup>
-                  {typeof startMonthIdx === "number" ? field.calendar?.months[startMonthIdx]?.title : ""}{" "}
-                  {fieldData?.calendar?.start_year || ""}
-                  {fieldData?.calendar?.end_day ? (
-                    <>
-                      {" "}
-                      - {fieldData?.calendar?.end_day}
-                      <sup>{endDayOrdinal} </sup>
-                    </>
-                  ) : (
-                    ""
-                  )}
-                  {typeof endMonthIdx === "number" ? field.calendar?.months[endMonthIdx]?.title || "" : ""}{" "}
-                  {fieldData?.calendar?.end_year || ""}
-                </span>
-              );
-            }
-            if (field.field_type === "dice_roll" && field?.formula) {
-              return (
-                <div className="flex items-center gap-x-2 [&>button]:px-0">
-                  <span>{(fieldData?.value as number) || ""}</span>
-                  (
-                  <Button
-                    hasNoBackground
-                    icon={IconEnum.d20}
-                    iconPos="left"
-                    isDisabled={!field.formula}
-                    label={field.formula || ""}
-                    onClick={async () => {
-                      if (field?.formula && field.formula.match(DiceRollRegex))
-                        await rollDiceWithNotification(createNotification, field.formula, true);
-                    }}
-                  />
-                  )
-                </div>
-              );
-            }
-
-            return "";
-          },
+          cell: ({ row }) => <Cell createNotification={createNotification} field={field} row={row} update={updateSingle} />,
           meta: {
             centered: centeredColumns.includes(field.field_type),
-            noLink: noLinkColumns.includes(field.field_type),
+            noLink: true,
             filterOptions: CharacterBlueprintRelationFilter(
               field.field_type,
               field.field_type === "select" || field.field_type === "select_multiple"
@@ -667,6 +738,7 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
     fields: ["id", "title", "title_name"],
   });
   useNavbarTitle(`Blueprints | ${blueprint?.data?.title || ""}`, !!blueprint?.data?.title);
+  const { mutate: updateSingle } = useUpdateSubEntity("blueprint_instances", project_id as string, blueprint?.data?.id);
   const { mutate: updateMany } = useBulkUpdate(project_id as string, "blueprint_instances");
   const { mutateAsync: deleteMany } = useDeleteMany("blueprint_instances", arkived === "active", project_id);
 
@@ -753,6 +825,7 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
             setDialog,
             createNotification,
             updateMany,
+            updateSingle,
             user?.webhooks || [],
             permissions,
             isProjectOwner,
