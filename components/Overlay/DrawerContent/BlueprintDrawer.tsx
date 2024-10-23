@@ -93,7 +93,7 @@ function FieldRow({
             onChange={changeField}
             placeholder="Eg. Location"
             value={title}
-            variant={title ? "primary" : "error"}
+            variant={title ? "secondary" : "error"}
           />
         </div>
         <div className="h-full flex-1">
@@ -106,6 +106,7 @@ function FieldRow({
             options={BlueprintFieldTypesEnum}
             placeholder="Field type"
             value={field_type}
+            variant="secondary"
           />
         </div>
 
@@ -169,7 +170,7 @@ function FieldRow({
                             name={`blueprint_fields[${index}].options[${optIndex}].value`}
                             onChange={changeField}
                             value={opt.value}
-                            variant={!opt.value ? "error" : "primary"}
+                            variant={!opt.value ? "error" : "secondary"}
                           />
                         </div>
 
@@ -210,7 +211,7 @@ function FieldRow({
               onChange={changeField}
               placeholder="E.g. 4d6dl1"
               value={formula || ""}
-              variant={formula?.match?.(DiceRollRegex) ? "primary" : "error"}
+              variant={formula?.match?.(DiceRollRegex) ? "secondary" : "error"}
             />
           </div>
         </div>
@@ -226,6 +227,7 @@ function FieldRow({
             onChange={changeField}
             searchEntity="random_tables"
             value={random_table_id || ""}
+            variant="secondary"
           />
         </div>
       ) : null}
@@ -240,6 +242,7 @@ function FieldRow({
             onChange={changeField}
             searchEntity="blueprints"
             value={blueprint_id || ""}
+            variant="secondary"
           />
         </div>
       ) : null}
@@ -254,6 +257,7 @@ function FieldRow({
             onChange={changeField}
             searchEntity="calendars"
             value={calendar_id || ""}
+            variant="secondary"
           />
         </div>
       ) : null}
