@@ -89,12 +89,15 @@ const InputClasses = tv({
       true: {
         base: "cursor-not-allowed",
         inputContainer: "cursor-not-allowed pointer-events-none",
-        input: "truncate",
+        input:
+          "truncate [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
       },
     },
     isInline: {
       true: {
         inputContainer: "rounded-none border-none",
+        input:
+          "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
       },
     },
   },
