@@ -154,6 +154,7 @@ function AdditionalFieldsTab({
                         fields_data={character_fields || []}
                         handleChange={handleChange}
                         hasCreateOrEdit={hasCreateOrEdit}
+                        isDrawer
                         type="characters"
                       />
                     </div>
@@ -170,6 +171,7 @@ function AdditionalFieldsTab({
                       fields_data={character_fields || []}
                       handleChange={handleChange}
                       hasCreateOrEdit={hasCreateOrEdit}
+                      isDrawer
                       type="characters"
                     />
                   </div>
