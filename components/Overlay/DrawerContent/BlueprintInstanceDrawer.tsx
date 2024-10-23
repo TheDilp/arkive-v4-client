@@ -254,6 +254,7 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
             fields_data={instance.blueprint_fields}
             handleChange={handleChange}
             hasCreateOrEdit={canCreateOrEdit}
+            isDrawer
             type="blueprint_instances"
           />
         </>
