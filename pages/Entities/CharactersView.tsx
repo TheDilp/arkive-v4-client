@@ -1,7 +1,9 @@
+import { UseMutateFunction } from "@tanstack/react-query";
+import { Row } from "@tanstack/react-table";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
-import { Dispatch, useLayoutEffect, useState } from "react";
+import { Dispatch, useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import {
@@ -59,13 +61,79 @@ import {
   TextFilters,
   userAtom,
 } from "../../utils";
+import { UpdateCharacterSchema } from "../../validation";
 
 const columnHelper = createColumnHelper<CharacterType>();
+
+type UpdateSingleType = UseMutateFunction<
+  any,
+  unknown,
+  {
+    data?:
+      | {
+          id?: string;
+          parent_id?: string | null;
+        }
+      | undefined;
+  }
+>;
+
+function Cell({ row, name, update }: { name: keyof CharacterType; row: Row<CharacterType>; update: UpdateSingleType }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [value, setValue] = useState<string | number>(row.original[name]);
+
+  useEffect(() => {
+    if (!isEditing) setValue(row.original[name]);
+  }, [isEditing]);
+
+  if (isEditing)
+    return (
+      <div className="[&>div>div]:border-0 [&>div>div]:pl-0">
+        <Input
+          isAutofocused
+          name=""
+          onBlur={() => updateCharacterValueField({ row, value, name, update, setIsEditing })}
+          onChange={({ value: newValue }) => setValue(newValue as string | number)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              e.preventDefault();
+              setIsEditing(false);
+            }
+            if (e.key === "Enter") {
+              updateCharacterValueField({ row, value, name, update, setIsEditing });
+            }
+          }}
+          type={name === "age" ? "number" : "text"}
+          value={value}
+        />
+      </div>
+    );
+
+  if (!row.original[name])
+    return (
+      <div className="flex h-full w-full cursor-text items-center [&>div>div]:pl-0" onClick={() => setIsEditing(true)}>
+        <Input
+          isInline
+          name={name}
+          onChange={() => {}}
+          type={name === "age" ? "number" : "text"}
+          value={row.original?.[name] || ""}
+        />
+      </div>
+    );
+
+  return (
+    <div className="w-full cursor-text" onClick={() => setIsEditing(true)}>
+      {row.original?.[name] || ""}
+    </div>
+  );
+}
 
 function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   updatePublicMany: UpdatePublicManyType,
+  updateSingle: UpdateSingleType,
   isMd: boolean,
   webhooks: WebhookType[],
   project_id: string,
@@ -102,10 +170,11 @@ function createColumns(
     columnHelper.accessor("first_name", {
       id: "first_name",
       header: "First name",
-      cell: (info) => info.getValue(),
+      cell: ({ row }) => <Cell name="first_name" row={row} update={updateSingle} />,
       meta: {
         pinned: true,
         sortable: true,
+        noLink: true,
         filterOptions: TextFilters,
       },
       minSize: 12,
@@ -113,10 +182,11 @@ function createColumns(
     columnHelper.accessor("last_name", {
       id: "last_name",
       header: "Last name",
-      cell: (info) => info.getValue(),
+      cell: ({ row }) => <Cell name="last_name" row={row} update={updateSingle} />,
       meta: {
         pinned: isMd,
         sortable: true,
+        noLink: true,
         filterOptions: TextFilters,
       },
       minSize: 12,
@@ -124,20 +194,22 @@ function createColumns(
     columnHelper.accessor("nickname", {
       id: "nickname",
       header: "Nickname",
-      cell: (info) => info.getValue(),
+      cell: ({ row }) => <Cell name="nickname" row={row} update={updateSingle} />,
       meta: {
         sortable: true,
         filterOptions: TextFilters,
+        noLink: true,
       },
       maxSize: 15,
     }),
     columnHelper.accessor("age", {
       id: "age",
       header: "Age",
-      cell: (info) => info.getValue() || "",
+      cell: ({ row }) => <Cell name="age" row={row} update={updateSingle} />,
       meta: {
         sortable: true,
         centered: true,
+        noLink: true,
         filterOptions: NumberFilters,
       },
       minSize: 8,
@@ -569,6 +641,33 @@ function getSelectedActions(
   return selectedActions;
 }
 
+function updateCharacterValueField({
+  row,
+  value,
+  update,
+  setIsEditing,
+  name,
+}: {
+  row: Row<CharacterType>;
+  value: string | number;
+  update: UpdateSingleType;
+  setIsEditing: Dispatch<SetStateAction<boolean>>;
+  name: keyof CharacterType;
+}) {
+  const dataToParse = {
+    data: {
+      id: row.original.id,
+      [name]: value,
+    },
+  };
+  const parsedData = UpdateCharacterSchema.parse(dataToParse);
+  update(parsedData, {
+    onSuccess: () => {
+      setIsEditing(false);
+    },
+  });
+}
+
 function CharacterViewHeader({
   setArkived,
   setDrawer,
@@ -813,7 +912,7 @@ export function CharactersView() {
       enabled: view === "table" && !!permissions?.read_characters,
     }
   );
-
+  const { mutate: updateSingle } = useUpdateEntity("characters", project_id);
   const { mutateAsync: updatePublicMany } = useUpdateManyPublic("characters", project_id as string);
   const { mutate: updateMany } = useBulkUpdate(project_id as string, "characters");
 
@@ -864,7 +963,6 @@ export function CharactersView() {
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const resetDialogAtom = useResetAtom(dialogAtom);
-
   const selectedActions = getSelectedActions(permissions, {
     deleteMany,
     updateMany,
@@ -963,6 +1061,7 @@ export function CharactersView() {
               setDrawer,
               setDialog,
               updatePublicMany,
+              updateSingle,
               isMd,
               user?.webhooks || [],
               project_id as string,
