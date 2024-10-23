@@ -4,7 +4,7 @@ import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { Dispatch, useEffect, useLayoutEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import {
   Avatar,
@@ -92,14 +92,16 @@ function Cell({ row, name, update }: { name: keyof CharacterType; row: Row<Chara
         <Input
           isAutofocused
           name=""
-          onBlur={() => updateCharacterValueField({ row, value, name, update, setIsEditing })}
+          onBlur={() => {
+            if (value !== row.original[name]) updateCharacterValueField({ row, value, name, update, setIsEditing });
+          }}
           onChange={({ value: newValue }) => setValue(newValue as string | number)}
           onKeyDown={(e) => {
             if (e.key === "Escape") {
               e.preventDefault();
               setIsEditing(false);
             }
-            if (e.key === "Enter") {
+            if (e.key === "Enter" && value !== row.original[name]) {
               updateCharacterValueField({ row, value, name, update, setIsEditing });
             }
           }}
@@ -134,6 +136,7 @@ function createColumns(
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   updatePublicMany: UpdatePublicManyType,
   updateSingle: UpdateSingleType,
+  navigate: any,
   isMd: boolean,
   webhooks: WebhookType[],
   project_id: string,
@@ -334,6 +337,22 @@ function createColumns(
                           size: "3xl",
                           type: "characters",
                         }));
+                      },
+                    },
+                    {
+                      id: "char_profile",
+                      title: "View character profile",
+                      icon: IconEnum.user,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "read_characters",
+                        user_role_id
+                      ),
+                      onClick: () => {
+                        navigate(`/projects/${project_id}/characters/${row.original.id}`);
                       },
                     },
                     {
@@ -873,11 +892,13 @@ function CharacterViewHeader({
 
 export function CharactersView() {
   useNavbarTitle("Characters", true);
+  const { project_id } = useParams();
+  const navigate = useNavigate();
   const { isMd } = useBreakpoint();
   const [view, setView] = useState<"card" | "table">(ls.get("characters_view") || "table");
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("characters-table-active") || "active");
   const [filter, setFilter] = useState("");
-  const { project_id } = useParams();
+
   const user = useAtomValue(userAtom);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(
@@ -1062,6 +1083,7 @@ export function CharactersView() {
               setDialog,
               updatePublicMany,
               updateSingle,
+              navigate,
               isMd,
               user?.webhooks || [],
               project_id as string,
