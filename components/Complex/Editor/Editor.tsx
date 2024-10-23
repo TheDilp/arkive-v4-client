@@ -20,6 +20,7 @@ export function Editor({
   setContext,
   isFullHeight,
   title,
+  variant = "primary",
   hooks,
 }: EditorType) {
   const createNotification = useNotifications();
@@ -62,7 +63,7 @@ export function Editor({
           }
         }}>
         <div
-          className={`editor-component flex w-full max-w-full flex-col rounded-md border border-zinc-700 ${
+          className={`editor-component flex w-full max-w-full flex-col rounded-md border ${variant === "primary" ? "border-zinc-800" : "border-zinc-600"} ${
             isDisabled ? "cursor-not-allowed bg-zinc-600" : "bg-zinc-950"
           } ${isReadOnly ? "cursor-not-allowed" : ""} ${isFullHeight ? "h-full" : "max-h-[30rem]"}`}>
           {isReadOnly || isDisabled ? null : (

@@ -3,7 +3,7 @@ import { SetStateAction } from "jotai";
 import { Dispatch } from "react";
 import { RemirrorJSON } from "remirror";
 
-import { Size } from "../../baseTypes";
+import { Size, Variant } from "../../baseTypes";
 
 export interface EditorType {
   initialContent: RemirrorJSON | string | undefined;
@@ -20,6 +20,7 @@ export interface EditorType {
   title?: string;
   setContext?: Dispatch<SetStateAction<ReactFrameworkOutput<Remirror.Extensions> | undefined>>;
   hooks?: any;
+  variant?: Variant;
 }
 
 export type slashMenuItem = {
