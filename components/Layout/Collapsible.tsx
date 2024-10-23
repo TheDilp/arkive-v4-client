@@ -10,7 +10,7 @@ const CollapsibleClasses = tv({
     details: "cursor-default select-none",
     label: "flex select-none items-center gap-x-2 text-white",
     summary:
-      "cursor-pointer flex items-center gap-x-2 border-b pb-1 font-lato outline-none focus:border-blue-400 focus:border-zinc-400",
+      "cursor-pointer flex items-center gap-x-2 border-b font-lato outline-none focus:border-blue-400 focus:border-zinc-400",
     actions: "ml-auto flex flex-nowrap gap-x-1",
     icon: "no-rotate",
     children: "rounded-b bg-zinc-950",
@@ -45,23 +45,17 @@ const CollapsibleClasses = tv({
       },
     },
     size: {
-      "4xs": {},
-      "3xs": {},
-      "2xs": {},
-      xs: {},
-      sm: {},
-      md: {
-        label: "text-base",
-      },
-      lg: {
-        label: "text-lg",
-      },
-      xl: {
-        label: "text-xl",
-      },
-      "2xl": {},
-      "3xl": {},
-      "4xl": {},
+      "4xs": { label: "text-xs" },
+      "3xs": { label: "text-xs" },
+      "2xs": { label: "text-xs" },
+      xs: { label: "text-xs" },
+      sm: { label: "text-sm" },
+      md: { label: "text-base" },
+      lg: { label: "text-lg" },
+      xl: { label: "text-xl" },
+      "2xl": { label: "text-2xl" },
+      "3xl": { label: "text-3xl" },
+      "4xl": { label: "text-4xl" },
     },
   },
 });
