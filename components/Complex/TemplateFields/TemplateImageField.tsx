@@ -116,6 +116,7 @@ export function TemplateImageField({
             }
             id={currentValue?.[0].related_id}
             image_id={currentValue?.[0].related_id}
+            label={title}
             manual_project_id={project_id}
             title={currentValue?.[0]?.image?.title || ""}
             type="images"

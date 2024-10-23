@@ -15,7 +15,6 @@ type Props = {
 
 export function TemplateBooleanField({
   isDisabled,
-
   isOpen,
   title,
   name,
@@ -29,6 +28,7 @@ export function TemplateBooleanField({
       <div className="col-span-1 md:col-span-1">
         <Checkbox
           isDisabled={isDisabled}
+          label={title}
           name={name}
           onChange={({ value }) =>
             handleChange([

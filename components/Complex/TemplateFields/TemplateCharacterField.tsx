@@ -40,7 +40,7 @@ export function TemplateCharacterField({
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <div
         className={`col-span-1 ${fieldType === "characters_multiple" ? "md:col-span-2 lg:col-span-4" : "md:col-span-2"} relative flex max-h-96 flex-col gap-y-2 overflow-y-auto`}>
-        {isDisabled || IS_GATEWAY ? null : (
+        {isDisabled || IS_GATEWAY || (currentValue?.length === 1 && fieldType === "characters_single") ? null : (
           <div className="sticky top-0">
             <Search
               isDisabled={isDisabled}
@@ -114,6 +114,7 @@ export function TemplateCharacterField({
             }
             id={currentValue?.[0].related_id}
             image_id={currentValue?.[0].character?.portrait_id}
+            label={title}
             manual_project_id={project_id}
             title={currentValue?.[0]?.character?.full_name || ""}
             type="characters"
