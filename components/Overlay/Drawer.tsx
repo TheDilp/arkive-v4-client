@@ -123,7 +123,7 @@ export function Drawer() {
 
   // Close drawer if the location changes
   useEffect(() => {
-    resetDrawer();
+    if (import.meta.env.PROD) resetDrawer();
     setHasChangedData(false);
   }, [pathname]);
 
