@@ -49,8 +49,8 @@ const SearchClasses = tv({
         helperText: "text-zinc-300",
       },
       secondary: {
-        base: "border-zinc-400",
-        input: "border-zinc-400",
+        base: "border-zinc-600",
+        input: "border-zinc-600",
         label: "text-zinc-300",
         helperText: "text-zinc-300",
       },
