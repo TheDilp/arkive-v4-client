@@ -42,7 +42,7 @@ import { DrawerLayout, Dropdown, Editor, EntityPreview, ImagePreview, Skeleton }
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { DnD5E } from "../../Complex/GameSystems";
 import { ImageSelect } from "../../Complex/ImageSelect";
-import { Button, Checkbox, Input, RelatedEntityForm, Search, TagInput } from "../../Form";
+import { Button, Checkbox, Input, RelatedEntityForm, Search, TagInput, Title } from "../../Form";
 import { Collapsible } from "../../Layout/Collapsible";
 import { Tabs } from "../../Layout/Tabs";
 import { Alert } from "../../Misc";
@@ -143,11 +143,12 @@ function AdditionalFieldsTab({
         const otherFields = t.character_fields.filter((f) => !f.section_id);
         return (
           <Collapsible key={t.id} initialOpen={areAllOpen} label={t.title}>
-            <div className="flex flex-col gap-y-2 p-1.5">
+            <div className="flex flex-col gap-y-1 px-2 pb-2">
               {t.character_fields_sections.map((section) => {
                 return (
-                  <Collapsible key={section.id} initialOpen={areAllOpen} label={section.title}>
-                    <div className="min-h-8 p-2">
+                  <div key={section.id} className="flex flex-col gap-y-2 bg-zinc-950">
+                    <Title isDrawerTitle label={section.title} size="lg" />
+                    <div className="min-h-8">
                       <RelatedEntityForm
                         fields={t.character_fields.filter((f) => f.section_id === section.id)}
                         fields_data={character_fields || []}
@@ -156,12 +157,14 @@ function AdditionalFieldsTab({
                         type="characters"
                       />
                     </div>
-                  </Collapsible>
+                  </div>
                 );
               })}
               {otherFields.length ? (
-                <Collapsible initialOpen={areAllOpen} label={"Other"}>
-                  <div className="min-h-8 p-2">
+                <div className="flex flex-col gap-y-2">
+                  <Title isDrawerTitle label="Other" size="lg" />
+
+                  <div className="min-h-8">
                     <RelatedEntityForm
                       fields={otherFields}
                       fields_data={character_fields || []}
@@ -170,7 +173,7 @@ function AdditionalFieldsTab({
                       type="characters"
                     />
                   </div>
-                </Collapsible>
+                </div>
               ) : null}
             </div>
           </Collapsible>
