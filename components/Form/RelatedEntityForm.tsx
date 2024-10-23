@@ -26,23 +26,24 @@ import {
 } from "../Complex";
 
 const classes = tv({
-  base: "select-none grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-4 lg:gap-x-4",
+  base: "select-none",
   variants: {
-    compoundVariants: [
-      {
-        isDrawer: false,
-        type: "blueprint_instances",
-        isGateway: false,
-        class: "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
-      },
-      {
-        isDrawer: true,
-        type: "characters",
-        isGateway: false,
-        class: "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
-      },
-    ],
+    isDrawer: {},
+    isGateway: {},
+    type: {},
   },
+  compoundVariants: [
+    {
+      isDrawer: true,
+      type: "blueprint_instances",
+      isGateway: false,
+      class: "grid grid-cols-1 gap-y-2",
+    },
+    {
+      type: "characters",
+      class: "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
+    },
+  ],
 });
 
 export function RelatedEntityForm({
