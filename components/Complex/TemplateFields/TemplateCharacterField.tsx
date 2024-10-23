@@ -17,7 +17,6 @@ type Props = {
   isOpen?: boolean;
   isDisabled?: boolean;
   isGlobal?: boolean;
-  isDrawer?: boolean;
   presetOptions: GatewayConfigOptionType[];
   currentValue: BlueprintInstanceBlueprintFieldType["characters"];
 };
@@ -32,7 +31,6 @@ export function TemplateCharacterField({
   isCollapsible,
   isDisabled,
   isGlobal,
-  isDrawer,
   presetOptions = [],
   isOpen,
 }: Props) {
@@ -41,7 +39,7 @@ export function TemplateCharacterField({
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <div
-        className={`col-span-1 ${isDrawer ? "md:col-span-2 lg:col-span-4" : ""} relative flex max-h-96 flex-col gap-y-2 overflow-y-auto`}>
+        className={`col-span-1 ${fieldType === "characters_multiple" ? "md:col-span-2 lg:col-span-4" : "md:col-span-2"} relative flex max-h-96 flex-col gap-y-2 overflow-y-auto`}>
         {isDisabled || IS_GATEWAY ? null : (
           <div className="sticky top-0">
             <Search
@@ -96,6 +94,7 @@ export function TemplateCharacterField({
               placeholder="Type at least 2 characters"
               searchEntity="characters"
               value={fieldType === "characters_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
+              variant="secondary"
             />
           </div>
         )}

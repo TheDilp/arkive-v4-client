@@ -30,22 +30,25 @@ export function TemplateSelectField({
 }: Props) {
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <Select
-        hasSearch
-        isClearable
-        isDisabled={isDisabled}
-        isMultiple={fieldType === "select_multiple"}
-        label={title}
-        name={name}
-        onChange={({ value }) =>
-          handleChange([
-            { name: `${name}.id`, value: id },
-            { name: `${name}.value`, value },
-          ])
-        }
-        options={options?.map((opt) => ({ label: opt.value, value: opt.id })) || []}
-        value={currentValue as string | string[]}
-      />
+      <div className="col-span-1 md:col-span-2">
+        <Select
+          hasSearch
+          isClearable
+          isDisabled={isDisabled}
+          isMultiple={fieldType === "select_multiple"}
+          label={title}
+          name={name}
+          onChange={({ value }) =>
+            handleChange([
+              { name: `${name}.id`, value: id },
+              { name: `${name}.value`, value },
+            ])
+          }
+          options={options?.map((opt) => ({ label: opt.value, value: opt.id })) || []}
+          value={currentValue as string | string[]}
+          variant="secondary"
+        />
+      </div>
     </TemplateFieldContainer>
   );
 }

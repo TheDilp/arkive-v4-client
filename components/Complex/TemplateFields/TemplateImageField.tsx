@@ -38,7 +38,8 @@ export function TemplateImageField({
   const projectId = project_id || presetOptions?.[0]?.project_id;
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="flex max-h-96 flex-col gap-y-2 overflow-y-auto">
+      <div
+        className={`col-span-1 flex max-h-96 flex-col gap-y-2 overflow-y-auto ${fieldType === "images_multiple" ? "md:col-span-2 lg:col-span-4" : "md:col-span-2"}`}>
         {isDisabled || IS_GATEWAY || (currentValue?.length === 1 && fieldType === "images_single") ? null : (
           <div className="sticky top-0">
             <Search
@@ -95,6 +96,7 @@ export function TemplateImageField({
               value={
                 fieldType === "images_multiple" ? (currentValue || [])?.map((t) => t.related_id) : currentValue?.[0]?.related_id
               }
+              variant="secondary"
             />
           </div>
         )}

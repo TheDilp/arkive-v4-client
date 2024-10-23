@@ -26,7 +26,7 @@ export function TemplateBooleanField({
 }: Props) {
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="flex flex-nowrap justify-end">
+      <div className="col-span-1 md:col-span-1">
         <Checkbox
           isDisabled={isDisabled}
           name={name}
@@ -37,6 +37,7 @@ export function TemplateBooleanField({
             ])
           }
           value={currentValue as boolean}
+          variant="secondary"
         />
       </div>
     </TemplateFieldContainer>

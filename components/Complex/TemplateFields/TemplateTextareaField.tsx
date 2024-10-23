@@ -39,6 +39,7 @@ export function TemplateTextareaField({
               { name: `${name}.value`, value },
             ])
           }
+          variant="secondary"
         />
       </div>
     </TemplateFieldContainer>

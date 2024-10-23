@@ -65,7 +65,7 @@ export function TemplateDateField({
   }, [currentValue?.end_month_id, currentValue?.start_month_id]);
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="col-span-2 flex flex-col gap-y-2">
+      <div className="col-span-1 flex flex-col gap-y-2 md:col-span-2 lg:col-span-4">
         <div className="flex items-center justify-between gap-x-2">
           <Input
             isDisabled={isDisabled || typeof startMonthIdx !== "number"}
@@ -83,6 +83,7 @@ export function TemplateDateField({
             placeholder={typeof startMonthIdx !== "number" ? "Select a month." : ""}
             type="number"
             value={currentValue?.start_day ?? ""}
+            variant="secondary"
           />
           <Select
             isClearable
@@ -98,6 +99,7 @@ export function TemplateDateField({
             }
             options={(calendar?.months || []).map((m) => ({ label: m.title, value: m.id }))}
             value={typeof startMonthIdx === "number" ? calendar?.months?.[startMonthIdx].id : undefined}
+            variant="secondary"
           />
           <Input
             isDisabled={isDisabled}
@@ -112,6 +114,7 @@ export function TemplateDateField({
             }
             type="number"
             value={currentValue?.start_year || ""}
+            variant="secondary"
           />
         </div>
         <div className="grid grid-cols-3 gap-x-2">
@@ -132,7 +135,7 @@ export function TemplateDateField({
             placeholder={typeof endMonthIdx !== "number" ? "Select a month." : ""}
             type="number"
             value={currentValue?.end_day || ""}
-            variant={isDayCorrect ? "primary" : "error"}
+            variant={isDayCorrect ? "secondary" : "error"}
           />
           <Select
             helperText={isMonthCorrect ? "" : "End month must be more or equal to start month if in the same year."}
@@ -149,7 +152,7 @@ export function TemplateDateField({
             }
             options={calendar?.months?.map((month) => ({ label: month.title, value: month.id })) || []}
             value={typeof endMonthIdx === "number" ? calendar?.months?.[endMonthIdx].id : undefined}
-            variant={isMonthCorrect ? "primary" : "error"}
+            variant={isMonthCorrect ? "secondary" : "error"}
           />
           <Input
             helperText={isYearCorrect ? "" : "End year must be more or equal to start year."}
@@ -166,7 +169,7 @@ export function TemplateDateField({
             placeholder={typeof endMonthIdx !== "number" ? "Select a month." : ""}
             type="number"
             value={currentValue?.end_year || ""}
-            variant={isYearCorrect ? "primary" : "error"}
+            variant={isYearCorrect ? "secondary" : "error"}
           />
         </div>
       </div>

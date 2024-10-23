@@ -33,7 +33,7 @@ export function TemplateDiceRollField({
   const [isRolling, setIsRolling] = useState(false);
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="flex flex-nowrap items-center gap-x-2">
+      <div className="col-span-1 flex flex-nowrap items-center gap-x-2 md:col-span-2">
         <Input
           isDisabled={isDisabled}
           label={title}
@@ -45,6 +45,7 @@ export function TemplateDiceRollField({
             ])
           }
           value={currentValue || ""}
+          variant="secondary"
         />
         <div className="flex self-end pb-1.5">
           <Button

@@ -32,7 +32,7 @@ export function TemplateRandomTableField({
 
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="flex flex-col gap-y-1">
+      <div className="col-span-1 flex flex-col gap-y-1 md:col-span-2">
         <div className="flex flex-nowrap items-center gap-x-2">
           <Select
             hasSearch
@@ -57,6 +57,7 @@ export function TemplateRandomTableField({
             }}
             options={(random_table?.random_table_options || []).map((opt) => ({ label: opt.title, value: opt.id }))}
             value={currentValue?.option_id || ""}
+            variant="secondary"
           />
           <div className="flex self-end pb-1.5">
             <Button
@@ -104,6 +105,7 @@ export function TemplateRandomTableField({
                 }
                 options={availableSuboptions.map((subopt) => ({ label: subopt.title, value: subopt.id }))}
                 value={currentValue?.suboption_id || ""}
+                variant="secondary"
               />
               <div className="flex self-end pb-1.5" />
             </div>

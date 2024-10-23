@@ -38,7 +38,8 @@ export function TemplateDocumentField({
   const projectId = project_id || presetOptions?.[0]?.project_id;
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="relative flex max-h-96 flex-col gap-y-2 overflow-y-auto">
+      <div
+        className={`relative col-span-1 flex max-h-96 flex-col gap-y-2 overflow-y-auto ${fieldType === "documents_multiple" ? "md:col-span-2 lg:col-span-4" : "md:col-span-2"}`}>
         {isDisabled || IS_GATEWAY ? null : (
           <div className="sticky top-0">
             <Search
@@ -92,6 +93,7 @@ export function TemplateDocumentField({
               placeholder="Type at least 2 documents"
               searchEntity="documents"
               value={fieldType === "documents_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
+              variant="secondary"
             />
           </div>
         )}

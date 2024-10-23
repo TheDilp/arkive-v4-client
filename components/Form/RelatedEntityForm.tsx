@@ -26,19 +26,18 @@ import {
 } from "../Complex";
 
 const classes = tv({
-  base: "select-none",
+  base: "select-none grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-4 lg:gap-x-4",
   variants: {
-    type: {
-      characters: "grid-cols-1 md:grid-cols-2 lg:grid-cols-4",
-    },
-    isDrawer: {
-      true: "flex flex-col gap-y-2 pt-2",
-      false: "grid gap-x-2 gap-y-4 lg:gap-x-4",
-    },
     compoundVariants: [
       {
         isDrawer: false,
         type: "blueprint_instances",
+        isGateway: false,
+        class: "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
+      },
+      {
+        isDrawer: true,
+        type: "characters",
         isGateway: false,
         class: "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
       },
@@ -98,7 +97,6 @@ export function RelatedEntityForm({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isCollapsible={isDrawer}
                 isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
@@ -119,7 +117,6 @@ export function RelatedEntityForm({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isCollapsible={isDrawer}
                 isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 options={template_field.options || []}
@@ -133,7 +130,6 @@ export function RelatedEntityForm({
                 currentValue={fields_data[`${templateValueIndex < 0 ? fields_data.length : templateValueIndex}`]?.value as any}
                 handleChange={handleChange}
                 id={template_field.id}
-                isCollapsible={isDrawer}
                 isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
@@ -148,7 +144,6 @@ export function RelatedEntityForm({
                 }
                 handleChange={handleChange}
                 id={template_field.id}
-                isCollapsible={isDrawer}
                 isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
@@ -164,7 +159,6 @@ export function RelatedEntityForm({
                 formula={template_field.formula as string}
                 handleChange={handleChange}
                 id={template_field.id}
-                isCollapsible={isDrawer}
                 isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
@@ -178,7 +172,6 @@ export function RelatedEntityForm({
                 currentValue={fields_data[`${templateValueIndex < 0 ? fields_data.length : templateValueIndex}`]?.calendar}
                 handleChange={handleChange}
                 id={template_field.id}
-                isCollapsible={isDrawer}
                 isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
@@ -192,7 +185,6 @@ export function RelatedEntityForm({
                 currentValue={fields_data[`${templateValueIndex < 0 ? fields_data.length : templateValueIndex}`]?.random_table}
                 handleChange={handleChange}
                 id={template_field.id}
-                isCollapsible={isDrawer}
                 isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 random_table={template_field.random_table}
@@ -209,7 +201,6 @@ export function RelatedEntityForm({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isCollapsible={isDrawer}
                 isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 presetOptions={presetOptions || []}
@@ -229,7 +220,6 @@ export function RelatedEntityForm({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isCollapsible={isDrawer}
                 isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 presetOptions={presetOptions || []}
@@ -245,7 +235,6 @@ export function RelatedEntityForm({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isCollapsible={isDrawer}
                 isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 presetOptions={presetOptions || []}
@@ -261,7 +250,6 @@ export function RelatedEntityForm({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isCollapsible={isDrawer}
                 isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 presetOptions={presetOptions || []}
@@ -277,7 +265,6 @@ export function RelatedEntityForm({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isCollapsible={isDrawer}
                 isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 presetOptions={presetOptions || []}
@@ -293,7 +280,6 @@ export function RelatedEntityForm({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isCollapsible={isDrawer}
                 isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 presetOptions={presetOptions || []}
