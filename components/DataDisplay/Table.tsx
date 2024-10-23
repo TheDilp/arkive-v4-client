@@ -56,7 +56,8 @@ const TableClasses = tv({
     hasLinkRow: "cursor-pointer",
     hasRowAction: "cursor-pointer",
     contentWrapper: "w-full flex justify-start items-center truncate h-full",
-    content: "flex flex-1 group-hover:bg-zinc-700 items-center px-2 border-zinc-800 border-r last:border-r-0 first:border-l",
+    content:
+      "flex flex-1 group-hover:bg-zinc-700 group-hover:[&>div>div>div>*:not(:focus)]:bg-zinc-700 items-center px-2 border-zinc-800 border-r last:border-r-0 first:border-l",
     centeredContent: "flex items-center justify-center",
     paginationContainer:
       "flex h-10 max-h-[2.5rem] min-h-[2.5rem] items-start justify-between border-zinc-800 pl-2 sticky bottom-0 bg-zinc-950 pb-9 pt-1 mt-1",
@@ -823,7 +824,7 @@ export function Table<T>({ columns, data = [], config, isLoading, pagination, di
                           (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
                         } ${cell.column.id === "select" && isLg ? "sticky left-0 z-10" : "z-0"} ${selected?.includes(row.original.id) ? "group-hover:bg-blue-300" : ""} ${
                           config?.selection && selected?.includes(row.original.id) ? "bg-blue-400" : "bg-zinc-950"
-                        } ${(cell.column.columnDef.meta as MetaType)?.pinned && isLg ? "sticky z-10" : ""} ${getLink && !selected?.includes(row.original.id) ? hasLinkRow() : ""} ${cell.column.columnDef.id === "tags" ? "" : "cursor-default"} `}
+                        } ${(cell.column.columnDef.meta as MetaType)?.pinned && isLg ? "sticky z-10" : ""} ${getLink && !selected?.includes(row.original.id) ? hasLinkRow() : ""} ${cell.column.columnDef.id === "tags" ? "" : ""} `}
                         onClick={(e) => {
                           if (
                             cell.column.id === "select" ||
