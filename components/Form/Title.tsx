@@ -26,7 +26,7 @@ const TitleClasses = tv({
       true: "border-zinc-700 border-b mt-2",
     },
     variant: {
-      primary: "border-zinc-700",
+      primary: "border-zinc-800",
       secondary: "border-zinc-200",
       info: "border-blue-400",
       success: "border-green-400",
