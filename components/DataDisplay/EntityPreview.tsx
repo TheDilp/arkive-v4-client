@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { ItemPreviewType } from "../../types/ComponentTypes/DataDisplayTypes/itemPreviewTypes";
-import { AvailableIcons, getDefaultEntityIcon, IconEnum } from "../../utils";
+import { AvailableIcons, getAvatarInitials, getDefaultEntityIcon, IconEnum } from "../../utils";
 import { Button } from "../Form";
 import { Avatar, Icon } from "../Misc";
 
@@ -100,6 +100,7 @@ export function EntityPreview({
             hasShowImage
             imageType={type === "maps" ? "map_images" : "images"}
             image_id={image_id}
+            initials={getAvatarInitials(title)}
             isTooltipDisabled
             label={title}
             manual_project_id={manual_project_id}
