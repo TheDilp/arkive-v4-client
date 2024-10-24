@@ -40,7 +40,21 @@ const classes = tv({
       class: "grid grid-cols-1 gap-y-2",
     },
     {
+      isDrawer: true,
       type: "characters",
+      isGateway: false,
+      class: "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
+    },
+    {
+      isDrawer: false,
+      type: "characters",
+      isGateway: true,
+      class: "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
+    },
+    {
+      isDrawer: false,
+      type: "blueprint_instances",
+      isGateway: true,
       class: "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
     },
   ],
