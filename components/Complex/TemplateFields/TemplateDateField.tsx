@@ -65,7 +65,7 @@ export function TemplateDateField({
   }, [currentValue?.end_month_id, currentValue?.start_month_id]);
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="col-span-1 flex flex-col gap-y-2 md:col-span-2 lg:col-span-4">
+      <div className={`col-span-1 flex flex-col gap-y-2 ${IS_GATEWAY ? "md:col-span-1" : "md:col-span-2 lg:col-span-4"}`}>
         <div className="flex items-center justify-between gap-x-2">
           <Input
             isDisabled={isDisabled || typeof startMonthIdx !== "number"}

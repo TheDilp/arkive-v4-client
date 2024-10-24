@@ -5,7 +5,7 @@ import { GatewayConfigOptionType } from "../../../types/EntityTypes/gatewayTypes
 import { getAssetURL } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search, Select } from "../../Form";
-import { TemplateFieldContainer } from ".";
+import { RelationFieldContainer, TemplateFieldContainer } from ".";
 
 type Props = {
   title: string;
@@ -38,8 +38,7 @@ export function TemplateImageField({
   const projectId = project_id || presetOptions?.[0]?.project_id;
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div
-        className={`col-span-1 flex max-h-96 flex-col gap-y-2 overflow-y-auto ${fieldType === "images_multiple" ? "md:col-span-2 lg:col-span-4" : "md:col-span-2"}`}>
+      <RelationFieldContainer isMultiple={fieldType === "images_multiple"}>
         {isDisabled || IS_GATEWAY || (currentValue?.length === 1 && fieldType === "images_single") ? null : (
           <div className="sticky top-0">
             <Search
@@ -259,7 +258,7 @@ export function TemplateImageField({
             })}
           </div>
         ) : null}
-      </div>
+      </RelationFieldContainer>
     </TemplateFieldContainer>
   );
 }

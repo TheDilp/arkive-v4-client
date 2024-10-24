@@ -32,7 +32,7 @@ export function TemplateRandomTableField({
 
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="col-span-1 flex flex-col gap-y-1 md:col-span-2">
+      <div className={`col-span-1 flex flex-col gap-y-1 ${IS_GATEWAY ? "md:col-span-1" : "md:col-span-2"}`}>
         <div className="flex flex-nowrap items-center gap-x-2">
           <Select
             hasSearch

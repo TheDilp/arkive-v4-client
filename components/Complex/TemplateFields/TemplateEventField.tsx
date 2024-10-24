@@ -5,7 +5,7 @@ import { GatewayConfigOptionType } from "../../../types/EntityTypes/gatewayTypes
 import { getEntityLink } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search, Select } from "../../Form";
-import { TemplateFieldContainer } from ".";
+import { RelationFieldContainer, TemplateFieldContainer } from ".";
 
 type Props = {
   title: string;
@@ -39,8 +39,7 @@ export function TemplateEventField({
 
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div
-        className={`relative flex max-h-96 flex-col gap-y-2 overflow-y-auto ${fieldType === "events_multiple" ? "md:col-span-2 lg:col-span-4" : "md:col-span-2"}`}>
+      <RelationFieldContainer isMultiple={fieldType === "events_multiple"}>
         {isDisabled || IS_GATEWAY || (currentValue?.length === 1 && fieldType === "events_single") ? null : (
           <div className="sticky top-0">
             <Search
@@ -243,7 +242,7 @@ export function TemplateEventField({
             })}
           </div>
         ) : null}
-      </div>
+      </RelationFieldContainer>
     </TemplateFieldContainer>
   );
 }

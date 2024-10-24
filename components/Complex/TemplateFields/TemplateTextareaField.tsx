@@ -27,7 +27,8 @@ export function TemplateTextareaField({
 }: Props) {
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="col-span-1 flex max-h-[30rem] min-h-fit flex-col gap-x-2 gap-y-4 md:col-span-2 lg:col-span-4">
+      {/* Textarea should always span all columns */}
+      <div className={"col-span-1 flex max-h-[30rem] min-h-fit flex-col gap-x-2 gap-y-4 md:col-span-2 lg:col-span-4"}>
         <Editor
           initialContent={currentValue as any}
           isDisabled={isDisabled}

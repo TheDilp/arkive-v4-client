@@ -30,7 +30,7 @@ export function TemplateSelectField({
 }: Props) {
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="col-span-1 md:col-span-2">
+      <div className={`col-span-1 ${IS_GATEWAY ? "md:col-span-1" : "md:col-span-2"}`}>
         <Select
           hasSearch
           isClearable

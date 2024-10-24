@@ -27,7 +27,7 @@ export function TemplateInputField({
 }: Props) {
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="col-span-1 md:col-span-1 lg:col-span-2">
+      <div className={`col-span-1 md:col-span-1 ${IS_GATEWAY ? "lg:col-span-1" : "lg:col-span-2"}`}>
         <Input
           isDisabled={isDisabled}
           label={isCollapsible ? "" : title}

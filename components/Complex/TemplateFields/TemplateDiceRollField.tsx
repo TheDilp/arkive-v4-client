@@ -33,7 +33,7 @@ export function TemplateDiceRollField({
   const [isRolling, setIsRolling] = useState(false);
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="col-span-1 flex flex-nowrap items-center gap-x-2 md:col-span-2">
+      <div className={`col-span-1 flex flex-nowrap items-center gap-x-2 ${IS_GATEWAY ? "md:col-span-1" : "md:col-span-2"}`}>
         <Input
           isDisabled={isDisabled}
           label={title}
