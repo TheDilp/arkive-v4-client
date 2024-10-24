@@ -80,7 +80,7 @@ function update({
   );
 }
 
-export function DocumentView({ editable }: { editable: boolean }) {
+export function DocumentView({ editable, data }: { editable: boolean; data?: DocumentType }) {
   const { item_id } = useParams();
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
 
@@ -103,7 +103,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
     },
 
     {
-      enabled: !!editable && !!item_id,
+      enabled: !!editable && !!item_id && !data,
       staleTime: 1000,
       queryKeyConcat: ["content"],
     }
@@ -111,21 +111,23 @@ export function DocumentView({ editable }: { editable: boolean }) {
   useNavbarTitle(`Documents | ${currentDocument?.data?.title}`, !!currentDocument?.data?.title);
   const setEntityUpdatePermission = useSetAtom(hasEntityUpdatePermissionForEntityView);
 
-  const permissions = useHasPermissions(["update_documents"], currentDocument?.data?.owner_id);
-  const can_update = hasActionPermission(
+  const permissions = useHasPermissions(["update_documents"], currentDocument?.data?.owner_id || data?.owner_id);
+  const canUpdate = hasActionPermission(
     isProjectOwner,
-    user?.id === currentDocument?.data?.owner_id,
+    user?.id === currentDocument?.data?.owner_id || user?.id === data?.owner_id,
     permissions,
-    currentDocument?.data?.permissions || [],
+    currentDocument?.data?.permissions || data?.permissions || [],
     "update_documents",
     user?.role?.id
   );
 
   useEffect(() => {
     if (!isFetching) {
-      if (currentDocument?.data) {
+      if (currentDocument?.data || data) {
         setBreadcrumbs({ items: currentDocument?.data?.parents || [], type: "documents" });
-        setEntityUpdatePermission(currentDocument?.data?.permissions?.some((p) => p.code === "update_documents") || false);
+        setEntityUpdatePermission(
+          (currentDocument?.data?.permissions || data?.permissions)?.some((p) => p.code === "update_documents") || false
+        );
         if (currentDocument?.data?.dice_color) {
           Dice.updateConfig({ themeColor: currentDocument?.data?.dice_color });
         } else {
@@ -134,7 +136,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
         }
       }
     }
-  }, [currentDocument]);
+  }, [currentDocument, data]);
 
   if (isFetching)
     return (
@@ -142,30 +144,31 @@ export function DocumentView({ editable }: { editable: boolean }) {
         <Skeleton type="editor" />
       </div>
     );
-  if (!currentDocument && !isFetching) {
+  if (!currentDocument && !data && !isFetching) {
     return <Navigate to="../" />;
   }
-  if (currentDocument?.data?.is_folder) {
+  if (currentDocument?.data?.is_folder || data?.is_folder) {
     return <Navigate to={`../folder/${currentDocument?.data?.id}`} />;
   }
 
-  if (currentDocument?.data)
+  if (currentDocument?.data || data?.content)
     return (
       <DocumentViewEditor
-        can_update={can_update}
-        content={currentDocument.data.content as RemirrorJSON | undefined}
-        icon={currentDocument.data.icon}
-        id={currentDocument.data.id}
-        is_template={currentDocument.data.is_template}
+        canUpdate={canUpdate}
+        content={(currentDocument?.data?.content || data?.content) as RemirrorJSON | undefined}
+        hasNoOutline={!!data}
+        icon={currentDocument?.data.icon || data?.icon}
+        id={(currentDocument?.data.id || data?.id) as string}
+        is_template={!!(currentDocument?.data.is_template || data?.is_template)}
         refetch={refetch}
-        title={currentDocument.data.title}
+        title={(currentDocument?.data.title || data?.title) as string}
       />
     );
 
   return null;
 }
 
-function DocumentContent({ can_update }: { can_update: boolean }) {
+function DocumentContent({ canUpdate }: { canUpdate: boolean }) {
   const createNotification = useNotifications();
 
   const setContextMenu = useSetAtom(contextMenuAtom);
@@ -327,9 +330,9 @@ function DocumentContent({ can_update }: { can_update: boolean }) {
   return (
     <div
       className="relative flex h-full w-full max-w-full flex-col content-start focus-visible:outline-none"
-      onContextMenu={can_update ? (e) => getContextActions(e) : undefined}
+      onContextMenu={canUpdate ? (e) => getContextActions(e) : undefined}
       onDrop={
-        can_update
+        canUpdate
           ? (e) => {
               const stringData = e.dataTransfer.getData("Text");
               if (!stringData) return;
@@ -351,16 +354,18 @@ function DocumentViewEditor({
   id,
   title,
   icon,
-  can_update,
+  canUpdate,
   content,
   is_template,
+  hasNoOutline,
   refetch,
 }: {
   id: string;
   title: string;
   icon: AvailableIcons | undefined | null;
-  can_update: boolean;
+  canUpdate: boolean;
   is_template: boolean | null;
+  hasNoOutline: boolean;
   content: RemirrorJSON | undefined;
   refetch: () => void;
 }) {
@@ -423,7 +428,7 @@ function DocumentViewEditor({
     if (changedData) {
       const timeout = setTimeout(() => {
         if (editorData?.content || editorData === undefined) {
-          update({ item_id: item_id as string, queryClient, resetChanges, updateDocument, editorData });
+          update({ item_id: id, queryClient, resetChanges, updateDocument, editorData });
         }
       }, 800);
 
@@ -435,39 +440,41 @@ function DocumentViewEditor({
   }, [editorData]);
 
   return (
-    <div className="documentView grid h-[calc(100%-4rem)] w-full grid-cols-6 items-start justify-start">
-      <div className={"col-span-1 h-full max-h-full"}>
-        <ul
-          className={`h-full rounded-l p-2 ${uiOptions.outline ? "bg-zinc-900" : "w-[4.5rem] overflow-hidden rounded-r"} documentViewOutline transition-all`}>
-          <li className="relative mb-2 mr-auto flex w-full items-center justify-between">
-            <div className="absolute top-0 w-14">
-              <Button
-                icon={uiOptions.outline ? IconEnum.chevron_left : IconEnum.chevron_right}
-                onClick={() => setUIOptions((prev) => ({ ...prev, outline: !prev.outline }))}
-              />
-            </div>
-            <h2 className={`mx-auto text-lg font-semibold ${uiOptions?.outline ? "" : "hidden"}`}>Outline</h2>
-          </li>
-          {headings.map((h) => (
-            <li
-              key={h.id}
-              className={`cursor-pointer hover:text-blue-400 ${uiOptions.outline ? "" : "hidden"}`}
-              onClick={() => {
-                const el = document.getElementById(h.id);
-                if (el) {
-                  const editor = document.getElementById("editor");
-                  if (editor) editor.scrollTo({ top: el.offsetTop, behavior: "smooth" });
-                }
-              }}
-              style={{
-                paddingLeft: `${0.45 * (h.level - 1)}rem`,
-              }}>
-              {h.title}
+    <div className={`grid ${hasNoOutline ? "h-full" : "h-[calc(100%-4rem)]"} w-full grid-cols-6 items-start justify-start`}>
+      {hasNoOutline ? null : (
+        <div className="col-span-1 h-full max-h-full">
+          <ul
+            className={`h-full rounded-l p-2 ${uiOptions.outline ? "bg-zinc-900" : "w-[4.5rem] overflow-hidden rounded-r"} transition-all`}>
+            <li className="relative mb-2 mr-auto flex w-full items-center justify-between">
+              <div className="absolute top-0 w-14">
+                <Button
+                  icon={uiOptions.outline ? IconEnum.chevron_left : IconEnum.chevron_right}
+                  onClick={() => setUIOptions((prev) => ({ ...prev, outline: !prev.outline }))}
+                />
+              </div>
+              <h2 className={`mx-auto text-lg font-semibold ${uiOptions?.outline ? "" : "hidden"}`}>Outline</h2>
             </li>
-          ))}
-        </ul>
-      </div>
-      <div ref={editorRef} className="col-span-4 h-full max-h-full overflow-hidden">
+            {headings.map((h) => (
+              <li
+                key={h.id}
+                className={`cursor-pointer hover:text-blue-400 ${uiOptions.outline ? "" : "hidden"}`}
+                onClick={() => {
+                  const el = document.getElementById(h.id);
+                  if (el) {
+                    const editor = document.getElementById("editor");
+                    if (editor) editor.scrollTo({ top: el.offsetTop, behavior: "smooth" });
+                  }
+                }}
+                style={{
+                  paddingLeft: `${0.45 * (h.level - 1)}rem`,
+                }}>
+                {h.title}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <div ref={editorRef} className={`${hasNoOutline ? "col-span-6" : "col-span-4"} h-full max-h-full overflow-hidden`}>
         <div className="h-full w-full rounded-t bg-zinc-800">
           {mentionPosition ? (
             <div
@@ -483,7 +490,7 @@ function DocumentViewEditor({
           ) : null}
 
           <Remirror
-            editable={can_update}
+            editable={canUpdate}
             hooks={documentEditorHooks(changedData, resetChanges, refetch)}
             initialContent={state}
             manager={manager}
@@ -499,7 +506,7 @@ function DocumentViewEditor({
             <div
               className="relative flex h-full max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0"
               id="editor">
-              {can_update ? (
+              {canUpdate ? (
                 <Menubar
                   handlePrint={handlePrint}
                   hasChanges={!!changedData}
@@ -511,7 +518,7 @@ function DocumentViewEditor({
                   title={title || ""}
                 />
               ) : null}
-              <DocumentContent can_update={can_update} />
+              <DocumentContent canUpdate={canUpdate} />
             </div>
           </Remirror>
         </div>
