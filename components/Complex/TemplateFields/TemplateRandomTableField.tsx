@@ -1,7 +1,7 @@
 import { BlueprintFieldType, BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
 import { chooseRandomItems, IconEnum } from "../../../utils";
 import { Button, Select } from "../../Form";
-import { TemplateFieldContainer } from ".";
+import { FormFieldContainer, TemplateFieldContainer } from ".";
 
 type Props = {
   title: string;
@@ -10,6 +10,7 @@ type Props = {
   id: string;
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isDrawer?: boolean;
   isOpen?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["random_table"] | null;
   random_table?: BlueprintFieldType["random_table"];
@@ -23,6 +24,7 @@ export function TemplateRandomTableField({
   handleChange,
   random_table,
   isCollapsible,
+  isDrawer,
   isDisabled,
   isOpen,
 }: Props) {
@@ -32,7 +34,7 @@ export function TemplateRandomTableField({
 
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className={`col-span-1 flex flex-col gap-y-1 ${IS_GATEWAY ? "md:col-span-1" : "md:col-span-2"}`}>
+      <FormFieldContainer isDrawer={isDrawer}>
         <div className="flex flex-nowrap items-center gap-x-2">
           <Select
             hasSearch
@@ -57,7 +59,7 @@ export function TemplateRandomTableField({
             }}
             options={(random_table?.random_table_options || []).map((opt) => ({ label: opt.title, value: opt.id }))}
             value={currentValue?.option_id || ""}
-            variant={IS_GATEWAY ? "primary" : "secondary"}
+            variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
           />
           <div className="flex self-end pb-1.5">
             <Button
@@ -105,13 +107,13 @@ export function TemplateRandomTableField({
                 }
                 options={availableSuboptions.map((subopt) => ({ label: subopt.title, value: subopt.id }))}
                 value={currentValue?.suboption_id || ""}
-                variant={IS_GATEWAY ? "primary" : "secondary"}
+                variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
               />
               <div className="flex self-end pb-1.5" />
             </div>
           ) : null}
         </div>
-      </div>
+      </FormFieldContainer>
     </TemplateFieldContainer>
   );
 }

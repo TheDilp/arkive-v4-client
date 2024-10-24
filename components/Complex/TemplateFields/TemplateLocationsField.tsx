@@ -16,6 +16,7 @@ type Props = {
   isCollapsible?: boolean;
   isGlobal?: boolean;
   isDisabled?: boolean;
+  isDrawer?: boolean;
   isOpen?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["map_pins"];
   presetOptions: GatewayConfigOptionType[];
@@ -30,6 +31,7 @@ export function TemplateLocationsField({
   currentValue,
   isCollapsible,
   isDisabled,
+  isDrawer,
   isOpen,
   isGlobal,
   presetOptions = [],
@@ -76,7 +78,7 @@ export function TemplateLocationsField({
               placeholder="Type at least 2 characters"
               searchEntity="map_pins"
               value={fieldType === "locations_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
-              variant={IS_GATEWAY ? "primary" : "secondary"}
+              variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
             />
           </div>
         )}
@@ -210,7 +212,7 @@ export function TemplateLocationsField({
             value={
               fieldType === "locations_multiple" ? (currentValue || []).map((c) => c.related_id) : currentValue?.[0]?.related_id
             }
-            variant={IS_GATEWAY ? "primary" : "secondary"}
+            variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
           />
         ) : null}
 

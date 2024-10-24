@@ -1,6 +1,12 @@
 import { useEffect } from "react";
 
-import { BlueprintFieldType, BlueprintInstanceBlueprintFieldType, EventStateType, HandleChangePropsType } from "../../../types";
+import {
+  BlueprintFieldType,
+  BlueprintInstanceBlueprintFieldType,
+  EventStateType,
+  HandleChangePropsType,
+  Variant,
+} from "../../../types";
 import { checkIfDayCorrect, checkIfMonthCorrect, checkIfYearCorrect } from "../../../utils";
 import { Input, Select } from "../../Form";
 import { TemplateFieldContainer } from ".";
@@ -14,14 +20,22 @@ type Props = {
   calendar?: BlueprintFieldType["calendar"];
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isDrawer?: boolean;
   isOpen?: boolean;
 };
+
+function getVariant(isDrawer: boolean | undefined, isCorrect: boolean): Variant {
+  if (!isCorrect) return "error";
+  if (isDrawer) return "secondary";
+  return "primary";
+}
 
 export function TemplateDateField({
   isOpen,
   title,
   name,
   handleChange,
+  isDrawer,
   id,
   currentValue,
   calendar,
@@ -83,7 +97,7 @@ export function TemplateDateField({
             placeholder={typeof startMonthIdx !== "number" ? "Select a month." : ""}
             type="number"
             value={currentValue?.start_day ?? ""}
-            variant={IS_GATEWAY ? "primary" : "secondary"}
+            variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
           />
           <Select
             isClearable
@@ -99,7 +113,7 @@ export function TemplateDateField({
             }
             options={(calendar?.months || []).map((m) => ({ label: m.title, value: m.id }))}
             value={typeof startMonthIdx === "number" ? calendar?.months?.[startMonthIdx].id : undefined}
-            variant={IS_GATEWAY ? "primary" : "secondary"}
+            variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
           />
           <Input
             isDisabled={isDisabled}
@@ -114,7 +128,7 @@ export function TemplateDateField({
             }
             type="number"
             value={currentValue?.start_year || ""}
-            variant={IS_GATEWAY ? "primary" : "secondary"}
+            variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
           />
         </div>
         <div className="grid grid-cols-3 gap-x-2">
@@ -135,7 +149,7 @@ export function TemplateDateField({
             placeholder={typeof endMonthIdx !== "number" ? "Select a month." : ""}
             type="number"
             value={currentValue?.end_day || ""}
-            variant={isDayCorrect ? "secondary" : "error"}
+            variant={getVariant(isDrawer, isDayCorrect)}
           />
           <Select
             helperText={isMonthCorrect ? "" : "End month must be more or equal to start month if in the same year."}
@@ -152,7 +166,7 @@ export function TemplateDateField({
             }
             options={calendar?.months?.map((month) => ({ label: month.title, value: month.id })) || []}
             value={typeof endMonthIdx === "number" ? calendar?.months?.[endMonthIdx].id : undefined}
-            variant={isMonthCorrect ? "secondary" : "error"}
+            variant={getVariant(isDrawer, isMonthCorrect)}
           />
           <Input
             helperText={isYearCorrect ? "" : "End year must be more or equal to start year."}
@@ -169,7 +183,7 @@ export function TemplateDateField({
             placeholder={typeof endMonthIdx !== "number" ? "Select a month." : ""}
             type="number"
             value={currentValue?.end_year || ""}
-            variant={isYearCorrect ? "secondary" : "error"}
+            variant={getVariant(isDrawer, isYearCorrect)}
           />
         </div>
       </div>

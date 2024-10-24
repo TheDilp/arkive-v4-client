@@ -5,7 +5,7 @@ import { GatewayConfigOptionType } from "../../../types/EntityTypes/gatewayTypes
 import { getAssetURL, getEntityLink } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search, Select } from "../../Form";
-import { TemplateFieldContainer } from ".";
+import { RelationFieldContainer, TemplateFieldContainer } from ".";
 
 type Props = {
   title: string;
@@ -17,6 +17,7 @@ type Props = {
   isOpen?: boolean;
   isDisabled?: boolean;
   isGlobal?: boolean;
+  isDrawer?: boolean;
   presetOptions: GatewayConfigOptionType[];
   currentValue: BlueprintInstanceBlueprintFieldType["characters"];
 };
@@ -30,6 +31,7 @@ export function TemplateCharacterField({
   currentValue,
   isCollapsible,
   isDisabled,
+  isDrawer,
   isGlobal,
   presetOptions = [],
   isOpen,
@@ -38,8 +40,7 @@ export function TemplateCharacterField({
   const projectId = project_id || presetOptions?.[0]?.project_id;
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div
-        className={`col-span-1 ${fieldType === "characters_multiple" ? "md:col-span-2 lg:col-span-4" : "md:col-span-2"} relative flex max-h-96 flex-col gap-y-2 overflow-y-auto`}>
+      <RelationFieldContainer isMultiple={fieldType === "characters_multiple"}>
         {isDisabled || IS_GATEWAY || (currentValue?.length === 1 && fieldType === "characters_single") ? null : (
           <div className="sticky top-0">
             <Search
@@ -94,7 +95,7 @@ export function TemplateCharacterField({
               placeholder="Type at least 2 characters"
               searchEntity="characters"
               value={fieldType === "characters_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
-              variant={IS_GATEWAY ? "primary" : "secondary"}
+              variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
             />
           </div>
         )}
@@ -227,7 +228,7 @@ export function TemplateCharacterField({
             value={
               fieldType === "characters_single" ? currentValue?.[0]?.related_id : (currentValue || []).map((c) => c.related_id)
             }
-            variant={IS_GATEWAY ? "primary" : "secondary"}
+            variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
           />
         ) : null}
         {fieldType === "characters_multiple" ? (
@@ -255,7 +256,7 @@ export function TemplateCharacterField({
             })}
           </div>
         ) : null}
-      </div>
+      </RelationFieldContainer>
     </TemplateFieldContainer>
   );
 }

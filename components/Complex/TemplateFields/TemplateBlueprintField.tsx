@@ -19,6 +19,7 @@ type Props = {
   blueprint_id: string | null | undefined;
   isDisabled?: boolean;
   isOpen?: boolean;
+  isDrawer?: boolean;
   isGlobal?: boolean;
 };
 
@@ -31,6 +32,7 @@ export function TemplateBlueprintField({
   fieldType,
   currentValue,
   isDisabled,
+  isDrawer,
   isGlobal,
   isOpen,
   isCollapsible,
@@ -156,7 +158,7 @@ export function TemplateBlueprintField({
               placeholder="Type at least 2 characters"
               searchEntity="blueprint_instances"
               value={fieldType === "blueprints_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
-              variant={IS_GATEWAY ? "primary" : "secondary"}
+              variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
             />
           </div>
         )}
@@ -265,7 +267,7 @@ export function TemplateBlueprintField({
               image: undefined,
             }))}
             value={(currentValue || []).map((c) => c.related_id)}
-            variant={IS_GATEWAY ? "primary" : "secondary"}
+            variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
           />
         )}
         {fieldType === "blueprints_multiple" ? (

@@ -1,6 +1,6 @@
 import { HandleChangePropsType } from "../../../types";
 import { Input } from "../../Form";
-import { TemplateFieldContainer } from ".";
+import { FormFieldContainer, TemplateFieldContainer } from ".";
 
 type Props = {
   title: string;
@@ -11,6 +11,7 @@ type Props = {
   currentValue: string | number | null;
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isDrawer?: boolean;
   isOpen?: boolean;
 };
 
@@ -23,11 +24,12 @@ export function TemplateInputField({
   currentValue,
   isCollapsible,
   isOpen,
+  isDrawer,
   isDisabled,
 }: Props) {
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className={`col-span-1 md:col-span-1 ${IS_GATEWAY ? "lg:col-span-1" : "lg:col-span-2"}`}>
+      <FormFieldContainer isDrawer={isDrawer}>
         <Input
           isDisabled={isDisabled}
           label={isCollapsible ? "" : title}
@@ -40,9 +42,9 @@ export function TemplateInputField({
           }
           type={fieldType}
           value={currentValue || ""}
-          variant={IS_GATEWAY ? "primary" : "secondary"}
+          variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
         />
-      </div>
+      </FormFieldContainer>
     </TemplateFieldContainer>
   );
 }

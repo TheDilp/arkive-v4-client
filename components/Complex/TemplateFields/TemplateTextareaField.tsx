@@ -12,6 +12,7 @@ type Props = {
   currentValue: RemirrorJSON;
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isDrawer?: boolean;
   isOpen?: boolean;
 };
 
@@ -23,6 +24,7 @@ export function TemplateTextareaField({
   currentValue,
   handleChange,
   id,
+  isDrawer,
   isCollapsible,
 }: Props) {
   return (
@@ -40,7 +42,7 @@ export function TemplateTextareaField({
               { name: `${name}.value`, value },
             ])
           }
-          variant={IS_GATEWAY ? "primary" : "secondary"}
+          variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
         />
       </div>
     </TemplateFieldContainer>

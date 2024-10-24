@@ -9,6 +9,7 @@ type Props = {
   id: string;
   currentValue: boolean | null;
   isCollapsible?: boolean;
+  isDrawer?: boolean;
   isDisabled?: boolean;
   isOpen?: boolean;
 };
@@ -19,13 +20,14 @@ export function TemplateBooleanField({
   title,
   name,
   currentValue,
+  isDrawer,
   handleChange,
   id,
   isCollapsible,
 }: Props) {
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className="col-span-1 md:col-span-1">
+      <div className="col-span-1">
         <Checkbox
           isDisabled={isDisabled}
           label={title}
@@ -37,7 +39,7 @@ export function TemplateBooleanField({
             ])
           }
           value={currentValue as boolean}
-          variant={IS_GATEWAY ? "primary" : "secondary"}
+          variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
         />
       </div>
     </TemplateFieldContainer>

@@ -15,6 +15,7 @@ type Props = {
   fieldType: "events_single" | "events_multiple";
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isDrawer?: boolean;
   isOpen?: boolean;
   isGlobal?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["events"];
@@ -32,6 +33,7 @@ export function TemplateEventField({
   isDisabled,
   isGlobal,
   isOpen,
+  isDrawer,
   presetOptions = [],
 }: Props) {
   const { project_id } = useParams();
@@ -78,7 +80,7 @@ export function TemplateEventField({
               placeholder="Type at least 2 characters"
               searchEntity="events"
               value={fieldType === "events_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
-              variant={IS_GATEWAY ? "primary" : "secondary"}
+              variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
             />
           </div>
         )}
@@ -213,7 +215,7 @@ export function TemplateEventField({
               image: undefined,
             }))}
             value={(currentValue || []).map((c) => c.related_id)}
-            variant={IS_GATEWAY ? "primary" : "secondary"}
+            variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
           />
         )}
         {fieldType === "events_multiple" ? (

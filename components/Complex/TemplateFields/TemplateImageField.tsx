@@ -17,6 +17,7 @@ type Props = {
   isDisabled?: boolean;
   isOpen?: boolean;
   isGlobal?: boolean;
+  isDrawer?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["images"];
   presetOptions: GatewayConfigOptionType[];
 };
@@ -30,6 +31,7 @@ export function TemplateImageField({
   isCollapsible,
   isDisabled,
   isOpen,
+  isDrawer,
   isGlobal,
   currentValue,
   presetOptions = [],
@@ -95,7 +97,7 @@ export function TemplateImageField({
               value={
                 fieldType === "images_multiple" ? (currentValue || [])?.map((t) => t.related_id) : currentValue?.[0]?.related_id
               }
-              variant={IS_GATEWAY ? "primary" : "secondary"}
+              variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
             />
           </div>
         )}
@@ -225,7 +227,7 @@ export function TemplateImageField({
             value={
               fieldType === "images_multiple" ? (currentValue || []).map((c) => c.related_id) : currentValue?.[0]?.related_id
             }
-            variant={IS_GATEWAY ? "primary" : "secondary"}
+            variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
           />
         ) : null}
         {fieldType === "images_multiple" ? (

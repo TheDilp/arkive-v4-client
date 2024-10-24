@@ -1,6 +1,6 @@
 import { HandleChangePropsType } from "../../../types";
 import { Select } from "../../Form";
-import { TemplateFieldContainer } from ".";
+import { FormFieldContainer, TemplateFieldContainer } from ".";
 
 type Props = {
   title: string;
@@ -14,6 +14,7 @@ type Props = {
   isDisabled?: boolean;
   isEditEnabled?: boolean;
   isOpen?: boolean;
+  isDrawer?: boolean;
 };
 
 export function TemplateSelectField({
@@ -26,11 +27,12 @@ export function TemplateSelectField({
   options,
   isCollapsible,
   isDisabled,
+  isDrawer,
   isOpen,
 }: Props) {
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
-      <div className={`col-span-1 ${IS_GATEWAY ? "md:col-span-1" : "md:col-span-2"}`}>
+      <FormFieldContainer isDrawer={isDrawer}>
         <Select
           hasSearch
           isClearable
@@ -46,9 +48,9 @@ export function TemplateSelectField({
           }
           options={options?.map((opt) => ({ label: opt.value, value: opt.id })) || []}
           value={currentValue as string | string[]}
-          variant={IS_GATEWAY ? "primary" : "secondary"}
+          variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
         />
-      </div>
+      </FormFieldContainer>
     </TemplateFieldContainer>
   );
 }
