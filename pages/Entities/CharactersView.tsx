@@ -88,12 +88,13 @@ function Cell({ row, name, update }: { name: keyof CharacterType; row: Row<Chara
 
   if (isEditing)
     return (
-      <div className="[&>div>div]:border-0 [&>div>div]:pl-0">
+      <div className="[&>div>div:has(:focus)]:bg-transparent [&>div>div]:border-0 [&>div>div]:pl-0">
         <Input
           isAutofocused
           name=""
           onBlur={() => {
             if (value !== row.original[name]) updateCharacterValueField({ row, value, name, update, setIsEditing });
+            setIsEditing(false);
           }}
           onChange={({ value: newValue }) => setValue(newValue as string | number)}
           onKeyDown={(e) => {
@@ -113,7 +114,9 @@ function Cell({ row, name, update }: { name: keyof CharacterType; row: Row<Chara
 
   if (!row.original[name])
     return (
-      <div className="flex h-full w-full cursor-text items-center [&>div>div]:pl-0" onClick={() => setIsEditing(true)}>
+      <div
+        className="flex h-full w-full cursor-text items-center [&>div>div:has(:focus)]:bg-transparent [&>div>div]:pl-0"
+        onClick={() => setIsEditing(true)}>
         <Input
           isInline
           name={name}
