@@ -122,7 +122,10 @@ export function AdditionalBlueprintFieldDisplay({
           ? selectMultipleFormatted
           : (blueprint_field_data.value as string)) || ""
       ).toString()}
-      isDisabled={!tooltipFields.includes(blueprint_field.field_type)}
+      isDisabled={
+        !tooltipFields.includes(blueprint_field.field_type) ||
+        ((blueprint_field.field_type === "text" || blueprint_field.field_type === "number") && !value)
+      }
       variant="secondary">
       <div className={fieldClasses}>
         {blueprint_field.field_type === "text" ||
