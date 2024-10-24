@@ -1,3 +1,4 @@
+export * from "./RelationFieldContainer";
 export * from "./TemplateBlueprintField";
 export * from "./TemplateBooleanField";
 export * from "./TemplateCharacterField";
