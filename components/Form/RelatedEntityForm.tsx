@@ -48,6 +48,12 @@ const classes = tv({
     {
       isDrawer: false,
       type: "characters",
+      isGateway: false,
+      class: "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
+    },
+    {
+      isDrawer: false,
+      type: "characters",
       isGateway: true,
       class: "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
     },
@@ -65,7 +71,7 @@ export function RelatedEntityForm({
   fields_data = [],
   handleChange,
   hasCreateOrEdit,
-  isDrawer = true,
+  isDrawer = false,
   options,
   type,
 }: {
@@ -113,6 +119,7 @@ export function RelatedEntityForm({
                 handleChange={handleChange}
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
+                isDrawer={isDrawer}
                 name={baseName}
                 title={template_field.title}
               />
@@ -133,6 +140,7 @@ export function RelatedEntityForm({
                 handleChange={handleChange}
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
+                isDrawer={isDrawer}
                 name={baseName}
                 options={template_field.options || []}
                 title={template_field.title}
@@ -146,6 +154,7 @@ export function RelatedEntityForm({
                 handleChange={handleChange}
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
+                isDrawer={isDrawer}
                 name={baseName}
                 title={template_field.title}
               />
@@ -160,6 +169,7 @@ export function RelatedEntityForm({
                 handleChange={handleChange}
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
+                isDrawer={isDrawer}
                 name={baseName}
                 title={template_field.title}
               />
@@ -175,6 +185,7 @@ export function RelatedEntityForm({
                 handleChange={handleChange}
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
+                isDrawer={isDrawer}
                 name={baseName}
                 title={template_field.title}
               />
@@ -188,6 +199,7 @@ export function RelatedEntityForm({
                 handleChange={handleChange}
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
+                isDrawer={isDrawer}
                 name={baseName}
                 title={template_field.title}
               />
@@ -217,6 +229,7 @@ export function RelatedEntityForm({
                 handleChange={handleChange}
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
+                isDrawer={isDrawer}
                 name={baseName}
                 presetOptions={presetOptions || []}
                 title={template_field.title}
@@ -236,6 +249,7 @@ export function RelatedEntityForm({
                 handleChange={handleChange}
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
+                isDrawer={isDrawer}
                 name={baseName}
                 presetOptions={presetOptions || []}
                 title={template_field.title}
