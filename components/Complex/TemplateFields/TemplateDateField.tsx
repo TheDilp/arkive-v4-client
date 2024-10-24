@@ -83,7 +83,7 @@ export function TemplateDateField({
             placeholder={typeof startMonthIdx !== "number" ? "Select a month." : ""}
             type="number"
             value={currentValue?.start_day ?? ""}
-            variant="secondary"
+            variant={IS_GATEWAY ? "primary" : "secondary"}
           />
           <Select
             isClearable
@@ -99,7 +99,7 @@ export function TemplateDateField({
             }
             options={(calendar?.months || []).map((m) => ({ label: m.title, value: m.id }))}
             value={typeof startMonthIdx === "number" ? calendar?.months?.[startMonthIdx].id : undefined}
-            variant="secondary"
+            variant={IS_GATEWAY ? "primary" : "secondary"}
           />
           <Input
             isDisabled={isDisabled}
@@ -114,7 +114,7 @@ export function TemplateDateField({
             }
             type="number"
             value={currentValue?.start_year || ""}
-            variant="secondary"
+            variant={IS_GATEWAY ? "primary" : "secondary"}
           />
         </div>
         <div className="grid grid-cols-3 gap-x-2">

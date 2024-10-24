@@ -92,7 +92,7 @@ export function TemplateDocumentField({
               placeholder="Type at least 2 documents"
               searchEntity="documents"
               value={fieldType === "documents_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
-              variant="secondary"
+              variant={IS_GATEWAY ? "primary" : "secondary"}
             />
           </div>
         )}
@@ -222,6 +222,7 @@ export function TemplateDocumentField({
                   : undefined,
             }))}
             value={(currentValue || []).map((c) => c.related_id)}
+            variant={IS_GATEWAY ? "primary" : "secondary"}
           />
         )}
         <div className={IS_GATEWAY ? "grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-y-2"}>

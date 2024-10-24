@@ -78,7 +78,7 @@ export function TemplateEventField({
               placeholder="Type at least 2 characters"
               searchEntity="events"
               value={fieldType === "events_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
-              variant="secondary"
+              variant={IS_GATEWAY ? "primary" : "secondary"}
             />
           </div>
         )}
@@ -213,6 +213,7 @@ export function TemplateEventField({
               image: undefined,
             }))}
             value={(currentValue || []).map((c) => c.related_id)}
+            variant={IS_GATEWAY ? "primary" : "secondary"}
           />
         )}
         {fieldType === "events_multiple" ? (

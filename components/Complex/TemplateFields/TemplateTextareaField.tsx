@@ -40,7 +40,7 @@ export function TemplateTextareaField({
               { name: `${name}.value`, value },
             ])
           }
-          variant="secondary"
+          variant={IS_GATEWAY ? "primary" : "secondary"}
         />
       </div>
     </TemplateFieldContainer>

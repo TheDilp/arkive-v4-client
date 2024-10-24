@@ -156,7 +156,7 @@ export function TemplateBlueprintField({
               placeholder="Type at least 2 characters"
               searchEntity="blueprint_instances"
               value={fieldType === "blueprints_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
-              variant="secondary"
+              variant={IS_GATEWAY ? "primary" : "secondary"}
             />
           </div>
         )}
@@ -265,6 +265,7 @@ export function TemplateBlueprintField({
               image: undefined,
             }))}
             value={(currentValue || []).map((c) => c.related_id)}
+            variant={IS_GATEWAY ? "primary" : "secondary"}
           />
         )}
         {fieldType === "blueprints_multiple" ? (

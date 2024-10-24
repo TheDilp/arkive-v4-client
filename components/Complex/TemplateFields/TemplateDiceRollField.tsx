@@ -45,7 +45,7 @@ export function TemplateDiceRollField({
             ])
           }
           value={currentValue || ""}
-          variant="secondary"
+          variant={IS_GATEWAY ? "primary" : "secondary"}
         />
         <div className="flex self-end pb-1.5">
           <Button

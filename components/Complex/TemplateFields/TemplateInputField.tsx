@@ -40,7 +40,7 @@ export function TemplateInputField({
           }
           type={fieldType}
           value={currentValue || ""}
-          variant="secondary"
+          variant={IS_GATEWAY ? "primary" : "secondary"}
         />
       </div>
     </TemplateFieldContainer>

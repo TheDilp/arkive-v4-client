@@ -94,7 +94,7 @@ export function TemplateCharacterField({
               placeholder="Type at least 2 characters"
               searchEntity="characters"
               value={fieldType === "characters_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
-              variant="secondary"
+              variant={IS_GATEWAY ? "primary" : "secondary"}
             />
           </div>
         )}
@@ -227,6 +227,7 @@ export function TemplateCharacterField({
             value={
               fieldType === "characters_single" ? currentValue?.[0]?.related_id : (currentValue || []).map((c) => c.related_id)
             }
+            variant={IS_GATEWAY ? "primary" : "secondary"}
           />
         ) : null}
         {fieldType === "characters_multiple" ? (

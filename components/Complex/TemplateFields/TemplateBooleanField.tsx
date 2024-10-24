@@ -37,7 +37,7 @@ export function TemplateBooleanField({
             ])
           }
           value={currentValue as boolean}
-          variant="secondary"
+          variant={IS_GATEWAY ? "primary" : "secondary"}
         />
       </div>
     </TemplateFieldContainer>

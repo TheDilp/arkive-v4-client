@@ -57,7 +57,7 @@ export function TemplateRandomTableField({
             }}
             options={(random_table?.random_table_options || []).map((opt) => ({ label: opt.title, value: opt.id }))}
             value={currentValue?.option_id || ""}
-            variant="secondary"
+            variant={IS_GATEWAY ? "primary" : "secondary"}
           />
           <div className="flex self-end pb-1.5">
             <Button
@@ -105,7 +105,7 @@ export function TemplateRandomTableField({
                 }
                 options={availableSuboptions.map((subopt) => ({ label: subopt.title, value: subopt.id }))}
                 value={currentValue?.suboption_id || ""}
-                variant="secondary"
+                variant={IS_GATEWAY ? "primary" : "secondary"}
               />
               <div className="flex self-end pb-1.5" />
             </div>

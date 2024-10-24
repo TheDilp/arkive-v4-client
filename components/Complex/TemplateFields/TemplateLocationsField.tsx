@@ -76,7 +76,7 @@ export function TemplateLocationsField({
               placeholder="Type at least 2 characters"
               searchEntity="map_pins"
               value={fieldType === "locations_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
-              variant="secondary"
+              variant={IS_GATEWAY ? "primary" : "secondary"}
             />
           </div>
         )}
@@ -210,6 +210,7 @@ export function TemplateLocationsField({
             value={
               fieldType === "locations_multiple" ? (currentValue || []).map((c) => c.related_id) : currentValue?.[0]?.related_id
             }
+            variant={IS_GATEWAY ? "primary" : "secondary"}
           />
         ) : null}
 

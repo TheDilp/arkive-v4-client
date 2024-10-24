@@ -46,7 +46,7 @@ export function TemplateSelectField({
           }
           options={options?.map((opt) => ({ label: opt.value, value: opt.id })) || []}
           value={currentValue as string | string[]}
-          variant="secondary"
+          variant={IS_GATEWAY ? "primary" : "secondary"}
         />
       </div>
     </TemplateFieldContainer>
