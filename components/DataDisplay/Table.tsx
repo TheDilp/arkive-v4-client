@@ -52,7 +52,7 @@ const TableClasses = tv({
     subheaderRowTitle: "font-medium",
     rowContainer:
       "flex flex-col bg-zinc-950 min-h-[3rem] relative min-w-fit last:border-b last:min-h-[3.05rem] border-zinc-800",
-    row: "flex flex-1 min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato border-t border-r border-zinc-800",
+    row: "flex flex-1 min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato border-t border-r border-zinc-800 cursor-default",
     hasLinkRow: "cursor-pointer",
     hasRowAction: "cursor-pointer",
     contentWrapper: "w-full flex justify-start items-center truncate h-full",
