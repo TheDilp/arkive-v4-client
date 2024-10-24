@@ -239,7 +239,7 @@ export function ArkivedAtColumn(): ColumnDef<any & { deleted_at: string | null }
       const params = getDeletedAtParams(row.original.deleted_at);
       return (
         <Tooltip content={params.tooltip} isDisabled={!params.tooltip}>
-          <div>
+          <div className="w-full">
             <Button
               hasNoBackground
               icon={IconEnum.archive}
