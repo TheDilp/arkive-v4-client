@@ -1079,7 +1079,11 @@ export function CharacterProfileView({
                   ))}
                 </div>
               ) : null}
-              {isEditable ? <TagInput handleChange={handleChange} isAutofocused={false} tags={character?.tags || []} /> : null}
+              {isEditable ? (
+                <div className="w-full">
+                  <TagInput handleChange={handleChange} isAutofocused={false} tags={character?.tags || []} />
+                </div>
+              ) : null}
             </div>
           ) : null}
           <div className="col-span-6 flex h-full flex-1 flex-col overflow-auto lg:col-span-5 lg:py-4">
@@ -1243,14 +1247,14 @@ export function CharacterProfileView({
             ) : null}
             {(isPreview ? tabs[selectedTab].id === "1" : type === "additional fields") &&
             enabledEntities.includes("character_fields_templates") ? (
-              <ul className="animate-in fade-in fill-mode-both flex max-h-[90%] flex-col gap-y-2 overflow-y-auto px-4">
+              <div className="animate-in fade-in fill-mode-both flex max-h-[90%] flex-col gap-y-2 overflow-y-auto px-4">
                 {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
 
                 {isEditable
                   ? (existingTemplates?.data || []).map((t) => {
                       return (
                         <Collapsible key={t.id} label={t.title}>
-                          <div className="pt-2">
+                          <div className="py-2">
                             <RelatedEntityForm
                               fields={t.character_fields}
                               fields_data={character?.character_fields || []}
@@ -1293,7 +1297,7 @@ export function CharacterProfileView({
                 {!isFetchingTemplates && !existingTemplates?.data?.length ? (
                   <Alert label="There are no templates available." variant="info" />
                 ) : null}
-              </ul>
+              </div>
             ) : null}
             {(isPreview ? tabs[selectedTab].id === "2" : type === "relationships") ? (
               <div className="h-full px-4">

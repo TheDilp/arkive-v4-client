@@ -83,7 +83,6 @@ export function FolderDrawer({ data }: Props) {
 
   const resetDrawerAtom = useToggledResetAtom();
   const { changedData, handleChange } = useHandleChange({ data: folder, setData: setFolder });
-
   async function handleSave() {
     if (changedData) {
       if (data?.id) {
@@ -174,4 +173,3 @@ export function FolderDrawer({ data }: Props) {
     </div>
   );
 }
-

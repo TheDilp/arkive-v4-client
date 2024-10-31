@@ -91,18 +91,18 @@ export function EventDrawer({ data, exceptions }: Props) {
     start_month_id: "",
     start_day: data?.day,
     start_year: data?.year,
-    parent_id: exceptions?.globalCreate ? null : (item_id as string),
+    parent_id: null,
   });
 
   const { data: calendar, isFetching: isFetchingMonths } = useGetEntity<CalendarType>(
-    (data?.parent_id as string) || event?.parent_id || (item_id as string),
+    event?.parent_id as string,
     "calendars",
     {
       fields: ["id", "title", "icon", "hours", "minutes"],
       relations: { months: true },
     },
     {
-      enabled: !exceptions?.globalCreate || (exceptions?.globalCreate && !!event?.parent_id),
+      enabled: !!event?.parent_id,
       queryKeyConcat: ["event_drawer"],
     }
   );
@@ -319,7 +319,7 @@ export function EventDrawer({ data, exceptions }: Props) {
               </div>
 
               <Collapsible initialOpen label="Start">
-                <div className="flex flex-col gap-y-2 p-2">
+                <div className="flex flex-col gap-y-2 py-2">
                   <div className="flex items-center justify-between gap-x-2">
                     <Input
                       isReadOnly={data?.isReadOnly}

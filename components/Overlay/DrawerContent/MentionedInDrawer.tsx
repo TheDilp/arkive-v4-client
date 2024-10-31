@@ -46,7 +46,7 @@ export function MentionedInDrawer({ data }: Props) {
     {
       enabled: !data?.isAll,
       staleTime: 5 * 60 * 1000,
-    },
+    }
   );
 
   const { data: allMentionsData } = useQuery<{
@@ -61,7 +61,7 @@ export function MentionedInDrawer({ data }: Props) {
     {
       enabled: !!data?.isAll,
       staleTime: 5 * 60 * 1000,
-    },
+    }
   );
   const nodes: any[] = (mentionsData?.data?.nodes || allMentionsData?.data?.nodes || []).map(docToNode).concat(
     data?.isAll
@@ -81,7 +81,7 @@ export function MentionedInDrawer({ data }: Props) {
             text_v_align: data?.icon ? "top" : "center",
             background_color: data?.icon ? "#27272a" : "#595959",
           },
-        ],
+        ]
   );
   const edges = (mentionsData?.data?.edges || allMentionsData?.data?.edges || []).map((doc) => ({
     id: `${data.id}-${doc.target_id}`,
@@ -102,7 +102,7 @@ export function MentionedInDrawer({ data }: Props) {
             nodes,
             edges,
           }}
-          isViewOnly
+          isReadOnly
           layoutOptions={{
             name: "concentric",
             minNodeSpacing: 150,

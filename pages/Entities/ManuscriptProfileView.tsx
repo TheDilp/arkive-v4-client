@@ -33,7 +33,7 @@ function ManuscriptEntityPreview({ type }: { type: AvailableManuscriptEntityType
     </div>
   ) : (
     <EntityPreviewDrawer
-      data={{ id: subitem_id as string, parent_id: undefined, image_type: "images", entity_type: type, isViewOnly: true }}
+      data={{ id: subitem_id as string, parent_id: undefined, image_type: "images", entity_type: type, isViewOnly: false }}
     />
   );
 }

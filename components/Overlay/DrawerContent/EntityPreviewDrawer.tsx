@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import { useGetEntity, useGetImage } from "../../../hooks";
-import { CalendarView, CharacterProfileView, DictionaryView, MapView } from "../../../pages/Entities";
+import { CalendarView, CharacterProfileView, DictionaryView, DocumentView, MapView } from "../../../pages/Entities";
 import { BlueprintProfileView } from "../../../pages/Entities/BlueprintProfileView";
 import { AssetType, AvailableEntityType, DocumentType, GraphType, MapType } from "../../../types";
 import { drawerAtom, getSingularEntityType, IconEnum, openEntityEditDrawer } from "../../../utils";
@@ -15,7 +15,7 @@ import { Alert, Skeleton } from "../../Misc";
 import { EventDrawer } from "./EventDrawer";
 
 function CharacterPreviewDrawer({ id, isViewOnly }: { id: string; isViewOnly?: boolean }) {
-  return <CharacterProfileView id={id} isPreview isViewOnly={isViewOnly} />;
+  return <CharacterProfileView id={id} isPreview={isViewOnly} isViewOnly={isViewOnly} />;
 }
 function BlueprintPreviewDrawer({ id, parent_id, isViewOnly }: { id: string; parent_id?: string; isViewOnly?: boolean }) {
   return (
@@ -24,13 +24,14 @@ function BlueprintPreviewDrawer({ id, parent_id, isViewOnly }: { id: string; par
     </div>
   );
 }
-function DocumentPreviewDrawer({ id }: { id: string }) {
+function DocumentPreviewDrawer({ id, isReadOnly = true }: { id: string; isReadOnly: boolean }) {
   const { data: existingDocument, isLoading } = useGetEntity<DocumentType>(
     id,
     "documents",
     {
       data: { id },
-      fields: ["title", "content", "project_id", "is_public"],
+      fields: ["id", "title", "content", "project_id", "is_public", "icon", "owner_id"],
+      permissions: true,
     },
     {
       enabled: !!id,
@@ -44,8 +45,12 @@ function DocumentPreviewDrawer({ id }: { id: string }) {
       {existingDocument?.data?.content ? (
         <div className="flex h-full flex-col gap-y-2">
           <Title label={existingDocument?.data?.title} size="xl" />
-          <div className="h-[calc(92%)] max-h-full overflow-auto [&>div]:p-0">
-            <StaticRender content={existingDocument?.data?.content as RemirrorJSON} />
+          <div className={`${isReadOnly ? "h-[calc(92%)]" : "h-full"} max-h-full overflow-auto [&>div]:p-0`}>
+            {isReadOnly ? (
+              <StaticRender content={existingDocument?.data?.content as RemirrorJSON} />
+            ) : (
+              <DocumentView data={existingDocument?.data} editable />
+            )}
           </div>
         </div>
       ) : (
@@ -75,7 +80,7 @@ function MapPreviewDrawer({ id, subitem_id }: { id?: string; subitem_id?: string
     </div>
   );
 }
-function GraphPreviewDrawer({ id }: { id?: string }) {
+function GraphPreviewDrawer({ id, isReadOnly = true }: { id?: string; isReadOnly?: boolean }) {
   const { data: graph, isLoading } = useGetEntity<GraphType>(
     id,
     "graphs",
@@ -93,7 +98,7 @@ function GraphPreviewDrawer({ id }: { id?: string }) {
   if (graph?.data)
     return (
       <div className="h-full w-full overflow-hidden">
-        <Graph data={graph?.data} isReadOnly isViewOnly />
+        <Graph data={graph?.data} isReadOnly={isReadOnly} />
       </div>
     );
   if (!graph?.data) return <Alert label="Could not get graph." variant="error" />;
@@ -150,12 +155,12 @@ export function EntityPreviewDrawer({
         {data.entity_type === "blueprint_instances" && "parent_id" in data ? (
           <BlueprintPreviewDrawer id={data.id} isViewOnly={data?.isViewOnly} parent_id={data.parent_id} />
         ) : null}
-        {data.entity_type === "documents" ? <DocumentPreviewDrawer id={data.id} /> : null}
+        {data.entity_type === "documents" ? <DocumentPreviewDrawer id={data.id} isReadOnly={data.isViewOnly ?? true} /> : null}
         {data.entity_type === "maps" ? <MapPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "map_pins" && "parent_id" in data ? (
           <MapPreviewDrawer id={data.parent_id} subitem_id={data?.id} />
         ) : null}
-        {data.entity_type === "graphs" ? <GraphPreviewDrawer id={data.id} /> : null}
+        {data.entity_type === "graphs" ? <GraphPreviewDrawer id={data.id} isReadOnly={data.isViewOnly ?? true} /> : null}
         {data.entity_type === "dictionaries" ? <DictionaryPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "calendars" ? <CalendarPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "events" && "parent_id" in data ? (

@@ -82,11 +82,11 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
     { staleTime: 3 * 60 * 1000 }
   );
   const { data: blueprint } = useGetEntity<BlueprintType>(
-    isViewOnly ? (existingBlueprintInstance?.data?.parent_id as string) : parent_id || item_id,
+    existingBlueprintInstance?.data?.parent_id as string,
     "blueprints",
     {
       data: {
-        id: isViewOnly ? existingBlueprintInstance?.data?.parent_id : parent_id || item_id,
+        id: existingBlueprintInstance?.data?.parent_id,
       },
       fields: ["id", "title", "title_name", "icon", "owner_id"],
       relations: {
@@ -95,7 +95,7 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
       },
       permissions: true,
     },
-    { enabled: isViewOnly ? !!existingBlueprintInstance?.data?.parent_id : true, staleTime: 3 * 60 * 1000 }
+    { enabled: !!existingBlueprintInstance?.data?.parent_id, staleTime: 3 * 60 * 1000 }
   );
 
   function openEditTagDrawer() {
@@ -278,7 +278,7 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
 
             <Collapsible icon={IconEnum.additional_fields} initialOpen label="Fields">
               {isEditable ? (
-                <div className="p-2">
+                <div className="py-2">
                   <RelatedEntityForm
                     fields={blueprint?.data?.blueprint_fields || []}
                     fields_data={blueprintInstance?.blueprint_fields || []}
