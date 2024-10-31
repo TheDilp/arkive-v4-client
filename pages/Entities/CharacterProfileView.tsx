@@ -6,7 +6,6 @@ import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import {
-  AdditionalFieldDisplay,
   Alert,
   Avatar,
   Badge,
@@ -28,6 +27,7 @@ import {
   Table,
   Tabs,
   TagInput,
+  Title,
 } from "../../components";
 import { Toggle } from "../../components/Form/Toggle";
 import {
@@ -859,7 +859,7 @@ export function CharacterProfileView({
     {
       data: { project_id },
       fields: ["id", "title"],
-      relations: { character_fields: true },
+      relations: { character_fields: true, character_fields_sections: true },
       relationFilters: {
         or: (existingCharacter?.data?.tags || [])?.map((t) => ({
           id: "tags",
@@ -1250,49 +1250,50 @@ export function CharacterProfileView({
               <div className="animate-in fade-in fill-mode-both flex max-h-[90%] flex-col gap-y-2 overflow-y-auto px-4">
                 {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
 
-                {isEditable
-                  ? (existingTemplates?.data || []).map((t) => {
-                      return (
-                        <Collapsible key={t.id} label={t.title}>
-                          <div className="py-2">
-                            <RelatedEntityForm
-                              fields={t.character_fields}
-                              fields_data={character?.character_fields || []}
-                              handleChange={handleChange}
-                              hasCreateOrEdit={canUpdate}
-                              isDrawer={false}
-                              isEditEnabled
-                              type="characters"
-                            />
-                          </div>
-                        </Collapsible>
-                      );
-                    })
-                  : null}
-
-                {isEditable
-                  ? null
-                  : (existingTemplates?.data || []).map((t) => {
-                      return (
-                        <Collapsible key={t.id} label={t.title}>
-                          <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-2 overflow-auto">
-                            {t.character_fields.map((template_field) => {
-                              const characterField = existingCharacter?.data?.character_fields?.find(
-                                (f) => f.id === template_field.id
-                              );
-                              return (
-                                <AdditionalFieldDisplay
-                                  key={template_field.id}
-                                  character_field={template_field}
-                                  character_field_data={characterField ?? null}
-                                  isPreview={!!id}
+                {(existingTemplates?.data || []).map((t) => {
+                  const otherFields = t.character_fields.filter((f) => !f.section_id);
+                  return (
+                    <Collapsible key={t.id} label={t.title}>
+                      <div className="flex flex-col gap-y-1 px-2 pb-2">
+                        {t.character_fields_sections.map((section) => {
+                          return (
+                            <div key={section.id} className="flex flex-col gap-y-2 bg-zinc-950">
+                              <Title isDrawerTitle label={section.title} size="lg" />
+                              <div className="min-h-8">
+                                <RelatedEntityForm
+                                  fields={t.character_fields.filter((f) => f.section_id === section.id)}
+                                  fields_data={character?.character_fields || []}
+                                  handleChange={handleChange}
+                                  hasCreateOrEdit={canUpdate}
+                                  isDrawer={false}
+                                  isEditEnabled={isEditable}
+                                  type="characters"
                                 />
-                              );
-                            })}
+                              </div>
+                            </div>
+                          );
+                        })}
+                        {otherFields.length ? (
+                          <div className="flex flex-col gap-y-2">
+                            <Title isDrawerTitle label="Other" size="lg" />
+
+                            <div className="min-h-8">
+                              <RelatedEntityForm
+                                fields={otherFields}
+                                fields_data={character?.character_fields || []}
+                                handleChange={handleChange}
+                                hasCreateOrEdit={canUpdate}
+                                isDrawer={false}
+                                isEditEnabled={isEditable}
+                                type="characters"
+                              />
+                            </div>
                           </div>
-                        </Collapsible>
-                      );
-                    })}
+                        ) : null}
+                      </div>
+                    </Collapsible>
+                  );
+                })}
 
                 {!isFetchingTemplates && !existingTemplates?.data?.length ? (
                   <Alert label="There are no templates available." variant="info" />
