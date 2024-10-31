@@ -105,7 +105,7 @@ const SelectClasses = tv({
     },
     isDisabled: {
       true: {
-        select: "bg-zinc-700 text-zinc-400 cursor-not-allowed select-none border-zinc-700",
+        select: "bg-zinc-700 text-zinc-400 cursor-not-allowed select-none",
       },
     },
     isOpen: {
