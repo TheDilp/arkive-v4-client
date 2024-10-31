@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { Spinner } from "../../components";
-import { useSignout, useUpdateAuthStatus } from "../../hooks";
+import { useUpdateAuthStatus } from "../../hooks";
 import { IconEnum, loggedInAtom, semverCompare, useNotifications, userStatusAtom } from "../../utils";
 
 export function AuthWrapper() {
@@ -13,7 +13,6 @@ export function AuthWrapper() {
   const navigate = useNavigate();
   const createNotification = useNotifications();
   const { reset, mutate: updateAuthStatus, isLoading: isUpdatingStatus, isIdle } = useUpdateAuthStatus();
-  const { mutate: signOut } = useSignout();
 
   const loggedIn = useAtomValue(loggedInAtom);
   const userStatus = useAtomValue(userStatusAtom);
@@ -39,9 +38,7 @@ export function AuthWrapper() {
 
   useEffect(() => {
     if (!isUpdatingStatus && !isIdle) {
-      if (!loggedIn && !pathname.endsWith("/auth/login")) {
-        document.location = `${import.meta.env.VITE_HOME}/arkive/sign-in`;
-      } else if (loggedIn && (pathname.includes("auth/") || pathname === "/")) {
+      if (loggedIn && (pathname.includes("auth/") || pathname === "/")) {
         navigate("/projects");
       }
     }
@@ -57,10 +54,7 @@ export function AuthWrapper() {
         <Spinner />
       </div>
     );
+
   if (userStatus?.status === "authenticated") return <Outlet />;
-  else {
-    signOut();
-    document.location = import.meta.env.VITE_HOME;
-    return null;
-  }
+  return null;
 }

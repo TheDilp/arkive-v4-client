@@ -867,11 +867,13 @@ export function useUpdateAuthStatus() {
         name: null,
         image_url: null,
       });
-      throw new Error("UNAUTHORIZED");
+      document.location = `${import.meta.env.VITE_HOME}/arkive/sign-in`;
     }
 
     const data = (await res.json()) as UserStatusType;
-    if (data.status !== "authenticated") throw new Error("UNAUTHORIZED");
+    if (data.status !== "authenticated") {
+      document.location = `${import.meta.env.VITE_HOME}/arkive/sign-in`;
+    }
     setLoggedIn(true);
     setUserStatus(data);
     return data;
