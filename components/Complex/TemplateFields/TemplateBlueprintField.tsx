@@ -20,6 +20,7 @@ type Props = {
   isDisabled?: boolean;
   isOpen?: boolean;
   isDrawer?: boolean;
+  isReadOnly?: boolean;
   isGlobal?: boolean;
 };
 
@@ -32,6 +33,7 @@ export function TemplateBlueprintField({
   fieldType,
   currentValue,
   isDisabled,
+  isReadOnly,
   isDrawer,
   isGlobal,
   isOpen,
@@ -49,6 +51,7 @@ export function TemplateBlueprintField({
               isDisabled={isDisabled}
               isGlobal={isGlobal}
               isMultiple={fieldType === "blueprints_multiple"}
+              isReadOnly={isReadOnly}
               label={isCollapsible ? "" : title}
               name={name}
               onBrowserChange={(props) => {

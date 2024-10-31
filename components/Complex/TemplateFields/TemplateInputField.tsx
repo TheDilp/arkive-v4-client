@@ -11,6 +11,8 @@ type Props = {
   currentValue: string | number | null;
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isReadOnly?: boolean;
+
   isDrawer?: boolean;
   isOpen?: boolean;
 };
@@ -26,12 +28,14 @@ export function TemplateInputField({
   isOpen,
   isDrawer,
   isDisabled,
+  isReadOnly,
 }: Props) {
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <FormFieldContainer isDrawer={isDrawer}>
         <Input
           isDisabled={isDisabled}
+          isReadOnly={isReadOnly}
           label={isCollapsible ? "" : title}
           name={name}
           onChange={({ value }) =>

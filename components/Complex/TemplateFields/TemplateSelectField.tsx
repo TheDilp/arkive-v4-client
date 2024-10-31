@@ -12,7 +12,7 @@ type Props = {
   options: { id: string; value: string }[];
   isCollapsible?: boolean;
   isDisabled?: boolean;
-  isEditEnabled?: boolean;
+  isReadOnly?: boolean;
   isOpen?: boolean;
   isDrawer?: boolean;
 };
@@ -28,6 +28,7 @@ export function TemplateSelectField({
   isCollapsible,
   isDisabled,
   isDrawer,
+  isReadOnly,
   isOpen,
 }: Props) {
   return (
@@ -38,6 +39,7 @@ export function TemplateSelectField({
           isClearable
           isDisabled={isDisabled}
           isMultiple={fieldType === "select_multiple"}
+          isReadOnly={isReadOnly}
           label={title}
           name={name}
           onChange={({ value }) =>

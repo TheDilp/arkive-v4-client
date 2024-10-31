@@ -11,6 +11,7 @@ type Props = {
   isCollapsible?: boolean;
   isDisabled?: boolean;
   isDrawer?: boolean;
+  isReadOnly?: boolean;
   isOpen?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["random_table"] | null;
   random_table?: BlueprintFieldType["random_table"];
@@ -25,6 +26,7 @@ export function TemplateRandomTableField({
   random_table,
   isCollapsible,
   isDrawer,
+  isReadOnly,
   isDisabled,
   isOpen,
 }: Props) {
@@ -40,7 +42,7 @@ export function TemplateRandomTableField({
             hasSearch
             isClearable
             isDisabled={isDisabled}
-            isReadOnly
+            isReadOnly={isReadOnly}
             name={`${name}`}
             onChange={({ value }) => {
               handleChange([
@@ -61,34 +63,36 @@ export function TemplateRandomTableField({
             value={currentValue?.option_id || ""}
             variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
           />
-          <div className="flex self-end pb-1.5">
-            <Button
-              hasNoBackground
-              icon={IconEnum.d20}
-              iconSize={24}
-              isDisabled={isDisabled}
-              isIconOnly
-              onClick={() => {
-                const items = chooseRandomItems(random_table?.random_table_options || [], 1);
-                if (items?.[0]) {
-                  const { id: option_id } = items[0];
+          {isDisabled || isReadOnly ? null : (
+            <div className="flex self-end pb-1.5">
+              <Button
+                hasNoBackground
+                icon={IconEnum.d20}
+                iconSize={24}
+                isDisabled={isDisabled}
+                isIconOnly
+                onClick={() => {
+                  const items = chooseRandomItems(random_table?.random_table_options || [], 1);
+                  if (items?.[0]) {
+                    const { id: option_id } = items[0];
 
-                  handleChange([
-                    { name: `${name}.id`, value: id },
-                    {
-                      name: `${name}.random_table.related_id`,
-                      value: random_table?.id,
-                    },
-                    {
-                      name: `${name}.random_table.option_id`,
-                      value: option_id,
-                    },
-                  ]);
-                }
-              }}
-              tooltip={`Roll ${random_table?.title ? `(${random_table?.title})` : ""}`}
-            />
-          </div>
+                    handleChange([
+                      { name: `${name}.id`, value: id },
+                      {
+                        name: `${name}.random_table.related_id`,
+                        value: random_table?.id,
+                      },
+                      {
+                        name: `${name}.random_table.option_id`,
+                        value: option_id,
+                      },
+                    ]);
+                  }
+                }}
+                tooltip={`Roll ${random_table?.title ? `(${random_table?.title})` : ""}`}
+              />
+            </div>
+          )}
         </div>
         <div className="flex flex-col pl-4 pr-[1.55rem]">
           {availableSuboptions?.length ? (
@@ -96,6 +100,7 @@ export function TemplateRandomTableField({
               <Select
                 isClearable
                 isDisabled={isDisabled}
+                isReadOnly={isReadOnly}
                 name={name}
                 onChange={({ value }) =>
                   handleChange([

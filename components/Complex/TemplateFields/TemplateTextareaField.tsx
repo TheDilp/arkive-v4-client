@@ -11,6 +11,7 @@ type Props = {
   id: string;
   currentValue: RemirrorJSON;
   isCollapsible?: boolean;
+  isReadOnly?: boolean;
   isDisabled?: boolean;
   isDrawer?: boolean;
   isOpen?: boolean;
@@ -25,6 +26,7 @@ export function TemplateTextareaField({
   handleChange,
   id,
   isDrawer,
+  isReadOnly,
   isCollapsible,
 }: Props) {
   return (
@@ -35,6 +37,7 @@ export function TemplateTextareaField({
           initialContent={currentValue as any}
           isDisabled={isDisabled}
           isPrintable
+          isReadOnly={isReadOnly}
           name={name}
           onChange={({ value }) =>
             handleChange([

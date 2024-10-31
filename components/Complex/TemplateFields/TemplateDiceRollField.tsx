@@ -15,6 +15,7 @@ type Props = {
   currentValue: string | number | null;
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isReadOnly?: boolean;
   isDrawer?: boolean;
   isOpen?: boolean;
 };
@@ -23,6 +24,7 @@ const defaultDiceColor = ls.get("default_dice_color");
 export function TemplateDiceRollField({
   title,
   isDisabled,
+  isReadOnly,
   name,
   formula,
   handleChange,
@@ -40,6 +42,7 @@ export function TemplateDiceRollField({
         <div className="flex flex-nowrap items-center justify-between">
           <Input
             isDisabled={isDisabled}
+            isReadOnly={isReadOnly}
             label={title}
             name={name}
             onChange={({ value }) =>
@@ -51,56 +54,58 @@ export function TemplateDiceRollField({
             value={currentValue || ""}
             variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
           />
-          <div className="flex self-end pb-1.5">
-            <Button
-              hasNoBackground
-              icon={IconEnum.d20}
-              iconSize={24}
-              isDisabled={isRolling || isDisabled}
-              isLoading={isRolling}
-              onClick={() => {
-                setIsRolling(true);
-                try {
-                  const parsedNotation = DiceRollParser.parseNotation(formula);
-                  Dice.updateConfig({
-                    themeColor: defaultDiceColor || DefaultTagColor,
-                    suspendSimulation: IS_GATEWAY ? false : true,
-                  });
-
-                  Dice.roll(parsedNotation)
-                    .then((r: any) => {
-                      const rollData = DiceRollParser.parseFinalResults(r);
-                      if (rollData?.valid) {
-                        handleChange([
-                          { name: `${name}.id`, value: id },
-                          { name: `${name}.value`, value: rollData.value },
-                        ]);
-                      }
-                    })
-                    .catch(() => {
-                      createNotification({
-                        timer: 2,
-                        title: "The dice roll notation is not valid.",
-                        icon: IconEnum.warning,
-                        variant: "error",
-                        position: "top",
-                      });
+          {isDisabled || isReadOnly ? null : (
+            <div className="flex self-end pb-1.5">
+              <Button
+                hasNoBackground
+                icon={IconEnum.d20}
+                iconSize={24}
+                isDisabled={isRolling || isDisabled}
+                isLoading={isRolling}
+                onClick={() => {
+                  setIsRolling(true);
+                  try {
+                    const parsedNotation = DiceRollParser.parseNotation(formula);
+                    Dice.updateConfig({
+                      themeColor: defaultDiceColor || DefaultTagColor,
+                      suspendSimulation: IS_GATEWAY ? false : true,
                     });
-                  Dice.updateConfig({ themeColor: defaultDiceColor || DefaultTagColor, suspendSimulation: false });
-                } catch (error) {
-                  createNotification({
-                    timer: 2,
-                    title: "The dice roll notation is not valid.",
-                    icon: IconEnum.warning,
-                    variant: "error",
-                    position: "top",
-                  });
-                }
-                setIsRolling(false);
-              }}
-              tooltip={`Roll (${formula})`}
-            />
-          </div>
+
+                    Dice.roll(parsedNotation)
+                      .then((r: any) => {
+                        const rollData = DiceRollParser.parseFinalResults(r);
+                        if (rollData?.valid) {
+                          handleChange([
+                            { name: `${name}.id`, value: id },
+                            { name: `${name}.value`, value: rollData.value },
+                          ]);
+                        }
+                      })
+                      .catch(() => {
+                        createNotification({
+                          timer: 2,
+                          title: "The dice roll notation is not valid.",
+                          icon: IconEnum.warning,
+                          variant: "error",
+                          position: "top",
+                        });
+                      });
+                    Dice.updateConfig({ themeColor: defaultDiceColor || DefaultTagColor, suspendSimulation: false });
+                  } catch (error) {
+                    createNotification({
+                      timer: 2,
+                      title: "The dice roll notation is not valid.",
+                      icon: IconEnum.warning,
+                      variant: "error",
+                      position: "top",
+                    });
+                  }
+                  setIsRolling(false);
+                }}
+                tooltip={`Roll (${formula})`}
+              />
+            </div>
+          )}
         </div>
       </FormFieldContainer>
     </TemplateFieldContainer>

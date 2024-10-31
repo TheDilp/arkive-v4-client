@@ -16,6 +16,7 @@ type Props = {
   isCollapsible?: boolean;
   isGlobal?: boolean;
   isDisabled?: boolean;
+  isReadOnly?: boolean;
   isDrawer?: boolean;
   isOpen?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["map_pins"];
@@ -32,6 +33,7 @@ export function TemplateLocationsField({
   isCollapsible,
   isDisabled,
   isDrawer,
+  isReadOnly,
   isOpen,
   isGlobal,
   presetOptions = [],
@@ -46,6 +48,7 @@ export function TemplateLocationsField({
           <div className="sticky top-0">
             <Search
               isGlobal={isGlobal}
+              isReadOnly={isReadOnly}
               label={isCollapsible ? "" : title}
               name={name}
               onChange={({ value, label, icon, parent_id }) => {
@@ -110,6 +113,7 @@ export function TemplateLocationsField({
           <Select
             isClearable
             isMultiple={fieldType === "locations_multiple"}
+            isReadOnly={isReadOnly}
             label={title}
             name={name}
             onChange={({ value, label, icon }) => {

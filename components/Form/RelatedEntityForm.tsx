@@ -78,6 +78,7 @@ export function RelatedEntityForm({
   handleChange,
   hasCreateOrEdit,
   isDrawer = false,
+  isEditEnabled = false,
   options,
   type,
 }: {
@@ -126,6 +127,7 @@ export function RelatedEntityForm({
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
                 isDrawer={isDrawer}
+                isReadOnly={!isEditEnabled}
                 name={baseName}
                 title={template_field.title}
               />
@@ -147,6 +149,7 @@ export function RelatedEntityForm({
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
                 isDrawer={isDrawer}
+                isReadOnly={!isEditEnabled}
                 name={baseName}
                 options={template_field.options || []}
                 title={template_field.title}
@@ -161,6 +164,7 @@ export function RelatedEntityForm({
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
                 isDrawer={isDrawer}
+                isReadOnly={!isEditEnabled}
                 name={baseName}
                 title={template_field.title}
               />
@@ -176,6 +180,7 @@ export function RelatedEntityForm({
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
                 isDrawer={isDrawer}
+                isReadOnly={!isEditEnabled}
                 name={baseName}
                 title={template_field.title}
               />
@@ -192,6 +197,7 @@ export function RelatedEntityForm({
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
                 isDrawer={isDrawer}
+                isReadOnly={!isEditEnabled}
                 name={baseName}
                 title={template_field.title}
               />
@@ -206,6 +212,7 @@ export function RelatedEntityForm({
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
                 isDrawer={isDrawer}
+                isReadOnly={!isEditEnabled}
                 name={baseName}
                 title={template_field.title}
               />
@@ -219,6 +226,7 @@ export function RelatedEntityForm({
                 handleChange={handleChange}
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
+                isReadOnly={!isEditEnabled}
                 name={baseName}
                 random_table={template_field.random_table}
                 title={template_field.title}
@@ -236,6 +244,7 @@ export function RelatedEntityForm({
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
                 isDrawer={isDrawer}
+                isReadOnly={!isEditEnabled}
                 name={baseName}
                 presetOptions={presetOptions || []}
                 title={template_field.title}
@@ -256,6 +265,7 @@ export function RelatedEntityForm({
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
                 isDrawer={isDrawer}
+                isReadOnly={!isEditEnabled}
                 name={baseName}
                 presetOptions={presetOptions || []}
                 title={template_field.title}
@@ -271,6 +281,7 @@ export function RelatedEntityForm({
                 handleChange={handleChange}
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
+                isReadOnly={!isEditEnabled}
                 name={baseName}
                 presetOptions={presetOptions || []}
                 title={template_field.title}
@@ -286,6 +297,7 @@ export function RelatedEntityForm({
                 handleChange={handleChange}
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
+                isReadOnly={!isEditEnabled}
                 name={baseName}
                 presetOptions={presetOptions || []}
                 title={template_field.title}
@@ -301,6 +313,7 @@ export function RelatedEntityForm({
                 handleChange={handleChange}
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
+                isReadOnly={!isEditEnabled}
                 name={baseName}
                 presetOptions={presetOptions || []}
                 title={template_field.title}
@@ -316,6 +329,7 @@ export function RelatedEntityForm({
                 handleChange={handleChange}
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
+                isReadOnly={!isEditEnabled}
                 name={baseName}
                 presetOptions={presetOptions || []}
                 title={template_field.title}

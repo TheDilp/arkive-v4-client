@@ -17,6 +17,7 @@ type Props = {
   isDisabled?: boolean;
   isDrawer?: boolean;
   isOpen?: boolean;
+  isReadOnly?: boolean;
   isGlobal?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["events"];
   presetOptions: GatewayConfigOptionType[];
@@ -33,6 +34,7 @@ export function TemplateEventField({
   isDisabled,
   isGlobal,
   isOpen,
+  isReadOnly,
   isDrawer,
   presetOptions = [],
 }: Props) {
@@ -47,6 +49,7 @@ export function TemplateEventField({
             <Search
               isDisabled={isDisabled}
               isGlobal={isGlobal}
+              isReadOnly={isReadOnly}
               label={isCollapsible ? "" : title}
               name={name}
               onChange={({ value, label, icon, parent_id, project_id: entity_project_id }) => {
@@ -112,6 +115,7 @@ export function TemplateEventField({
           <Select
             isClearable
             isMultiple={fieldType === "events_multiple"}
+            isReadOnly={isReadOnly}
             label={title}
             name={name}
             onChange={({ value, label, icon, parent_id }) => {

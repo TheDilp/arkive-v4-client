@@ -16,6 +16,7 @@ type Props = {
   isCollapsible?: boolean;
   isDisabled?: boolean;
   isOpen?: boolean;
+  isReadOnly?: boolean;
   isGlobal?: boolean;
   isDrawer?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["images"];
@@ -31,6 +32,7 @@ export function TemplateImageField({
   isCollapsible,
   isDisabled,
   isOpen,
+  isReadOnly,
   isDrawer,
   isGlobal,
   currentValue,
@@ -47,6 +49,7 @@ export function TemplateImageField({
               imageType="images"
               isGlobal={isGlobal}
               isMultiple={fieldType === "images_multiple"}
+              isReadOnly={isReadOnly}
               label={isCollapsible ? "" : title}
               name={name}
               onBrowserChange={(props) => {
@@ -128,6 +131,7 @@ export function TemplateImageField({
           <Select
             isClearable
             isMultiple={fieldType === "images_multiple"}
+            isReadOnly={isReadOnly}
             label={title}
             name={name}
             onChange={({ value, label }) => {

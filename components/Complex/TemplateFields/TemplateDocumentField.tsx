@@ -18,6 +18,7 @@ type Props = {
   isGlobal?: boolean;
   isOpen?: boolean;
   isDrawer?: boolean;
+  isReadOnly?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["documents"];
   presetOptions: GatewayConfigOptionType[];
 };
@@ -34,6 +35,7 @@ export function TemplateDocumentField({
   isOpen,
   isDrawer,
   isGlobal,
+  isReadOnly,
   presetOptions = [],
 }: Props) {
   const { project_id } = useParams();
@@ -46,6 +48,7 @@ export function TemplateDocumentField({
             <Search
               isDisabled={isDisabled}
               isGlobal={isGlobal}
+              isReadOnly={isReadOnly}
               label={isCollapsible ? "" : title}
               name={name}
               onBrowserChange={(props) => {
@@ -124,6 +127,7 @@ export function TemplateDocumentField({
           <Select
             isClearable
             isMultiple={fieldType === "documents_multiple"}
+            isReadOnly={isReadOnly}
             label={title}
             name={name}
             onChange={({ value, label, icon }) => {

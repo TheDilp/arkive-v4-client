@@ -16,6 +16,7 @@ type Props = {
   isCollapsible?: boolean;
   isOpen?: boolean;
   isDisabled?: boolean;
+  isReadOnly?: boolean;
   isGlobal?: boolean;
   isDrawer?: boolean;
   presetOptions: GatewayConfigOptionType[];
@@ -33,6 +34,7 @@ export function TemplateCharacterField({
   isDisabled,
   isDrawer,
   isGlobal,
+  isReadOnly,
   presetOptions = [],
   isOpen,
 }: Props) {
@@ -47,6 +49,7 @@ export function TemplateCharacterField({
               isDisabled={isDisabled}
               isGlobal={isGlobal}
               isMultiple={fieldType === "characters_multiple"}
+              isReadOnly={isReadOnly}
               label={title}
               name={name}
               onBrowserChange={(props) => {
@@ -125,6 +128,7 @@ export function TemplateCharacterField({
           <Select
             isClearable
             isMultiple={fieldType === "characters_multiple"}
+            isReadOnly={isReadOnly}
             label={title}
             name={name}
             onChange={({ value, label, image }) => {
