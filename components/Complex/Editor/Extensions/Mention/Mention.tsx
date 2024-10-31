@@ -126,7 +126,7 @@ function GraphMentionTooltip({ id, title, alter_name, project_id }: Pick<Props, 
   );
   return (
     <MentionTooltipCard title={alter_name || title || ""}>
-      {data?.data ? <Graph data={data?.data} isReadOnly isViewOnly /> : null}
+      {data?.data ? <Graph data={data?.data} isReadOnly /> : null}
     </MentionTooltipCard>
   );
 }

@@ -82,7 +82,6 @@ export function FamilyTreeDialog({ data }: { data: { id: string } }) {
           }}
           highlightNodeIds={[data?.id]}
           isFamilyTreeView
-          isViewOnly
           layoutOptions={{ rankDir: layoutDirection }}
         />
       ) : (

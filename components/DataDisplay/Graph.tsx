@@ -58,22 +58,13 @@ import { Button, Quickbar, Spinner } from "..";
 type Props = {
   data?: Partial<GraphType>;
   isReadOnly?: boolean;
-  isViewOnly?: boolean;
   center_on?: string;
   isFamilyTreeView?: boolean;
   highlightNodeIds?: string[];
   layoutOptions?: Partial<LayoutOptions> & { rankDir?: "LR" | "TB" };
 };
 
-export function Graph({
-  data,
-  isReadOnly,
-  isViewOnly,
-  center_on,
-  isFamilyTreeView,
-  highlightNodeIds = [],
-  layoutOptions,
-}: Props) {
+export function Graph({ data, isReadOnly, center_on, isFamilyTreeView, highlightNodeIds = [], layoutOptions }: Props) {
   const { project_id, item_id, subitem_id } = useParams();
   const [elements, setElements] = useState();
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
@@ -115,7 +106,7 @@ export function Graph({
     user?.role?.id
   );
 
-  useNavbarTitle(`Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly && !!graph);
+  useNavbarTitle(`Graphs | ${graph?.title}`, !isReadOnly && !!graph);
   const { mutate: createNode } = useCreateSubEntity<InsertNodeType>("nodes", project_id);
   const { mutate: createEdges } = useCreateSubEntity<InsertEdgeType>("edges", project_id);
   const { mutateAsync: generateGraph, isLoading: isMutating } = useGenerateGraph<{
@@ -252,7 +243,7 @@ export function Graph({
   }, [item_id]);
   // Board Events
   useEffect(() => {
-    if (cyRef?.current?._cy && !isReadOnly && !isViewOnly) {
+    if (cyRef?.current?._cy && !isReadOnly) {
       cyRef?.current?._cy.removeListener("grabon grab");
       // cyRef?.current?._cy.on("grabon", function (evt: any) {
       //   const selected = cyRef?.current?._cy.elements(":selected");
@@ -1114,7 +1105,6 @@ export function Graph({
           hasPermission={updateGraphActionPermission}
           isFamilyTreeView={isFamilyTreeView}
           isReadOnly={isReadOnly ?? false}
-          isViewOnly={isViewOnly ?? false}
         />
       </div>
     </div>

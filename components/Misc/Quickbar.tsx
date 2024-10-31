@@ -48,14 +48,12 @@ function changeCurveStyle(
 }
 
 export function Quickbar({
-  isViewOnly,
   isReadOnly,
   isFamilyTreeView,
   graphTitle,
   hasPermission,
   cy,
 }: {
-  isViewOnly: boolean;
   isReadOnly: boolean;
   isFamilyTreeView?: boolean;
   graphTitle: string;
@@ -82,7 +80,7 @@ export function Quickbar({
 
   if (isFamilyTreeView) return null;
 
-  if (isReadOnly || isViewOnly || IS_PUBLIC)
+  if (isReadOnly || isReadOnly || IS_PUBLIC)
     return (
       <div
         className={
@@ -106,7 +104,7 @@ export function Quickbar({
         icon={IconEnum.add}
         isDisabled={!hasPermission}
         onClick={() => {
-          if (!isViewOnly && hasPermission)
+          if (!isReadOnly && hasPermission)
             setBoardState({ ...boardState, draw_mode: false, add_nodes: !boardState.add_nodes });
         }}
         tooltip="Create nodes"
@@ -118,7 +116,7 @@ export function Quickbar({
         icon={IconEnum.lock}
         isDisabled={!hasPermission}
         onClick={() => {
-          if (boardRef && !isViewOnly && hasPermission) changeLockState(boardRef, true, updateManyNodes, item_id as string);
+          if (boardRef && !isReadOnly && hasPermission) changeLockState(boardRef, true, updateManyNodes, item_id as string);
         }}
         tooltip="Lock selected"
       />
@@ -127,7 +125,7 @@ export function Quickbar({
         icon={IconEnum.unlock}
         isDisabled={!hasPermission}
         onClick={() => {
-          if (boardRef && !isViewOnly && hasPermission) changeLockState(boardRef, false, updateManyNodes, item_id as string);
+          if (boardRef && !isReadOnly && hasPermission) changeLockState(boardRef, false, updateManyNodes, item_id as string);
         }}
         tooltip="Unlock selected"
       />
@@ -136,7 +134,7 @@ export function Quickbar({
         icon={IconEnum.trash}
         isDisabled={!hasPermission}
         onClick={() => {
-          if (!boardRef || isViewOnly || !hasPermission) return;
+          if (!boardRef || isReadOnly || !hasPermission) return;
           const selected = boardRef.elements(":selected");
           if (selected.length === 0) {
             createNotification({ timer: 3, title: "No elements are selected.", variant: "info", icon: IconEnum.info_circle });
@@ -191,12 +189,12 @@ export function Quickbar({
             ))}
           </div>
         }
-        isDisabled={isViewOnly || !hasPermission}>
+        isDisabled={isReadOnly || !hasPermission}>
         <span className="cursor-pointer">
           <Button
             hasNoBackground
             icon={getCurveStyleIcon(boardState.curve_style)}
-            isDisabled={!hasPermission || isViewOnly}
+            isDisabled={!hasPermission || isReadOnly}
             onClick={() => {
               if (!hasPermission) return;
               if (boardState.draw_mode) changeDrawMode(false, setBoardState);
@@ -237,7 +235,7 @@ export function Quickbar({
       <Button
         hasNoBackground
         icon={IconEnum.character}
-        isDisabled={!hasPermission || isViewOnly}
+        isDisabled={!hasPermission || isReadOnly}
         isIconOnly
         onClick={() => {
           if (hasPermission)
@@ -254,7 +252,7 @@ export function Quickbar({
       <Button
         hasNoBackground
         icon={IconEnum.image}
-        isDisabled={!hasPermission || isViewOnly}
+        isDisabled={!hasPermission || isReadOnly}
         isIconOnly
         onClick={() => {
           if (hasPermission)
@@ -271,7 +269,7 @@ export function Quickbar({
 
       <div className="">
         <ColorPicker
-          isDisabled={!hasPermission || isViewOnly}
+          isDisabled={!hasPermission || isReadOnly}
           name="pickerColor"
           onChange={({ value }) => {
             if (boardRef) {

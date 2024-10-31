@@ -39,7 +39,7 @@ export function PublicGraph() {
   }
   return (
     <PublicEntityLayout title={graph?.data?.title}>
-      <Graph data={graph?.data} isReadOnly isViewOnly />
+      <Graph data={graph?.data} isReadOnly />
     </PublicEntityLayout>
   );
 }
