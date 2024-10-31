@@ -104,10 +104,9 @@ const SelectClasses = tv({
       },
     },
     isDisabled: {
-      true: "",
-    },
-    isReadOnly: {
-      true: "",
+      true: {
+        select: "bg-zinc-700 text-zinc-400 cursor-not-allowed select-none border-zinc-700",
+      },
     },
     isOpen: {
       true: "",
@@ -126,34 +125,14 @@ const SelectClasses = tv({
         optionsContainer: "max-h-[14.5rem]",
       },
     },
+    isReadOnly: {
+      true: {
+        base: "cursor-not-allowed",
+        select: "cursor-not-allowed pointer-events-none bg-zinc-950",
+        optionsContainer: "cursor-not-allowed pointer-events-none",
+      },
+    },
   },
-  compoundSlots: [
-    {
-      slots: ["select"],
-      isDisabled: true,
-      class: "bg-zinc-700 text-zinc-400 cursor-not-allowed select-none border-zinc-700",
-    },
-    {
-      slots: ["select"],
-      isReadOnly: true,
-      class: "cursor-not-allowed select-none border-zinc-700 bg-zinc-900 text-white",
-    },
-    {
-      slots: ["select"],
-      isOpen: true,
-      class: "bg-zinc-700",
-    },
-    {
-      slots: ["helperText"],
-      isDisabled: true,
-      class: "hidden",
-    },
-    {
-      slots: ["helperText"],
-      isReadOnly: true,
-      class: "hidden",
-    },
-  ],
 
   defaultVariants: {
     // size: "md",
