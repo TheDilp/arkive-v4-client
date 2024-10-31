@@ -56,7 +56,7 @@ export function TemplateDiceRollField({
               hasNoBackground
               icon={IconEnum.d20}
               iconSize={24}
-              isDisabled={isRolling}
+              isDisabled={isRolling || isDisabled}
               isLoading={isRolling}
               onClick={() => {
                 setIsRolling(true);
