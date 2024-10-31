@@ -13,7 +13,6 @@ import {
   Icon,
   ImageSelect,
   Input,
-  Select,
   Skeleton,
   Table,
   Tabs,
@@ -39,7 +38,6 @@ import {
   CharacterRelationshipType,
   DialogAtomType,
   DrawerAtomType,
-  GameSystemType,
   MapPinTypesType,
   ProjectType,
   RoleType,
@@ -552,9 +550,9 @@ export function ProjectSettingsView() {
     "gateway_configurations",
     { enabled: !!user?.id && isProjectOwner && finalTabs?.[selectedTab]?.id === "gateway_configuration" }
   );
-  const { data: gameSystems } = useGetEntities<GameSystemType>({ fields: ["id", "title", "code"] }, "game_systems", {
-    enabled: tabs[selectedTab].id === "integrations",
-  });
+  // const { data: gameSystems } = useGetEntities<GameSystemType>({ fields: ["id", "title", "code"] }, "game_systems", {
+  //   enabled: tabs[selectedTab].id === "integrations",
+  // });
   const { mutateAsync: deleteProject } = useDeleteEntity("projects", project?.id || "", false);
 
   useLayoutEffect(() => {
@@ -850,7 +848,7 @@ export function ProjectSettingsView() {
           ) : null}
           {finalTabs?.[selectedTab]?.id === "integrations" && isProjectOwner ? (
             <div className="flex flex-col gap-y-2">
-              <div className="flex flex-nowrap items-center justify-between">
+              {/* <div className="flex flex-nowrap items-center justify-between">
                 <span>Game System:</span>
                 <div className="w-56">
                   <Select
@@ -884,7 +882,7 @@ export function ProjectSettingsView() {
                   />
                 </div>
               </div>
-              <hr className="border-zinc-700" />
+              <hr className="border-zinc-700" /> */}
               <div className="flex flex-nowrap items-center justify-between">
                 <span>API Key:</span>
                 <div className="flex items-center gap-x-2">
