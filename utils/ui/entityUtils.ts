@@ -488,5 +488,11 @@ export function openEntityEditDrawer(
     | "images",
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>
 ) {
-  setDrawer((prev) => ({ ...prev, title: `Edit ${getSingularEntityType(type)}`, data: { id }, type }));
+  setDrawer((prev) => ({
+    ...prev,
+    title: `Edit ${getSingularEntityType(type)}`,
+    data: { id },
+    type,
+    exceptions: { globalCreate: true },
+  }));
 }
