@@ -119,6 +119,12 @@ const SearchClasses = tv({
         input: "bg-transparent border-t-0 border-b-0",
       },
     },
+    isReadOnly: {
+      true: {
+        base: "cursor-not-allowed",
+        input: "cursor-not-allowed pointer-events-none",
+      },
+    },
   },
 });
 
@@ -190,6 +196,7 @@ export function Search({
   imageType,
   isOptionsHidden,
   isMultiple,
+  isReadOnly,
   isGlobal,
   isFolders,
   limit,
@@ -219,6 +226,7 @@ export function Search({
     isDisabled,
     size,
     hasNoBackground,
+    isReadOnly,
   });
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -336,11 +344,12 @@ export function Search({
         {...getReferenceProps({
           ref: refs.setReference,
         })}>
-        {onBrowserChange ? (
+        {onBrowserChange && !isDisabled && !isReadOnly ? (
           <div className="mr-2">
             <Button
               hasNoBackground
               icon={IconEnum.folder}
+              isDisabled={isDisabled || isReadOnly}
               isIconOnly
               onClick={() =>
                 setDialog((prev) => ({
@@ -364,7 +373,7 @@ export function Search({
           autoComplete="off"
           autoFocus={isAutofocused}
           className={input()}
-          disabled={isDisabled}
+          disabled={isDisabled || isReadOnly}
           name="search"
           onBlur={() => {
             if (activeIndex === null) setOpen(false);
