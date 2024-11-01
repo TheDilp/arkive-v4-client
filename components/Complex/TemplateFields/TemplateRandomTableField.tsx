@@ -43,6 +43,7 @@ export function TemplateRandomTableField({
             isClearable
             isDisabled={isDisabled}
             isReadOnly={isReadOnly}
+            label={title}
             name={`${name}`}
             onChange={({ value }) => {
               handleChange([

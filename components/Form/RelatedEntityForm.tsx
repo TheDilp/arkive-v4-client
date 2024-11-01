@@ -20,6 +20,7 @@ import {
   TemplateSelectField,
   TemplateTextareaField,
 } from "../Complex";
+import { Alert } from "../Misc";
 
 const classes = tv({
   base: "select-none",
@@ -122,7 +123,25 @@ export function RelatedEntityForm({
           const templateValueIndex = fields_data.findIndex((f) => f.id === template_field.id);
 
           const baseName = `${type === "characters" ? "character_fields" : "blueprint_fields"}[${templateValueIndex < 0 ? fields_data.length : templateValueIndex}]`;
-
+          if (
+            (fields_data[`${templateValueIndex < 0 ? fields_data.length : templateValueIndex}`]?.value === null ||
+              fields_data[`${templateValueIndex < 0 ? fields_data.length : templateValueIndex}`]?.value === undefined) &&
+            !isEditEnabled &&
+            !IS_PUBLIC
+          )
+            return (
+              <div className="flex flex-col">
+                <span className="block w-full truncate font-lato text-sm font-medium">{template_field.title}</span>
+                <Alert label="There is no content." />
+              </div>
+            );
+          if (
+            (fields_data[`${templateValueIndex < 0 ? fields_data.length : templateValueIndex}`]?.value === null ||
+              fields_data[`${templateValueIndex < 0 ? fields_data.length : templateValueIndex}`]?.value === undefined) &&
+            !isEditEnabled &&
+            IS_PUBLIC
+          )
+            return null;
           if (template_field.field_type === "text" || template_field.field_type === "number") {
             return (
               <TemplateInputField
