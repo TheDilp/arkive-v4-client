@@ -378,10 +378,11 @@ export function TemplateRelatedField({
                       result.source.index,
                       result.destination.index
                     );
+
                     handleChange([
                       {
                         name: `${name}.${entity}`,
-                        value: newData,
+                        value: newData.map((item, idx) => ({ ...item, sort: idx })),
                       },
                     ]);
                   }
