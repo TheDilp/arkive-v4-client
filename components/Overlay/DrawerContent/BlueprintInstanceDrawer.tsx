@@ -255,6 +255,7 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
             handleChange={handleChange}
             hasCreateOrEdit={canCreateOrEdit}
             isDrawer
+            isEditEnabled={canCreateOrEdit}
             type="blueprint_instances"
           />
         </>
