@@ -16,12 +16,12 @@ import {
   useUpdateEntity,
 } from "../../../hooks";
 import {
-  CharacterCharacterFieldType,
   CharacterFieldTemplateType,
   CharacterRelatedType,
   CharacterRelationshipType,
   CharacterType,
   DrawerAtomType,
+  FieldDataType,
   GameSystemType,
   HandleChangePropsType,
   NotificationType,
@@ -106,7 +106,7 @@ function AdditionalFieldsTab({
   hasCreateOrEdit,
 }: {
   templates: CharacterFieldTemplateType[] | undefined;
-  character_fields?: CharacterCharacterFieldType[];
+  character_fields?: FieldDataType[];
   handleChange: (props: HandleChangePropsType) => void;
   isLoading: boolean;
   tags?: Omit<TagType, "owner_id" | "permissions">[];
@@ -382,7 +382,7 @@ export function CharacterDrawer({
   );
 
   const [relationGroupIds, setRelationGroupIds] = useState<string[]>([]);
-  const [groupedFields, setGroupedFields] = useState<Record<string, CharacterCharacterFieldType[]>>({});
+  const [groupedFields, setGroupedFields] = useState<Record<string, FieldDataType[]>>({});
 
   const relationGroups = (relationshipTypes?.data || [])?.filter((rt) => relationGroupIds.includes(rt.id));
 

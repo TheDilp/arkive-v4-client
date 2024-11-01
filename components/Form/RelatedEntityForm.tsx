@@ -1,13 +1,6 @@
 import { tv } from "tailwind-variants";
 
-import {
-  BlueprintFieldType,
-  BlueprintInstanceBlueprintFieldType,
-  CharacterCharacterFieldType,
-  CharacterFieldType,
-  FieldTypes,
-  HandleChangePropsType,
-} from "../../types";
+import { BlueprintFieldType, CharacterFieldType, FieldDataType, FieldTypes, HandleChangePropsType } from "../../types";
 import { GatewayConfigOptionType } from "../../types/EntityTypes/gatewayTypes";
 import { getFieldValueFromType } from "../../utils";
 import {
@@ -23,50 +16,12 @@ import {
 import { Alert } from "../Misc";
 
 const classes = tv({
-  base: "select-none",
+  base: "select-none grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
   variants: {
     isDrawer: {},
     isGateway: {},
     type: {},
   },
-  compoundVariants: [
-    {
-      isDrawer: true,
-      type: "characters",
-      isGateway: false,
-      class: "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
-    },
-    {
-      isDrawer: false,
-      type: "characters",
-      isGateway: false,
-      class: "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
-    },
-    {
-      isDrawer: false,
-      type: "characters",
-      isGateway: true,
-      class: "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
-    },
-    {
-      isDrawer: true,
-      type: "blueprint_instances",
-      isGateway: false,
-      class: "grid grid-cols-1 gap-y-2",
-    },
-    {
-      isDrawer: false,
-      type: "blueprint_instances",
-      isGateway: true,
-      class: "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
-    },
-    {
-      isDrawer: false,
-      type: "blueprint_instances",
-      isGateway: false,
-      class: "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
-    },
-  ],
 });
 
 const relatedEntityTypes: FieldTypes[] = [
@@ -95,7 +50,7 @@ export function RelatedEntityForm({
   type,
 }: {
   fields: CharacterFieldType[] | BlueprintFieldType[] | undefined;
-  fields_data: CharacterCharacterFieldType[] | BlueprintInstanceBlueprintFieldType[];
+  fields_data: FieldDataType[];
   handleChange: (props: HandleChangePropsType) => void;
   hasCreateOrEdit: boolean;
   isDrawer?: boolean;
