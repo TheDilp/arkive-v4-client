@@ -5,22 +5,18 @@ import {
   BlueprintInstanceBlueprintFieldType,
   CharacterCharacterFieldType,
   CharacterFieldType,
+  FieldTypes,
   HandleChangePropsType,
 } from "../../types";
 import { GatewayConfigOptionType } from "../../types/EntityTypes/gatewayTypes";
 import { getFieldValueFromType } from "../../utils";
 import {
-  TemplateBlueprintField,
   TemplateBooleanField,
-  TemplateCharacterField,
   TemplateDateField,
   TemplateDiceRollField,
-  TemplateDocumentField,
-  TemplateEventField,
-  TemplateImageField,
   TemplateInputField,
-  TemplateLocationsField,
   TemplateRandomTableField,
+  TemplateRelatedField,
   TemplateSelectField,
   TemplateTextareaField,
 } from "../Complex";
@@ -71,6 +67,21 @@ const classes = tv({
     },
   ],
 });
+
+const relatedEntityTypes: FieldTypes[] = [
+  "characters_single",
+  "characters_multiple",
+  "blueprints_single",
+  "blueprints_multiple",
+  "documents_single",
+  "documents_multiple",
+  "locations_single",
+  "locations_multiple",
+  "events_single",
+  "events_multiple",
+  "images_single",
+  "images_multiple",
+];
 
 export function RelatedEntityForm({
   fields = [],
@@ -226,6 +237,7 @@ export function RelatedEntityForm({
                 handleChange={handleChange}
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
+                isDrawer={isDrawer}
                 isReadOnly={!isEditEnabled}
                 name={baseName}
                 random_table={template_field.random_table}
@@ -234,9 +246,9 @@ export function RelatedEntityForm({
             );
           }
 
-          if (template_field.field_type === "characters_single" || template_field.field_type === "characters_multiple") {
+          if (relatedEntityTypes.includes(template_field.field_type)) {
             return (
-              <TemplateCharacterField
+              <TemplateRelatedField
                 key={template_field.id}
                 currentValue={fields_data[`${templateValueIndex < 0 ? fields_data.length : templateValueIndex}`]?.characters}
                 fieldType={template_field.field_type}
@@ -244,91 +256,6 @@ export function RelatedEntityForm({
                 id={template_field.id}
                 isDisabled={!hasCreateOrEdit}
                 isDrawer={isDrawer}
-                isReadOnly={!isEditEnabled}
-                name={baseName}
-                presetOptions={presetOptions || []}
-                title={template_field.title}
-              />
-            );
-          }
-
-          if (template_field.field_type === "blueprints_single" || template_field.field_type === "blueprints_multiple") {
-            return (
-              <TemplateBlueprintField
-                key={template_field.id}
-                blueprint_id={template_field.blueprint_id}
-                currentValue={
-                  fields_data[`${templateValueIndex < 0 ? fields_data.length : templateValueIndex}`]?.blueprint_instances
-                }
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                isDrawer={isDrawer}
-                isReadOnly={!isEditEnabled}
-                name={baseName}
-                presetOptions={presetOptions || []}
-                title={template_field.title}
-              />
-            );
-          }
-          if (template_field.field_type === "documents_single" || template_field.field_type === "documents_multiple") {
-            return (
-              <TemplateDocumentField
-                key={template_field.id}
-                currentValue={fields_data[`${templateValueIndex < 0 ? fields_data.length : templateValueIndex}`]?.documents}
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                isReadOnly={!isEditEnabled}
-                name={baseName}
-                presetOptions={presetOptions || []}
-                title={template_field.title}
-              />
-            );
-          }
-          if (template_field.field_type === "locations_single" || template_field.field_type === "locations_multiple") {
-            return (
-              <TemplateLocationsField
-                key={template_field.id}
-                currentValue={fields_data[`${templateValueIndex < 0 ? fields_data.length : templateValueIndex}`]?.map_pins}
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                isReadOnly={!isEditEnabled}
-                name={baseName}
-                presetOptions={presetOptions || []}
-                title={template_field.title}
-              />
-            );
-          }
-          if (template_field.field_type === "images_single" || template_field.field_type === "images_multiple") {
-            return (
-              <TemplateImageField
-                key={template_field.id}
-                currentValue={fields_data[`${templateValueIndex < 0 ? fields_data.length : templateValueIndex}`]?.images}
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                isReadOnly={!isEditEnabled}
-                name={baseName}
-                presetOptions={presetOptions || []}
-                title={template_field.title}
-              />
-            );
-          }
-          if (template_field.field_type === "events_single" || template_field.field_type === "events_multiple") {
-            return (
-              <TemplateEventField
-                key={template_field.id}
-                currentValue={fields_data[`${templateValueIndex < 0 ? fields_data.length : templateValueIndex}`]?.events}
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
                 isReadOnly={!isEditEnabled}
                 name={baseName}
                 presetOptions={presetOptions || []}
