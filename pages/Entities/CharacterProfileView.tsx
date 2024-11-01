@@ -71,7 +71,7 @@ import {
   getCharacterFullName,
   getCharacterProfileTabFromType,
   getDefaultEntityIcon,
-  getDifferenceForCharacterFields,
+  getDifferenceForAdditionalFields,
   getEntityLink,
   getFirstLetters,
   getSentenceCase,
@@ -950,7 +950,10 @@ export function CharacterProfileView({
       permissions: character?.permissions,
       relations: {
         tags: character?.tags?.map((t) => ({ id: t.id })),
-        character_fields: getDifferenceForCharacterFields(existingCharacter?.data || {}, character || {}),
+        character_fields: getDifferenceForAdditionalFields(
+          existingCharacter?.data?.character_fields || [],
+          character?.character_fields || []
+        ),
         is_favorite: character?.is_favorite,
         is_public: character?.is_public,
       },

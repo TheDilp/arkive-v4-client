@@ -29,7 +29,7 @@ import { BlueprintInstanceType, BlueprintType } from "../../types";
 import {
   breadcrumbsAtom,
   drawerAtom,
-  getDifferenceForBlueprintInstance,
+  getDifferenceForAdditionalFields,
   hasActionPermission,
   IconEnum,
   isProjectOwnerAtom,
@@ -132,7 +132,10 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
         },
         relations: {
           tags: blueprintInstance?.tags?.map((t) => ({ id: t.id })),
-          blueprint_fields: getDifferenceForBlueprintInstance(existingBlueprintInstance?.data, blueprintInstance),
+          blueprint_fields: getDifferenceForAdditionalFields(
+            existingBlueprintInstance?.data?.blueprint_fields || [],
+            blueprintInstance?.blueprint_fields || []
+          ),
         },
         permissions: blueprintInstance?.permissions,
       };

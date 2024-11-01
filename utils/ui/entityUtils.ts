@@ -7,11 +7,8 @@ import {
   AvailableEntityType,
   AvailableSubEntityType,
   BaseEntityType,
-  BlueprintInstanceBlueprintFieldType,
-  BlueprintInstanceType,
-  CharacterCharacterFieldType,
-  CharacterType,
   DrawerAtomType,
+  FieldDataType,
   FieldTypes,
   RandomTableOptionType,
   SearchableEntities,
@@ -121,17 +118,17 @@ export function getFieldValueFromType(
   return null;
 }
 
-export function getDifferenceForBlueprintInstance(
-  originalInstance: Omit<BlueprintInstanceType, "deleted_at">,
-  updatedInstance: Omit<BlueprintInstanceType, "deleted_at">
-): BlueprintInstanceBlueprintFieldType[] {
-  const fields = [...updatedInstance.blueprint_fields];
-  const originalFields = originalInstance.blueprint_fields;
+export function getDifferenceForAdditionalFields(
+  originalFields: FieldDataType[],
+  updatedFields: FieldDataType[]
+): FieldDataType[] {
+  const fields = [...updatedFields];
 
   return fields.filter((field) => {
     const idx = originalFields.findIndex((original_field) => original_field.id === field.id);
     if (idx === -1) return true;
     const originalField = originalFields[idx];
+    if (originalField.sort !== field.sort) return true;
     if (typeof originalField.value === "string" || typeof field.value === "string")
       return !isEqual(field.value, originalField.value);
     if (typeof originalField.value === "number" || typeof field.value === "number")
@@ -169,7 +166,9 @@ export function getDifferenceForBlueprintInstance(
       originalField?.characters?.length === field?.characters?.length
     ) {
       return !field.characters.every((char) =>
-        originalField.characters.some((original_char) => original_char?.related_id === char?.related_id)
+        originalField.characters.some(
+          (original_char) => original_char?.related_id === char?.related_id && original_char.sort === char.sort
+        )
       );
     }
     if (
@@ -178,7 +177,9 @@ export function getDifferenceForBlueprintInstance(
       originalField?.blueprint_instances?.length === field.blueprint_instances?.length
     ) {
       return !field?.blueprint_instances?.every((char) =>
-        originalField?.blueprint_instances?.some((original_char) => original_char?.related_id === char?.related_id)
+        originalField?.blueprint_instances?.some(
+          (original_char) => original_char?.related_id === char?.related_id && original_char.sort === char.sort
+        )
       );
     }
     if (
@@ -188,7 +189,7 @@ export function getDifferenceForBlueprintInstance(
     ) {
       return !field.documents.every((char) =>
         originalField.documents.some((original_char) => {
-          return original_char?.related_id === char?.related_id;
+          return original_char?.related_id === char?.related_id && original_char.sort === char.sort;
         })
       );
     }
@@ -198,110 +199,23 @@ export function getDifferenceForBlueprintInstance(
       originalField?.map_pins?.length === field?.map_pins?.length
     ) {
       return !field?.map_pins?.every((char) =>
-        originalField?.map_pins?.some((original_char) => original_char?.related_id === char?.related_id)
+        originalField?.map_pins?.some(
+          (original_char) => original_char?.related_id === char?.related_id && original_char.sort === char.sort
+        )
       );
     }
     if (!!originalField?.events?.length && !!field?.events?.length && originalField?.events?.length === field?.events?.length) {
       return !field?.events?.every((char) =>
-        originalField?.events?.some((original_char) => original_char?.related_id === char?.related_id)
+        originalField?.events?.some(
+          (original_char) => original_char?.related_id === char?.related_id && original_char.sort === char.sort
+        )
       );
     }
     if (!!originalField?.images?.length && !!field?.images?.length && originalField?.images?.length === field?.images?.length) {
       return !field?.images?.every((char) =>
-        originalField?.images?.some((original_char) => original_char?.related_id === char?.related_id)
-      );
-    }
-
-    return false;
-  });
-}
-
-export function getDifferenceForCharacterFields(
-  originalCharacter: Partial<CharacterType>,
-  updatedCharacter: Partial<CharacterType>
-): CharacterCharacterFieldType[] {
-  const fields = [...(updatedCharacter.character_fields || [])];
-  const originalFields = originalCharacter.character_fields || [];
-
-  return fields.filter((field) => {
-    const idx = originalFields.findIndex((original_field) => original_field.id === field.id);
-    if (idx === -1) return true;
-    const originalField = originalFields[idx];
-    if (typeof originalField.value === "string" || typeof field.value === "string")
-      return !isEqual(field.value, originalField.value);
-    if (typeof originalField.value === "number" || typeof field.value === "number")
-      return !isEqual(field.value, originalField.value);
-    if (isRemirrorJSON(originalField.value) || isRemirrorJSON(field.value)) {
-      return !isEqual(field.value, originalField.value);
-    }
-    if (Array.isArray(originalField.value) || Array.isArray(field.value)) {
-      return !isEqual(field.value, originalField.value);
-    }
-    if (originalField?.characters?.length !== field?.characters?.length) return true;
-    if (originalField?.blueprint_instances?.length !== field?.blueprint_instances?.length) return true;
-    if (originalField?.events?.length !== field?.events?.length) return true;
-    if (originalField?.documents?.length !== field?.documents?.length) return true;
-    if (originalField?.map_pins?.length !== field?.map_pins?.length) return true;
-    if (originalField?.images?.length !== field?.images?.length) return true;
-
-    if (originalField?.random_table?.related_id !== field?.random_table?.related_id) return true;
-    if (originalField?.random_table?.option_id !== field?.random_table?.option_id) return true;
-    if (originalField?.random_table?.suboption_id !== field?.random_table?.suboption_id) return true;
-
-    if (originalField?.calendar?.related_id !== field.calendar?.related_id) return true;
-    if (originalField?.calendar?.start_day !== field?.calendar?.start_day) return true;
-    if (originalField?.calendar?.start_month_id !== field?.calendar?.start_month_id) return true;
-    if (originalField?.calendar?.end_day !== field?.calendar?.end_day) return true;
-    if (originalField?.calendar?.end_month_id !== field?.calendar?.end_month_id) return true;
-    if (originalField?.calendar?.end_year !== field?.calendar?.end_year) return true;
-
-    if (
-      !!originalField?.characters?.length &&
-      !!field?.characters?.length &&
-      originalField?.characters?.length === field?.characters?.length
-    ) {
-      return !field.characters.every((char) =>
-        originalField.characters.some((original_char) => original_char?.related_id === char?.related_id)
-      );
-    }
-
-    if (
-      !!originalField?.blueprint_instances?.length &&
-      !!field?.blueprint_instances?.length &&
-      originalField?.blueprint_instances?.length === field.blueprint_instances?.length
-    ) {
-      return !field?.blueprint_instances?.every((char) =>
-        originalField?.blueprint_instances?.some((original_char) => original_char?.related_id === char?.related_id)
-      );
-    }
-    if (
-      !!originalField?.documents?.length &&
-      !!field?.documents?.length &&
-      originalField?.documents?.length === field?.documents?.length
-    ) {
-      return !field.documents.every((char) =>
-        originalField.documents.some((original_char) => {
-          return original_char?.related_id === char?.related_id;
-        })
-      );
-    }
-    if (
-      !!originalField?.map_pins?.length &&
-      !!field?.map_pins?.length &&
-      originalField?.map_pins?.length === field?.map_pins?.length
-    ) {
-      return !field?.map_pins?.every((char) =>
-        originalField?.map_pins?.some((original_char) => original_char?.related_id === char?.related_id)
-      );
-    }
-    if (!!originalField?.images?.length && !!field?.images?.length && originalField?.images?.length === field?.images?.length) {
-      return !field?.images?.every((char) =>
-        originalField?.images?.some((original_char) => original_char?.related_id === char?.related_id)
-      );
-    }
-    if (!!originalField?.events?.length && !!field?.events?.length && originalField?.events?.length === field?.events?.length) {
-      return !field?.events?.every((char) =>
-        originalField?.events?.some((original_char) => original_char?.related_id === char?.related_id)
+        originalField?.images?.some(
+          (original_char) => original_char?.related_id === char?.related_id && original_char.sort === char.sort
+        )
       );
     }
 
@@ -465,7 +379,7 @@ export function buildManuscript(manuscript: ManuscriptType | undefined) {
   return base.flat().sort((a, b) => a.sort - b.sort);
 }
 
-export function checkIfFieldHasValue(field: CharacterCharacterFieldType): boolean {
+export function checkIfFieldHasValue(field: FieldDataType): boolean {
   if (field.value) return true;
   if (
     field.characters.length ||

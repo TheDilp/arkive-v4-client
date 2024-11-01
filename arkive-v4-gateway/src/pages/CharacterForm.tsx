@@ -16,7 +16,7 @@ import { CreateConfigType } from "../../../types/EntityTypes/gatewayTypes";
 import {
   dialogAtom,
   getCharacterFullName,
-  getDifferenceForCharacterFields,
+  getDifferenceForAdditionalFields,
   getSavingIcon,
   getSavingTooltip,
   IconEnum,
@@ -258,9 +258,9 @@ export function CharacterForm() {
                 data: character,
                 permissions: character?.permissions,
                 relations: {
-                  character_fields: getDifferenceForCharacterFields(
-                    existingCharacter?.data,
-                    character || { character_fields: [] }
+                  character_fields: getDifferenceForAdditionalFields(
+                    existingCharacter?.data?.character_fields || [],
+                    character?.character_fields || []
                   ),
                 },
               };

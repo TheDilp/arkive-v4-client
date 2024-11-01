@@ -33,7 +33,7 @@ import {
 import {
   createOrEditPermission,
   gameSystemAtom,
-  getDifferenceForCharacterFields,
+  getDifferenceForAdditionalFields,
   IconEnum,
   useNotifications,
 } from "../../../utils";
@@ -805,7 +805,10 @@ export function CharacterDrawer({
                   permissions: character?.permissions,
                   relations: {
                     tags: character?.tags?.map((t) => ({ id: t.id })),
-                    character_fields: getDifferenceForCharacterFields(existingCharacter?.data, character),
+                    character_fields: getDifferenceForAdditionalFields(
+                      existingCharacter?.data?.character_fields || [],
+                      character?.character_fields || []
+                    ),
                     related_from: character?.related_from?.map(formatRelationship),
                     related_to: character?.related_to?.map(formatRelationship),
                     related_other: character?.related_other?.map(formatRelationship),

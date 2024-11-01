@@ -13,7 +13,7 @@ import {
 } from "../../../hooks";
 import { BlueprintFieldType, BlueprintInstanceType, BlueprintType, HandleChangePropsType } from "../../../types";
 import { CreateConfigType } from "../../../types/EntityTypes/gatewayTypes";
-import { dialogAtom, getDifferenceForCharacterFields, getSavingIcon, getSavingTooltip, IconEnum } from "../../../utils";
+import { dialogAtom, getDifferenceForAdditionalFields, getSavingIcon, getSavingTooltip, IconEnum } from "../../../utils";
 import { InsertBlueprintInstanceSchema, UpdateBlueprintInstanceSchema } from "../../../validation";
 
 const baseCharacterSections = [{ id: "title", title: "Basic info" }];
@@ -184,9 +184,9 @@ export function BlueprintInstanceForm() {
                 data: blueprintInstance,
                 permissions: blueprintInstance?.permissions,
                 relations: {
-                  character_fields: getDifferenceForCharacterFields(
-                    existingBlueprintInstance?.data,
-                    blueprintInstance || { character_fields: [] }
+                  character_fields: getDifferenceForAdditionalFields(
+                    existingBlueprintInstance?.data?.blueprint_fields || [],
+                    blueprintInstance?.blueprint_fields || []
                   ),
                 },
               };

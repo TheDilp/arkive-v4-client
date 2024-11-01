@@ -24,7 +24,7 @@ import {
   checkIfMonthCorrect,
   checkIfYearCorrect,
   createOrEditPermission,
-  getDifferenceForBlueprintInstance,
+  getDifferenceForAdditionalFields,
   IconEnum,
   useNotifications,
 } from "../../../utils";
@@ -303,7 +303,10 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
                   },
                   relations: {
                     tags: instance?.tags?.map((t) => ({ id: t.id })),
-                    blueprint_fields: getDifferenceForBlueprintInstance(existingInstance?.data, instance),
+                    blueprint_fields: getDifferenceForAdditionalFields(
+                      existingInstance?.data?.blueprint_fields || [],
+                      instance?.blueprint_fields || []
+                    ),
                   },
                   permissions: instance?.permissions,
                 };
