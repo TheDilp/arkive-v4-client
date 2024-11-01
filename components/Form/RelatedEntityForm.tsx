@@ -2,7 +2,7 @@ import { tv } from "tailwind-variants";
 
 import { BlueprintFieldType, CharacterFieldType, FieldDataType, FieldTypes, HandleChangePropsType } from "../../types";
 import { GatewayConfigOptionType } from "../../types/EntityTypes/gatewayTypes";
-import { getFieldValueFromType } from "../../utils";
+import { getEntityFromFieldType, getFieldValueFromType } from "../../utils";
 import {
   TemplateBooleanField,
   TemplateDateField,
@@ -16,9 +16,12 @@ import {
 import { Alert } from "../Misc";
 
 const classes = tv({
-  base: "select-none grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
+  base: "select-none",
   variants: {
-    isDrawer: {},
+    isDrawer: {
+      true: "flex flex-col gap-y-2",
+      false: "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-4",
+    },
     isGateway: {},
     type: {},
   },
@@ -221,21 +224,23 @@ export function RelatedEntityForm({
           }
 
           if (relatedEntityTypes.includes(template_field.field_type)) {
-            return (
-              <TemplateRelatedField
-                key={template_field.id}
-                currentValue={fields_data[`${templateValueIndex < 0 ? fields_data.length : templateValueIndex}`]?.characters}
-                fieldType={template_field.field_type}
-                handleChange={handleChange}
-                id={template_field.id}
-                isDisabled={!hasCreateOrEdit}
-                isDrawer={isDrawer}
-                isReadOnly={!isEditEnabled}
-                name={baseName}
-                presetOptions={presetOptions || []}
-                title={template_field.title}
-              />
-            );
+            const entity = getEntityFromFieldType(template_field.field_type);
+            if (entity)
+              return (
+                <TemplateRelatedField
+                  key={template_field.id}
+                  currentValue={fields_data[`${templateValueIndex < 0 ? fields_data.length : templateValueIndex}`]?.[entity]}
+                  fieldType={template_field.field_type}
+                  handleChange={handleChange}
+                  id={template_field.id}
+                  isDisabled={!hasCreateOrEdit}
+                  isDrawer={isDrawer}
+                  isReadOnly={!isEditEnabled}
+                  name={baseName}
+                  presetOptions={presetOptions || []}
+                  title={template_field.title}
+                />
+              );
           }
 
           return null;
