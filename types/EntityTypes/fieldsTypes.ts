@@ -26,6 +26,7 @@ export type FieldTypes =
   | "events_single"
   | "events_multiple";
 
+export type RelatedFieldType = "characters" | "blueprint_instances" | "documents" | "map_pins" | "images" | "events";
 export interface CharacterFieldType {
   id: string;
   sort: number;

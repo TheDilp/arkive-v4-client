@@ -75,6 +75,17 @@ export function getEntityFields(type: AvailableEntityType | AvailableSubEntityTy
   return fields;
 }
 
+export function getEntityFromFieldType(
+  type: FieldTypes
+): "characters" | "blueprint_instances" | "map_pins" | "images" | "events" | null {
+  if (type === "characters_single" || type === "characters_multiple") return "characters";
+  if (type === "blueprints_single" || type === "blueprints_multiple") return "blueprint_instances";
+  if (type === "locations_single" || type === "locations_multiple") return "map_pins";
+  if (type === "events_single" || type === "events_multiple") return "events";
+  if (type === "images_single" || type === "images_multiple") return "images";
+  return null;
+}
+
 export function getBlueprintInstanceColumnWidth(type: FieldTypes): { minSize: number; maxSize?: number } {
   if (type === "text" || type === "date") return { minSize: 15, maxSize: 15 };
   if (type === "images_single" || type === "characters_single" || type === "number" || type === "boolean")

@@ -24,11 +24,11 @@ export interface BlueprintInstanceBlueprintFieldType {
     related_id: string;
   }[];
   documents: {
-    document: Pick<DocumentType, "id" | "title" | "icon" | "project_id">;
+    document: Pick<DocumentType, "id" | "title" | "icon" | "image_id" | "project_id">;
     related_id: string;
   }[];
   map_pins: {
-    map_pin: Pick<MapPinType, "id" | "title" | "icon" | "parent_id"> & { project_id: string };
+    map_pin: Pick<MapPinType, "id" | "title" | "image_id" | "icon" | "parent_id"> & { project_id: string };
     related_id: string;
   }[];
   images: {
