@@ -2,14 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useNavigate, useParams } from "react-router-dom";
 
-import {
-  BlueprintInstanceBlueprintFieldType,
-  MetaType,
-  RequestPaginationType,
-  SetFavoriteType,
-  TableDispatch,
-  TagType,
-} from "../../../types";
+import { FieldDataType, MetaType, RequestPaginationType, SetFavoriteType, TableDispatch, TagType } from "../../../types";
 import {
   drawerAtom,
   FavoritesFilters,
@@ -258,7 +251,7 @@ export function ArkivedAtColumn(): ColumnDef<any & { deleted_at: string | null }
 export function ShowMultipleWithBadge({ titles, isMultiple }: { titles: string[]; isMultiple: boolean }) {
   return (
     <div className="flex max-w-full items-center gap-x-2">
-      <div className="max-w-full truncate">{titles?.[0]}</div>
+      <div className="w-fit max-w-full truncate">{titles?.[0]}</div>
       {titles?.length > 1 && isMultiple ? (
         <Tooltip
           content={titles
@@ -274,16 +267,10 @@ export function ShowMultipleWithBadge({ titles, isMultiple }: { titles: string[]
     </div>
   );
 }
-export function CharacterColumn({
-  characters,
-  isMultiple,
-}: {
-  isMultiple: boolean;
-  characters: BlueprintInstanceBlueprintFieldType["characters"];
-}) {
+export function CharacterColumn({ characters, isMultiple }: { isMultiple: boolean; characters: FieldDataType["characters"] }) {
   return (
-    <div className="flex w-full items-center gap-x-2">
-      <div className="z-0 flex w-full items-center justify-center -space-x-4">
+    <div className="flex w-full items-center justify-center gap-x-2">
+      <div className="z-0 flex w-fit items-center justify-center -space-x-4">
         {characters?.slice(0, isMultiple ? 5 : 1)?.map((char) => {
           return (
             <Avatar
@@ -325,13 +312,7 @@ export function CharacterColumn({
     </div>
   );
 }
-export function LocationColumn({
-  locations,
-  isMultiple,
-}: {
-  isMultiple: boolean;
-  locations: BlueprintInstanceBlueprintFieldType["map_pins"];
-}) {
+export function LocationColumn({ locations, isMultiple }: { isMultiple: boolean; locations: FieldDataType["map_pins"] }) {
   const { project_id } = useParams();
   const navigate = useNavigate();
   const setDrawer = useSetAtom(drawerAtom);
@@ -375,13 +356,7 @@ export function LocationColumn({
     </div>
   );
 }
-export function EventColumn({
-  isMultiple,
-  locations: events,
-}: {
-  isMultiple: boolean;
-  locations: BlueprintInstanceBlueprintFieldType["events"];
-}) {
+export function EventColumn({ isMultiple, locations: events }: { isMultiple: boolean; locations: FieldDataType["events"] }) {
   const { project_id } = useParams();
   const navigate = useNavigate();
   const setDrawer = useSetAtom(drawerAtom);
