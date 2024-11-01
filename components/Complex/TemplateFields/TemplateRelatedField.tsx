@@ -146,7 +146,7 @@ export function TemplateRelatedField({
                           : {
                               id: value,
                               title: label,
-                              image,
+                              image: entity === "images" ? value : image,
                               icon,
                             },
                     },
@@ -183,7 +183,7 @@ export function TemplateRelatedField({
                           : {
                               id: value,
                               title: label,
-                              image,
+                              image: entity === "images" ? value : image,
                               icon,
                             },
                     },
