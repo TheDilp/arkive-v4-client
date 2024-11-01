@@ -23,6 +23,7 @@ type Props = {
   isDrawer?: boolean;
   presetOptions: GatewayConfigOptionType[];
   currentValue: FieldDataType[RelatedFieldType];
+  parent_id?: string | null | undefined;
 };
 type SingleRelatedEntityType = "character" | "blueprint_instance" | "document" | "map_pin" | "image" | "event";
 function getValue(value: Props["currentValue"][number], single_entity: SingleRelatedEntityType) {
@@ -103,6 +104,7 @@ export function TemplateRelatedField({
   isGlobal,
   isReadOnly,
   presetOptions = [],
+  parent_id,
   isOpen,
 }: Props) {
   const { project_id } = useParams();
@@ -190,6 +192,7 @@ export function TemplateRelatedField({
                   },
                 ]);
               }}
+              parent_id={parent_id || undefined}
               placeholder="Type at least 2 characters"
               searchEntity={entity}
               value={isMultiple ? currentValue?.map((c) => c.related_id) : undefined}

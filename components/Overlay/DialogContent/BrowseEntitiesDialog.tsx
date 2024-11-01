@@ -39,8 +39,10 @@ export function BrowseEntitiesDialog({
   const [{ orderBy, pagination, filters }, dispatch] = useTable<{ full_name?: string; title?: string }>({
     orderBy: [getOrderBy(data.type)],
     pagination: { limit: 48 },
+    filters: data.parent_id
+      ? { and: [{ id: "parent_id", value: data.parent_id, field: "parent_id", operator: "eq", header_name: "Parent" }] }
+      : {},
   });
-
   const {
     data: cardData,
     isFetching: isFetchingEntities,
@@ -83,7 +85,6 @@ export function BrowseEntitiesDialog({
       permissions: true,
       fields: ["id", "title", "type"],
       pagination,
-      filters,
       orderBy: [
         {
           field: "title",

@@ -237,6 +237,7 @@ export function RelatedEntityForm({
                   isDrawer={isDrawer}
                   isReadOnly={!isEditEnabled}
                   name={baseName}
+                  parent_id={template_field.blueprint_id || template_field.calendar_id}
                   presetOptions={presetOptions || []}
                   title={template_field.title}
                 />
