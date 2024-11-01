@@ -6,9 +6,9 @@ import { QueryClient, UseMutateFunction, useQueryClient } from "@tanstack/react-
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import { MouseEvent, MutableRefObject, useEffect, useRef, useState } from "react";
-import { Navigate, useBlocker, useParams } from "react-router-dom";
+import { Navigate, useBlocker, useLocation, useParams } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import { RemirrorJSON } from "remirror";
+import { findChildrenByNode, findElementAtPosition, RemirrorJSON } from "remirror";
 
 import { Button, Icon, MentionDropdownComponent, Menubar, Skeleton, SlashMenu } from "../../components";
 import { useGetEntities, useGetEntity, useHandleChange, useHasPermissions, useNavbarTitle, useUpdateEntity } from "../../hooks";
@@ -326,7 +326,31 @@ function DocumentContent({ canUpdate }: { canUpdate: boolean }) {
       ],
     });
   }
+  const location = useLocation();
 
+  useEffect(() => {
+    if (location?.hash?.length) {
+      const headingHashTitle = decodeURIComponent(location.hash.replace("#", ""));
+
+      const headingNodes = findChildrenByNode({
+        node: getContext.getState().doc,
+        type: getContext.getState().schema.nodes.heading,
+      });
+
+      if (headingNodes.length) {
+        for (let index = 0; index < headingNodes.length; index++) {
+          const heading = headingNodes[index];
+          if (!heading.node.textContent.length) return;
+          if (heading.node.textContent.trim().toLowerCase() === headingHashTitle.trim().toLowerCase()) {
+            const domN = findElementAtPosition(heading.pos, getContext.view);
+            if (domN) {
+              domN.scrollIntoView({ behavior: "smooth", block: "center", inline: "end" });
+            }
+          }
+        }
+      }
+    }
+  }, []);
   return (
     <div
       className="relative flex h-full w-full max-w-full flex-col content-start focus-visible:outline-none"
@@ -372,6 +396,7 @@ function DocumentViewEditor({
   const { project_id, item_id } = useParams();
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
+
   const drawer = useAtomValue(drawerAtom);
   const mentionPosition = useAtomValue(mentionPositionAtom);
   const editorRef = useRef() as MutableRefObject<HTMLDivElement>;

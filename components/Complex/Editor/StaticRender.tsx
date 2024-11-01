@@ -1,7 +1,7 @@
 import { Doc, Heading, RemirrorRenderer, TextHandler } from "@remirror/react";
 import { useSetAtom } from "jotai";
-import { ComponentType, ReactElement } from "react";
-import { useParams } from "react-router-dom";
+import { ComponentType, ReactElement, useEffect } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import { useGetImage } from "../../../hooks";
@@ -197,11 +197,26 @@ function markMap(): MarkMap {
 }
 export function StaticRender({ content }: { content: RemirrorJSON | undefined }) {
   const { project_id } = useParams();
+  const location = useLocation();
   const createNotification = useNotifications();
+
+  useEffect(() => {
+    if (location?.hash?.length) {
+      const headingHashTitle = decodeURIComponent(location.hash.replace("#", ""));
+
+      const domEl = document
+        .querySelectorAll("h1, h2, h3, h4, h5, h6")
+        .values()
+        .find((heading) => heading.textContent?.trim()?.toLowerCase() === headingHashTitle.trim().toLowerCase());
+      domEl?.scrollIntoView({ behavior: "smooth", block: "center", inline: "end" });
+    }
+  }, []);
+
   if (!content) return null;
 
   const parsedContent = deleteObjectPropsRecursive(content, ["style", "closed", "resizable", "nested"]);
   if (!parsedContent) return null;
+
   return (
     <div className="staticRendererContainer">
       {/* @ts-ignore */}
