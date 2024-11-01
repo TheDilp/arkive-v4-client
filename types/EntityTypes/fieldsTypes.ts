@@ -1,6 +1,11 @@
 import { EntityPermissionType } from "./baseEntityTypes";
+import { BlueprintInstanceType } from "./blueprintInstanceTypes";
 import { BlueprintType } from "./blueprintTypes";
-import { RandomTableOptionType } from "./randomTableTypes";
+import { EventType } from "./calendarTypes";
+import { DocumentType } from "./documentTypes";
+import { ImageType } from "./imageTypes";
+import { MapPinType } from "./mapTypes";
+import { RandomTableOptionType, RandomTableType } from "./randomTableTypes";
 import { TagType } from "./tagTypes";
 
 export type FieldTypes =
@@ -67,3 +72,61 @@ export type TemplateStateType = Partial<
     character_fields: (Omit<CharacterFieldType, "options"> & { options?: { id: string; value: string }[] })[];
   }
 >;
+
+export type FieldDataType = {
+  id: string;
+  title: string;
+  sort: number;
+  parent_id: string;
+  field_type: FieldTypes;
+
+  characters: {
+    character: { id: string; full_name: string; portrait_id: string; project_id: string };
+    related_id: string;
+    sort: number;
+  }[];
+  blueprint_instances: {
+    blueprint_instance: Pick<BlueprintInstanceType, "id" | "title" | "parent_id"> & { icon: string; project_id: string };
+    related_id: string;
+    sort: number;
+  }[];
+  documents: {
+    document: Pick<DocumentType, "id" | "title" | "icon" | "image_id" | "project_id">;
+    related_id: string;
+    sort: number;
+  }[];
+  map_pins: {
+    map_pin: Pick<MapPinType, "id" | "title" | "image_id" | "icon" | "parent_id"> & { project_id: string };
+    related_id: string;
+    sort: number;
+  }[];
+  images: {
+    image: Pick<ImageType, "id" | "title" | "project_id">;
+    related_id: string;
+    sort: number;
+  }[];
+  events: {
+    event: Pick<EventType, "id" | "title" | "image_id" | "parent_id"> & { project_id: string };
+    related_id: string;
+    sort: number;
+  }[];
+
+  random_table: {
+    option_id?: string;
+    suboption_id?: string;
+    related_id: string;
+  };
+  calendar: {
+    related_id: string;
+
+    start_day?: number;
+    start_year?: number;
+    start_month_id?: string;
+
+    end_day?: number;
+    end_month_id?: string;
+    end_year?: number;
+  };
+  random_table_data: Pick<RandomTableType, "id" | "title">;
+  value: string | number | null | string[] | number[];
+};

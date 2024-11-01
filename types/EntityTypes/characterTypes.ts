@@ -2,16 +2,13 @@ import { RemirrorJSON } from "remirror";
 
 import { RequestFilterType } from "../CRUD";
 import {
-  BlueprintInstanceType,
   CharacterLocationType,
   CharacterRelationshipType,
   DocumentType,
   EntityPermissionType,
   EventType,
-  FieldTypes,
-  MapPinType,
+  FieldDataType,
   MapType,
-  RandomTableType,
   TagType,
 } from ".";
 import { ImageType } from "./imageTypes";
@@ -45,57 +42,6 @@ export type FormattedRelationship = {
   }[];
 };
 
-export interface CharacterCharacterFieldType {
-  id: string;
-  title: string;
-  sort: number;
-  parent_id: string;
-  field_type: FieldTypes;
-
-  characters: {
-    character: { id: string; full_name: string; portrait_id: string; project_id: string };
-    related_id: string;
-  }[];
-  blueprint_instances: {
-    blueprint_instance: Pick<BlueprintInstanceType, "id" | "title" | "parent_id"> & { icon: string; project_id: string };
-    related_id: string;
-  }[];
-  documents: {
-    document: Pick<DocumentType, "id" | "title" | "icon" | "project_id">;
-    related_id: string;
-  }[];
-  map_pins: {
-    map_pin: Pick<MapPinType, "id" | "title" | "icon" | "parent_id"> & { project_id: string };
-    related_id: string;
-  }[];
-  images: {
-    image: Pick<ImageType, "id" | "title" | "project_id">;
-    related_id: string;
-  }[];
-  events: {
-    event: Pick<EventType, "id" | "title" | "parent_id"> & { project_id: string };
-    related_id: string;
-  }[];
-
-  random_table: {
-    option_id?: string;
-    suboption_id?: string;
-    related_id: string;
-  };
-  calendar: {
-    related_id: string;
-
-    start_day?: number;
-    start_year?: number;
-    start_month_id?: string;
-
-    end_day?: number;
-    end_month_id?: string;
-    end_year?: number;
-  };
-  random_table_data: Pick<RandomTableType, "id" | "title">;
-  value: string | number | null | string[] | number[];
-}
 export interface CharacterType {
   id: string;
   deleted_at: string;
@@ -117,7 +63,7 @@ export interface CharacterType {
   monthOfBirth?: number | null;
   yearOfBirth?: number | null;
   maps?: MapType | [];
-  character_fields?: CharacterCharacterFieldType[];
+  character_fields?: FieldDataType[];
   character_relationship_types?: CharacterRelationshipDataType[];
   locations?: CharacterLocationType[];
   documents?: Pick<DocumentType, "id" | "title" | "icon">[];

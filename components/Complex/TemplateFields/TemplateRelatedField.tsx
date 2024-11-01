@@ -1,15 +1,11 @@
+import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useParams } from "react-router-dom";
 
-import {
-  BlueprintInstanceBlueprintFieldType,
-  FieldTypes,
-  GatewayConfigOptionType,
-  HandleChangePropsType,
-  RelatedFieldType,
-} from "../../../types";
-import { getAssetURL, getEntityFromFieldType, getEntityLink, getSingularEntityType } from "../../../utils";
+import { FieldDataType, FieldTypes, GatewayConfigOptionType, HandleChangePropsType, RelatedFieldType } from "../../../types";
+import { getAssetURL, getEntityFromFieldType, getEntityLink, getSingularEntityType, IconEnum, reorder } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search, Select } from "../../Form";
+import { Icon } from "../../Misc";
 import { RelationFieldContainer } from "./RelationFieldContainer";
 import { TemplateFieldContainer } from "./TemplateFieldContainer";
 
@@ -26,7 +22,7 @@ type Props = {
   isGlobal?: boolean;
   isDrawer?: boolean;
   presetOptions: GatewayConfigOptionType[];
-  currentValue: BlueprintInstanceBlueprintFieldType[RelatedFieldType];
+  currentValue: FieldDataType[RelatedFieldType];
 };
 type SingleRelatedEntityType = "character" | "blueprint_instance" | "document" | "map_pin" | "image" | "event";
 function getValue(value: Props["currentValue"][number], single_entity: SingleRelatedEntityType) {
@@ -139,6 +135,7 @@ export function TemplateRelatedField({
                     name: `${name}.${entity}[${isMultiple ? index || 0 : 0}]`,
                     value: {
                       related_id: value,
+                      sort: index,
                       [single_entity]:
                         single_entity === "character"
                           ? {
@@ -159,40 +156,39 @@ export function TemplateRelatedField({
                 handleChange(itemsToChange);
               }}
               onChange={({ value, label, image, icon }) => {
-                if (Array.isArray(currentValue)) {
-                  if ((currentValue || [])?.some((entity) => entity.related_id === value)) {
-                    handleChange([
-                      { name: `${name}.id`, value: id },
-                      {
-                        name: `${name}.${entity}`,
-                        value: (currentValue || []).filter((t) => t.related_id !== value),
-                      },
-                    ]);
-                    return;
-                  }
+                if ((currentValue || [])?.some((entity) => entity.related_id === value)) {
                   handleChange([
                     { name: `${name}.id`, value: id },
                     {
-                      name: `${name}.${entity}[${isMultiple ? currentValue?.length || 0 : 0}]`,
-                      value: {
-                        related_id: value,
-                        [single_entity]:
-                          single_entity === "character"
-                            ? {
-                                id: value,
-                                full_name: label,
-                                portrait_id: image,
-                              }
-                            : {
-                                id: value,
-                                title: label,
-                                image,
-                                icon,
-                              },
-                      },
+                      name: `${name}.${entity}`,
+                      value: (currentValue || []).filter((t) => t.related_id !== value),
                     },
                   ]);
+                  return;
                 }
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.${entity}[${isMultiple ? currentValue?.length || 0 : 0}]`,
+                    value: {
+                      related_id: value,
+                      sort: currentValue.length,
+                      [single_entity]:
+                        single_entity === "character"
+                          ? {
+                              id: value,
+                              full_name: label,
+                              portrait_id: image,
+                            }
+                          : {
+                              id: value,
+                              title: label,
+                              image,
+                              icon,
+                            },
+                    },
+                  },
+                ]);
               }}
               placeholder="Type at least 2 characters"
               searchEntity={entity}
@@ -257,8 +253,9 @@ export function TemplateRelatedField({
                     { name: `${name}.id`, value: id },
                     {
                       name: `${name}.${entity}`,
-                      value: selectedValues.map((opt) => ({
+                      value: selectedValues.map((opt, index) => ({
                         related_id: opt.value,
+                        sort: index,
                         [single_entity]:
                           entity === "characters"
                             ? {
@@ -283,6 +280,7 @@ export function TemplateRelatedField({
                       name: `${name}.${entity}[0]`,
                       value: {
                         related_id: value,
+                        sort: 0,
                         [single_entity]:
                           entity === "characters"
                             ? {
@@ -308,8 +306,9 @@ export function TemplateRelatedField({
                   { name: `${name}.id`, value: id },
                   {
                     name: `${name}.${entity}`,
-                    value: selectedValues.map((opt) => ({
+                    value: selectedValues.map((opt, index) => ({
                       related_id: opt.value,
+                      sort: index,
                       [single_entity]:
                         entity === "characters"
                           ? {
@@ -334,6 +333,7 @@ export function TemplateRelatedField({
                     value: [
                       {
                         related_id: value,
+                        sort: 0,
                         [single_entity]:
                           entity === "characters"
                             ? {
@@ -365,34 +365,82 @@ export function TemplateRelatedField({
           />
         ) : null}
         {isMultiple ? (
-          <div className={IS_GATEWAY ? "grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-y-2"}>
-            {(currentValue || [])?.map((val) => {
-              const entity_value = getValue(val, single_entity);
-              return (
-                <EntityPreview
-                  key={entity_value?.id}
-                  clearAction={
-                    isDisabled || isReadOnly
-                      ? undefined
-                      : (char_id) => {
-                          handleChange([
-                            {
-                              name: `${name}.${entity}`,
-                              value: currentValue.filter((c) => c.related_id !== char_id),
-                            },
-                          ]);
-                        }
+          <DragDropContext
+            onDragEnd={
+              isDisabled || isReadOnly
+                ? () => {}
+                : (result) => {
+                    if (!result.destination) {
+                      return;
+                    }
+                    const newData = reorder<{ sort: number }>(
+                      currentValue || [],
+                      result.source.index,
+                      result.destination.index
+                    );
+                    handleChange([
+                      {
+                        name: `${name}.${entity}`,
+                        value: newData,
+                      },
+                    ]);
                   }
-                  id={entity_value?.id || ""}
-                  image_id={entity_value?.image_id}
-                  link={IS_GATEWAY ? undefined : getEntityLink(projectId || "", entity, id, undefined)}
-                  manual_project_id={projectId}
-                  title={entity_value?.title || ""}
-                  type={entity}
-                />
-              );
-            })}
-          </div>
+            }>
+            <Droppable droppableId={id}>
+              {(providedDroppable) => (
+                <div
+                  className={IS_GATEWAY ? "grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4" : "flex flex-col"}
+                  {...providedDroppable.droppableProps}
+                  ref={providedDroppable.innerRef}>
+                  {(currentValue || [])?.map((val, index) => {
+                    const entity_value = getValue(val, single_entity);
+                    return (
+                      <Draggable
+                        key={val.related_id}
+                        draggableId={val.related_id}
+                        index={index}
+                        isDragDisabled={isDisabled || isReadOnly}>
+                        {(provided) => (
+                          <div
+                            className="my-1 flex w-full flex-1 items-center gap-x-0.5"
+                            {...provided.draggableProps}
+                            ref={provided.innerRef}>
+                            <span {...provided.dragHandleProps}>
+                              <Icon fontSize={20} icon={IconEnum.drag} />
+                            </span>
+                            <div className="w-full">
+                              <EntityPreview
+                                key={entity_value?.id}
+                                clearAction={
+                                  isDisabled || isReadOnly
+                                    ? undefined
+                                    : (char_id) => {
+                                        handleChange([
+                                          {
+                                            name: `${name}.${entity}`,
+                                            value: currentValue.filter((c) => c.related_id !== char_id),
+                                          },
+                                        ]);
+                                      }
+                                }
+                                id={entity_value?.id || ""}
+                                image_id={entity_value?.image_id}
+                                link={IS_GATEWAY ? undefined : getEntityLink(projectId || "", entity, id, undefined)}
+                                manual_project_id={projectId}
+                                title={entity_value?.title || ""}
+                                type={entity}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    );
+                  })}
+                  {providedDroppable.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         ) : null}
       </RelationFieldContainer>
     </TemplateFieldContainer>
