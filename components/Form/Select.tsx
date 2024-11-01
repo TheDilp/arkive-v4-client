@@ -128,7 +128,7 @@ const SelectClasses = tv({
     isReadOnly: {
       true: {
         base: "cursor-not-allowed",
-        select: "cursor-not-allowed pointer-events-none bg-zinc-950",
+        select: "cursor-not-allowed pointer-events-none bg-zinc-950 text-white",
         optionsContainer: "cursor-not-allowed pointer-events-none",
       },
     },
