@@ -204,10 +204,9 @@ export function StaticRender({ content }: { content: RemirrorJSON | undefined })
     if (location?.hash?.length) {
       const headingHashTitle = decodeURIComponent(location.hash.replace("#", ""));
 
-      const domEl = document
-        .querySelectorAll("h1, h2, h3, h4, h5, h6")
-        .values()
-        .find((heading) => heading.textContent?.trim()?.toLowerCase() === headingHashTitle.trim().toLowerCase());
+      const domEl = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6")).find(
+        (heading: Element) => heading.textContent?.trim()?.toLowerCase() === headingHashTitle.trim().toLowerCase()
+      );
       domEl?.scrollIntoView({ behavior: "smooth", block: "center", inline: "end" });
     }
   }, []);
