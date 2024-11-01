@@ -1,4 +1,4 @@
-import { BlueprintFieldType, BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
+import { BlueprintFieldType, FieldDataType, HandleChangePropsType } from "../../../types";
 import { chooseRandomItems, IconEnum } from "../../../utils";
 import { Button, Select } from "../../Form";
 import { FormFieldContainer, TemplateFieldContainer } from ".";
@@ -13,7 +13,7 @@ type Props = {
   isDrawer?: boolean;
   isReadOnly?: boolean;
   isOpen?: boolean;
-  currentValue: BlueprintInstanceBlueprintFieldType["random_table"] | null;
+  currentValue: FieldDataType["random_table"] | null;
   random_table?: BlueprintFieldType["random_table"];
 };
 

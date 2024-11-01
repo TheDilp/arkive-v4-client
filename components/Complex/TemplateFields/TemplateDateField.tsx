@@ -1,12 +1,6 @@
 import { useEffect } from "react";
 
-import {
-  BlueprintFieldType,
-  BlueprintInstanceBlueprintFieldType,
-  EventStateType,
-  HandleChangePropsType,
-  Variant,
-} from "../../../types";
+import { BlueprintFieldType, EventStateType, FieldDataType, HandleChangePropsType, Variant } from "../../../types";
 import { checkIfDayCorrect, checkIfMonthCorrect, checkIfYearCorrect } from "../../../utils";
 import { Input, Select } from "../../Form";
 import { TemplateFieldContainer } from ".";
@@ -16,7 +10,7 @@ type Props = {
   name: string;
   handleChange: (params: HandleChangePropsType) => void;
   id: string;
-  currentValue: BlueprintInstanceBlueprintFieldType["calendar"] | null;
+  currentValue: FieldDataType["calendar"] | null;
   calendar?: BlueprintFieldType["calendar"];
   isCollapsible?: boolean;
   isDisabled?: boolean;
