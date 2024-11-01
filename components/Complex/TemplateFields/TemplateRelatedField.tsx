@@ -110,7 +110,7 @@ export function TemplateRelatedField({
   const entity = getEntityFromFieldType(fieldType);
   const isMultiple = fieldType.includes("_multiple");
   if (!entity) return null;
-  const single_entity = getSingularEntityType(entity).toLowerCase() as
+  const single_entity = getSingularEntityType(entity).toLowerCase().replace(" ", "_") as
     | "character"
     | "blueprint_instance"
     | "document"
