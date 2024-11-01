@@ -140,7 +140,7 @@ function FieldRow({
             {(providedDroppable) => (
               <div className="flex flex-col" {...providedDroppable.droppableProps} ref={providedDroppable.innerRef}>
                 {field.options?.map((opt, optIndex) => (
-                  <Draggable draggableId={opt.id || opt.value + index} index={optIndex} key={opt.id}>
+                  <Draggable key={opt.id} draggableId={opt.id || opt.value + index} index={optIndex}>
                     {(provided, draggableSnapshot) => (
                       <div
                         className={`my-1 flex w-full flex-nowrap items-center gap-x-2 ${
@@ -703,7 +703,7 @@ function CharacterFieldSection({
       isDisabled={!canCreateOrEdit}
       label={title}>
       {character_fields.length ? <span /> : <div className="w-full p-2">Drop fields here</div>}
-      <Droppable direction="vertical" droppableId={id} key={id} type="CHARACTER_FIELDS">
+      <Droppable key={id} direction="vertical" droppableId={id} type="CHARACTER_FIELDS">
         {(providedDroppable) => (
           <div
             className={`flex min-h-8 flex-col rounded-md p-1.5 ${character_fields.length ? "" : "border border-dashed border-zinc-600"}`}
@@ -711,13 +711,13 @@ function CharacterFieldSection({
             ref={providedDroppable.innerRef}>
             {character_fields?.length
               ? character_fields.map((field, index) => (
-                  <Draggable draggableId={field.id} index={index} key={field.id}>
+                  <Draggable key={field.id} draggableId={field.id} index={index}>
                     {(provided, draggableSnapshot) => (
                       <div
+                        ref={provided.innerRef}
                         className={`my-1 flex flex-nowrap items-center gap-x-2 ${
                           draggableSnapshot.isDragging ? "rounded shadow-sm" : ""
                         }`}
-                        ref={provided.innerRef}
                         {...provided.draggableProps}
                         key={field.id}
                         style={provided.draggableProps.style}>
@@ -953,13 +953,13 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
             }}>
             {(template.character_fields_sections || [])?.map((section) => (
               <CharacterFieldSection
+                key={section.id}
                 canCreateOrEdit={canCreateOrEdit}
                 character_fields={groupedFields?.[section.id] || []}
                 handleChange={handleCustomFieldsChange}
                 id={section.id}
                 isInitialOpen={areAllOpen}
                 isLoading={isFetching}
-                key={section.id}
                 title={section.title}
               />
             ))}
@@ -1018,13 +1018,13 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                 <div className="relative flex flex-col" {...providedDroppable.droppableProps} ref={providedDroppable.innerRef}>
                   {template.character_fields_sections?.length
                     ? template.character_fields_sections.map((section, index) => (
-                        <Draggable draggableId={section.id || section.title + index} index={index} key={section.id}>
+                        <Draggable key={section.id} draggableId={section.id || section.title + index} index={index}>
                           {(provided, draggableSnapshot) => (
                             <div
+                              ref={provided.innerRef}
                               className={`my-1 flex flex-nowrap items-center gap-x-2 ${
                                 draggableSnapshot.isDragging ? "rounded shadow-sm" : ""
                               }`}
-                              ref={provided.innerRef}
                               {...provided.draggableProps}
                               style={{
                                 ...provided.draggableProps.style,
@@ -1100,7 +1100,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
           ]}
         />
       ) : null}
-      <div>
+      <div className="mt-auto">
         <Button
           icon={data?.id ? IconEnum.save : IconEnum.add}
           isDisabled={

@@ -111,23 +111,23 @@ export function RandomTableDrawer({ data, exceptions }: Props) {
       permissions: true,
       fields: ["id", "title", "description", "icon", "is_public"],
     },
-    { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
+    { enabled: !!data?.id, queryKeyConcat: ["drawer"] }
   );
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertRandomTableType>("random_tables");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateRandomTableType>(
     "random_tables",
-    project_id as string,
+    project_id as string
   );
 
   const [randomTable, setRandomTable] = useState<Partial<RandomTableType> & { project_id: string }>(
-    existingRandomTable?.data || { project_id: project_id as string, parent_id: exceptions?.globalCreate ? null : item_id },
+    existingRandomTable?.data || { project_id: project_id as string, parent_id: exceptions?.globalCreate ? null : item_id }
   );
 
   const { changedData, handleChange } = useHandleChange({ data: randomTable, setData: setRandomTable });
 
   const permissions = useHasPermissions(
     ["read_random_tables", "create_random_tables", "update_random_tables"],
-    randomTable?.owner_id,
+    randomTable?.owner_id
   );
   const tabs = getTabs(permissions, data?.id);
 
@@ -195,6 +195,7 @@ export function RandomTableDrawer({ data, exceptions }: Props) {
           <div className="flex max-h-full flex-col gap-y-2 overflow-y-auto">
             {randomTable.random_table_options?.map((option, optionIndex) => (
               <Collapsible
+                key={option.id}
                 actions={[
                   {
                     icon: IconEnum.trash,
@@ -210,7 +211,6 @@ export function RandomTableDrawer({ data, exceptions }: Props) {
                   },
                 ]}
                 initialOpen={option.title === "New option"}
-                key={option.id}
                 label={option.title}
                 variant={option?.title ? "primary" : "error"}>
                 <div className="flex flex-col gap-y-2 p-2">
