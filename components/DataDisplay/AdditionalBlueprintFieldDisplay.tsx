@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { isRemirrorJSON } from "remirror";
 
 import { useGetSubEntity } from "../../hooks";
-import { BlueprintFieldType, BlueprintInstanceBlueprintFieldType, RandomTableOptionType } from "../../types";
+import { BlueprintFieldType, FieldDataType, RandomTableOptionType } from "../../types";
 import { FieldClasses, formatDateToString, getEntityLink, IconEnum } from "../../utils";
 import { StaticRender } from "../Complex";
 import { Input, Title } from "../Form";
@@ -50,7 +50,7 @@ function RandomTableField({
   );
 }
 
-function DateField({ fieldData, field }: { fieldData: BlueprintInstanceBlueprintFieldType; field: BlueprintFieldType }) {
+function DateField({ fieldData, field }: { fieldData: FieldDataType; field: BlueprintFieldType }) {
   const startMonthIdx =
     field?.calendar && field.calendar.months.length
       ? field.calendar.months.findIndex((m) => m.id === fieldData?.calendar?.start_month_id)
@@ -102,7 +102,7 @@ export function AdditionalBlueprintFieldDisplay({
 }: {
   isPreview: boolean;
   blueprint_field: BlueprintFieldType;
-  blueprint_field_data: BlueprintInstanceBlueprintFieldType;
+  blueprint_field_data: FieldDataType;
 }) {
   const value = blueprint_field_data?.value;
   const { project_id } = useParams();

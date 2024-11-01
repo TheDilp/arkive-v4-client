@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 
 import { useGetSubEntity } from "../../hooks";
-import { CharacterCharacterFieldType, CharacterFieldType, RandomTableOptionType } from "../../types";
+import { CharacterFieldType, FieldDataType, RandomTableOptionType } from "../../types";
 import { FieldClasses, formatDateToString, getEntityLink, IconEnum } from "../../utils";
 import { EntityPreview, FormattedDate, Gallery, GroupEntityPreview, Input, StaticRender, Tooltip } from "..";
 
@@ -42,7 +42,7 @@ function RandomTableField({
   );
 }
 
-function DateField({ fieldData, field }: { fieldData: CharacterCharacterFieldType | null; field: CharacterFieldType }) {
+function DateField({ fieldData, field }: { fieldData: FieldDataType | null; field: CharacterFieldType }) {
   const startMonthIdx =
     field?.calendar && field.calendar.months.length
       ? field.calendar.months.findIndex((m) => m.id === fieldData?.calendar?.start_month_id)
@@ -94,7 +94,7 @@ export function AdditionalFieldDisplay({
 }: {
   isPreview: boolean;
   character_field: CharacterFieldType;
-  character_field_data: CharacterCharacterFieldType | null;
+  character_field_data: FieldDataType | null;
 }) {
   const value = character_field_data?.value;
   const { project_id } = useParams();
@@ -258,4 +258,3 @@ export function AdditionalFieldDisplay({
     </div>
   );
 }
-
