@@ -31,6 +31,11 @@ export function getProjectsViewNavItems(
 }
 
 export const projectNavItems: SidebarItemType[] = [
+  {
+    icon: IconEnum.dasboard,
+    tooltip: "Dasboard",
+    navigate: "/",
+  },
   { icon: IconEnum.manuscripts, navigate: "manuscripts", tooltip: "Manuscripts" },
   { icon: IconEnum.character, navigate: "characters", tooltip: "Characters" },
   { icon: IconEnum.blueprint, navigate: "blueprints", tooltip: "Blueprints" },

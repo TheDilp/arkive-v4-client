@@ -28,13 +28,6 @@ import { Dialog, Drawer, Dropdown } from "../Overlay";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
 
-const projectSidebarItems = [...projectNavItems];
-projectSidebarItems.unshift({
-  icon: IconEnum.dasboard,
-  tooltip: "Dasboard",
-  navigate: "/",
-});
-
 export function ProjectLayout() {
   const { project_id } = useParams();
   const { isLg } = useBreakpoint();
@@ -184,7 +177,7 @@ export function ProjectLayout() {
 
       <Dropdown allowedPlacements={["bottom", "right", "left"]} event={contextMenu.event} items={contextMenu?.items || []} />
       {isLg ? (
-        <Sidebar isLoading={isInitialLoading || isInitialLoadingUser} isUsingPermissions items={projectSidebarItems} />
+        <Sidebar isLoading={isInitialLoading || isInitialLoadingUser} isUsingPermissions items={projectNavItems} />
       ) : null}
 
       <div className="flex h-full w-full flex-col lg:w-[calc(100%-4rem)]">
@@ -194,7 +187,7 @@ export function ProjectLayout() {
           {isInitialLoading || isInitialLoadingUser || isInitialLoadingPermissions || !projectAtomData ? null : <Outlet />}
         </div>
         {!isLg ? (
-          <Sidebar isLoading={isInitialLoading || isInitialLoadingUser} isUsingPermissions items={projectSidebarItems} />
+          <Sidebar isLoading={isInitialLoading || isInitialLoadingUser} isUsingPermissions items={projectNavItems} />
         ) : null}
       </div>
     </div>
