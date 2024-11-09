@@ -9,12 +9,10 @@ function RandomTableField({
   random_table_id,
   random_table_option_id,
   title,
-  suboptionValue,
 }: {
   random_table_id: string | undefined | null;
   random_table_option_id: string | undefined;
   title: string;
-  suboptionValue: string | undefined;
 }) {
   const { data: option, isLoading } = useGetSubEntity<RandomTableOptionType>(random_table_option_id, "random_table_options", {
     data: { parent_id: random_table_id },
@@ -23,10 +21,7 @@ function RandomTableField({
       random_table_suboptions: true,
     },
   });
-  const subOption =
-    option?.data?.random_table_suboptions?.length && suboptionValue
-      ? option?.data?.random_table_suboptions.find((subopt) => subopt.id === suboptionValue)
-      : null;
+
   return (
     <div>
       <Input
@@ -36,7 +31,7 @@ function RandomTableField({
         label={title}
         name={title}
         onChange={() => {}}
-        value={`${option?.data?.title || ""} ${subOption?.title ? `(${subOption?.title})` : ""}` || ""}
+        value={option?.data?.title}
       />
     </div>
   );
@@ -251,7 +246,6 @@ export function AdditionalFieldDisplay({
         <RandomTableField
           random_table_id={character_field_data?.random_table.related_id}
           random_table_option_id={character_field_data?.random_table.option_id as string | undefined}
-          suboptionValue={character_field_data?.random_table.suboption_id}
           title={character_field.title}
         />
       ) : null}

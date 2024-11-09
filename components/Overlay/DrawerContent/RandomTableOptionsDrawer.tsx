@@ -13,12 +13,12 @@ export function RandomTableOptionsDrawer({ data }: { data: { parent_id: string }
   const queryClient = useQueryClient();
   const { project_id } = useParams();
   const [options, setOptions] = useState<Pick<RandomTableOptionType, "id" | "title" | "description" | "icon" | "icon_color">[]>(
-    [],
+    []
   );
   const resetDrawerAtom = useToggledResetAtom();
   const { mutateAsync: create, isLoading: isCreating } = useCreateSubEntities<{ data: InsertRandomTableOptionType[] }>(
     "random_table_options",
-    data.parent_id,
+    data.parent_id
   );
   const { handleChange } = useHandleChange({ data: options, setData: setOptions });
   return (
@@ -35,7 +35,7 @@ export function RandomTableOptionsDrawer({ data }: { data: { parent_id: string }
       </div>
       <div className="flex flex-col gap-y-2 overflow-auto">
         {options.map((opt, idx) => (
-          <div className="flex flex-col gap-y-1" key={opt.id}>
+          <div key={opt.id} className="flex flex-col gap-y-1">
             <hr className="mb-2 border-zinc-700" />
             <div className="flex flex-nowrap items-center gap-x-2">
               <Input label="Title (required)" name={`[${idx}].title`} onChange={handleChange} value={opt?.title || ""} />
@@ -81,7 +81,7 @@ export function RandomTableOptionsDrawer({ data }: { data: { parent_id: string }
                     queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, "random_table_options"] });
                   }
                 },
-              },
+              }
             );
           }}
           variant="success"

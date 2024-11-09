@@ -192,12 +192,8 @@ function createColumns(
               const randomTable = fieldData
                 ? field.random_table?.random_table_options?.find((opt) => opt?.id === fieldData?.random_table?.option_id)
                 : null;
-              const subOption =
-                randomTable && fieldData?.random_table?.suboption_id
-                  ? randomTable.random_table_suboptions?.find((subOpt) => subOpt.id === fieldData?.random_table?.suboption_id)
-                  : null;
 
-              return `${randomTable?.title ?? ""} ${subOption ? `(${subOption?.title})` : ""}`;
+              return randomTable?.title || "";
             }
 
             if (field.field_type === "date") {

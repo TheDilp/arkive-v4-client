@@ -72,23 +72,6 @@ export const UpdateRandomTableOptionSchema = z.object({
     icon: z.string().nullable().optional(),
     icon_color: z.string().nullable().optional(),
   }),
-  relations: z.object({
-    random_table_suboptions: z
-      .object({
-        data: z.object({
-          id: z.string(),
-          parent_id: z.string(),
-          title: z.string().transform((value) => value.trim()),
-          description: z
-            .string()
-            .transform((value) => value.trim())
-            .optional()
-            .nullable(),
-        }),
-      })
-      .array()
-      .optional(),
-  }),
 });
 
 export const InsertRandomTableSchema = z.object({

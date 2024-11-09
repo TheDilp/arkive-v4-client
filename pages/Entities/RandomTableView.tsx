@@ -177,56 +177,18 @@ export function RandomTableView() {
       const option = data?.data?.[idx];
 
       if (option) {
-        if (option?.random_table_suboptions?.length) {
-          const subOptionRoll = await getRollValue(`1d${option.random_table_suboptions.length}`, true);
-          const subIdx = subOptionRoll - 1;
-          const subOption = option.random_table_suboptions[subIdx];
-
-          if (subOption) {
-            const resultTitle = `${option.title} - ${subOption.title}`;
-            if (isValueOnly) {
-              return {
-                option: { title: resultTitle, description: option?.description || "" },
-                subOption: { title: subOption?.title || "", description: subOption.description || "" },
-              };
-            }
-            createNotification({
-              title: resultTitle,
-              timer: 15,
-              description: `${option?.description || ""} ${subOption?.description || ""}`,
-              variant: "info",
-              icon: IconEnum.d20,
-              hasTitleBorder: true,
-              position: "top",
-            });
-          } else {
-            if (isValueOnly) {
-              return { option: { title: option.title, description: option?.description || null }, subOption };
-            }
-            createNotification({
-              title: option.title,
-              timer: 15,
-              description: option?.description || "",
-              variant: "info",
-              icon: IconEnum.d20,
-              hasTitleBorder: true,
-              position: "top",
-            });
-          }
-        } else {
-          if (isValueOnly) {
-            return { option: { title: option.title, description: option.description || null }, subOption: null };
-          }
-          createNotification({
-            title: option.title,
-            timer: 15,
-            description: option?.description || "",
-            variant: "info",
-            icon: IconEnum.d20,
-            hasTitleBorder: true,
-            position: "top",
-          });
+        if (isValueOnly) {
+          return { option: { title: option.title, description: option.description || null }, subOption: null };
         }
+        createNotification({
+          title: option.title,
+          timer: 15,
+          description: option?.description || "",
+          variant: "info",
+          icon: IconEnum.d20,
+          hasTitleBorder: true,
+          position: "top",
+        });
       }
       return { option: null, subOption: null };
     }

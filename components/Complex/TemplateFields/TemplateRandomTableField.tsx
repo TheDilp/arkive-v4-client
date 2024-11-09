@@ -30,10 +30,6 @@ export function TemplateRandomTableField({
   isDisabled,
   isOpen,
 }: Props) {
-  const availableSuboptions = random_table?.random_table_options?.find(
-    (opt) => opt?.id === currentValue?.option_id
-  )?.random_table_suboptions;
-
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <FormFieldContainer isDrawer={isDrawer}>
@@ -94,30 +90,6 @@ export function TemplateRandomTableField({
               />
             </div>
           )}
-        </div>
-        <div className="flex flex-col pl-4 pr-[1.55rem]">
-          {availableSuboptions?.length ? (
-            <div className="flex flex-nowrap gap-x-2">
-              <Select
-                isClearable
-                isDisabled={isDisabled}
-                isReadOnly={isReadOnly}
-                name={name}
-                onChange={({ value }) =>
-                  handleChange([
-                    {
-                      name: `${name}.random_table.suboption_id`,
-                      value,
-                    },
-                  ])
-                }
-                options={availableSuboptions.map((subopt) => ({ label: subopt.title, value: subopt.id }))}
-                value={currentValue?.suboption_id || ""}
-                variant={IS_GATEWAY || !isDrawer ? "primary" : "secondary"}
-              />
-              <div className="flex self-end pb-1.5" />
-            </div>
-          ) : null}
         </div>
       </FormFieldContainer>
     </TemplateFieldContainer>

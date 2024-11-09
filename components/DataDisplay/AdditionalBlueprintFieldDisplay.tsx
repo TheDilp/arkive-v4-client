@@ -17,7 +17,6 @@ function RandomTableField({
   random_table_id,
   random_table_option_id,
   title,
-  suboptionValue,
 }: {
   random_table_id: string | undefined | null;
   random_table_option_id: string | undefined;
@@ -31,10 +30,7 @@ function RandomTableField({
       random_table_suboptions: true,
     },
   });
-  const subOption =
-    option?.data?.random_table_suboptions?.length && suboptionValue
-      ? option?.data?.random_table_suboptions.find((subopt) => subopt.id === suboptionValue)
-      : null;
+
   return (
     <div>
       <Input
@@ -44,7 +40,7 @@ function RandomTableField({
         label={title}
         name={title}
         onChange={() => {}}
-        value={`${option?.data?.title || ""} ${subOption?.title ? `(${subOption?.title})` : ""}` || ""}
+        value={option?.data?.title}
       />
     </div>
   );

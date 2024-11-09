@@ -13,7 +13,6 @@ import {
   TableType,
   WordType,
 } from "../../../types";
-import { RandomTableSubOptionType } from "../../../types/EntityTypes/randomTableTypes";
 import { capitalizeFirstLetter, getSentenceCase, IconEnum, permissionsByEntity, sortCharacters } from "../../../utils";
 import { Textarea } from "../../Form";
 import { Collapsible, Tabs } from "../../Layout";
@@ -157,27 +156,7 @@ function ExpandedTemplateFields({ templateId }: { templateId: string }) {
     </div>
   );
 }
-function ExpandedRandomOption({ random_table_suboptions }: { random_table_suboptions: RandomTableSubOptionType[] }) {
-  return (
-    <div className="flex flex-col gap-y-2">
-      {random_table_suboptions?.map((suboption) => (
-        <div key={suboption.id} className="flex flex-col font-lato">
-          <div className="flex w-full max-w-full items-center gap-x-2">
-            <span>
-              <Badge label={getSentenceCase(suboption.title || "")} variant="info" />
-            </span>
-            {suboption?.description ? (
-              <>
-                <span>-</span>
-                <div className="truncate text-sm">{suboption?.description}</div>
-              </>
-            ) : null}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
+
 function ExpandedRelationships({ relationships }: { relationships: FormattedRelationship["relationships"] }) {
   return (
     <ul className="flex flex-wrap gap-2">
@@ -300,11 +279,6 @@ export function ExpandedTableRow<T>({ data, type }: { data: any } & Pick<TableTy
     <div className={ExpandedTableRowClasses()}>
       {/* {type === "documents" ? <ExpandedDocument id={data?.id} /> : null} */}
       {type === "character_fields_templates" ? <ExpandedTemplateFields templateId={data?.id} /> : null}
-      {/* Random table options have suboptions fetched with them in order to use the "Roll on table" feature */}
-      {/* Therefore they can be passed as prop directly, instead of using an id to fetch them */}
-      {type === "random_table_options" ? (
-        <ExpandedRandomOption random_table_suboptions={data?.random_table_suboptions || []} />
-      ) : null}
       {type === "relationships" ? <ExpandedRelationships relationships={data?.relationships || []} /> : null}
       {type === "words" ? <ExpandedWord id={data?.id} /> : null}
       {type === "tags" ? <ExpandedTag id={data?.id} /> : null}
