@@ -217,7 +217,7 @@ export function StaticRender({ content }: { content: RemirrorJSON | undefined })
   if (!parsedContent) return null;
 
   return (
-    <div className="staticRendererContainer">
+    <div className={`staticRendererContainer ${IS_PUBLIC ? "p-4" : ""}`}>
       {/* @ts-ignore */}
       <RemirrorRenderer
         json={parsedContent as RemirrorJSON}
