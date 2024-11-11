@@ -4,7 +4,6 @@ export const baseURLS = {
   }/api/v1`,
 
   basePublicServer: import.meta.env.VITE_ARKIVE_WIKI_SERVER,
-  baseAuthServer: import.meta.env.VITE_ARKIVE_AUTH_SERVER,
   baseAssetServer: import.meta.env.VITE_ARKIVE_ASSET_SERVICE,
   baseWebsocketServer: `${
     import.meta.env.DEV

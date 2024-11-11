@@ -6,7 +6,6 @@ import {
   useQueryClient,
   UseQueryOptions,
 } from "@tanstack/react-query";
-import { useSetAtom } from "jotai";
 
 import {
   AvailableEntityType,
@@ -19,7 +18,6 @@ import {
   SearchableMentionEntities,
   TagColorStatType,
   TagEntityStatType,
-  UserStatusType,
   UserType,
 } from "../../types";
 import { CreateConfigType, GatewayConfigOptionType } from "../../types/EntityTypes/gatewayTypes";
@@ -32,9 +30,7 @@ import {
   getServerUrl,
   getSingularEntityType,
   IconEnum,
-  loggedInAtom,
   useNotifications,
-  userStatusAtom,
 } from "../../utils";
 
 //#region projects
@@ -464,50 +460,7 @@ export function useGetNotifications(
     }
   );
 }
-export function useGetAuthStatus() {
-  const setLoggedIn = useSetAtom(loggedInAtom);
-  const setUserStatus = useSetAtom(userStatusAtom);
-  return useQuery<UserStatusType>(
-    ["auth_status"],
-    async () => {
-      const res = await fetch(`${baseURLS.baseAuthServer}/auth/status`, {
-        credentials: "include",
-      });
 
-      if (res.status === 401) {
-        setLoggedIn(false);
-        setUserStatus(null);
-        // @ts-ignore
-        document.location = import.meta.env.VITE_HOME;
-        return { status: "unauthenticated", user_id: "", project_id: null, image_url: null, name: null } as UserStatusType;
-      }
-
-      const data = (await res.json()) as UserStatusType;
-      return data;
-    },
-    {
-      onError: () => {
-        setLoggedIn(false);
-        setUserStatus(null);
-        // @ts-ignore
-        document.location = import.meta.env.VITE_HOME;
-      },
-      onSuccess: (data) => {
-        if (data.status === "authenticated") {
-          setLoggedIn(true);
-          setUserStatus(data);
-        } else {
-          setLoggedIn(false);
-          setUserStatus(null);
-          // @ts-ignore
-          document.location = import.meta.env.VITE_HOME;
-        }
-      },
-      retry: false,
-      staleTime: Infinity,
-    }
-  );
-}
 export function useGetGatewayOptions(
   request: {
     data: { access_id: string; entity_type: "characters" | "blueprint_instances" };

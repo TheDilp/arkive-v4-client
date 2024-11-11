@@ -845,7 +845,7 @@ export function useUpdateAuthStatus() {
 
   return useMutation(async (payload: { project_id: string | null }) => {
     const module = ls.get("module");
-    const res = await fetch(`${baseURLS.baseAuthServer}/auth/status/update`, {
+    const res = await fetch(`${baseURLS.baseServer.replace("/api/v1", "")}/auth/status/update`, {
       // @ts-ignore
       headers: {
         "Content-Type": "application/json",
@@ -867,12 +867,12 @@ export function useUpdateAuthStatus() {
         name: null,
         image_url: null,
       });
-      document.location = `${import.meta.env.VITE_HOME}/arkive/sign-in`;
+      document.location = `${import.meta.env.VITE_HOME}/sign-in`;
     }
 
     const data = (await res.json()) as UserStatusType;
     if (data.status !== "authenticated") {
-      document.location = `${import.meta.env.VITE_HOME}/arkive/sign-in`;
+      document.location = `${import.meta.env.VITE_HOME}/sign-in`;
     }
     setLoggedIn(true);
     setUserStatus(data);
@@ -886,16 +886,15 @@ export function useSignout() {
   const queryClient = useQueryClient();
   return useMutation(
     async () => {
-      const res = await fetch(`${baseURLS.baseAuthServer}/auth/signout`, {
+      await fetch(`${baseURLS.baseServer.replace("/api/v1", "")}/auth/signout`, {
         credentials: "include",
         method: "GET",
       });
-      const text = await res.text();
-      if (res.status >= 400 || text === "UNAUTHORIZED") {
-        setLoggedIn(false);
-        setUserStatus({ status: "unauthenticated", user_id: "", project_id: null, game_id: null, name: null, image_url: null });
-        return;
-      }
+      setLoggedIn(false);
+      setUserStatus({ status: "unauthenticated", user_id: "", project_id: null, game_id: null, name: null, image_url: null });
+      document.location = `${import.meta.env.VITE_HOME}/sign-in`;
+
+      return;
     },
     {
       onSettled: () => {
