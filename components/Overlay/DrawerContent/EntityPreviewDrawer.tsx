@@ -146,8 +146,10 @@ export function EntityPreviewDrawer({
     isViewOnly?: boolean;
   };
 }) {
-  const { project_id } = useParams();
+  const { project_id, subitem_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
+  if (!!subitem_id && subitem_id !== data.id) return null;
+
   return (
     <DrawerLayout>
       <div className="flex-1 overflow-y-auto">
