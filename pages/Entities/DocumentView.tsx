@@ -80,7 +80,7 @@ function update({
   );
 }
 
-export function DocumentView({ editable, data }: { editable: boolean; data?: DocumentType }) {
+export function DocumentView({ editable, isPreview, data }: { editable: boolean; isPreview?: boolean; data?: DocumentType }) {
   const { item_id } = useParams();
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
 
@@ -122,7 +122,7 @@ export function DocumentView({ editable, data }: { editable: boolean; data?: Doc
   );
 
   useEffect(() => {
-    if (!isFetching) {
+    if (!isFetching && !isPreview) {
       if (currentDocument?.data || data) {
         setBreadcrumbs({ items: currentDocument?.data?.parents || [], type: "documents" });
         setEntityUpdatePermission(

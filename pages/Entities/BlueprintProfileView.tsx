@@ -37,7 +37,17 @@ import {
 } from "../../utils";
 import { UpdateBlueprintInstanceSchema } from "../../validation";
 
-export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: string; parent_id?: string; isViewOnly?: boolean }) {
+export function BlueprintProfileView({
+  id,
+  parent_id,
+  isViewOnly,
+  isPreview,
+}: {
+  id?: string;
+  parent_id?: string;
+  isViewOnly?: boolean;
+  isPreview?: boolean;
+}) {
   const { project_id, item_id, subitem_id } = useParams();
   const { isMd } = useBreakpoint();
   const [blueprintInstance, setBlueprintInstance] = useState<BlueprintInstanceType | null>(null);
@@ -145,7 +155,7 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
   }
 
   useLayoutEffect(() => {
-    if (blueprint?.data && existingBlueprintInstance?.data && !isViewOnly) {
+    if (blueprint?.data && existingBlueprintInstance?.data && !isPreview) {
       setBreadcrumbs({
         items: [
           { id: blueprint.data.id, title: blueprint.data.title, is_folder: false, parent_id: null },
@@ -170,7 +180,7 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
 
   useNavbarTitle(
     `Blueprints | ${blueprint?.data?.title} | ${existingBlueprintInstance?.data?.title}`,
-    !!blueprint?.data && !!existingBlueprintInstance?.data && !isViewOnly
+    !!blueprint?.data && !!existingBlueprintInstance?.data && !isPreview
   );
 
   if (isLoading) return <Skeleton type="character_profile" />;
@@ -179,7 +189,7 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
     <div className="flex max-h-[calc(100vh-6rem)] min-h-[calc(100vh-6rem)] flex-col gap-y-2">
       {item_id && !IS_PUBLIC && !isViewOnly ? (
         <div className="flex h-12 min-h-[3rem] items-center justify-between">
-          <Breadcrumbs />
+          {isPreview ? <div /> : <Breadcrumbs />}
           <div className="flex flex-nowrap gap-x-2">
             <div className="flex w-24 items-center justify-end">
               <Toggle

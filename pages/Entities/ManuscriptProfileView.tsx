@@ -3,7 +3,7 @@ import { createContext, Dispatch, SetStateAction, useContext, useLayoutEffect, u
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Breadcrumbs, Button, EntityPreviewDrawer, Icon, Tabs } from "../../components";
-import { useBreakpoint, useGetEntity, useHasPermissions } from "../../hooks";
+import { useBreakpoint, useGetEntity, useHasPermissions, useNavbarTitle } from "../../hooks";
 import { TabType } from "../../types";
 import { AvailableManuscriptEntityTypes, ManuscriptEntityType, ManuscriptType } from "../../types/EntityTypes/manuscriptTypes";
 import {
@@ -101,13 +101,14 @@ export function ManuscriptProfileView({ data }: { data?: ManuscriptType }) {
     "update_manuscripts",
     user?.role?.id
   );
+  useNavbarTitle(`Manuscripts | ${existingManuscript?.data?.title}`, !!existingManuscript?.data);
 
   useLayoutEffect(() => {
     if (existingManuscript?.data) {
       setBreadcrumbs({
         items: [
           {
-            id: existingManuscript?.data?.id,
+            id: existingManuscript?.data?.id || "",
             title: existingManuscript?.data?.title,
             is_folder: false,
             parent_id: null,

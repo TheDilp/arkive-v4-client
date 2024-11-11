@@ -14,7 +14,6 @@ type Props = {
   data?: MapType;
   isReadOnly?: boolean;
   isViewOnly?: boolean;
-
   center_on?: string;
 };
 
@@ -61,7 +60,7 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
     currentMap?.owner_id
   );
 
-  useNavbarTitle(`Maps | ${currentMap?.title || ""}`, !!currentMap?.title);
+  useNavbarTitle(`Maps | ${currentMap?.title || ""}`, !!currentMap?.title && !isViewOnly);
 
   function changeMapPinFilters({ value }: { value: onChangeValue["value"] }) {
     if (Array.isArray(value)) {

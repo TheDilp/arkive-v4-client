@@ -58,13 +58,22 @@ import { Button, Quickbar, Spinner } from "..";
 type Props = {
   data?: Partial<GraphType>;
   isReadOnly?: boolean;
+  isPreview?: boolean;
   center_on?: string;
   isFamilyTreeView?: boolean;
   highlightNodeIds?: string[];
   layoutOptions?: Partial<LayoutOptions> & { rankDir?: "LR" | "TB" };
 };
 
-export function Graph({ data, isReadOnly, center_on, isFamilyTreeView, highlightNodeIds = [], layoutOptions }: Props) {
+export function Graph({
+  data,
+  isPreview,
+  isReadOnly,
+  center_on,
+  isFamilyTreeView,
+  highlightNodeIds = [],
+  layoutOptions,
+}: Props) {
   const { project_id, item_id, subitem_id } = useParams();
   const [elements, setElements] = useState();
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
@@ -83,10 +92,12 @@ export function Graph({ data, isReadOnly, center_on, isFamilyTreeView, highlight
   const setEntityUpdatePermission = useSetAtom(hasEntityUpdatePermissionForEntityView);
 
   useLayoutEffect(() => {
-    if (!item_id) {
-      setBreadcrumbs({ items: [], type: "graphs" });
-    } else if (existingGraphData?.data?.parents && existingGraphData?.data?.parents?.length) {
-      setBreadcrumbs({ items: existingGraphData?.data?.parents, type: "graphs" });
+    if (!isPreview) {
+      if (!item_id) {
+        setBreadcrumbs({ items: [], type: "graphs" });
+      } else if (existingGraphData?.data?.parents && existingGraphData?.data?.parents?.length) {
+        setBreadcrumbs({ items: existingGraphData?.data?.parents, type: "graphs" });
+      }
     }
   }, [existingGraphData, setBreadcrumbs, item_id]);
 
@@ -106,7 +117,7 @@ export function Graph({ data, isReadOnly, center_on, isFamilyTreeView, highlight
     user?.role?.id
   );
 
-  useNavbarTitle(`Graphs | ${graph?.title}`, !isReadOnly && !!graph);
+  useNavbarTitle(`Graphs | ${graph?.title}`, !isReadOnly && !!graph && !isPreview);
   const { mutate: createNode } = useCreateSubEntity<InsertNodeType>("nodes", project_id);
   const { mutate: createEdges } = useCreateSubEntity<InsertEdgeType>("edges", project_id);
   const { mutateAsync: generateGraph, isLoading: isMutating } = useGenerateGraph<{

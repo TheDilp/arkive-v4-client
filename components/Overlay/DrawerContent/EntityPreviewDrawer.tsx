@@ -15,12 +15,12 @@ import { Alert, Skeleton } from "../../Misc";
 import { EventDrawer } from "./EventDrawer";
 
 function CharacterPreviewDrawer({ id, isViewOnly }: { id: string; isViewOnly?: boolean }) {
-  return <CharacterProfileView id={id} isPreview={isViewOnly} isViewOnly={isViewOnly} />;
+  return <CharacterProfileView id={id} isPreview isViewOnly={isViewOnly} />;
 }
 function BlueprintPreviewDrawer({ id, parent_id, isViewOnly }: { id: string; parent_id?: string; isViewOnly?: boolean }) {
   return (
     <div className={IS_PUBLIC ? "h-[calc(100%-8rem)] [&>div]:max-h-[calc(100%-6rem)] [&>div]:min-h-0" : ""}>
-      <BlueprintProfileView id={id} isViewOnly={isViewOnly} parent_id={parent_id} />
+      <BlueprintProfileView id={id} isPreview isViewOnly={isViewOnly} parent_id={parent_id} />
     </div>
   );
 }
@@ -49,7 +49,7 @@ function DocumentPreviewDrawer({ id, isReadOnly = true }: { id: string; isReadOn
             {isReadOnly ? (
               <StaticRender content={existingDocument?.data?.content as RemirrorJSON} />
             ) : (
-              <DocumentView data={existingDocument?.data} editable />
+              <DocumentView data={existingDocument?.data} editable isPreview />
             )}
           </div>
         </div>
@@ -98,7 +98,7 @@ function GraphPreviewDrawer({ id, isReadOnly = true }: { id?: string; isReadOnly
   if (graph?.data)
     return (
       <div className="h-full w-full overflow-hidden">
-        <Graph data={graph?.data} isReadOnly={isReadOnly} />
+        <Graph data={graph?.data} isPreview isReadOnly={isReadOnly} />
       </div>
     );
   if (!graph?.data) return <Alert label="Could not get graph." variant="error" />;
