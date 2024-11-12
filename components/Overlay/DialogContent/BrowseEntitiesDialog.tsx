@@ -3,7 +3,7 @@ import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useGetInfiniteAssets, useGetInfiniteEntities, useTable } from "../../../hooks";
-import { AssetType, AvailableEntityType, OnSearchChangePropsType, RequestOrderByType } from "../../../types";
+import { AssetType, AvailableEntityType, OnSearchChangePropsType, RequestFilterType, RequestOrderByType } from "../../../types";
 import { AvailableIcons, dialogAtom, getEntityFields, IconEnum } from "../../../utils";
 import { Image } from "../../DataDisplay";
 import { Button, Input } from "../../Form";
@@ -85,6 +85,7 @@ export function BrowseEntitiesDialog({
       permissions: true,
       fields: ["id", "title", "type"],
       pagination,
+      filters,
       orderBy: [
         {
           field: "title",
@@ -111,21 +112,31 @@ export function BrowseEntitiesDialog({
     if (filter.length >= 3) {
       const timeout = setTimeout(() => {
         if (filter) {
+          const baseFilters = data.parent_id
+            ? [
+                {
+                  id: "parent_id",
+                  value: data.parent_id,
+                  field: "parent_id",
+                  operator: "eq" as RequestFilterType["operator"],
+                  header_name: "Parent",
+                },
+              ]
+            : [];
+          baseFilters.push({
+            id: "quick_filter",
+            header_name: "title",
+            field: data.type === "characters" ? "full_name" : "title",
+            operator: "ilike",
+            value: filter,
+          });
           dispatch({
             type: "clearAllFilters",
           });
           dispatch({
             type: "setFilter",
             payload: {
-              and: [
-                {
-                  id: "quick_filter",
-                  header_name: "title",
-                  field: data.type === "characters" ? "full_name" : "title",
-                  operator: "ilike",
-                  value: filter,
-                },
-              ],
+              and: baseFilters,
               field: data.type === "characters" ? "full_name" : "title",
             },
           });
