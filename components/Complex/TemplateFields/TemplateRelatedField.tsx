@@ -174,7 +174,7 @@ export function TemplateRelatedField({
                     name: `${name}.${entity}[${isMultiple ? currentValue?.length || 0 : 0}]`,
                     value: {
                       related_id: value,
-                      sort: currentValue.length,
+                      sort: currentValue?.length || 0,
                       [single_entity]:
                         single_entity === "character"
                           ? {
