@@ -36,7 +36,6 @@ export const projectNavItems: SidebarItemType[] = [
     tooltip: "Dasboard",
     navigate: "/",
   },
-  { icon: IconEnum.manuscripts, navigate: "manuscripts", tooltip: "Manuscripts" },
   { icon: IconEnum.character, navigate: "characters", tooltip: "Characters" },
   { icon: IconEnum.blueprint, navigate: "blueprints", tooltip: "Blueprints" },
   { icon: IconEnum.document, navigate: "documents", tooltip: "Documents" },
@@ -48,6 +47,7 @@ export const projectNavItems: SidebarItemType[] = [
   // { icon: IconEnum.tags, navigate: "tags", tooltip: "Tags" },
   // { icon: IconEnum.additional_fields, navigate: "character_fields_templates", tooltip: "Character field templates" },
   { icon: IconEnum.image, navigate: "assets", tooltip: "Assets" },
+  { icon: IconEnum.manuscripts, navigate: "manuscripts", tooltip: "Manuscripts" },
   { icon: IconEnum.settings, navigate: "settings", tooltip: "Settings" },
 ];
 
