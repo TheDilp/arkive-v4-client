@@ -240,6 +240,15 @@ function EntityWithRelatedRow({
     }
   }, [images, related]);
 
+  useEffect(() => {
+    setSelectedEntities([]);
+    const toChange = [
+      { name: `template_fields[${idx}].value`, value: null },
+      { name: `template_fields[${idx}].related`, value: [] },
+    ];
+    handleChange(toChange);
+  }, [isRandomized]);
+
   return (
     <div className="flex flex-col gap-y-2">
       <div className="flex flex-nowrap gap-x-1">
@@ -316,6 +325,15 @@ function EntityWithRelatedRow({
                     )
                   )}
                   name="value"
+                  onBrowserChange={(props) => {
+                    const parent_id = getParentIdField(entity_type as "blueprint_instances" | "map_pins" | "events");
+
+                    const itemsToChange: { name: string; value: string | Record<string, any> }[] = props.map(({ value }) => ({
+                      name: `template_fields[${idx}].${parent_id}`,
+                      value,
+                    }));
+                    handleChange(itemsToChange);
+                  }}
                   onChange={({ value: newValue }) => {
                     const parent_id = getParentIdField(entity_type as "blueprint_instances" | "map_pins" | "events");
                     if (parent_id) handleChange({ name: `template_fields[${idx}].${parent_id}`, value: newValue });
@@ -339,25 +357,38 @@ function EntityWithRelatedRow({
                   />
                 </div>
               ) : null}
-              <div className="flex flex-1 flex-col gap-y-2">
-                <Search
-                  isAutofocused
-                  isDisabled={
-                    !parent?.data?.id || (!!isRandomized && !!(selectedEntities.length >= getMaxEntityCount(random_count)))
-                  }
-                  isMultiple
-                  label="Replace with"
-                  name={`template_fields[${idx}].related`}
-                  onChange={({ value: newValue }) => {
-                    if (related?.includes(newValue))
-                      handleChange({ name: `template_fields[${idx}].related`, value: related.filter((v) => v !== newValue) });
-                    else handleChange({ name: `template_fields[${idx}].related`, value: related.concat(newValue) });
-                  }}
-                  parent_id={parent?.data?.id}
-                  searchEntity={entity_type as EntitiesWithRelatedType}
-                  value={related}
-                />
-              </div>
+              {isRandomized ? null : (
+                <div className="flex flex-1 flex-col gap-y-2">
+                  <Search
+                    isAutofocused
+                    isDisabled={
+                      !parent?.data?.id || (!!isRandomized && !!(selectedEntities.length >= getMaxEntityCount(random_count)))
+                    }
+                    isMultiple
+                    label="Replace with"
+                    name={`template_fields[${idx}].related`}
+                    onBrowserChange={(props) => {
+                      const updateValues = [...(related || [])];
+                      props.forEach(({ value }, itemIndex) => {
+                        if (updateValues?.includes(value)) {
+                          updateValues.splice(itemIndex, 1);
+                        } else {
+                          updateValues.push(value);
+                        }
+                      });
+                      handleChange({ name: `template_fields[${idx}].related`, value: updateValues });
+                    }}
+                    onChange={({ value: newValue }) => {
+                      if (related?.includes(newValue))
+                        handleChange({ name: `template_fields[${idx}].related`, value: related.filter((v) => v !== newValue) });
+                      else handleChange({ name: `template_fields[${idx}].related`, value: related.concat(newValue) });
+                    }}
+                    parent_id={parent?.data?.id}
+                    searchEntity={entity_type as EntitiesWithRelatedType}
+                    value={related}
+                  />
+                </div>
+              )}
             </div>
           </>
         ) : null}
@@ -393,39 +424,61 @@ function EntityWithRelatedRow({
                 />
               </div>
             ) : null}
-            <Search
-              isAutofocused
-              isDisabled={!!isRandomized}
-              isMultiple
-              label="Replace with"
-              name={`template_fields[${idx}].related`}
-              onChange={({ value: newValue, label }) => {
-                if (related?.includes(newValue))
-                  handleChange([
-                    { name: `template_fields[${idx}].related`, value: related.filter((v) => v !== newValue) },
-                    { name: `template_fields[${idx}].additional_data`, value: null },
-                  ]);
-                else if (entity_type === "images") {
-                  handleChange([
-                    { name: `template_fields[${idx}].related`, value: [newValue] },
-                    {
-                      name: `template_fields[${idx}].additional_data.title`,
-                      value: label,
-                    },
-                  ]);
-                } else {
-                  handleChange([
-                    { name: `template_fields[${idx}].related`, value: related.concat(newValue) },
-                    {
-                      name: `template_fields[${idx}].additional_data.title`,
-                      value: label,
-                    },
-                  ]);
-                }
-              }}
-              searchEntity={entity_type as EntitiesWithRelatedType}
-              value={entity_type === "images" ? related?.[0] : related}
-            />
+            {isRandomized || (related.length && entity_type === "images") ? null : (
+              <Search
+                isAutofocused
+                isDisabled={!!isRandomized}
+                isMultiple={entity_type !== "images"}
+                label="Replace with"
+                name={`template_fields[${idx}].related`}
+                onBrowserChange={(props) => {
+                  const itemsToChange = props.map(({ label, value }) => {
+                    if (related?.includes(value))
+                      return [
+                        { name: `template_fields[${idx}].related`, value: related.filter((v) => v !== value) },
+                        { name: `template_fields[${idx}].additional_data`, value: null },
+                      ];
+                    else if (entity_type === "images") {
+                      return [
+                        { name: `template_fields[${idx}].related`, value: [value] },
+                        {
+                          name: `template_fields[${idx}].additional_data.title`,
+                          value: label as string,
+                        },
+                      ];
+                    }
+                    return [{ name: `template_fields[${idx}].related`, value: related.concat(value) }];
+                  });
+                  handleChange(itemsToChange.flat());
+                }}
+                onChange={({ value: newValue, label }) => {
+                  if (related?.includes(newValue))
+                    handleChange([
+                      { name: `template_fields[${idx}].related`, value: related.filter((v) => v !== newValue) },
+                      { name: `template_fields[${idx}].additional_data`, value: null },
+                    ]);
+                  else if (entity_type === "images") {
+                    handleChange([
+                      { name: `template_fields[${idx}].related`, value: [newValue] },
+                      {
+                        name: `template_fields[${idx}].additional_data.title`,
+                        value: label,
+                      },
+                    ]);
+                  } else {
+                    handleChange([
+                      { name: `template_fields[${idx}].related`, value: related.concat(newValue) },
+                      {
+                        name: `template_fields[${idx}].additional_data.title`,
+                        value: label,
+                      },
+                    ]);
+                  }
+                }}
+                searchEntity={entity_type as EntitiesWithRelatedType}
+                value={entity_type === "images" ? related?.[0] : related}
+              />
+            )}
           </div>
         ) : null}
         <div className="flex w-full flex-col gap-y-2">
