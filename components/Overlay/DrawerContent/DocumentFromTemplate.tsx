@@ -12,7 +12,6 @@ import {
   Dice,
   DiceRollParser,
   DocumentTemplateFieldRegex,
-  getAssetURL,
   getMatchFieldVariant,
   getSentenceCase,
   IconEnum,
@@ -234,7 +233,7 @@ export function DocumentFromTemplate({ data }: Props) {
       {isGeneratingPreview ? <Skeleton isFullWidth type="editor" /> : null}
       {isGeneratingPreview ? null : (
         <div className={`flex h-full justify-center ${tabs[selectedTab].id === "2" && !isGeneratingPreview ? "" : "hidden"}`}>
-          <div className="w-full [&>.editor-component]:bg-zinc-800">
+          <div className="h-full w-full [&>div>div]:min-h-full [&>div>div]:bg-zinc-800 [&>div]:h-full">
             <Editor
               // @ts-ignore
               initialContent={previewContext?.getState()?.doc || undefined}
@@ -309,8 +308,8 @@ export function DocumentFromTemplate({ data }: Props) {
                                   tr: previewContext?.view?.state?.tr,
                                   content: previewContext?.getState()?.schema?.nodes.image.create({
                                     id: nodeField?.related?.[0],
+                                    project_id,
                                     alt: nodeField?.additional_data?.title || "template",
-                                    src: getAssetURL(project_id as string, "images", nodeField?.related?.[0]),
                                     crop: null,
                                     title: nodeField?.additional_data?.title,
                                     width: nodeField?.additional_data?.width || 250,
