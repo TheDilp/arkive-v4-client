@@ -4,9 +4,10 @@ import { useParams } from "react-router-dom";
 
 import { useGetSubEntity, useHandleChange, useToggledResetAtom, useUpdateSubEntity } from "../../../hooks";
 import { RandomTableOptionType } from "../../../types/EntityTypes/randomTableTypes";
-import { IconEnum } from "../../../utils";
+import { IconEnum, optionRelatedEntities } from "../../../utils";
 import { UpdateRandomTableOptionSchema } from "../../../validation/random_tables";
-import { Button, Input, Textarea } from "../../Form";
+import { EntityPreview } from "../../DataDisplay";
+import { Button, Input, Search, Select, Textarea } from "../../Form";
 import { Tabs } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 
@@ -14,10 +15,7 @@ type Props = {
   data: { id?: string };
 };
 
-const tabs = [
-  { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-  { id: "2", label: "Suboptions", icon: IconEnum.random_table },
-];
+const tabs = [{ id: "1", label: "Basic info", icon: IconEnum.info_circle }];
 export function RandomTableOptionDrawer({ data }: Props) {
   const queryClient = useQueryClient();
   const { project_id } = useParams();
@@ -33,7 +31,7 @@ export function RandomTableOptionDrawer({ data }: Props) {
     data?.id,
     "random_table_options",
     {
-      fields: ["id", "title", "description", "icon", "icon_color"],
+      fields: ["id", "title", "description", "related_data"],
       relations: { random_table_suboptions: true },
     },
     {
@@ -64,21 +62,83 @@ export function RandomTableOptionDrawer({ data }: Props) {
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       <div className="flex flex-col gap-y-2 overflow-hidden">
         {selectedTab === 0 ? (
-          <>
-            <div className="flex flex-nowrap items-center gap-x-2">
-              <div className="flex-1">
-                <Input label="Title (required)" name="title" onChange={handleChange} value={randomTableOption?.title || ""} />
+          <div className="flex flex-col gap-y-2">
+            <div className="flex w-full items-center gap-x-2">
+              {!randomTableOption.related_data || randomTableOption?.related_data?.type === "text" ? (
+                <Input
+                  label="Title (required)"
+                  name={"title"}
+                  onChange={handleChange}
+                  value={randomTableOption.title || ""}
+                  variant={randomTableOption.title ? "primary" : "error"}
+                />
+              ) : null}
+
+              {randomTableOption.related_data &&
+              !randomTableOption?.related_data?.id &&
+              randomTableOption.related_data?.type !== "text" ? (
+                <Search
+                  label="Entity (required)"
+                  name="related_id"
+                  onChange={(e) => {
+                    handleChange([
+                      { name: "title", value: e.label },
+                      {
+                        name: "related_data",
+                        value: {
+                          id: e.value,
+                          title: e.label,
+                          icon: e.icon,
+                          image_id: e.image,
+                          type: randomTableOption.related_data?.type,
+                        },
+                      },
+                    ]);
+                  }}
+                  searchEntity={randomTableOption.related_data?.type}
+                  variant={randomTableOption.related_data?.id ? "primary" : "error"}
+                />
+              ) : null}
+              {!!randomTableOption.related_data?.id && randomTableOption.related_data?.type !== "text" ? (
+                <div className="flex-1">
+                  <EntityPreview
+                    clearAction={() => {
+                      handleChange([
+                        { name: "title", value: null },
+                        {
+                          name: "related_data",
+                          value: { type: randomTableOption.related_data?.type },
+                        },
+                      ]);
+                    }}
+                    icon={randomTableOption.related_data?.icon}
+                    id={randomTableOption.related_data?.id || ""}
+                    image_id={randomTableOption.related_data?.image_id || null}
+                    label="Entity"
+                    title={randomTableOption.related_data?.title || ""}
+                    type={randomTableOption.related_data.type}
+                  />
+                </div>
+              ) : null}
+              <div className="min-w-[33%]">
+                <Select
+                  label="Type"
+                  name={"related_data.type"}
+                  onChange={handleChange}
+                  options={optionRelatedEntities}
+                  value={randomTableOption?.related_data?.type || "text"}
+                />
               </div>
             </div>
-            <div className="h-56">
+            <div>
               <Textarea
                 label="Description (optional)"
-                name="description"
+                name={"description"}
                 onChange={handleChange}
-                value={randomTableOption?.description || ""}
+                value={randomTableOption.description || ""}
               />
             </div>
-          </>
+          </div>
         ) : null}
 
         <div className="w-full">
