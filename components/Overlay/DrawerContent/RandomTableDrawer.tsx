@@ -1,3 +1,4 @@
+import omit from "lodash.omit";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -9,7 +10,7 @@ import {
   useToggledResetAtom,
   useUpdateEntity,
 } from "../../../hooks";
-import { DrawerAtomType, HandleChangePropsType, TabType, UserHasPermissionsType } from "../../../types";
+import { DrawerAtomType, HandleChangePropsType, SelectOptionType, TabType, UserHasPermissionsType } from "../../../types";
 import { RandomTableOptionType, RandomTableType } from "../../../types/EntityTypes/randomTableTypes";
 import { IconEnum } from "../../../utils";
 import {
@@ -20,8 +21,9 @@ import {
 } from "../../../validation/random_tables";
 import { FolderSelect } from "../../Complex";
 import { EntityPermission } from "../../Complex/EntityPermission";
-import { Button, Checkbox, Input, Textarea } from "../../Form";
-import { Collapsible, Tabs } from "../../Layout";
+import { EntityPreview } from "../../DataDisplay";
+import { Button, Checkbox, Input, Search, Select, Textarea } from "../../Form";
+import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
 
 type Props = {
@@ -51,36 +53,92 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
   }
   return tabs;
 }
-
+const optionRelatedEntities: SelectOptionType[] = [
+  { label: "Text", value: "text", icon: IconEnum.text_align_justify },
+  { label: "Character", value: "characters", icon: IconEnum.character },
+  { label: "Blueprint instance", value: "blueprint_instances", icon: IconEnum.blueprint },
+  { label: "Document", value: "documents", icon: IconEnum.document },
+  { label: "Map", value: "maps", icon: IconEnum.map },
+  { label: "Map pin", value: "map_pins", icon: IconEnum.map_pin },
+  { label: "Graph", value: "graphs", icon: IconEnum.graph },
+  { label: "Event", value: "events", icon: IconEnum.event },
+  { label: "Word", value: "words", icon: IconEnum.word },
+  { label: "Image", value: "images", icon: IconEnum.image },
+];
 function OptionInput({
   name,
   title,
   description,
+  related_data,
   handleChange,
-  removeSuboption,
 }: {
   name: string;
   title: string;
   description: string;
+  related_data: RandomTableOptionType["related_data"];
   handleChange: (newValue: HandleChangePropsType) => void;
-  removeSuboption?: (newValue: HandleChangePropsType) => void;
 }) {
   return (
     <>
       <div className="flex flex-col items-center gap-x-2 border-zinc-700">
         <div className="flex w-full items-center gap-x-2">
-          <Input
-            label="Title (required)"
-            name={`${name}.title`}
-            onChange={handleChange}
-            value={title || ""}
-            variant={title ? "primary" : "error"}
-          />
-          {removeSuboption ? (
-            <div className="mb-2 h-6 w-6 self-end">
-              <Button hasNoBackground icon={IconEnum.trash} isIconOnly onClick={removeSuboption} variant="error" />
+          {!related_data ? (
+            <Input
+              label="Title (required)"
+              name={`${name}.title`}
+              onChange={handleChange}
+              value={title || ""}
+              variant={title ? "primary" : "error"}
+            />
+          ) : null}
+
+          {related_data && !related_data?.id && related_data?.type !== "text" ? (
+            <Search
+              label="Entity (required)"
+              name="related_id"
+              onChange={(e) => {
+                handleChange([
+                  { name: `${name}.title`, value: e.label },
+                  {
+                    name: `${name}.related_data`,
+                    value: { id: e.value, title: e.label, icon: e.icon, image_id: e.image, type: related_data.type },
+                  },
+                ]);
+              }}
+              searchEntity={related_data.type}
+              variant={related_data.id ? "primary" : "error"}
+            />
+          ) : null}
+          {!!related_data?.id && related_data?.type !== "text" ? (
+            <div className="flex-1">
+              <EntityPreview
+                clearAction={() => {
+                  handleChange([
+                    { name: `${name}.title`, value: null },
+                    {
+                      name: `${name}.related_data`,
+                      value: { type: related_data.type },
+                    },
+                  ]);
+                }}
+                icon={related_data?.icon}
+                id={related_data?.id || ""}
+                image_id={related_data?.image_id || null}
+                label="Entity"
+                title={related_data?.title || ""}
+                type={related_data.type}
+              />
             </div>
           ) : null}
+          <div className="w-1/3">
+            <Select
+              label="Type"
+              name={`${name}.related_data.type`}
+              onChange={handleChange}
+              options={optionRelatedEntities}
+              value={related_data?.type || "text"}
+            />
+          </div>
         </div>
       </div>
       <div>
@@ -98,6 +156,7 @@ function OptionInput({
 export function RandomTableDrawer({ data, exceptions }: Props) {
   const { project_id, item_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
+  const [areAllOpen, setAreAllOpen] = useState(false);
   const resetDrawerAtom = useToggledResetAtom();
 
   const { data: existingRandomTable, isInitialLoading } = useGetEntity<RandomTableType>(
@@ -140,7 +199,7 @@ export function RandomTableDrawer({ data, exceptions }: Props) {
   if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
-    <div className="flex flex-col gap-y-2">
+    <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {tabs[selectedTab].id === "1" ? (
         <>
@@ -174,22 +233,33 @@ export function RandomTableDrawer({ data, exceptions }: Props) {
         <>
           <div className="flex w-full items-center justify-between">
             <span>Insert new option:</span>
-            <div className="h-8 w-8">
-              <Button
-                icon={IconEnum.add}
-                onClick={() =>
-                  handleChange({
-                    name: "random_table_options",
-                    value: (randomTable?.random_table_options || []).concat({
-                      id: crypto.randomUUID(),
-                      title: "New option",
-                      description: "",
-                      parent_id: randomTable.id,
-                    } as RandomTableOptionType),
-                  })
-                }
-                variant="info"
-              />
+            <div className="flex flex-nowrap gap-x-2">
+              <div className="h-8 w-8">
+                <Button
+                  icon={IconEnum.add}
+                  onClick={() =>
+                    handleChange({
+                      name: "random_table_options",
+                      value: (randomTable?.random_table_options || []).concat({
+                        id: crypto.randomUUID(),
+                        title: "New option",
+                        description: "",
+                        parent_id: randomTable.id,
+                      } as RandomTableOptionType),
+                    })
+                  }
+                  variant="info"
+                />
+              </div>
+              <div className="h-8 w-8">
+                <Button
+                  icon={areAllOpen ? IconEnum.chevron_down : IconEnum.chevron_up}
+                  isDisabled={isInitialLoading}
+                  onClick={() => setAreAllOpen((prev) => !prev)}
+                  tooltip={"Open/Close all"}
+                  variant="info"
+                />
+              </div>
             </div>
           </div>
           <div className="flex max-h-full flex-col gap-y-2 overflow-y-auto">
@@ -210,7 +280,7 @@ export function RandomTableDrawer({ data, exceptions }: Props) {
                     hasNoBackground: true,
                   },
                 ]}
-                initialOpen={option.title === "New option"}
+                initialOpen={areAllOpen}
                 label={option.title}
                 variant={option?.title ? "primary" : "error"}>
                 <div className="flex flex-col gap-y-2 p-2">
@@ -218,6 +288,7 @@ export function RandomTableDrawer({ data, exceptions }: Props) {
                     description={option?.description || ""}
                     handleChange={handleChange}
                     name={`random_table_options[${optionIndex}]`}
+                    related_data={option?.related_data}
                     title={option.title}
                   />
                 </div>
@@ -235,44 +306,80 @@ export function RandomTableDrawer({ data, exceptions }: Props) {
           selectablePermissions={["read_random_tables", "update_random_tables", "delete_random_tables"]}
         />
       ) : null}
+      <div>
+        <Button
+          icon={randomTable?.id ? IconEnum.save : IconEnum.add}
+          isDisabled={isSaveDisabled(randomTable) || isCreating || isUpdating}
+          isLoading={isCreating || isUpdating}
+          label={randomTable?.id ? "Save" : "Create"}
+          onClick={async () => {
+            if (changedData) {
+              if (randomTable?.id) {
+                const parsed = UpdateRandomTableSchema.parse({
+                  data: randomTable,
+                  relations: {
+                    random_table_options: (randomTable?.random_table_options || [])?.map((opt) => {
+                      const temp = omit(opt, "related_data");
+                      if (opt.related_data?.type === "characters") temp.character_id = opt.related_data.id;
+                      else if (opt.related_data?.type === "blueprint_instances")
+                        temp.blueprint_instance_id = opt.related_data.id;
+                      else if (opt.related_data?.type === "documents") temp.document_id = opt.related_data.id;
+                      else if (opt.related_data?.type === "maps") temp.map_id = opt.related_data.id;
+                      else if (opt.related_data?.type === "map_pins") temp.map_pin_id = opt.related_data.id;
+                      else if (opt.related_data?.type === "graphs") temp.graph_id = opt.related_data.id;
+                      else if (opt.related_data?.type === "events") temp.event_id = opt.related_data.id;
+                      else if (opt.related_data?.type === "words") temp.word_id = opt.related_data.id;
+                      else if (opt.related_data?.type === "images") temp.image_id = opt.related_data.id;
 
-      <Button
-        icon={randomTable?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled(randomTable) || isCreating || isUpdating}
-        isLoading={isCreating || isUpdating}
-        label={randomTable?.id ? "Save" : "Create"}
-        onClick={async () => {
-          if (changedData) {
-            if (randomTable?.id) {
-              const parsed = UpdateRandomTableSchema.parse({
-                data: randomTable,
-                relations: { random_table_options: (randomTable?.random_table_options || [])?.map((opt) => ({ data: opt })) },
-                permissions: randomTable.permissions,
-              });
-              await update(parsed, {
-                onSuccess: (res) => {
-                  if (res?.ok) resetDrawerAtom();
-                },
-              });
-            } else {
-              const parsed = InsertRandomTableSchema.parse({
-                data: randomTable,
-                relations: { random_table_options: (randomTable?.random_table_options || [])?.map((opt) => ({ data: opt })) },
-                permissions: randomTable.permissions,
-              });
-              await create(parsed, {
-                onSuccess: (res) => {
-                  if (res?.ok) {
-                    resetDrawerAtom();
-                    setRandomTable({ project_id: project_id as string, parent_id: exceptions?.globalCreate ? null : item_id });
-                  }
-                },
-              });
+                      return { data: temp };
+                    }),
+                  },
+                  permissions: randomTable.permissions,
+                });
+                await update(parsed, {
+                  onSuccess: (res) => {
+                    if (res?.ok) resetDrawerAtom();
+                  },
+                });
+              } else {
+                const parsed = InsertRandomTableSchema.parse({
+                  data: randomTable,
+                  relations: {
+                    random_table_options: (randomTable?.random_table_options || [])?.map((opt) => {
+                      const temp = omit(opt, "related_data");
+                      if (opt.related_data?.type === "characters") temp.character_id = opt.related_data.id;
+                      else if (opt.related_data?.type === "blueprint_instances")
+                        temp.blueprint_instance_id = opt.related_data.id;
+                      else if (opt.related_data?.type === "documents") temp.document_id = opt.related_data.id;
+                      else if (opt.related_data?.type === "maps") temp.map_id = opt.related_data.id;
+                      else if (opt.related_data?.type === "map_pins") temp.map_pin_id = opt.related_data.id;
+                      else if (opt.related_data?.type === "graphs") temp.graph_id = opt.related_data.id;
+                      else if (opt.related_data?.type === "events") temp.event_id = opt.related_data.id;
+                      else if (opt.related_data?.type === "words") temp.word_id = opt.related_data.id;
+                      else if (opt.related_data?.type === "images") temp.image_id = opt.related_data.id;
+
+                      return { data: temp };
+                    }),
+                  },
+                  permissions: randomTable.permissions,
+                });
+                await create(parsed, {
+                  onSuccess: (res) => {
+                    if (res?.ok) {
+                      resetDrawerAtom();
+                      setRandomTable({
+                        project_id: project_id as string,
+                        parent_id: exceptions?.globalCreate ? null : item_id,
+                      });
+                    }
+                  },
+                });
+              }
             }
-          }
-        }}
-        variant="success"
-      />
-    </div>
+          }}
+          variant="success"
+        />
+      </div>
+    </DrawerLayout>
   );
 }
