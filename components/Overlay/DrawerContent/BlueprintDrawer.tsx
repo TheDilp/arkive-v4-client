@@ -388,15 +388,6 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
         <>
           {canCreateOrEdit ? (
             <div className="flex items-center justify-end gap-x-2">
-              <div className="h-8 w-8">
-                <Button
-                  icon={areAllOpen ? IconEnum.chevron_down : IconEnum.chevron_up}
-                  isDisabled={isLoading}
-                  onClick={() => setAreAllOpen((prev) => !prev)}
-                  tooltip={"Open/Close all"}
-                  variant="info"
-                />
-              </div>
               <Dropdown
                 allowedPlacements={["left-start"]}
                 isDisabled={canCreateOrEdit}
@@ -801,6 +792,15 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                   <Button icon={IconEnum.add} isDisabled={isLoading || !canCreateOrEdit} onClick={undefined} variant="info" />
                 </div>
               </Dropdown>
+              <div className="h-8 w-8">
+                <Button
+                  icon={areAllOpen ? IconEnum.chevron_down : IconEnum.chevron_up}
+                  isDisabled={isLoading}
+                  onClick={() => setAreAllOpen((prev) => !prev)}
+                  tooltip={"Open/Close all"}
+                  variant="info"
+                />
+              </div>
             </div>
           ) : null}
           <DragDropContext
