@@ -1,4 +1,4 @@
-import { SearchableMentionEntities } from "../../types";
+import { SearchableMentionEntities, SelectOptionType } from "../../types";
 import { AvailableManuscriptEntityTypes } from "../../types/EntityTypes/manuscriptTypes";
 import { AvailableIcons, IconEnum } from "./IconEnums";
 
@@ -318,4 +318,17 @@ export const MentionEntityOptions: {
     icon: IconEnum.word,
     hasAlterNames: false,
   },
+];
+
+export const optionRelatedEntities: SelectOptionType[] = [
+  { label: "Text", value: "text", icon: IconEnum.text_align_justify },
+  { label: "Character", value: "characters", icon: IconEnum.character },
+  { label: "Blueprint instance", value: "blueprint_instances", icon: IconEnum.blueprint },
+  { label: "Document", value: "documents", icon: IconEnum.document },
+  { label: "Map", value: "maps", icon: IconEnum.map },
+  { label: "Map pin", value: "map_pins", icon: IconEnum.map_pin },
+  { label: "Graph", value: "graphs", icon: IconEnum.graph },
+  { label: "Event", value: "events", icon: IconEnum.event },
+  { label: "Word", value: "words", icon: IconEnum.word },
+  { label: "Image", value: "images", icon: IconEnum.image },
 ];

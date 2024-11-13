@@ -10,9 +10,9 @@ import {
   useToggledResetAtom,
   useUpdateEntity,
 } from "../../../hooks";
-import { DrawerAtomType, HandleChangePropsType, SelectOptionType, TabType, UserHasPermissionsType } from "../../../types";
+import { DrawerAtomType, HandleChangePropsType, TabType, UserHasPermissionsType } from "../../../types";
 import { RandomTableOptionType, RandomTableType } from "../../../types/EntityTypes/randomTableTypes";
-import { IconEnum } from "../../../utils";
+import { IconEnum, optionRelatedEntities } from "../../../utils";
 import {
   InsertRandomTableSchema,
   InsertRandomTableType,
@@ -53,18 +53,7 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
   }
   return tabs;
 }
-const optionRelatedEntities: SelectOptionType[] = [
-  { label: "Text", value: "text", icon: IconEnum.text_align_justify },
-  { label: "Character", value: "characters", icon: IconEnum.character },
-  { label: "Blueprint instance", value: "blueprint_instances", icon: IconEnum.blueprint },
-  { label: "Document", value: "documents", icon: IconEnum.document },
-  { label: "Map", value: "maps", icon: IconEnum.map },
-  { label: "Map pin", value: "map_pins", icon: IconEnum.map_pin },
-  { label: "Graph", value: "graphs", icon: IconEnum.graph },
-  { label: "Event", value: "events", icon: IconEnum.event },
-  { label: "Word", value: "words", icon: IconEnum.word },
-  { label: "Image", value: "images", icon: IconEnum.image },
-];
+
 function OptionInput({
   name,
   title,
