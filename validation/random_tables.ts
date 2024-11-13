@@ -52,7 +52,16 @@ export const InsertRandomTableOptionSchema = z.object({
       .transform((value) => value.trim())
       .nullable()
       .optional(),
-    parent_id: z.string(),
+
+    character_id: z.string().optional().nullable(),
+    blueprint_instance_id: z.string().optional().nullable(),
+    document_id: z.string().optional().nullable(),
+    map_id: z.string().optional().nullable(),
+    map_pin_id: z.string().optional().nullable(),
+    graph_id: z.string().optional().nullable(),
+    event_id: z.string().optional().nullable(),
+    word_id: z.string().optional().nullable(),
+    image_id: z.string().optional().nullable(),
     icon: z.string().nullable().optional(),
     icon_color: z.string().nullable().optional(),
   }),
@@ -69,6 +78,15 @@ export const UpdateRandomTableOptionSchema = z.object({
       .transform((value) => value.trim())
       .nullable()
       .optional(),
+    character_id: z.string().optional().nullable(),
+    blueprint_instance_id: z.string().optional().nullable(),
+    document_id: z.string().optional().nullable(),
+    map_id: z.string().optional().nullable(),
+    map_pin_id: z.string().optional().nullable(),
+    graph_id: z.string().optional().nullable(),
+    event_id: z.string().optional().nullable(),
+    word_id: z.string().optional().nullable(),
+    image_id: z.string().optional().nullable(),
     icon: z.string().nullable().optional(),
     icon_color: z.string().nullable().optional(),
   }),
@@ -90,21 +108,7 @@ export const InsertRandomTableSchema = z.object({
   }),
   relations: z
     .object({
-      random_table_options: z
-        .object({
-          data: z.object({
-            title: z.string().transform((value) => value.trim()),
-            description: z
-              .string()
-              .transform((value) => value.trim())
-              .nullable()
-              .optional(),
-            icon: z.string().nullable().optional(),
-            icon_color: z.string().nullable().optional(),
-          }),
-        })
-        .array()
-        .optional(),
+      random_table_options: InsertRandomTableOptionSchema.array().optional(),
     })
     .optional(),
 
