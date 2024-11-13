@@ -63,12 +63,6 @@ function createColumns(
                 },
               },
               {
-                id: "expand",
-                title: `${!row.getIsExpanded() ? "Show" : "Hide"} suboptions`,
-                icon: IconEnum.random_table,
-                onClick: row.getToggleExpandedHandler(),
-              },
-              {
                 id: "discord",
                 title: "Send to Discord",
                 icon: IconEnum.discord,
