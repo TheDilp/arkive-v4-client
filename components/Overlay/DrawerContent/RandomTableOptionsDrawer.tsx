@@ -83,7 +83,7 @@ export function RandomTableOptionsDrawer({ data }: { data: { parent_id: string }
             variant={option?.title ? "primary" : "error"}>
             <div className="flex flex-col gap-y-2 p-2">
               <div className="flex w-full items-center gap-x-2">
-                {!option.related_data ? (
+                {!option.related_data || option?.related_data?.type === "text" ? (
                   <Input
                     label="Title (required)"
                     name={`[${idx}].title`}

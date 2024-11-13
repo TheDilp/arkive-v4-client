@@ -70,7 +70,7 @@ export function OptionInput({
   return (
     <>
       <div className="flex w-full items-center gap-x-2">
-        {!related_data ? (
+        {!related_data || related_data?.type === "text" ? (
           <Input
             label="Title (required)"
             name={`${name}.title`}
