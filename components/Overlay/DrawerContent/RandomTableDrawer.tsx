@@ -54,7 +54,7 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
   return tabs;
 }
 
-function OptionInput({
+export function OptionInput({
   name,
   title,
   description,
@@ -69,65 +69,63 @@ function OptionInput({
 }) {
   return (
     <>
-      <div className="flex flex-col items-center gap-x-2 border-zinc-700">
-        <div className="flex w-full items-center gap-x-2">
-          {!related_data ? (
-            <Input
-              label="Title (required)"
-              name={`${name}.title`}
-              onChange={handleChange}
-              value={title || ""}
-              variant={title ? "primary" : "error"}
-            />
-          ) : null}
+      <div className="flex w-full items-center gap-x-2">
+        {!related_data ? (
+          <Input
+            label="Title (required)"
+            name={`${name}.title`}
+            onChange={handleChange}
+            value={title || ""}
+            variant={title ? "primary" : "error"}
+          />
+        ) : null}
 
-          {related_data && !related_data?.id && related_data?.type !== "text" ? (
-            <Search
-              label="Entity (required)"
-              name="related_id"
-              onChange={(e) => {
+        {related_data && !related_data?.id && related_data?.type !== "text" ? (
+          <Search
+            label="Entity (required)"
+            name="related_id"
+            onChange={(e) => {
+              handleChange([
+                { name: `${name}.title`, value: e.label },
+                {
+                  name: `${name}.related_data`,
+                  value: { id: e.value, title: e.label, icon: e.icon, image_id: e.image, type: related_data.type },
+                },
+              ]);
+            }}
+            searchEntity={related_data.type}
+            variant={related_data.id ? "primary" : "error"}
+          />
+        ) : null}
+        {!!related_data?.id && related_data?.type !== "text" ? (
+          <div className="flex-1">
+            <EntityPreview
+              clearAction={() => {
                 handleChange([
-                  { name: `${name}.title`, value: e.label },
+                  { name: `${name}.title`, value: null },
                   {
                     name: `${name}.related_data`,
-                    value: { id: e.value, title: e.label, icon: e.icon, image_id: e.image, type: related_data.type },
+                    value: { type: related_data.type },
                   },
                 ]);
               }}
-              searchEntity={related_data.type}
-              variant={related_data.id ? "primary" : "error"}
-            />
-          ) : null}
-          {!!related_data?.id && related_data?.type !== "text" ? (
-            <div className="flex-1">
-              <EntityPreview
-                clearAction={() => {
-                  handleChange([
-                    { name: `${name}.title`, value: null },
-                    {
-                      name: `${name}.related_data`,
-                      value: { type: related_data.type },
-                    },
-                  ]);
-                }}
-                icon={related_data?.icon}
-                id={related_data?.id || ""}
-                image_id={related_data?.image_id || null}
-                label="Entity"
-                title={related_data?.title || ""}
-                type={related_data.type}
-              />
-            </div>
-          ) : null}
-          <div className="w-1/3">
-            <Select
-              label="Type"
-              name={`${name}.related_data.type`}
-              onChange={handleChange}
-              options={optionRelatedEntities}
-              value={related_data?.type || "text"}
+              icon={related_data?.icon}
+              id={related_data?.id || ""}
+              image_id={related_data?.image_id || null}
+              label="Entity"
+              title={related_data?.title || ""}
+              type={related_data.type}
             />
           </div>
+        ) : null}
+        <div className="w-1/3">
+          <Select
+            label="Type"
+            name={`${name}.related_data.type`}
+            onChange={handleChange}
+            options={optionRelatedEntities}
+            value={related_data?.type || "text"}
+          />
         </div>
       </div>
       <div>
