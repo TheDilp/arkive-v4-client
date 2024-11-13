@@ -118,7 +118,7 @@ export function OptionInput({
             />
           </div>
         ) : null}
-        <div className="w-1/3">
+        <div className="min-w-[33%]">
           <Select
             label="Type"
             name={`${name}.related_data.type`}
