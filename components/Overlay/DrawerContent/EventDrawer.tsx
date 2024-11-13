@@ -319,7 +319,7 @@ export function EventDrawer({ data, exceptions }: Props) {
               </div>
 
               <Collapsible initialOpen label="Start">
-                <div className="flex flex-col gap-y-2 py-2">
+                <div className="flex flex-col gap-y-2 p-2">
                   <div className="flex items-center justify-between gap-x-2">
                     <Input
                       isReadOnly={data?.isReadOnly}
