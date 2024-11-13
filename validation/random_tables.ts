@@ -52,7 +52,6 @@ export const InsertRandomTableOptionSchema = z.object({
       .transform((value) => value.trim())
       .nullable()
       .optional(),
-
     character_id: z.string().optional().nullable(),
     blueprint_instance_id: z.string().optional().nullable(),
     document_id: z.string().optional().nullable(),

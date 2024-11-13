@@ -148,7 +148,7 @@ export function RandomTableView() {
   const { data, isLoading } = useGetEntities<RandomTableOptionType>(
     {
       data: { parent_id: item_id as string, project_id },
-      fields: ["id", "title", "description", "icon", "icon_color"],
+      fields: ["id", "title", "description"],
       relations: { random_table_suboptions: true },
       permissions: true,
       orderBy,

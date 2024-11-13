@@ -248,7 +248,7 @@ export function useCreateEntities<InsertType extends { data: { [key: string]: an
     }
   );
 }
-
+// Used for adding suboptions to an existing parent
 export function useCreateSubEntities<InsertType extends { data: { data: { parent_id: string } }[] }>(
   type: AvailableSubEntityType,
   parent_id: string
