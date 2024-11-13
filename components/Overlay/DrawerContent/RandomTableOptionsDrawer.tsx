@@ -5,59 +5,158 @@ import { useParams } from "react-router-dom";
 
 import { useCreateSubEntities, useHandleChange, useToggledResetAtom } from "../../../hooks";
 import { RandomTableOptionType } from "../../../types/EntityTypes/randomTableTypes";
-import { IconEnum } from "../../../utils";
+import { IconEnum, optionRelatedEntities } from "../../../utils";
 import { InsertRandomTableOptionSchema, InsertRandomTableOptionType } from "../../../validation/random_tables";
-import { Button, Input, Textarea } from "../../Form";
+import { EntityPreview } from "../../DataDisplay";
+import { Button, Input, Search, Select, Textarea } from "../../Form";
+import { Collapsible } from "../../Layout";
 
 export function RandomTableOptionsDrawer({ data }: { data: { parent_id: string } }) {
   const queryClient = useQueryClient();
   const { project_id } = useParams();
-  const [options, setOptions] = useState<Pick<RandomTableOptionType, "id" | "title" | "description" | "icon" | "icon_color">[]>(
-    []
-  );
+  const [options, setOptions] = useState<RandomTableOptionType[]>([]);
   const resetDrawerAtom = useToggledResetAtom();
-  const { mutateAsync: create, isLoading: isCreating } = useCreateSubEntities<{ data: InsertRandomTableOptionType[] }>(
-    "random_table_options",
-    data.parent_id
-  );
+  const { mutateAsync: create, isLoading: isCreating } = useCreateSubEntities<{
+    data: (InsertRandomTableOptionType & { data: { parent_id: string } })[];
+  }>("random_table_options", data.parent_id);
+  const [areAllOpen, setAreAllOpen] = useState(false);
+
   const { handleChange } = useHandleChange({ data: options, setData: setOptions });
   return (
     <div className="flex h-full flex-col gap-y-2">
       <div className="flex w-full items-center justify-between">
         <span>Insert new option:</span>
-        <div className="h-8 w-8">
-          <Button
-            icon={IconEnum.add}
-            onClick={() => setOptions((prev) => [...prev, { id: crypto.randomUUID(), title: "", parent_id: data.parent_id }])}
-            variant="info"
-          />
+        <div className="flex gap-x-2">
+          <div className="h-8 w-8">
+            <Button
+              icon={IconEnum.add}
+              onClick={() =>
+                setOptions((prev) => [
+                  ...prev,
+                  {
+                    id: crypto.randomUUID(),
+                    title: "New option",
+                    character_id: null,
+                    blueprint_instance_id: null,
+                    document_id: null,
+                    map_id: null,
+                    map_pin_id: null,
+                    graph_id: null,
+                    event_id: null,
+                    word_id: null,
+                    image_id: null,
+                    related_data: null,
+                    parent_id: data.parent_id,
+                  },
+                ])
+              }
+              variant="info"
+            />
+          </div>
+          <div className="h-8 w-8">
+            <Button
+              icon={areAllOpen ? IconEnum.chevron_down : IconEnum.chevron_up}
+              onClick={() => setAreAllOpen((prev) => !prev)}
+              tooltip={"Open/Close all"}
+              variant="info"
+            />
+          </div>
         </div>
       </div>
       <div className="flex flex-col gap-y-2 overflow-auto">
-        {options.map((opt, idx) => (
-          <div key={opt.id} className="flex flex-col gap-y-1">
-            <hr className="mb-2 border-zinc-700" />
-            <div className="flex flex-nowrap items-center gap-x-2">
-              <Input label="Title (required)" name={`[${idx}].title`} onChange={handleChange} value={opt?.title || ""} />
-              {/* <div className="mb-2 h-6 w-6 self-end rounded-full border border-dashed" /> */}
-              <div className="h-10 w-8 self-end">
-                <Button
-                  hasNoBackground
-                  icon={IconEnum.trash}
-                  onClick={() => setOptions((prev) => prev.filter((o) => o.id !== opt.id))}
-                  variant="error"
+        {options.map((option, idx) => (
+          <Collapsible
+            key={option.id}
+            actions={[
+              {
+                icon: IconEnum.trash,
+                variant: "error",
+                onClick: () => {
+                  setOptions(options?.toSpliced(idx, 1));
+                },
+                isIconOnly: true,
+                hasNoBackground: true,
+              },
+            ]}
+            initialOpen={areAllOpen}
+            label={option.title}
+            variant={option?.title ? "primary" : "error"}>
+            <div className="flex flex-col gap-y-2 p-2">
+              <div className="flex w-full items-center gap-x-2">
+                {!option.related_data ? (
+                  <Input
+                    label="Title (required)"
+                    name={`[${idx}].title`}
+                    onChange={handleChange}
+                    value={option.title || ""}
+                    variant={option.title ? "primary" : "error"}
+                  />
+                ) : null}
+
+                {option.related_data && !option?.related_data?.id && option.related_data?.type !== "text" ? (
+                  <Search
+                    label="Entity (required)"
+                    name="related_id"
+                    onChange={(e) => {
+                      handleChange([
+                        { name: `[${idx}].title`, value: e.label },
+                        {
+                          name: `[${idx}].related_data`,
+                          value: {
+                            id: e.value,
+                            title: e.label,
+                            icon: e.icon,
+                            image_id: e.image,
+                            type: option.related_data?.type,
+                          },
+                        },
+                      ]);
+                    }}
+                    searchEntity={option.related_data?.type}
+                    variant={option.related_data?.id ? "primary" : "error"}
+                  />
+                ) : null}
+                {!!option.related_data?.id && option.related_data?.type !== "text" ? (
+                  <div className="flex-1">
+                    <EntityPreview
+                      clearAction={() => {
+                        handleChange([
+                          { name: `[${idx}].title`, value: null },
+                          {
+                            name: `[${idx}].related_data`,
+                            value: { type: option.related_data?.type },
+                          },
+                        ]);
+                      }}
+                      icon={option.related_data?.icon}
+                      id={option.related_data?.id || ""}
+                      image_id={option.related_data?.image_id || null}
+                      label="Entity"
+                      title={option.related_data?.title || ""}
+                      type={option.related_data.type}
+                    />
+                  </div>
+                ) : null}
+                <div className="min-w-[33%]">
+                  <Select
+                    label="Type"
+                    name={`[${idx}].related_data.type`}
+                    onChange={handleChange}
+                    options={optionRelatedEntities}
+                    value={option?.related_data?.type || "text"}
+                  />
+                </div>
+              </div>
+              <div>
+                <Textarea
+                  label="Description (optional)"
+                  name={`[${idx}].description`}
+                  onChange={handleChange}
+                  value={option.description || ""}
                 />
               </div>
             </div>
-            <div>
-              <Textarea
-                label="Description"
-                name={`[${idx}].description`}
-                onChange={handleChange}
-                value={opt?.description || ""}
-              />
-            </div>
-          </div>
+          </Collapsible>
         ))}
       </div>
       <div className="w-full">
@@ -68,9 +167,25 @@ export function RandomTableOptionsDrawer({ data }: { data: { parent_id: string }
           label="Add"
           onClick={async () => {
             const optionsToCreate = options.map((opt) => {
-              return { data: omit(opt, "id") };
+              const temp = omit(opt, ["id", "related_data"]);
+              if (opt.related_data?.type === "characters") temp.character_id = opt.related_data.id;
+              else if (opt.related_data?.type === "blueprint_instances") temp.blueprint_instance_id = opt.related_data.id;
+              else if (opt.related_data?.type === "documents") temp.document_id = opt.related_data.id;
+              else if (opt.related_data?.type === "maps") temp.map_id = opt.related_data.id;
+              else if (opt.related_data?.type === "map_pins") temp.map_pin_id = opt.related_data.id;
+              else if (opt.related_data?.type === "graphs") temp.graph_id = opt.related_data.id;
+              else if (opt.related_data?.type === "events") temp.event_id = opt.related_data.id;
+              else if (opt.related_data?.type === "words") temp.word_id = opt.related_data.id;
+              else if (opt.related_data?.type === "images") temp.image_id = opt.related_data.id;
+              return { data: temp };
             });
-            const parsedData = InsertRandomTableOptionSchema.array().parse(optionsToCreate);
+            const parsedData = InsertRandomTableOptionSchema.transform((item) => ({
+              ...item,
+              data: { ...item.data, parent_id: data.parent_id },
+            }))
+              .array()
+              .parse(optionsToCreate);
+
             await create(
               { data: parsedData },
               {
