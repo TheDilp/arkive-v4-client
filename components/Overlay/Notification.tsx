@@ -2,7 +2,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { tv } from "tailwind-variants";
 
-import { DiceRollType, NotificationType } from "../../types";
+import { AssetType, DiceRollType, NotificationType } from "../../types";
 import { IconEnum, notificationsAtom, removeNotification } from "../../utils";
 import { getCritColor } from "../../utils/ui/diceRollerUtils";
 import { Button } from "../Form";
@@ -77,7 +77,9 @@ const NotificationClasses = tv({
       false: {},
     },
     hasEntityImage: {
-      true: {},
+      true: {
+        iconContainer: "bg-transparent",
+      },
       false: {},
     },
   },
@@ -166,6 +168,7 @@ export function Notification({
   icon,
   image_id,
   image_url,
+  image_type = "images",
   variant = "primary",
   actions,
   position = "top-right",
@@ -229,12 +232,12 @@ export function Notification({
             ) : null}
             {image_id ? (
               <div className={iconContainer()}>
-                <Avatar image_id={image_id} />
+                <Avatar imageType={image_type as AssetType} image_id={image_id} />
               </div>
             ) : null}
             {image_url ? (
               <div className={userImage()}>
-                <Avatar image_url={image_url} size="xs" />
+                <Avatar imageType={image_type as AssetType} image_url={image_url} size="xs" />
               </div>
             ) : null}
             <div className={titleClasses()}>{title}</div>

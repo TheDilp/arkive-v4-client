@@ -1,5 +1,5 @@
 import { AvailableIcons } from "../../../utils";
-import { Variant } from "../../baseTypes";
+import { AssetType, Variant } from "../../baseTypes";
 import { ButtonType } from "../FormTypes";
 
 type NotificationPositionsType = "top" | "center" | "top-right";
@@ -13,6 +13,7 @@ export interface NotificationType {
   icon?: AvailableIcons;
   image_id?: string;
   image_url?: string;
+  image_type?: AssetType | null;
   variant?: Variant;
   position?: NotificationPositionsType;
   hasTitleBorder?: boolean;

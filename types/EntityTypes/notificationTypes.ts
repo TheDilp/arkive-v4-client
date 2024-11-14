@@ -1,3 +1,5 @@
+import { ImageType } from "./imageTypes";
+
 type NotificationAction = "create" | "update" | "arkive" | "delete";
 
 type NotificationEntitiesType =
@@ -29,6 +31,7 @@ export interface NotificationEntityType {
   user_name: string;
   user_image: string | null;
   image_id: string | null;
+  image_type?: ImageType | null;
   action: NotificationAction;
   project_id: string;
   entity_type: NotificationEntitiesType;
