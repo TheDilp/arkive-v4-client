@@ -2,15 +2,17 @@ import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { Dispatch, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
+import { Avatar, Button, createColumnHelper, Dropdown, Icon, Table, TablePageLayout, Tooltip } from "../../components";
 import { useGetEntities, useGetEntity, useHasPermissions, useTable } from "../../hooks";
-import { DialogAtomType, DrawerAtomType, WebhookType } from "../../types";
+import { AvailableEntityType, DialogAtomType, DrawerAtomType, WebhookType } from "../../types";
 import { RandomTableOptionType, RandomTableType } from "../../types/EntityTypes/randomTableTypes";
 import {
   baseURLS,
   dialogAtom,
   drawerAtom,
   FetchFunction,
+  getDefaultEntityIcon,
+  getSingularEntityType,
   hasActionPermission,
   hasEntityUpdatePermissionForEntityView,
   IconEnum,
@@ -28,6 +30,42 @@ function createColumns(
   webhooks: WebhookType[]
 ) {
   return [
+    columnHelper.display({
+      id: "is_folder",
+      header: "",
+      cell: ({ row }) => (
+        <Tooltip
+          content={
+            !row.original.related_data?.type
+              ? "Text"
+              : getSingularEntityType(row.original.related_data.type as AvailableEntityType)
+          }>
+          <div className="flex w-full justify-center">
+            {row.original.related_data?.image_id ? (
+              <Avatar
+                imageType={row.original.related_data.type === "maps" ? "map_images" : "images"}
+                image_id={row.original.related_data.image_id || ""}
+                isBordered
+                isTooltipDisabled
+                size="sm"
+              />
+            ) : null}
+            {row.original.related_data?.icon ? <Icon fontSize={24} icon={row.original.related_data?.icon} /> : null}
+            {row.original.related_data && !row.original.related_data.icon && !row.original.related_data.image_id ? (
+              <Icon fontSize={24} icon={getDefaultEntityIcon(row.original.related_data?.type as AvailableEntityType)} />
+            ) : null}
+            {!row.original.related_data ? <Icon fontSize={24} icon={IconEnum.text_align_justify} /> : null}
+          </div>
+        </Tooltip>
+      ),
+      maxSize: 3.25,
+      minSize: 3.25,
+      meta: {
+        centered: true,
+        noLink: true,
+      },
+    }),
+
     columnHelper.accessor("title", {
       id: "title",
       header: "Title",
@@ -141,7 +179,7 @@ export function RandomTableView() {
 
   const { data, isLoading } = useGetEntities<RandomTableOptionType>(
     {
-      data: { parent_id: item_id as string, project_id },
+      data: { parent_id: randomTableData?.data?.id, project_id },
       fields: ["id", "title", "description"],
       relations: { random_table_suboptions: true },
       permissions: true,
