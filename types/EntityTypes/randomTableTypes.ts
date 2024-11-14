@@ -1,3 +1,4 @@
+import { AvailableIcons } from "../../utils";
 import { BaseEntityType } from "./baseEntityTypes";
 
 type OptionEntityType =
@@ -29,7 +30,7 @@ export interface RandomTableOptionType {
   related_data: {
     id: string;
     title: string;
-    icon: string | undefined | null;
+    icon: AvailableIcons | undefined | null;
     image_id: string | undefined | null;
     type: OptionEntityType;
   } | null;
