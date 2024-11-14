@@ -217,7 +217,9 @@ export function RandomTableView() {
           timer: 15,
           description: option?.description || "",
           variant: "info",
-          icon: IconEnum.d20,
+          icon: option.related_data?.icon || IconEnum.d20,
+          image_id: option.related_data?.image_id || undefined,
+          image_type: option.related_data?.type === "maps" ? "map_images" : "images",
           hasTitleBorder: true,
           position: "top",
         });
