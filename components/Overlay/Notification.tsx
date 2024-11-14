@@ -232,7 +232,7 @@ export function Notification({
             ) : null}
             {image_id ? (
               <div className={iconContainer()}>
-                <Avatar imageType={image_type as AssetType} image_id={image_id} />
+                <Avatar imageType={image_type as AssetType} image_id={image_id} size="sm" />
               </div>
             ) : null}
             {image_url ? (
