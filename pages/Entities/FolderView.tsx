@@ -131,19 +131,22 @@ function getColumns(
     columnHelper.display({
       id: "is_folder",
       header: "",
-      cell: ({ row }) =>
-        "image" in row.original && (row.original.image as ImageType) && show_image ? (
-          <Avatar image_id={(row.original.image as ImageType)?.id || ""} isBordered isTooltipDisabled size="sm" />
-        ) : (
-          <Icon
-            fontSize={24}
-            icon={
-              row.original.is_folder
-                ? IconEnum.folder
-                : (row.original.icon as AvailableIcons) || getDefaultEntityIcon(entityType)
-            }
-          />
-        ),
+      cell: ({ row }) => (
+        <div className="flex w-full justify-center">
+          {"image" in row.original && (row.original.image as ImageType) && show_image ? (
+            <Avatar image_id={(row.original.image as ImageType)?.id || ""} isBordered isTooltipDisabled size="sm" />
+          ) : (
+            <Icon
+              fontSize={24}
+              icon={
+                row.original.is_folder
+                  ? IconEnum.folder
+                  : (row.original.icon as AvailableIcons) || getDefaultEntityIcon(entityType)
+              }
+            />
+          )}
+        </div>
+      ),
       maxSize: 3.25,
       minSize: 3.25,
       meta: {

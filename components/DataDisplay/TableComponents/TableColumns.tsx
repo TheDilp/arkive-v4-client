@@ -45,52 +45,54 @@ export function SelectColumn<T>(
 
     cell: ({ table, row }) => {
       return (
-        <Checkbox
-          name={row.id}
-          onChange={(_, e) => {
-            if (e.shiftKey) {
-              const firstIdx = table
-                .getPaginationRowModel()
-                .flatRows.findIndex(
-                  (row) => row?.original?.id === (table.options.meta as MetaType)?.selection?.[pagination?.page || 0]?.[0]
-                );
+        <div className="flex w-full justify-center">
+          <Checkbox
+            name={row.id}
+            onChange={(_, e) => {
+              if (e.shiftKey) {
+                const firstIdx = table
+                  .getPaginationRowModel()
+                  .flatRows.findIndex(
+                    (row) => row?.original?.id === (table.options.meta as MetaType)?.selection?.[pagination?.page || 0]?.[0]
+                  );
 
-              if (firstIdx > -1) {
-                if (firstIdx < row.index) {
-                  dispatch({
-                    type: "selectAll",
-                    payload: {
-                      rows: table
-                        .getPaginationRowModel()
-                        .flatRows.slice(firstIdx, row.index + 1)
-                        .map((r) => r.original.id),
-                    },
-                  });
+                if (firstIdx > -1) {
+                  if (firstIdx < row.index) {
+                    dispatch({
+                      type: "selectAll",
+                      payload: {
+                        rows: table
+                          .getPaginationRowModel()
+                          .flatRows.slice(firstIdx, row.index + 1)
+                          .map((r) => r.original.id),
+                      },
+                    });
+                  } else {
+                    const lastIndex = table
+                      .getPaginationRowModel()
+                      .flatRows.findLastIndex((row) =>
+                        (table.options.meta as MetaType)?.selection?.[pagination?.page || 0]?.includes(row?.original?.id)
+                      );
+                    dispatch({
+                      type: "selectAll",
+                      payload: {
+                        rows: table
+                          .getPaginationRowModel()
+                          .flatRows.slice(row.index, lastIndex + 1)
+                          .map((r) => r.original.id),
+                      },
+                    });
+                  }
                 } else {
-                  const lastIndex = table
-                    .getPaginationRowModel()
-                    .flatRows.findLastIndex((row) =>
-                      (table.options.meta as MetaType)?.selection?.[pagination?.page || 0]?.includes(row?.original?.id)
-                    );
-                  dispatch({
-                    type: "selectAll",
-                    payload: {
-                      rows: table
-                        .getPaginationRowModel()
-                        .flatRows.slice(row.index, lastIndex + 1)
-                        .map((r) => r.original.id),
-                    },
-                  });
+                  dispatch({ type: "setSelection", payload: { row: row.original.id } });
                 }
               } else {
                 dispatch({ type: "setSelection", payload: { row: row.original.id } });
               }
-            } else {
-              dispatch({ type: "setSelection", payload: { row: row.original.id } });
-            }
-          }}
-          value={selected ? selected.includes(row.original.id) : false}
-        />
+            }}
+            value={selected ? selected.includes(row.original.id) : false}
+          />
+        </div>
       );
     },
     meta: {

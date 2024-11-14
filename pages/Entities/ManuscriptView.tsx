@@ -60,7 +60,9 @@ function createColumns(
       id: "icon",
       header: "",
       cell: ({ row }) => (
-        <Icon fontSize={24} icon={(row.original.icon as AvailableIcons | undefined) || IconEnum.manuscripts} />
+        <div className="flex w-full justify-center">
+          <Icon fontSize={24} icon={(row.original.icon as AvailableIcons | undefined) || IconEnum.manuscripts} />
+        </div>
       ),
       maxSize: 3.25,
       minSize: 3.25,

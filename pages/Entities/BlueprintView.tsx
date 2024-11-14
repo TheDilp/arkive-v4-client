@@ -49,7 +49,11 @@ function createColumns(
   return [
     columnHelper.display({
       id: "icon",
-      cell: ({ row }) => <Icon fontSize={24} icon={row.original?.icon || getDefaultEntityIcon("blueprints")} />,
+      cell: ({ row }) => (
+        <div className="flex w-full justify-center">
+          <Icon fontSize={24} icon={row.original?.icon || getDefaultEntityIcon("blueprints")} />
+        </div>
+      ),
       maxSize: 3.25,
       minSize: 3.25,
       meta: {
