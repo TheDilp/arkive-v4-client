@@ -188,7 +188,15 @@ function EntityWithRelatedRow({
           : ["id as value", "title as label"],
       filters: { and: [{ field: "id", id: "name", header_name: "Full name", value: related, operator: "in" }] },
     },
-    entity_type as "characters" | "blueprint_instances" | "documents" | "maps" | "map_pins" | "events" | "words",
+    entity_type as
+      | "characters"
+      | "blueprint_instances"
+      | "documents"
+      | "maps"
+      | "map_pins"
+      | "events"
+      | "words"
+      | "random_tables",
     { enabled: !!related?.length && entity_type !== "images", queryKeyConcat: related }
   );
 
@@ -240,15 +248,6 @@ function EntityWithRelatedRow({
     }
   }, [images, related]);
 
-  useEffect(() => {
-    setSelectedEntities([]);
-    const toChange = [
-      { name: `template_fields[${idx}].value`, value: null },
-      { name: `template_fields[${idx}].related`, value: [] },
-    ];
-    handleChange(toChange);
-  }, [isRandomized]);
-
   return (
     <div className="flex flex-col gap-y-2">
       <div className="flex flex-nowrap gap-x-1">
@@ -286,8 +285,13 @@ function EntityWithRelatedRow({
               label="Random"
               name={`template_fields[${idx}].is_randomized`}
               onChange={(e) => {
+                const toChange = [
+                  e,
+                  { name: `template_fields[${idx}].value`, value: null },
+                  { name: `template_fields[${idx}].related`, value: [] },
+                ];
                 setSelectedEntities([]);
-                handleChange(e);
+                handleChange(toChange);
               }}
               tooltip="Keys will be replaced when generating the document."
               value={!!isRandomized}
