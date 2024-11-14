@@ -279,7 +279,7 @@ function EntityWithRelatedRow({
             value={entity_type}
           />
         </div>
-        {entity_type === "images" ? null : (
+        {entity_type === "images" || entity_type === "random_tables" ? null : (
           <div className="flex w-16 items-center justify-between px-2">
             <Checkbox
               label="Random"
@@ -348,52 +348,38 @@ function EntityWithRelatedRow({
                 />
               )}
             </div>
-            <div className="flex w-full flex-col gap-y-2">
-              {isRandomized ? (
-                <div className="flex-1">
-                  <Select
-                    hasSearch
-                    label="Random count"
-                    name={`template_fields[${idx}].random_count`}
-                    onChange={handleChange}
-                    options={RandomCountOptions}
-                    value={random_count}
-                  />
-                </div>
-              ) : null}
-              {isRandomized ? null : (
-                <div className="flex flex-1 flex-col gap-y-2">
-                  <Search
-                    isAutofocused
-                    isDisabled={
-                      !parent?.data?.id || (!!isRandomized && !!(selectedEntities.length >= getMaxEntityCount(random_count)))
-                    }
-                    isMultiple
-                    label="Replace with"
-                    name={`template_fields[${idx}].related`}
-                    onBrowserChange={(props) => {
-                      const updateValues = [...(related || [])];
-                      props.forEach(({ value }, itemIndex) => {
-                        if (updateValues?.includes(value)) {
-                          updateValues.splice(itemIndex, 1);
-                        } else {
-                          updateValues.push(value);
-                        }
-                      });
-                      handleChange({ name: `template_fields[${idx}].related`, value: updateValues });
-                    }}
-                    onChange={({ value: newValue }) => {
-                      if (related?.includes(newValue))
-                        handleChange({ name: `template_fields[${idx}].related`, value: related.filter((v) => v !== newValue) });
-                      else handleChange({ name: `template_fields[${idx}].related`, value: related.concat(newValue) });
-                    }}
-                    parent_id={parent?.data?.id}
-                    searchEntity={entity_type as EntitiesWithRelatedType}
-                    value={related}
-                  />
-                </div>
-              )}
-            </div>
+            {isRandomized ? null : (
+              <div className="flex flex-1 flex-col gap-y-2">
+                <Search
+                  isAutofocused
+                  isDisabled={
+                    !parent?.data?.id || (!!isRandomized && !!(selectedEntities.length >= getMaxEntityCount(random_count)))
+                  }
+                  isMultiple
+                  label="Replace with"
+                  name={`template_fields[${idx}].related`}
+                  onBrowserChange={(props) => {
+                    const updateValues = [...(related || [])];
+                    props.forEach(({ value }, itemIndex) => {
+                      if (updateValues?.includes(value)) {
+                        updateValues.splice(itemIndex, 1);
+                      } else {
+                        updateValues.push(value);
+                      }
+                    });
+                    handleChange({ name: `template_fields[${idx}].related`, value: updateValues });
+                  }}
+                  onChange={({ value: newValue }) => {
+                    if (related?.includes(newValue))
+                      handleChange({ name: `template_fields[${idx}].related`, value: related.filter((v) => v !== newValue) });
+                    else handleChange({ name: `template_fields[${idx}].related`, value: related.concat(newValue) });
+                  }}
+                  parent_id={parent?.data?.id}
+                  searchEntity={entity_type as EntitiesWithRelatedType}
+                  value={related}
+                />
+              </div>
+            )}
           </>
         ) : null}
         {EntitiesWithRelated.includes(entity_type) && !EntitiesWithParents.includes(entity_type) ? (
@@ -428,11 +414,11 @@ function EntityWithRelatedRow({
                 />
               </div>
             ) : null}
-            {isRandomized || (related.length && entity_type === "images") ? null : (
+            {isRandomized || (related.length && (entity_type === "images" || entity_type === "random_tables")) ? null : (
               <Search
                 isAutofocused
                 isDisabled={!!isRandomized}
-                isMultiple={entity_type !== "images"}
+                isMultiple={entity_type !== "images" && entity_type !== "random_tables"}
                 label="Replace with"
                 name={`template_fields[${idx}].related`}
                 onBrowserChange={(props) => {
@@ -486,6 +472,18 @@ function EntityWithRelatedRow({
           </div>
         ) : null}
         <div className="flex w-full flex-col gap-y-2">
+          {isRandomized || entity_type === "random_tables" ? (
+            <div className="w-full">
+              <Select
+                hasSearch
+                label="Random count"
+                name={`template_fields[${idx}].random_count`}
+                onChange={handleChange}
+                options={RandomCountOptions}
+                value={random_count}
+              />
+            </div>
+          ) : null}
           {selectedEntities.map((ent) => (
             <EntityPreview
               key={ent.value}
