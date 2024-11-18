@@ -1,7 +1,6 @@
 import "../../index.css";
 
 import cytoscape from "cytoscape";
-import dagre from "cytoscape-dagre";
 import edgehandles from "cytoscape-edgehandles";
 import gridguide from "cytoscape-grid-guide";
 import { StrictMode } from "react";
@@ -16,8 +15,6 @@ import App from "./App";
 
 // eslint-disable-next-line import/no-named-as-default-member
 cytoscape.use(edgehandles);
-// eslint-disable-next-line import/no-named-as-default-member
-cytoscape.use(dagre);
 gridguide(cytoscape);
 
 const router = createBrowserRouter([
@@ -56,4 +53,3 @@ createRoot(document.getElementById("root")!).render(
     <RouterProvider router={router} />
   </StrictMode>
 );
-

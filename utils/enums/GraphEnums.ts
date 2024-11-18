@@ -330,38 +330,6 @@ export const cytoscapeGridOptions = {
   parentSpacing: -1, // -1 to set paddings of parents to gridSpacing
 };
 
-export const dagreLayoutOptions = {
-  // dagre algo options, uses default value on undefined
-  nodeSep: 50, // the separation between adjacent nodes in the same rank
-  edgeSep: 5, // the separation between adjacent edges in the same rank
-  rankSep: undefined, // the separation between each rank in the layout
-  rankDir: "TB", // 'TB' for top to bottom flow, 'LR' for left to right,
-  align: undefined, // alignment for rank nodes. Can be 'UL', 'UR', 'DL', or 'DR', where U = up, D = down, L = left, and R = right
-  acyclicer: "greedy", // If set to 'greedy', uses a greedy heuristic for finding a feedback arc set for a graph.
-  // A feedback arc set is a set of edges that can be removed to make a graph acyclic.
-  ranker: "tight-tree", // Type of algorithm to assign a rank to each node in the input graph. Possible values: 'network-simplex', 'tight-tree' or 'longest-path'
-  minLen() {
-    return 1;
-  }, // number of ranks to keep between the source and target of the edge
-
-  // general layout options
-  fit: true, // whether to fit to viewport
-  padding: 0, // fit padding
-  spacingFactor: 1, // Applies a multiplicative factor (>0) to expand or compress the overall area that the nodes take up
-  nodeDimensionsIncludeLabels: true, // whether labels should be included in determining the space used by a node
-  animate: false, // whether to transition the node positions
-  animateFilter() {
-    return true;
-  }, // whether to animate specific nodes when animation is on; non-animated nodes immediately go to their final positions
-  animationDuration: 500, // duration of animation in ms if enabled
-  animationEasing: undefined, // easing of animation if enabled
-  // boundingBox: { x1: 0, y1: 0, w: 5000, h: 5000 }, // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
-  transform(_: any, pos: { x: number; y: number }) {
-    const [x, y] = closestDivisibleBy50(pos.x, pos.y);
-    return { x: x + 25, y: y + 25 };
-  }, // a function that applies a transform to the final node position
-};
-
 export const DefaultBoardColor = "#595959";
 
 export const GraphFontSizesEnum = [
