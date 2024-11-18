@@ -1,14 +1,14 @@
+import "../../index.css";
+
+import cytoscape from "cytoscape";
+import gridguide from "cytoscape-grid-guide";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
-import "../../index.css";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { ErrorPage } from "../../pages/index";
-import cytoscape from "cytoscape";
-import dagre from "cytoscape-dagre";
-import gridguide from "cytoscape-grid-guide";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-cytoscape.use(dagre);
+import { ErrorPage } from "../../pages/index";
+import App from "./App";
+
 gridguide(cytoscape);
 
 const router = createBrowserRouter([
@@ -24,4 +24,3 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <RouterProvider router={router} />
   </React.StrictMode>
 );
-
