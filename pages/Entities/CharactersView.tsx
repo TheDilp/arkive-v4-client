@@ -285,7 +285,7 @@ function createColumns(
                             row.original?.last_name || ""
                           )}`,
                           data: { id: row.original.id },
-                          size: "lg",
+                          size: "full",
                           isOverlay: true,
                         });
                       },
