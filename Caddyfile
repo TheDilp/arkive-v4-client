@@ -6,6 +6,7 @@
 	# runtime logs
 	log {
 		format json # set runtime log format to json mode
+		level DEBUG
 	}
 	# server options
 	servers {
@@ -33,5 +34,7 @@
 	file_server {
 		 precompressed gzip
 	}
+
+	try_files {path}.gz {path} /index.html
 
 }
