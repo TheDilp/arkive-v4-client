@@ -36,36 +36,16 @@
 
 	try_files {path}.gz {path} /index.html
 
-	header {
-        # HTML files
-        text/html               .html.gz .html.gz
+	handle *.js {
+		header {
+        	Content-Type         "text/javascript"
+    	}
+	}
 
-        # CSS files
-        text/css                .css .css.gz
-
-        # JavaScript files
-        application/javascript  .js.gz
-
-        # JSON files
-        application/json        .json.gz
-
-        # SVG files
-        image/svg+xml           .svg.gz
-
-        # Image files
-        image/png               .png .png.gz
-        image/jpeg              .jpg .jpeg .jpg.gz .jpeg.gz
-        image/gif               .gif .gif.gz
-        image/webp              .webp .webp.gz
-
-        # Font files
-        font/woff               .woff .woff.gz
-        font/woff2              .woff2 .woff2.gz
-        font/ttf                .ttf .ttf.gz
-
-        # Other common types
-        text/plain              .txt .txt.gz
-        application/xml         .xml .xml.gz
-    }
+	handle *.css {
+		header {
+        	Content-Type         "text/css"
+    	}
+	}
 
 }
