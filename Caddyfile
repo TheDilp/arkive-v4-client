@@ -35,6 +35,6 @@
 		 precompressed gzip
 	}
 
-	try_files {path}.gz {path} /index.html.gz
+	try_files {path}.gz {path} /index.html
 
 }
