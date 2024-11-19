@@ -31,7 +31,7 @@
 		 precompressed gzip
 	}
 
-	try_files {path}.gz {path} /index.html
+	try_files {path} /index.html
 
 	@js {
         path *.js
