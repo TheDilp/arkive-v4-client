@@ -23,7 +23,7 @@ export default ({ mode }: { mode: any }) =>
       compression({
         algorithm: "gzip",
         compressionOptions: { level: 9 },
-        include: [/\.(html)$/, /\.(js)$/, /\.(css)$/],
+        include: [/\.(html)$/, /\.(js)$/, /\.(css)$/, /\.(ttf)$/],
       }),
     ],
     server: {
