@@ -36,11 +36,4 @@
 
 	try_files {path}.gz {path} /index.html
 
-	 # Set correct MIME types for precompressed files
-    @gzipFiles path *.gz
-    header @gzipFiles Content-Type "{http.matchers.file.relative}" {
-        map .js.gz application/javascript
-        map .css.gz text/css
-    }
-
 }
