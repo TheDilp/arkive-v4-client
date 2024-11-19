@@ -31,7 +31,7 @@
 
 	# serve files from 'dist'
 	file_server {
-		 precompressed br
+		 precompressed gzip
 	}
 
 	# if path doesn't exist, redirect it to 'index.html' for client side routing

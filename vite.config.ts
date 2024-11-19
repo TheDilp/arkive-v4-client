@@ -20,7 +20,7 @@ export default ({ mode }: { mode: any }) =>
           },
         },
       }),
-      compression({ algorithm: "brotliCompress" }),
+      compression({ algorithm: "gzip", deleteOriginalAssets: true, compressionOptions: { level: 9 } }),
     ],
     server: {
       fs: {
