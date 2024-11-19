@@ -20,7 +20,12 @@ export default ({ mode }: { mode: any }) =>
           },
         },
       }),
-      compression({ algorithm: "gzip", deleteOriginalAssets: true, compressionOptions: { level: 9 } }),
+      compression({
+        algorithm: "gzip",
+        compressionOptions: { level: 9 },
+        include: [/\.(js)$/, /\.(css)$/],
+        deleteOriginalAssets: true,
+      }),
     ],
     server: {
       fs: {

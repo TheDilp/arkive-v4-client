@@ -10,6 +10,7 @@ lerna-debug.log*
 .env
 vite.config.ts.*
 node_modules
+tsconfig.tsbuildinfo
 dist
 dist-ssr
 *.local
