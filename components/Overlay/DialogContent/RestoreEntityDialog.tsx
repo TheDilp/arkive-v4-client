@@ -20,11 +20,14 @@ export function RestoreEntityDialog({ data }: { data: { [key: string]: any } }) 
     <div className="flex flex-col justify-between">
       <div className="text-center text-lg">
         Are you sure you want to restore this {getSingularEntityType(data?.entity_title) || "entity"}{" "}
-        {data?.is_folder ? "folder" : ""} - &quot;
-        {data?.entity_title === "characters"
-          ? getCharacterFullName(data?.first_name || "", data?.last_name || "")
-          : data?.title}
-        &quot; ?
+        <div className="truncate">
+          {data?.is_folder ? "folder" : ""} - &quot;
+          {data?.entity_title === "characters"
+            ? getCharacterFullName(data?.first_name || "", data?.last_name || "")
+            : data?.title}
+          &quot;
+        </div>
+        ?
       </div>
 
       <div className="mx-auto my-2 flex items-center gap-x-4">
