@@ -1,6 +1,17 @@
 import { ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, useReactTable } from "@tanstack/react-table";
-import { Dispatch, Fragment, MutableRefObject, SetStateAction, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import {
+  Dispatch,
+  Fragment,
+  MutableRefObject,
+  SetStateAction,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { clamp } from "remirror";
 import { tv } from "tailwind-variants";
 
 import { useBreakpoint, useHandleChange } from "../../hooks";
@@ -532,6 +543,7 @@ function OrderByHeaderIcon({ onClick, orderBy, id }: { onClick: () => void; orde
 }
 export function Table<T>({ columns, data = [], config, isLoading, pagination, dispatch, type, skeletonLimit }: TableType<T>) {
   const { isLg } = useBreakpoint();
+  const [searchParams, setSearchParams] = useSearchParams();
   const {
     filters,
     relationFilters,
@@ -580,7 +592,6 @@ export function Table<T>({ columns, data = [], config, isLoading, pagination, di
     hasNoData: data?.length === 0 && !isSubheaderEnabled,
     hasNoCellTextWrap: config?.hasNoCellTextWrap,
   });
-
   const bodyRef = useRef() as MutableRefObject<HTMLDivElement>;
   const headerRef = useRef() as MutableRefObject<HTMLDivElement>;
 
@@ -622,7 +633,14 @@ export function Table<T>({ columns, data = [], config, isLoading, pagination, di
     if (bodyRef.current) {
       bodyRef.current.scrollTop = 0;
     }
-  }, [pagination?.page]);
+  }, [searchParams]);
+
+  useLayoutEffect(() => {
+    const page = Number(searchParams.get("page") || 1) - 1;
+    if (typeof page === "number" && !isNaN(page)) {
+      dispatch({ type: "setPagination", payload: { limit: pagination?.limit, page } });
+    }
+  }, [searchParams]);
 
   const { rows } = table.getRowModel();
 
@@ -867,7 +885,7 @@ export function Table<T>({ columns, data = [], config, isLoading, pagination, di
         <div className={paginationContainer()}>
           <div className={pageCountContainer()}>
             <div className={pageCount()}>
-              Page {(pagination?.page || 0) + 1} | Current count: {data?.length || ""} |
+              Page {searchParams.get("page") || 1} | Current count: {data?.length || ""} |
             </div>
             <div className={showPageCount()}>
               Show:
@@ -915,12 +933,11 @@ export function Table<T>({ columns, data = [], config, isLoading, pagination, di
               buttons={[
                 {
                   icon: IconEnum.chevron_left,
-                  isDisabled: pagination?.page === 0,
+                  isDisabled: !searchParams.get("page") || searchParams.get("page") === "1",
                   onClick: () => {
                     if (pagination?.page && pagination?.page > 0) {
-                      dispatch({
-                        type: "setPagination",
-                        payload: { ...pagination, page: pagination.page - 1 },
+                      setSearchParams({
+                        page: clamp({ min: 1, value: (Number(searchParams.get("page")) || 1) - 1, max: Infinity }).toString(),
                       });
                     }
                   },
@@ -928,12 +945,12 @@ export function Table<T>({ columns, data = [], config, isLoading, pagination, di
                 },
                 {
                   icon: IconEnum.chevron_right,
-                  isDisabled: data.length < (pagination?.limit || 10),
-                  onClick: () =>
-                    dispatch({
-                      type: "setPagination",
-                      payload: { ...pagination, page: (pagination?.page || 0) + 1 },
-                    }),
+                  isDisabled: data.length < (pagination?.limit || 20),
+                  onClick: () => {
+                    setSearchParams({
+                      page: clamp({ min: 1, value: (Number(searchParams.get("page")) || 1) + 1, max: Infinity }).toString(),
+                    });
+                  },
                   variant: "secondary",
                 },
               ]}

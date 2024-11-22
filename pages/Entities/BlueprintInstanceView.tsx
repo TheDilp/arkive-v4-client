@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { Dispatch, useEffect, useLayoutEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 
 import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Table } from "../../components";
 import {
@@ -636,6 +636,8 @@ function getSelectedActions(
 
 export function BlueprintInstanceView({ filter, arkived }: { filter: string; arkived: "active" | "arkive" }) {
   const { project_id, item_id } = useParams();
+  const [, setSearchParams] = useSearchParams();
+
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const resetDialog = useResetAtom(dialogAtom);
@@ -713,7 +715,6 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
       });
     }
     // dispatch({ type: "clearSelection" });
-    dispatch({ type: "setPagination", payload: { page: 0, limit: pagination?.limit } });
     if (filter.length >= 3) {
       const timeout = setTimeout(() => {
         if (filter) {
@@ -727,6 +728,7 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
               field: "title",
             },
           });
+          setSearchParams({ page: "1" });
         }
       }, 500);
 

@@ -2,7 +2,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import React, { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Icon, Input, Select, Table, TablePageLayout } from "../../components";
 import {
@@ -461,6 +461,8 @@ function getSelectedActions(
 
 export function ManuscriptView() {
   const { project_id } = useParams();
+  const [, setSearchParams] = useSearchParams();
+
   const { isMd } = useBreakpoint();
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("manuscripts-table-active") || "active");
   useNavbarTitle("Manuscripts", true);
@@ -525,9 +527,9 @@ export function ManuscriptView() {
       });
     }
     dispatch({ type: "clearSelection" });
-    dispatch({ type: "setPagination", payload: { page: 0, limit: pagination?.limit } });
     if (filter.length >= 3) {
       const timeout = setTimeout(() => {
+        setSearchParams({ page: "1" });
         if (filter) {
           dispatch({
             type: "clearAllFilters",

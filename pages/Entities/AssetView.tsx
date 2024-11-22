@@ -3,9 +3,19 @@ import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { Dispatch, useLayoutEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 
-import { Avatar, Button, createColumnHelper, Dropdown, Image, Input, Select, Table, TablePageLayout } from "../../components";
+import {
+  Avatar,
+  Button,
+  createColumnHelper,
+  Dropdown,
+  Image,
+  Select,
+  Table,
+  TablePageLayout,
+  TableViewHeader,
+} from "../../components";
 import {
   useBreakpoint,
   useDeleteMany,
@@ -389,6 +399,7 @@ function getSelectedActions(
 
 export function AssetView() {
   const { project_id } = useParams();
+  const [, setSearchParams] = useSearchParams();
   useNavbarTitle("Assets", true);
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -466,6 +477,7 @@ export function AssetView() {
     if (filter.length >= 3) {
       const timeout = setTimeout(() => {
         if (filter) {
+          setSearchParams({ page: "1" });
           dispatch({
             type: "clearAllFilters",
           });
@@ -496,16 +508,7 @@ export function AssetView() {
 
   return (
     <TablePageLayout>
-      <div className="sticky top-0 flex h-12 w-full items-center justify-end gap-x-2">
-        <div className="w-52">
-          <Input
-            isClearable
-            name="quick_filter"
-            onChange={({ value }) => setFilter(value as string)}
-            placeholder="Quick search by title"
-            value={filter}
-          />
-        </div>
+      <TableViewHeader dispatch={dispatch} setFilter={setFilter} type="images">
         <div className="w-32">
           <Select
             name="type"
@@ -555,7 +558,7 @@ export function AssetView() {
             tooltip={isMd ? undefined : "Upload image"}
           />
         </div>
-      </div>
+      </TableViewHeader>
       {view === "card" ? (
         <div
           className="grid grid-cols-1 gap-2 overflow-y-auto p-4 pb-36 md:grid-cols-2 lg:grid-cols-6"

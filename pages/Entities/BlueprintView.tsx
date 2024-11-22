@@ -2,7 +2,7 @@ import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { Dispatch, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Icon, Input, Select, Table, TablePageLayout } from "../../components";
 import {
@@ -341,6 +341,7 @@ function getSelectedActions(
 
 export function BlueprintView() {
   const { project_id } = useParams();
+  const [, setSearchParams] = useSearchParams();
   const { isMd } = useBreakpoint();
   useNavbarTitle("Blueprints", true);
   const permissions = useHasPermissions(
@@ -353,7 +354,6 @@ export function BlueprintView() {
   const [filter, setFilter] = useState("");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
-
   const columns = createColumns(setDrawer, setDialog, permissions, isProjectOwner, user?.id as string, user?.role?.id);
   const resetDialogAtom = useResetAtom(dialogAtom);
   const { mutate: updateMany } = useBulkUpdate(project_id as string, "blueprints");
@@ -397,13 +397,8 @@ export function BlueprintView() {
       });
     }
     dispatch({ type: "clearSelection" });
-    dispatch({
-      type: "setPagination",
-      payload: {
-        page: 0,
-        limit: pagination?.limit,
-      },
-    });
+    setSearchParams({ page: "1" });
+
     if (filter.length >= 3) {
       const timeout = setTimeout(() => {
         if (filter) {

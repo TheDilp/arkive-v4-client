@@ -3,7 +3,7 @@ import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { Dispatch, SyntheticEvent, useEffect, useLayoutEffect, useState } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import {
   Alert,
@@ -13,11 +13,11 @@ import {
   createColumnHelper,
   Dropdown,
   Icon,
-  Input,
   Select,
   Skeleton,
   Table,
   TablePageLayout,
+  TableViewHeader,
 } from "../../components";
 import {
   useBreakpoint,
@@ -711,7 +711,6 @@ function getSelectedActions(
 
 export function MainView() {
   const { type, item_id } = useParams();
-
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
 
   useLayoutEffect(() => {
@@ -719,7 +718,6 @@ export function MainView() {
       setBreadcrumbs({ items: [], type: type as AvailableEntityType | null });
     }
   }, [item_id]);
-
   if (!item_id && type === "characters") return <CharactersView />;
   if (!item_id && type === "blueprints") return <BlueprintView />;
   if (!item_id && type === "manuscripts") return <ManuscriptView />;
@@ -732,6 +730,7 @@ export function MainView() {
 
 function FolderView() {
   const { project_id, type, item_id } = useParams();
+  const [, setSearchParams] = useSearchParams();
   const { pathname } = useLocation();
   const breakpoints = useBreakpoint();
   const user = useAtomValue(userAtom);
@@ -916,7 +915,6 @@ function FolderView() {
       });
     }
     dispatch({ type: "clearSelection" });
-    dispatch({ type: "setPagination", payload: { page: 0, limit: pagination?.limit } });
     if (filter.length >= 3) {
       const timeout = setTimeout(() => {
         if (filter) {
@@ -930,6 +928,7 @@ function FolderView() {
               field: "title",
             },
           });
+          setSearchParams({ page: "1" });
         }
       }, 500);
 
@@ -948,17 +947,7 @@ function FolderView() {
             <Breadcrumbs />
           </span>
           {!item_id || isFolder ? (
-            <div className="flex min-w-fit gap-x-2">
-              <div className="w-52">
-                <Input
-                  isClearable
-                  name="quick_filter"
-                  onChange={({ value }) => setFilter(value as string)}
-                  placeholder="Quick search by title"
-                  type="search"
-                  value={filter}
-                />
-              </div>
+            <TableViewHeader dispatch={dispatch} setFilter={setFilter} type={type as AvailableEntityType}>
               {type === "documents" ? (
                 <>
                   <div className="w-10">
@@ -1117,7 +1106,7 @@ function FolderView() {
                   </div>
                 </Dropdown>
               </div>
-            </div>
+            </TableViewHeader>
           ) : null}
         </div>
 
