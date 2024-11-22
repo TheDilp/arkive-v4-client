@@ -78,7 +78,7 @@ export function Sidebar({ isLoading, items, isUsingPermissions }: SidebarType) {
         <ul className={list()}>
           <li className={sidebarLogo()}>
             <Link className="cursor-pointer" to={"/projects"}>
-              <img alt="Arkive Logo" className="h-12" height={48} src="/Logo.webp" width={64} />
+              <img alt="Arkive Logo" className="h-12" height={48} src="/LogoTransparent.png" width={64} />
             </Link>
           </li>
           {isLoading
