@@ -23,7 +23,7 @@ const DialogClasses = tv({
     container: "absolute z-[1000] top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]",
     base: "flex flex-col pointer-events-auto rounded bg-zinc-800 text-white mx-4 border border-zinc-600 shadow-lg p-4 h-full w-full max-w-[80%] lg:max-w-[100%]",
     titleContainer: "flex items-center relative",
-    title: "w-full flex justify-center font-merriweather text-2xl select-none text-center",
+    title: "w-full flex justify-center font-merriweather text-2xl select-none text-center max-w-[98%]",
     imageUploadContainer: "sticky top-0 bg-zinc-700",
     imagesList: "grid grid-cols-2 gap-2 overflow-y-auto",
   },
@@ -135,7 +135,7 @@ export function Dialog() {
   if (dialog?.type === "image_view")
     return (
       <div className={container()} onClick={resetDialogAtom}>
-        <div className="absolute right-4">
+        <div className="absolute right-4 top-0">
           <Button hasNoBackground icon={IconEnum.close} iconSize={48} isIconOnly onClick={resetDialogAtom} />
         </div>
         <div className={base()} onClick={resetDialogAtom}>
@@ -150,7 +150,7 @@ export function Dialog() {
       <div className={base()}>
         <div className={titleContainer()}>
           {dialog?.title ? <h1 className={title()}>{dialog.title}</h1> : null}
-          <div className="w-min">
+          <div className="absolute right-0 top-1.5">
             <Button hasNoBackground icon={IconEnum.close} isIconOnly onClick={() => resetDialogAtom()} />
           </div>
         </div>
