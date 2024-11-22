@@ -31,7 +31,7 @@ const SelectClasses = tv({
     optionsContainer:
       "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-[12.5rem] md:max-h-[15rem] lg:max-h-[25rem] bg-zinc-700 text-white rounded shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
     placeholder: "text-zinc-500 font-lato opacity-40",
-    displayItem: "max-w-[95%]",
+    displayItem: "w-fit",
     search:
       "sticky top-0 z-50 h-8 w-full border-y border-zinc-700 bg-zinc-800 pl-2 placeholder:text-sm placeholder:text-zinc-600 focus:outline-none focus-visible:outline-none",
   },
@@ -113,7 +113,7 @@ const SelectClasses = tv({
     },
     isTruncated: {
       true: {
-        displayItem: "truncate",
+        displayItem: "truncate w-fit",
       },
       false: {
         displayItem: "flex flex-wrap gap-2",
