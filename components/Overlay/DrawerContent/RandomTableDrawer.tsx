@@ -84,6 +84,31 @@ export function OptionInput({
           <Search
             label="Entity (required)"
             name="related_id"
+            onBrowserChange={(props) => {
+              const itemToChange: {
+                name: string;
+                value: string;
+                label?: string;
+                image?: string | undefined;
+                icon?: string | undefined;
+              } = props?.[0];
+
+              handleChange([
+                { name: `${name}.title`, value: itemToChange?.label },
+                {
+                  name: `${name}.related_data`,
+                  value: {
+                    id: itemToChange.value,
+                    title: itemToChange.label,
+                    icon: itemToChange?.icon,
+                    image_id: itemToChange?.image,
+                    type: related_data.type,
+                  },
+                },
+              ]);
+
+              handleChange(itemToChange);
+            }}
             onChange={(e) => {
               handleChange([
                 { name: `${name}.title`, value: e.label },
@@ -122,7 +147,9 @@ export function OptionInput({
           <Select
             label="Type"
             name={`${name}.related_data.type`}
-            onChange={handleChange}
+            onChange={(e) => {
+              handleChange({ name: `${name}.related_data`, value: { type: e.value } });
+            }}
             options={optionRelatedEntities}
             value={related_data?.type || "text"}
           />

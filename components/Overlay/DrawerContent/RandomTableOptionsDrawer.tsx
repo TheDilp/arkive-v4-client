@@ -97,6 +97,31 @@ export function RandomTableOptionsDrawer({ data }: { data: { parent_id: string }
                   <Search
                     label="Entity (required)"
                     name="related_id"
+                    onBrowserChange={(props) => {
+                      const itemToChange: {
+                        name: string;
+                        value: string;
+                        label?: string;
+                        image?: string | undefined;
+                        icon?: string | undefined;
+                      } = props?.[0];
+
+                      handleChange([
+                        { name: `[${idx}].title`, value: itemToChange?.label },
+                        {
+                          name: `[${idx}].related_data`,
+                          value: {
+                            id: itemToChange.value,
+                            title: itemToChange.label,
+                            icon: itemToChange?.icon,
+                            image_id: itemToChange?.image,
+                            type: option.related_data?.type,
+                          },
+                        },
+                      ]);
+
+                      handleChange(itemToChange);
+                    }}
                     onChange={(e) => {
                       handleChange([
                         { name: `[${idx}].title`, value: e.label },
@@ -141,7 +166,9 @@ export function RandomTableOptionsDrawer({ data }: { data: { parent_id: string }
                   <Select
                     label="Type"
                     name={`[${idx}].related_data.type`}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      handleChange({ name: `[${idx}].related_data`, value: { type: e.value } });
+                    }}
                     options={optionRelatedEntities}
                     value={option?.related_data?.type || "text"}
                   />
