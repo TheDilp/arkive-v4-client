@@ -224,6 +224,7 @@ export function Quickbar({
             position: "center",
             modal: true,
             type: "export_graph",
+            isOverlay: true,
             data: {
               title: graphTitle,
             },
