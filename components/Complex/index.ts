@@ -1,7 +1,10 @@
 export * from "./DocumentTemplateMatchField";
 export * from "./Editor";
+export { default as EditorGallery } from "./Editor/Extensions/Gallery/EditorGallery";
 export * from "./EntityPermission";
 export * from "./FolderSelect";
+export * from "./GameSystems";
 export * from "./ImageSelect";
 export * from "./Map";
+export * from "./TableViewHeader";
 export * from "./TemplateFields";
