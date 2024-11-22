@@ -1,6 +1,6 @@
 import { useSetAtom } from "jotai";
 import { CRS, LatLngBoundsExpression } from "leaflet";
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MapContainer } from "react-leaflet";
 import { useParams } from "react-router-dom";
 
@@ -28,8 +28,6 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
 
   const mapPinTypes = (existingMapPinTypes?.data || []).map((type) => ({ label: type.title, value: type.id }));
   const [mapPinFilters, setMapPinFilters] = useState<string[]>(["all"]);
-  const firstRender = useRef(true) as MutableRefObject<boolean>;
-  const mapRef = useRef() as any;
   const imgRef = useRef() as any;
   const {
     data: existingMap,
@@ -81,22 +79,28 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
           [0, 0],
           [img.height, img.width],
         ]);
-        if (imgRef.current) {
-          imgRef.current.setBounds([
+      };
+      setTimeout(() => {
+        if (!imgRef.current) return;
+
+        const pin =
+          center_on || subitem_id
+            ? currentMap?.map_pins?.find((map_pin) => (center_on ? map_pin.id === center_on : map_pin.id === subitem_id))
+            : null;
+
+        if (center_on && pin) {
+          imgRef.current._map?.panTo([pin.lat, pin.lng], {});
+        } else {
+          imgRef.current._map.panTo([img.height / 2, img.width / 2]);
+
+          imgRef.current._map.fitBounds([
             [0, 0],
             [img.height, img.width],
           ]);
-          imgRef.current.panTo([0, 0]);
-          // imgRef.current.leafletElement.fitBounds(bounds);
-        }
-      };
-      setTimeout(() => {
-        if (mapRef.current) {
-          firstRender.current = false;
         }
       }, 200);
     }
-  }, [currentMap, project_id, url]);
+  }, [currentMap, project_id, url, imgRef.current]);
   if (!currentMap) return null;
   return (
     <div className="relative z-[2] flex h-full w-full flex-col overflow-hidden">
@@ -126,18 +130,6 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
       {currentMap && (!isLoading || (data && isLoading)) && !!bounds && (IS_PUBLIC || permissions?.read_maps) ? (
         <div className="z-0 min-h-full min-w-full">
           <MapContainer
-            ref={(node) => {
-              mapRef.current = node;
-              if (bounds && firstRender.current) {
-                if (!center_on && !subitem_id) node?.fitBounds(bounds as LatLngBoundsExpression);
-                if (center_on) {
-                  const pin = currentMap?.map_pins?.find((map_pin) =>
-                    center_on ? map_pin.id === center_on : map_pin.id === subitem_id
-                  );
-                  if (pin) node?.panTo([pin.lat, pin.lng], {});
-                }
-              }
-            }}
             attributionControl={false}
             bounds={bounds as LatLngBoundsExpression}
             center={[bounds[1][0] / 2, bounds[1][1] / 2]}
