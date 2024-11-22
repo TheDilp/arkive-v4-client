@@ -1,5 +1,4 @@
 import { CurveStyleType, NodeShape } from "../../types/EntityTypes/graphTypes";
-import { closestDivisibleBy50 } from "../data";
 
 export const FamilyTreeGenerationsCountOptions = [
   { label: "1", value: "1" },
@@ -39,7 +38,7 @@ export function getCytoscapeStylesheet(curve_style: CurveStyleType) {
         "background-color": "data(background_color)",
         "background-opacity": "data(background_opacity)",
         "background-image-opacity": "data(background_opacity)",
-        "background-image-crossorigin": "null",
+        "background-image-crossorigin": "anonymous",
         "text-halign": "data(text_h_align)",
         "text-valign": "data(text_v_align)",
         "text-wrap": "wrap",
