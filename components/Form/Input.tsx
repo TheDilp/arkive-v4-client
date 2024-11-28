@@ -130,7 +130,7 @@ function handleNumberChange({
     onChange({ name, value: 1 });
     return;
   }
-  onChange({ name, value: Math.abs(parsed) });
+  onChange({ name, value: parsed });
 }
 
 export function Input({
@@ -212,8 +212,6 @@ export function Input({
                 return;
               }
             }
-            // if (type === "number")
-            //   handleNumberChange({ name, newValue: e.currentTarget.valueAsNumber, min, max, step, onChange });
             if (onKeyDown) onKeyDown(e);
           }}
           placeholder={placeholder}
