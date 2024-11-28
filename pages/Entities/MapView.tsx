@@ -22,7 +22,8 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
   const [bounds, setBounds] = useState<number[][] | null>(null);
   const { data: existingMapPinTypes, isInitialLoading: isInitialLoadingTypes } = useGetEntities<MapPinTypesType>(
     { data: { project_id }, fields: ["id", "title", "default_icon", "default_icon_color"] },
-    "map_pin_types"
+    "map_pin_types",
+    { enabled: !IS_PUBLIC && !IS_GATEWAY }
   );
   const setEntityUpdatePermission = useSetAtom(hasEntityUpdatePermissionForEntityView);
 
@@ -69,6 +70,10 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
     }
   }
   const url = useImageURL(getAssetURL(project_id as string, "map_images", currentMap?.image_id));
+  const pin =
+    center_on || subitem_id
+      ? currentMap?.map_pins?.find((map_pin) => (center_on ? map_pin.id === center_on : map_pin.id === subitem_id))
+      : null;
   useEffect(() => {
     if (currentMap && currentMap?.image_id && !bounds && url) {
       setEntityUpdatePermission(currentMap?.permissions?.some((p) => p.code === "update_maps") || false);
@@ -80,27 +85,9 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
           [img.height, img.width],
         ]);
       };
-      setTimeout(() => {
-        if (!imgRef.current) return;
-
-        const pin =
-          center_on || subitem_id
-            ? currentMap?.map_pins?.find((map_pin) => (center_on ? map_pin.id === center_on : map_pin.id === subitem_id))
-            : null;
-
-        if (center_on && pin) {
-          imgRef.current._map?.panTo([pin.lat, pin.lng], {});
-        } else {
-          imgRef.current._map.panTo([img.height / 2, img.width / 2]);
-
-          imgRef.current._map.fitBounds([
-            [0, 0],
-            [img.height, img.width],
-          ]);
-        }
-      }, 200);
     }
   }, [currentMap, project_id, url, imgRef.current]);
+
   if (!currentMap) return null;
   return (
     <div className="relative z-[2] flex h-full w-full flex-col overflow-hidden">
@@ -132,13 +119,13 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
           <MapContainer
             attributionControl={false}
             bounds={bounds as LatLngBoundsExpression}
-            center={[bounds[1][0] / 2, bounds[1][1] / 2]}
+            center={pin ? [pin.lat, pin.lng] : [bounds[1][0] / 2, bounds[1][1] / 2]}
             className="h-full w-full flex-1 outline-none"
             crs={CRS.Simple}
             maxZoom={5}
             minZoom={-3}
             scrollWheelZoom
-            zoom={1}
+            zoom={pin ? 1 : undefined}
             zoomSnap={0}>
             <MapImage
               bounds={bounds as LatLngBoundsExpression}
