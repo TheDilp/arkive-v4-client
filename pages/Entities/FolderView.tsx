@@ -613,8 +613,8 @@ function getSelectedActions(
         type: "bulk_access",
         data: {
           ids,
-          selectablePermissions: ["read_characters", "update_characters", "delete_characters"],
-          type: "characters",
+          selectablePermissions: [`read_${type}`, `update_${type}`, `delete_${type}`] as PermissionCodeType[],
+          type,
         },
       }));
     },
