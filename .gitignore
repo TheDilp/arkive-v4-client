@@ -11,11 +11,11 @@ lerna-debug.log*
 vite.config.ts.*
 node_modules
 tsconfig.tsbuildinfo
+*.tsbuildinfo
 dist
 dist-ssr
 *.local
 /arkive-v4-editor/public/assets
-/arkive-v4-dyce-vtt/public/assets
 # Editor directories and files
 .vscode/*
 .idea
