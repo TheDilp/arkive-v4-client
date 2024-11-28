@@ -59,12 +59,13 @@ function DayNumber({
   year,
   isFiller,
   isReadOnly,
-
+  parent_id,
   event_ids,
 }: {
   dayNumber: number;
   monthNumber: number;
   year: number;
+  parent_id: string;
   isFiller?: boolean;
   isReadOnly?: boolean;
   event_ids: string[];
@@ -85,7 +86,7 @@ function DayNumber({
                   ...prev,
                   type: "event_management",
                   title: "Manage events",
-                  data: { date: { month: monthNumber, year }, event_ids },
+                  data: { date: { month: monthNumber, year, parent_id }, event_ids },
                   size: "lg",
                 }));
             }}
@@ -100,7 +101,7 @@ function DayNumber({
                   ...prev,
                   type: "events",
                   title: "Create new event",
-                  data: { day: dayNumber + 1, month: monthNumber, year },
+                  data: { day: dayNumber + 1, month: monthNumber, year, parent_id },
                   size: "lg",
                 }));
             }}
@@ -743,6 +744,7 @@ export function CalendarView({
                   isFiller
                   isReadOnly={IS_PUBLIC}
                   monthNumber={date.month}
+                  parent_id={calendar?.id}
                   year={date.year}
                 />
               </div>
@@ -777,6 +779,7 @@ export function CalendarView({
                   event_ids={filteredEvents.map((e) => e.id)}
                   isReadOnly={IS_PUBLIC}
                   monthNumber={date.month}
+                  parent_id={calendar?.id}
                   year={date.year}
                 />
                 <div className="flex flex-col gap-y-0.5 overflow-auto px-1">
@@ -1061,6 +1064,7 @@ export function CalendarView({
                   isFiller
                   isReadOnly={IS_PUBLIC}
                   monthNumber={date.month}
+                  parent_id={calendar?.id}
                   year={date.year}
                 />
               </div>
