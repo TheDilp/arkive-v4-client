@@ -437,7 +437,7 @@ function DocumentViewEditor({
   });
 
   const headings: { id: string; title: string; level: number }[] = [];
-  state.doc.forEach((n) => {
+  manager.view?.state?.doc.forEach((n) => {
     if (n.type.name === "heading" && n.textContent) {
       headings.push({ id: n.attrs.id, title: n.textContent, level: n.attrs.level });
     }
@@ -508,6 +508,7 @@ function DocumentViewEditor({
                   paddingLeft: `${0.45 * (h.level - 1)}rem`,
                 }}>
                 {h.title}
+                {h.level === 1 ? <hr className="w-full border-zinc-600" /> : null}
               </li>
             ))}
           </ul>
