@@ -33,7 +33,7 @@ function OwnerDisplay({
   const ownerEmail = getOwnerEmail(owner_id, user, members);
   if (ownerEmail)
     return (
-      <div>
+      <div className="w-full [&>*]:max-w-full">
         <Badge label={`Owner: ${ownerEmail}`} variant="info" />
       </div>
     );
