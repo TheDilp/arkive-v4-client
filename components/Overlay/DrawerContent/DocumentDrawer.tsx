@@ -392,7 +392,10 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                 const { template_fields, tags, image, ...rest } = documentToUpdate;
 
                 const dataToParse = {
-                  data: { ...rest, image_id: image?.id },
+                  data: {
+                    ...rest,
+                    image_id: image?.id,
+                  },
                   relations: {},
                   permissions: document?.permissions,
                 };
@@ -436,7 +439,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                   },
                   permissions: document?.permissions,
                 };
-                dataToParse.data.parent_id = exceptions?.globalCreate ? null : item_id;
+                dataToParse.data.parent_id = document?.parent_id || item_id;
                 dataToParse.data.owner_id = user?.id;
                 const parsedData = InsertDocumentSchema.parse(dataToParse);
                 await create(
