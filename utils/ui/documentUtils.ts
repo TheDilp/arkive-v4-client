@@ -99,73 +99,6 @@ export function getRanges(
     : ranges;
 }
 
-export function createMentions(
-  initialRanges: matchResult[],
-  getContext: ReactFrameworkOutput<Remirror.Extensions>,
-  selectedEntity: SearchableMentionEntities | null,
-  project_id: string,
-  links: matchItem[]
-) {
-  if (!selectedEntity) return;
-
-  const initialRangesCount = initialRanges.length;
-  let newRanges;
-
-  let count = initialRangesCount;
-
-  while (count > 0) {
-    if (count > 0) count -= 1;
-    const range = (newRanges || initialRanges)[count];
-    getContext.commands.createMentionAtom(
-      {
-        name: selectedEntity,
-        range: {
-          from: range.from,
-          cursor: range.to,
-          to: range.to,
-        },
-      },
-      {
-        id: range.id,
-        label: range.title,
-        name: selectedEntity,
-        icon: range.icon,
-        projectId: project_id,
-        parent_id: range.parent_id,
-      }
-    );
-    newRanges = getRanges(getContext.getState().doc as ProsemirrorNode, links, selectedEntity, "automention");
-  }
-}
-
-export function getMatchFieldVariant(field: DocumentType["template_fields"][number]): Variant {
-  if (!field.entity_type) return "error";
-
-  if (field.is_randomized) {
-    if (!field.random_count) return "error";
-    return "primary";
-  }
-
-  if (field.entity_type === "custom" && !field.value) return "error";
-  if (field.entity_type === "dice_roll" && !field.formula) return "error";
-  if (field.entity_type === "derived" && (!field.derive_formula || !field.derive_from)) return "error";
-  if (field.entity_type === "blueprint_instances" && !field.blueprint_id) return "error";
-  if (field.entity_type === "map_pins" && !field.map_id) return "error";
-  if (field.entity_type === "events" && !field.calendar_id) return "error";
-  if (field.entity_type === "words" && !field.dictionary_id) return "error";
-
-  if (
-    field.entity_type !== "custom" &&
-    field.entity_type !== "derived" &&
-    field.entity_type !== "dice_roll" &&
-    !field.related?.length
-  ) {
-    return "error";
-  }
-
-  return "primary";
-}
-
 export function replaceWithMention(
   getContext: ReactFrameworkOutput<Remirror.Extensions>,
   {
@@ -199,4 +132,69 @@ export function replaceWithMention(
   tr.replaceWith(from, to, mentionNode);
 
   getContext.view.dispatch(tr);
+}
+
+export function createMentions(
+  initialRanges: matchResult[],
+  getContext: ReactFrameworkOutput<Remirror.Extensions>,
+  selectedEntity: SearchableMentionEntities | null,
+  project_id: string,
+  links: matchItem[]
+) {
+  if (!selectedEntity) return;
+
+  const initialRangesCount = initialRanges.length;
+  let newRanges;
+
+  let count = initialRangesCount;
+
+  while (count > 0) {
+    const { schema, tr } = getContext.getState();
+    if (count > 0) count -= 1;
+    const range = (newRanges || initialRanges)[count];
+
+    // Create a mention node
+    const mentionNode = schema.nodes.mentionAtom.create({
+      id: range.id,
+      label: range.title,
+      name: selectedEntity,
+      icon: range.icon,
+      projectId: project_id,
+      parent_id: range.parent_id,
+    });
+
+    tr.replaceWith(range.from, range.to, mentionNode);
+
+    getContext.view.dispatch(tr);
+
+    newRanges = getRanges(getContext.getState().doc as ProsemirrorNode, links, selectedEntity, "automention");
+  }
+}
+
+export function getMatchFieldVariant(field: DocumentType["template_fields"][number]): Variant {
+  if (!field.entity_type) return "error";
+
+  if (field.is_randomized) {
+    if (!field.random_count) return "error";
+    return "primary";
+  }
+
+  if (field.entity_type === "custom" && !field.value) return "error";
+  if (field.entity_type === "dice_roll" && !field.formula) return "error";
+  if (field.entity_type === "derived" && (!field.derive_formula || !field.derive_from)) return "error";
+  if (field.entity_type === "blueprint_instances" && !field.blueprint_id) return "error";
+  if (field.entity_type === "map_pins" && !field.map_id) return "error";
+  if (field.entity_type === "events" && !field.calendar_id) return "error";
+  if (field.entity_type === "words" && !field.dictionary_id) return "error";
+
+  if (
+    field.entity_type !== "custom" &&
+    field.entity_type !== "derived" &&
+    field.entity_type !== "dice_roll" &&
+    !field.related?.length
+  ) {
+    return "error";
+  }
+
+  return "primary";
 }
