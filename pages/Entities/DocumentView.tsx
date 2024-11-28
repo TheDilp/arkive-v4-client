@@ -6,7 +6,7 @@ import { QueryClient, UseMutateFunction, useQueryClient } from "@tanstack/react-
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import { MouseEvent, MutableRefObject, useEffect, useRef, useState } from "react";
-import { Navigate, useBlocker, useLocation, useParams } from "react-router-dom";
+import { Navigate, useBlocker, useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { findChildrenByNode, findElementAtPosition, RemirrorJSON } from "remirror";
 
@@ -425,6 +425,7 @@ function DocumentViewEditor({
   }>("documents", project_id as string, {
     mutationKey: ["document_view", "update"],
   });
+  const [searchParams] = useSearchParams();
 
   const [uiOptions, setUIOptions] = useState({ outline: false, comments: false });
 
@@ -478,6 +479,17 @@ function DocumentViewEditor({
     return () => {};
   }, [editorData]);
 
+  useEffect(() => {
+    const heading = searchParams.get("heading");
+    if (heading) {
+      const el = document.getElementById(heading);
+      if (el) {
+        const editor = document.getElementById("editor");
+        if (editor) editor.scrollTo({ top: el.offsetTop, behavior: "smooth" });
+      }
+    }
+  }, [searchParams]);
+
   return (
     <div className={`grid ${hasNoOutline ? "h-full" : "h-[calc(100%-4rem)]"} w-full grid-cols-6 items-start justify-start`}>
       {hasNoOutline ? null : (
@@ -507,7 +519,30 @@ function DocumentViewEditor({
                 style={{
                   paddingLeft: `${0.45 * (h.level - 1)}rem`,
                 }}>
-                {h.title}
+                <div className="flex items-center justify-between">
+                  <span>{h.title}</span>
+                  <div>
+                    <Button
+                      icon={IconEnum.link}
+                      iconSize={14}
+                      isIconOnly
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const url = new URL(window.location.href);
+                        url.searchParams.set("heading", h.id);
+                        window.navigator.clipboard.writeText(url.toString());
+                        createNotification({
+                          title: "Link to heading copied.",
+                          variant: "info",
+                          icon: IconEnum.link,
+                          timer: 2,
+                        });
+                      }}
+                      size="sm"
+                    />
+                  </div>
+                </div>
                 {h.level === 1 ? <hr className="w-full border-zinc-600" /> : null}
               </li>
             ))}
