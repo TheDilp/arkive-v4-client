@@ -73,7 +73,7 @@ export const InsertDocumentSchema = z.object({
     id: z.string().optional(),
     project_id: z.string(),
     title: z.string().transform((value) => value.trim()),
-    content: z.object({}).nullable().optional(),
+    content: z.any().nullable().optional(),
     icon: z.string().nullable().optional(),
     is_folder: z.boolean().nullable().optional(),
     is_public: z.boolean().nullable().optional(),

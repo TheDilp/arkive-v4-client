@@ -27,7 +27,7 @@ import {
   userAtom,
 } from "../../../utils";
 import { InsertDocumentSchema, UpdateDocumentSchema, UpdateDocumentType } from "../../../validation";
-import { FolderSelect, ImageSelect, MatchField } from "../../Complex";
+import { Editor, FolderSelect, ImageSelect, MatchField } from "../../Complex";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, TagInput } from "../../Form";
@@ -208,6 +208,17 @@ export function DocumentDrawer({ data, exceptions }: Props) {
             parent_id={document?.parent_id ?? null}
             type="documents"
           />
+
+          <Editor
+            initialContent={document?.content || undefined}
+            isDisabled={!canCreateOrEdit}
+            isFullHeight
+            isPrintable
+            name="content"
+            onChange={handleChange}
+          />
+
+          <hr />
 
           <div className="flex gap-x-2">
             <span>Dice color:</span>
