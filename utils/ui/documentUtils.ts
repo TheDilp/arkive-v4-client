@@ -3,6 +3,7 @@ import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { FromToProps, ProsemirrorNode } from "remirror";
 
 import { DocumentType, SearchableMentionEntities, Variant } from "../../types";
+import { AvailableIcons } from "../enums";
 import { DiceRollRegex } from "./diceRollerUtils";
 
 type matchItem = { id: string; title: string; blueprint_title?: string; image_id?: string; icon?: string; parent_id?: string };
@@ -163,4 +164,39 @@ export function getMatchFieldVariant(field: DocumentType["template_fields"][numb
   }
 
   return "primary";
+}
+
+export function replaceWithMention(
+  getContext: ReactFrameworkOutput<Remirror.Extensions>,
+  {
+    id,
+    label,
+    name,
+    icon,
+    parent_id,
+    project_id,
+  }: {
+    id: string;
+    label: string;
+    icon?: AvailableIcons;
+    parent_id?: string;
+    name: SearchableMentionEntities;
+    project_id: string;
+  }
+) {
+  const { selection, schema, tr } = getContext.getState();
+  const { from, to } = selection;
+  // Create a mention node
+  const mentionNode = schema.nodes.mentionAtom.create({
+    id,
+    label,
+    name,
+    icon,
+    projectId: project_id,
+    parent_id,
+  });
+
+  tr.replaceWith(from, to, mentionNode);
+
+  getContext.view.dispatch(tr);
 }
