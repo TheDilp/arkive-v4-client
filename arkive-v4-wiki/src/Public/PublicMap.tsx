@@ -2,9 +2,9 @@ import { Navigate, useParams } from "react-router-dom";
 
 import { Skeleton } from "../../../components";
 import { useGetEntity } from "../../../hooks";
+import { MapView } from "../../../pages/Entities";
 import { MapType } from "../../../types";
 import { IconEnum, useNotifications } from "../../../utils";
-import { MapView } from "../../../pages/Entities";
 import { PublicEntityLayout } from "./PublicLayout";
 
 export function PublicMap() {
@@ -22,7 +22,7 @@ export function PublicMap() {
       data: {
         project_id,
       },
-      fields: ["title", "image_id", "is_public"],
+      fields: ["title", "image_id", "is_public", "cluster_pins"],
       relations: {
         map_pins: true,
         map_layers: true,
