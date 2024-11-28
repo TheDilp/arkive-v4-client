@@ -356,10 +356,9 @@ function menuBarItems({
       onClick: () => chain?.toggleSecret({ secret: true, classNames: "secretBlock" })?.run(),
       tooltip: "Secret block",
     },
-    { id: "print", icon: IconEnum.blueprint, onClick: handlePrint, tooltip: "Print page" },
   ];
 
-  if (!IS_GATEWAY) {
+  if (!IS_GATEWAY && !isEditorMenubar) {
     options.push({
       id: "automention",
       // @ts-ignore
@@ -421,20 +420,22 @@ function menuBarItems({
       }
     );
   }
-  options.push({
-    id: "alter_names",
-    icon: IconEnum.alter_name,
-    tooltip: "Display mentions with alternative names",
+  if (!isEditorMenubar) {
+    options.push({
+      id: "alter_names",
+      icon: IconEnum.alter_name,
+      tooltip: "Display mentions with alternative names",
 
-    onClick: () =>
-      setDrawer((prev) => ({
-        ...prev,
-        title: "Alternative names",
-        size: "xs",
-        type: "alter_names",
-        data: { getContext, title: title || "", id: id || "" },
-      })),
-  });
+      onClick: () =>
+        setDrawer((prev) => ({
+          ...prev,
+          title: "Alternative names",
+          size: "xs",
+          type: "alter_names",
+          data: { getContext, title: title || "", id: id || "" },
+        })),
+    });
+  }
   if (isTemplate) {
     options.push({
       id: "template_maker",
