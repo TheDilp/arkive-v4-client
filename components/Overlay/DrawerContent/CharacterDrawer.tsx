@@ -35,6 +35,7 @@ import {
   gameSystemAtom,
   getDifferenceForAdditionalFields,
   IconEnum,
+  replaceWithMention,
   useNotifications,
 } from "../../../utils";
 import { InsertCharacterSchema, InsertCharacterType, UpdateCharacterSchema, UpdateCharacterType } from "../../../validation";
@@ -278,7 +279,6 @@ export function CharacterDrawer({
     preselectedTab?: number;
     title?: string;
     getContext?: ReactFrameworkOutput<Remirror.Extensions>;
-    range?: { from: number | undefined; to: number | undefined };
   };
 }) {
   const { project_id } = useParams();
@@ -852,34 +852,15 @@ export function CharacterDrawer({
                   onSuccess: (res) => {
                     if (res?.ok) {
                       if (createMention) {
-                        if (
-                          exceptions?.mention &&
-                          data?.getContext &&
-                          typeof data.range?.from === "number" &&
-                          typeof data.range?.to === "number" &&
-                          res?.data?.id
-                        ) {
-                          data.getContext.chain
-                            .delete({ from: Number(data.range.from), to: Number(data.range.to) })
-                            .createMentionAtom(
-                              {
-                                name: "characters",
-                                range: {
-                                  from: data.range.from,
-                                  cursor: data.range.to,
-                                  to: data.range.to,
-                                },
-                              },
-                              {
-                                id: res?.data?.id,
-                                label: data?.title || "",
-                                name: "characters",
-                                icon: undefined,
-                                projectId: project_id,
-                                parent_id: undefined,
-                              }
-                            )
-                            .run();
+                        if (exceptions?.mention && data?.getContext && res?.data?.id) {
+                          replaceWithMention(data.getContext, {
+                            id: res?.data?.id,
+                            label: data?.title || "",
+                            name: "characters",
+                            parent_id: undefined,
+                            icon: undefined,
+                            project_id: project_id as string,
+                          });
                         }
                       }
                       if (actions?.onSuccessAction) {

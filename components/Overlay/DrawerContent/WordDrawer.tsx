@@ -13,7 +13,7 @@ import {
   useUpdateSubEntity,
 } from "../../../hooks";
 import { DrawerAtomType, TabType, UserHasPermissionsType, WordStateType } from "../../../types";
-import { createOrEditPermission, IconEnum } from "../../../utils";
+import { createOrEditPermission, IconEnum, replaceWithMention } from "../../../utils";
 import { InsertWordSchema, InsertWordType, UpdateWordSchema } from "../../../validation";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { EntityPreview } from "../../DataDisplay";
@@ -26,7 +26,6 @@ type Props = {
     id?: string;
     title?: string;
     getContext?: ReactFrameworkOutput<Remirror.Extensions>;
-    range?: { from: number | undefined; to: number | undefined };
   };
   exceptions: DrawerAtomType["exceptions"];
 };
@@ -102,34 +101,15 @@ export function WordDrawer({ data, exceptions }: Props) {
       await createWord(parsedData, {
         onSuccess: (res) => {
           if (res?.ok && createMention) {
-            if (
-              exceptions?.mention &&
-              data?.getContext &&
-              typeof data.range?.from === "number" &&
-              typeof data.range?.to === "number" &&
-              res?.data?.id
-            ) {
-              data.getContext.chain
-                .delete({ from: Number(data.range.from), to: Number(data.range.to) })
-                .createMentionAtom(
-                  {
-                    name: "words",
-                    range: {
-                      from: data.range.from,
-                      cursor: data.range.to,
-                      to: data.range.to,
-                    },
-                  },
-                  {
-                    id: res?.data?.id,
-                    label: data?.title || "",
-                    name: "words",
-                    icon: undefined,
-                    projectId: project_id,
-                    parent_id: undefined,
-                  }
-                )
-                .run();
+            if (exceptions?.mention && data?.getContext && res?.data?.id) {
+              replaceWithMention(data.getContext, {
+                id: res?.data?.id,
+                label: data?.title || "",
+                name: "words",
+                parent_id: word?.parent_id,
+                icon: undefined,
+                project_id: project_id as string,
+              });
             }
           }
 

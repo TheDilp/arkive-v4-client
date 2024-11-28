@@ -1,3 +1,4 @@
+import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { useLayoutEffect, useState } from "react";
@@ -31,6 +32,7 @@ import {
   getDefaultEntityIcon,
   getEntityLink,
   IconEnum,
+  replaceWithMention,
 } from "../../../utils";
 import { InsertEventSchema, UpdateEventSchema } from "../../../validation/calendars/event";
 import { ImageSelect } from "../../Complex";
@@ -59,6 +61,7 @@ type Props = {
     year?: number;
     parent_id?: string;
     isReadOnly?: boolean;
+    getContext?: ReactFrameworkOutput<Remirror.Extensions>;
   };
   exceptions: DrawerAtomType["exceptions"];
 };
@@ -83,6 +86,8 @@ export function EventDrawer({ data, exceptions }: Props) {
   const { project_id, item_id } = useParams();
   const hasId = "id" in data && data?.id;
   const [selectedTab, setSelectedTab] = useState(0);
+  const [createMention, setCreateMention] = useState(true);
+
   const resetDrawer = useToggledResetAtom();
   const setDrawer = useSetAtom(drawerAtom);
 
@@ -91,7 +96,7 @@ export function EventDrawer({ data, exceptions }: Props) {
     start_month_id: "",
     start_day: data?.day,
     start_year: data?.year,
-    parent_id: null,
+    parent_id: data?.parent_id || item_id || null,
   });
 
   const { data: calendar, isFetching: isFetchingMonths } = useGetEntity<CalendarType>(
@@ -162,7 +167,6 @@ export function EventDrawer({ data, exceptions }: Props) {
   const tabs = getTabs(permissions, existingEvent?.data?.id);
 
   const existingMonths = calendar?.data?.months || [];
-
   const { mutateAsync: createEvent, isLoading: isCreating } = useCreateSubEntity<{
     data: EventStateType & { parent_id: string };
   }>("events", project_id as string);
@@ -217,7 +221,19 @@ export function EventDrawer({ data, exceptions }: Props) {
       });
 
       await createEvent(parsedData, {
-        onSuccess: () => {
+        onSuccess: (res) => {
+          if (res?.ok && createMention) {
+            if (exceptions?.mention && data?.getContext && res?.data?.id && event?.parent_id) {
+              replaceWithMention(data.getContext, {
+                id: res?.data?.id,
+                label: event?.title || "",
+                name: "events",
+                parent_id: event?.parent_id,
+                icon: undefined,
+                project_id: project_id as string,
+              });
+            }
+          }
           resetDrawer();
           setEvent({
             start_month: data?.month ?? 0,
@@ -350,6 +366,7 @@ export function EventDrawer({ data, exceptions }: Props) {
                       onChange={handleChange}
                       type="number"
                       value={event?.start_year || ""}
+                      variant={event?.start_year ? "primary" : "error"}
                     />
                   </div>
                   <div className="flex items-center gap-x-2">
@@ -456,6 +473,17 @@ export function EventDrawer({ data, exceptions }: Props) {
                   value={event?.is_public ?? false}
                 />
               </div>
+              {exceptions?.mention ? (
+                <li className="flex w-full items-center justify-between">
+                  <span>Create mention:</span>
+                  <Checkbox
+                    isDisabled={!permissions?.create_events}
+                    name="create_mention"
+                    onChange={(e) => setCreateMention(e.value)}
+                    value={createMention}
+                  />
+                </li>
+              ) : null}
             </>
           ) : null}
         </div>

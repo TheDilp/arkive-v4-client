@@ -60,6 +60,7 @@ export type DrawerAtomType = {
         | "maps"
         | "graphs"
         | "calendars"
+        | "events"
         | "dictionaries"
         | "random_tables"
         | "random_table_option"

@@ -22,6 +22,7 @@ import {
   getSentenceCase,
   IconEnum,
   reorder,
+  replaceWithMention,
   useNotifications,
   userAtom,
 } from "../../../utils";
@@ -74,7 +75,6 @@ type Props = {
     title?: string;
     preselectedTab?: number;
     getContext?: ReactFrameworkOutput<Remirror.Extensions>;
-    range?: { from: number | undefined; to: number | undefined };
   };
   exceptions: DrawerAtomType["exceptions"];
 };
@@ -102,7 +102,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
   const [selectedTab, setSelectedTab] = useState(data?.preselectedTab || 0);
-  const [createMention, setCreateMention] = useState(true);
+  const [createMention, setCreateMention] = useState(false);
   const user = useAtomValue(userAtom);
   const resetDrawerAtom = useToggledResetAtom();
 
@@ -451,34 +451,15 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                   {
                     onSuccess: (res) => {
                       if (res?.ok && createMention) {
-                        if (
-                          exceptions?.mention &&
-                          data?.getContext &&
-                          typeof data.range?.from === "number" &&
-                          typeof data.range?.to === "number" &&
-                          res?.data?.id
-                        ) {
-                          data.getContext.chain
-                            .delete({ from: Number(data.range.from), to: Number(data.range.to) })
-                            .createMentionAtom(
-                              {
-                                name: "documents",
-                                range: {
-                                  from: data.range.from,
-                                  cursor: data.range.to,
-                                  to: data.range.to,
-                                },
-                              },
-                              {
-                                id: res?.data?.id,
-                                label: data?.title || "",
-                                name: "documents",
-                                icon: undefined,
-                                projectId: project_id,
-                                parent_id: undefined,
-                              }
-                            )
-                            .run();
+                        if (exceptions?.mention && data?.getContext && res?.data?.id) {
+                          replaceWithMention(data.getContext, {
+                            id: res?.data?.id,
+                            label: data?.title || "",
+                            name: "documents",
+                            parent_id: undefined,
+                            icon: document?.icon || undefined,
+                            project_id: project_id as string,
+                          });
                         }
                       }
                       resetDrawerAtom();

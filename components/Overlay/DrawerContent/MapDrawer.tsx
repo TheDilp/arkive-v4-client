@@ -12,7 +12,7 @@ import {
   useUpdateEntity,
 } from "../../../hooks";
 import { DrawerAtomType, MapType, TabType, UserHasPermissionsType } from "../../../types";
-import { createOrEditPermission, getAssetURL, IconEnum, onDragEnd } from "../../../utils";
+import { createOrEditPermission, getAssetURL, IconEnum, onDragEnd, replaceWithMention } from "../../../utils";
 import { InsertMapSchema, InsertMapType, UpdateMapSchema, UpdateMapType } from "../../../validation/maps/maps";
 import { FolderSelect, ImageSelect } from "../../Complex";
 import { EntityPermission } from "../../Complex/EntityPermission";
@@ -53,7 +53,6 @@ export function MapDrawer({
     id?: string;
     title?: string;
     getContext?: ReactFrameworkOutput<Remirror.Extensions>;
-    range?: { from: number | undefined; to: number | undefined };
   };
   exceptions: DrawerAtomType["exceptions"];
 }) {
@@ -200,16 +199,16 @@ export function MapDrawer({
                 <div className="flex flex-col" {...providedDroppable.droppableProps} ref={providedDroppable.innerRef}>
                   {map?.map_layers?.map((item, index) => (
                     <Draggable
+                      key={item.id}
                       draggableId={item.id || item.title + index}
                       index={index}
-                      isDragDisabled={!canCreateOrEdit}
-                      key={item.id}>
+                      isDragDisabled={!canCreateOrEdit}>
                       {(provided, draggableSnapshot) => (
                         <div
+                          ref={provided.innerRef}
                           className={`my-1 flex w-full flex-nowrap items-center gap-x-2 ${
                             draggableSnapshot.isDragging ? "ml-8 w-full rounded bg-transparent bg-none shadow-sm" : ""
                           }`}
-                          ref={provided.innerRef}
                           {...provided.draggableProps}
                           style={{
                             ...provided.draggableProps.style,
@@ -320,34 +319,15 @@ export function MapDrawer({
             await create(parsedData, {
               onSuccess: (res) => {
                 if (res?.ok && createMention) {
-                  if (
-                    exceptions?.mention &&
-                    data?.getContext &&
-                    typeof data.range?.from === "number" &&
-                    typeof data.range?.to === "number" &&
-                    res?.data?.id
-                  ) {
-                    data.getContext.chain
-                      .delete({ from: Number(data.range.from), to: Number(data.range.to) })
-                      .createMentionAtom(
-                        {
-                          name: "maps",
-                          range: {
-                            from: data.range.from,
-                            cursor: data.range.to,
-                            to: data.range.to,
-                          },
-                        },
-                        {
-                          id: res?.data?.id,
-                          label: data?.title || "",
-                          name: "maps",
-                          icon: undefined,
-                          projectId: project_id,
-                          parent_id: undefined,
-                        }
-                      )
-                      .run();
+                  if (exceptions?.mention && data?.getContext && res?.data?.id) {
+                    replaceWithMention(data.getContext, {
+                      id: res?.data?.id,
+                      label: data?.title || "",
+                      name: "maps",
+                      parent_id: undefined,
+                      icon: undefined,
+                      project_id: project_id as string,
+                    });
                   }
                 }
 

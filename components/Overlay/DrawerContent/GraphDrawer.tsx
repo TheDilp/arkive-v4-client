@@ -12,7 +12,7 @@ import {
   useUpdateEntity,
 } from "../../../hooks";
 import { DrawerAtomType, EntityPermissionType, GraphType, TabType, UserHasPermissionsType } from "../../../types";
-import { createOrEditPermission, DefaultBoardColor, IconEnum, NodeShapesEnum } from "../../../utils";
+import { createOrEditPermission, DefaultBoardColor, IconEnum, NodeShapesEnum, replaceWithMention } from "../../../utils";
 import {
   Alert,
   Button,
@@ -60,7 +60,6 @@ export function GraphDrawer({
     id?: string;
     title?: string;
     getContext?: ReactFrameworkOutput<Remirror.Extensions>;
-    range?: { from: number | undefined; to: number | undefined };
   };
   exceptions: DrawerAtomType["exceptions"];
 }) {
@@ -261,34 +260,15 @@ export function GraphDrawer({
                     },
                     onSuccess: (res) => {
                       if (res?.ok && createMention) {
-                        if (
-                          exceptions?.mention &&
-                          data?.getContext &&
-                          typeof data.range?.from === "number" &&
-                          typeof data.range?.to === "number" &&
-                          res?.data?.id
-                        ) {
-                          data.getContext.chain
-                            .delete({ from: Number(data.range.from), to: Number(data.range.to) })
-                            .createMentionAtom(
-                              {
-                                name: "graphs",
-                                range: {
-                                  from: data.range.from,
-                                  cursor: data.range.to,
-                                  to: data.range.to,
-                                },
-                              },
-                              {
-                                id: res?.data?.id,
-                                label: data?.title || "",
-                                name: "graphs",
-                                icon: undefined,
-                                projectId: project_id,
-                                parent_id: undefined,
-                              }
-                            )
-                            .run();
+                        if (exceptions?.mention && data?.getContext && res?.data?.id) {
+                          replaceWithMention(data.getContext, {
+                            id: res?.data?.id,
+                            label: data?.title || "",
+                            name: "graphs",
+                            parent_id: undefined,
+                            icon: graph?.icon || undefined,
+                            project_id: project_id as string,
+                          });
                         }
                       }
 

@@ -186,6 +186,7 @@ function DocumentContent({ canUpdate }: { canUpdate: boolean }) {
 
     const slice = getContext?.getState().selection.content();
     let title = "";
+
     if (slice) {
       slice.content.descendants((node) => {
         if (node.type.name === "mentionAtom") {
@@ -194,12 +195,13 @@ function DocumentContent({ canUpdate }: { canUpdate: boolean }) {
           title += node.textContent;
         }
       });
+
+      title = title.trim();
       if (title.length > 250) {
         return;
       }
     }
 
-    const { from, to } = getContext?.getState().selection || {};
     setContextMenu({
       // @ts-ignore
       event: e,
@@ -222,7 +224,6 @@ function DocumentContent({ canUpdate }: { canUpdate: boolean }) {
                   data: {
                     title,
                     getContext: getContext || undefined,
-                    range: { from, to },
                   },
                   type: "characters",
                   size: "xl",
@@ -237,7 +238,7 @@ function DocumentContent({ canUpdate }: { canUpdate: boolean }) {
                   ...prev,
                   exceptions: { mention: true },
                   title: "Create blueprint instance",
-                  data: { title, getContext: getContext || undefined, range: { from, to } },
+                  data: { title, getContext: getContext || undefined },
                   type: "blueprint_instances",
                 })),
             },
@@ -250,7 +251,7 @@ function DocumentContent({ canUpdate }: { canUpdate: boolean }) {
                   ...prev,
                   exceptions: { mention: true, globalCreate: true },
                   title: "Create document",
-                  data: { title, getContext: getContext || undefined, range: { from, to } },
+                  data: { title, getContext: getContext || undefined },
                   type: "documents",
                 })),
             },
@@ -263,7 +264,7 @@ function DocumentContent({ canUpdate }: { canUpdate: boolean }) {
                   ...prev,
                   exceptions: { mention: true, globalCreate: true },
                   title: "Create map",
-                  data: { title, getContext: getContext || undefined, range: { from, to } },
+                  data: { title, getContext: getContext || undefined },
                   type: "maps",
                 })),
             },
@@ -276,12 +277,25 @@ function DocumentContent({ canUpdate }: { canUpdate: boolean }) {
                   ...prev,
                   title: "Create graph",
                   exceptions: { mention: true, globalCreate: true },
-                  data: { title, getContext: getContext || undefined, range: { from, to } },
+                  data: { title, getContext: getContext || undefined },
                   type: "graphs",
                 })),
             },
             {
               id: "3f",
+              title: "Event",
+              icon: IconEnum.event,
+              onClick: () =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  title: "Create event",
+                  exceptions: { mention: true, globalCreate: true },
+                  data: { title, getContext: getContext || undefined },
+                  type: "events",
+                })),
+            },
+            {
+              id: "3g",
               title: "Word",
               icon: IconEnum.word,
               onClick: () =>
@@ -289,7 +303,7 @@ function DocumentContent({ canUpdate }: { canUpdate: boolean }) {
                   ...prev,
                   title: "Create word",
                   exceptions: { mention: true, globalCreate: true },
-                  data: { title, getContext: getContext || undefined, range: { from, to } },
+                  data: { title, getContext: getContext || undefined },
                   type: "words",
                 })),
             },

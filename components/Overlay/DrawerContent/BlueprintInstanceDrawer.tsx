@@ -26,6 +26,7 @@ import {
   createOrEditPermission,
   getDifferenceForAdditionalFields,
   IconEnum,
+  replaceWithMention,
   useNotifications,
 } from "../../../utils";
 import { InsertBlueprintInstanceSchema, UpdateBlueprintInstanceSchema } from "../../../validation";
@@ -41,7 +42,6 @@ type Props = {
     parent_id?: string;
     title?: string;
     getContext?: ReactFrameworkOutput<Remirror.Extensions>;
-    range?: { from: number | undefined; to: number | undefined };
   };
   exceptions: DrawerAtomType["exceptions"];
 };
@@ -334,34 +334,15 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
                 await create(parsedData, {
                   onSuccess: (res) => {
                     if (res?.ok && createMention) {
-                      if (
-                        exceptions?.mention &&
-                        data?.getContext &&
-                        typeof data.range?.from === "number" &&
-                        typeof data.range?.to === "number" &&
-                        res?.data?.id
-                      ) {
-                        data.getContext.chain
-                          .delete({ from: Number(data.range.from), to: Number(data.range.to) })
-                          .createMentionAtom(
-                            {
-                              name: "blueprint_instances",
-                              range: {
-                                from: data.range.from,
-                                cursor: data.range.to,
-                                to: data.range.to,
-                              },
-                            },
-                            {
-                              id: res?.data?.id,
-                              label: data?.title || "",
-                              name: "blueprint_instances",
-                              icon: undefined,
-                              projectId: project_id,
-                              parent_id: undefined,
-                            }
-                          )
-                          .run();
+                      if (exceptions?.mention && data?.getContext && res?.data?.id) {
+                        replaceWithMention(data.getContext, {
+                          id: res?.data?.id,
+                          label: data?.title || "",
+                          name: "blueprint_instances",
+                          parent_id: instance?.parent_id,
+                          icon: undefined,
+                          project_id: project_id as string,
+                        });
                       }
 
                       resetDrawerAtom();
