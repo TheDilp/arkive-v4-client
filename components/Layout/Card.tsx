@@ -2,14 +2,14 @@ import ls from "localstorage-slim";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { useImageURL } from "../../hooks/ui/useImageURL";
-import { BaseCardType, CharacterType, ProjectGameCardType, ProjectType } from "../../types";
-import { getAssetURL, getAvatarInitials, IconEnum, projectCardNavItems } from "../../utils";
+import { BaseCardType, CharacterType, ProjectCardType, ProjectType } from "../../types";
+import { getAssetURL, getAvatarInitials, IconEnum, projectNavItems } from "../../utils";
 import { Avatar, Icon } from "../Misc";
 import { Tooltip } from "../Overlay/Tooltip";
 
 const alwaysEnabledItems = ["/", "settings", "tags", "assets"];
 
-export function ProjectGameCard({ id, project_id, title, image, feature_flags }: ProjectGameCardType) {
+export function ProjectCard({ id, project_id, title, image, feature_flags }: ProjectCardType) {
   const module = ls.get("module");
   const baseUrl = module === "editor" ? `/projects/${id}` : `/games/${id}/${project_id}`;
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ export function ProjectGameCard({ id, project_id, title, image, feature_flags }:
       </h2>
       {module === "editor" ? (
         <div className="count absolute top-[50%] z-20 mb-12 grid w-full grid-cols-3 gap-y-2 opacity-0 transition-all group-hover:opacity-100">
-          {projectCardNavItems
+          {projectNavItems
             .filter((item) => feature_flags?.[`${item.navigate}_enabled`] || alwaysEnabledItems.includes(item.navigate))
             .map((item, index) => (
               <div

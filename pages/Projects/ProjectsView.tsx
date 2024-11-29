@@ -11,7 +11,7 @@ import {
   Dialog,
   Drawer,
   Navbar,
-  ProjectGameCard,
+  ProjectCard,
   Sidebar,
   Skeleton,
   Table,
@@ -26,7 +26,7 @@ import {
   getProjectsViewNavItems,
   IconEnum,
   projectAtom,
-  projectCardNavItems,
+  projectNavItems,
   userAtom,
   userStatusAtom,
 } from "../../utils";
@@ -74,7 +74,7 @@ function createColumns(navigate: NavigateFunction) {
       cell: ({ row }) => {
         return (
           <div className="flex w-full flex-1 items-center justify-between gap-x-4 overflow-auto">
-            {projectCardNavItems
+            {projectNavItems
               .filter(
                 (item) =>
                   row.original?.feature_flags?.[`${item.navigate}_enabled`] || alwaysEnabledItems.includes(item.navigate)
@@ -197,7 +197,7 @@ export function ProjectsView() {
           {!view && !isLoading && !isInitialLoadingUser ? (
             <div className="grid h-full max-h-full flex-1 grid-cols-1 gap-4 overflow-auto xl:grid-cols-2 2xl:grid-cols-4">
               {(data?.data || []).map((project) => (
-                <ProjectGameCard
+                <ProjectCard
                   key={project.id}
                   feature_flags={project.feature_flags}
                   id={project.id}

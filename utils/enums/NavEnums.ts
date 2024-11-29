@@ -51,6 +51,4 @@ export const projectNavItems: SidebarItemType[] = [
   { icon: IconEnum.settings, navigate: "settings", tooltip: "Settings" },
 ];
 
-export const projectCardNavItems = projectNavItems.slice(0, -1);
-
 // Dyce VTT

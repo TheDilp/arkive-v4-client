@@ -6,7 +6,7 @@ export interface BaseCardType {
   image?: string;
 }
 
-export interface ProjectGameCardType extends BaseCardType {
+export interface ProjectCardType extends BaseCardType {
   id: string;
   project_id?: string;
   feature_flags: ProjectType["feature_flags"];
