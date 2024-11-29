@@ -114,6 +114,9 @@ export function useUpdateEntity<
           if (MentionableEntites.includes(type)) {
             queryClient.invalidateQueries([type, vars.data.id, "mention"]);
           }
+          if (type === "tags") {
+            queryClient.invalidateQueries(["projects"]);
+          }
           if (type !== "documents" && (options?.successNotification === undefined || options?.successNotification === true)) {
             createNotification({
               title: getEntityCRUDNotification(type, "update"),

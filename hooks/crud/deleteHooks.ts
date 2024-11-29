@@ -29,6 +29,10 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
           queryClient.invalidateQueries([type, vars.data.parent_id]);
           queryClient.invalidateQueries(["allEntities", project_id, type]);
 
+          if (type === "tags") {
+            queryClient.invalidateQueries(["projects"]);
+          }
+
           createNotification({
             title: getEntityCRUDNotification(type, arkive ? "arkive" : "delete"),
             variant: "success",
@@ -149,6 +153,10 @@ export function useDeleteMany(
             queryClient.invalidateQueries([type, parent_id]);
           } else {
             queryClient.invalidateQueries(["allEntities", project_id, type]);
+          }
+
+          if (type === "tags") {
+            queryClient.invalidateQueries(["projects"]);
           }
 
           createNotification({

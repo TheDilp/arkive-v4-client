@@ -228,6 +228,10 @@ export function useCreateEntities<InsertType extends { data: { [key: string]: an
         if (data.ok) {
           queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, type] });
 
+          if (type === "tags") {
+            queryClient.invalidateQueries(["projects"]);
+          }
+
           createNotification({
             title: data?.message || getEntityCRUDNotification(type, "create"),
             variant: "success",
