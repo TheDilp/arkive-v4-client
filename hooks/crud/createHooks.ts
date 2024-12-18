@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import {
-  AvailableDyceEntityType,
   AvailableEntityType,
   AvailableSubEntityType,
   DocumentTemplateFieldType,
@@ -63,7 +62,7 @@ export function useCreateProject<InsertType>() {
 }
 
 export function useCreateEntity<InsertType extends { data: { [key: string]: any }; relations?: { [key: string]: any } }>(
-  type: AvailableEntityType | AvailableDyceEntityType,
+  type: AvailableEntityType,
   isTemplate?: boolean,
   options?: { successNotification?: boolean }
 ) {
@@ -96,10 +95,8 @@ export function useCreateEntity<InsertType extends { data: { [key: string]: any 
         if (data?.ok) {
           if (type === "character_relationship_types") {
             queryClient.invalidateQueries(["projects", vars.data.project_id]);
-          } else if (type === "games") {
-            queryClient.invalidateQueries({
-              predicate: (q) => q.queryKey[0] === "allEntities" && q.queryKey.includes("games"),
-            });
+          } else if (type === "tags") {
+            queryClient.invalidateQueries(["projects"]);
           } else {
             queryClient.invalidateQueries(["allEntities", vars.data.project_id, type]);
           }

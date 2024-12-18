@@ -74,8 +74,6 @@ export type AvailableSubEntityType =
   | "messages"
   | "players";
 
-export type AvailableDyceEntityType = "games";
-
 export type SearchableEntities =
   | "all"
   | "projects"
