@@ -184,6 +184,7 @@ export function useGetEntities<ReturnType>(
     prefetch?: boolean;
     queryKeyOverwrite?: (string | number | Record<any, any>)[];
     queryKeyConcat?: (string | number | Record<any, any>)[];
+    isAll?: boolean;
   }
 ) {
   const createNotification = useNotifications();
@@ -207,7 +208,7 @@ export function useGetEntities<ReturnType>(
     } = await FetchFunction({
       method: "POST",
       body: JSON.stringify(finalRequest),
-      url: `${getServerUrl()}/${type.toLowerCase()}`,
+      url: `${getServerUrl()}/${type.toLowerCase()}${options?.isAll ? "/all" : ""}`,
     });
     if (!data?.role_access && !IS_PUBLIC) {
       createNotification({

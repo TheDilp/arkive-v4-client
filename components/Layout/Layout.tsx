@@ -5,8 +5,9 @@ import { ReactNode, useEffect } from "react";
 import { Navigate, Outlet, useBlocker, useLocation, useParams } from "react-router-dom";
 
 import { useBreakpoint, useGetEntities, useGetEntity, useGetUser, useToggledResetAtom } from "../../hooks";
-import { PermissionType, ProjectType } from "../../types";
+import { PermissionType, ProjectType, TagType } from "../../types";
 import {
+  availableTagsAtom,
   contextMenuAtom,
   currentUserPermissionsAtom,
   DefaultTagColor,
@@ -74,12 +75,17 @@ export function ProjectLayout() {
       staleTime: Infinity,
     }
   );
+  const { data: allTags } = useGetEntities<TagType>({ fields: [] }, "tags", {
+    isAll: true,
+    enabled: !isInitialLoading && !!projectData && !!project_id,
+  });
   const title = useAtomValue(navbarTitleAtom);
   const [history, setHistory] = useAtom(historyAtom);
   const [projectAtomData, setProjectAtom] = useAtom(projectAtom);
   const setDialog = useSetAtom(dialogAtom);
   const setPermissions = useSetAtom(permissionsAtom);
   const setUserPermissions = useSetAtom(currentUserPermissionsAtom);
+  const setAllTags = useSetAtom(availableTagsAtom);
   const hasChangedData = useAtomValue(hasChangedDataAtom);
   const drawer = useAtomValue(drawerAtom);
   const contextMenu = useAtomValue(contextMenuAtom);
@@ -125,6 +131,11 @@ export function ProjectLayout() {
     if (parsedTitle === "undefined") return;
     setHistory([{ label: parsedTitle, link: pathname }, ...history].slice(0, 10));
   }, [title]);
+
+  useEffect(() => {
+    if (allTags?.data) setAllTags(allTags?.data || []);
+  }, [allTags]);
+
   const { proceed, reset } = useBlocker(({ currentLocation, nextLocation }) => {
     if (hasChangedData && !!drawer?.title && currentLocation.pathname !== nextLocation.pathname) {
       if (proceed) {
