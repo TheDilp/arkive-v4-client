@@ -23,7 +23,7 @@ export function TableViewHeader({
   useLayoutEffect(() => {
     const timeout = setTimeout(() => {
       setFilter(localFilter);
-    }, 175);
+    }, 150);
 
     return () => {
       clearTimeout(timeout);
