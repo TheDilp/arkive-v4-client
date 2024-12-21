@@ -436,7 +436,7 @@ function NotificationList({
 }
 
 export function Navbar({ isDisabled }: { isDisabled: boolean }) {
-  const { project_id, game_id, subitem_id } = useParams();
+  const { project_id, subitem_id } = useParams();
   const { isLg } = useBreakpoint();
   const navigate = useNavigate();
   const module = ls.get("module");
@@ -649,37 +649,6 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
           </>
         ) : null}
 
-        {project_id && user?.id && !isDisabled ? (
-          <>
-            {isLg ? (
-              <div className="w-fit">
-                <Tooltip
-                  arrowColor="#27272a"
-                  content={<DiceRoller />}
-                  customOffset={{ mainAxis: 25, crossAxis: 50 }}
-                  isClickable>
-                  <div className="h-full">
-                    <Button hasNoBackground icon={IconEnum.d20} iconSize={24} isIconOnly onClick={undefined} />
-                  </div>
-                </Tooltip>
-              </div>
-            ) : null}
-            {game_id ? (
-              <div className="h-full w-fit">
-                <Link to={`/games/${game_id}/settings`}>
-                  <Button
-                    hasNoBackground
-                    icon={IconEnum.settings}
-                    iconSize={24}
-                    isIconOnly
-                    onClick={undefined}
-                    tooltip={"Game settings"}
-                  />
-                </Link>
-              </div>
-            ) : null}
-          </>
-        ) : null}
         {authUser ? (
           <Dropdown allowedPlacements={["bottom-end"]} items={accountItems(signOut, navigate)}>
             <div className="relative ml-auto flex cursor-pointer items-center">
