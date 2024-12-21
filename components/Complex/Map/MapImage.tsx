@@ -1,7 +1,7 @@
 import { useSetAtom } from "jotai";
 import { LatLngBoundsExpression } from "leaflet";
 import { useEffect, useRef } from "react";
-import { ImageOverlay, LayerGroup, LayersControl, useMapEvents } from "react-leaflet";
+import { ImageOverlay, LayerGroup, LayersControl, useMap, useMapEvents } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { useParams } from "react-router-dom";
 
@@ -12,7 +12,7 @@ import { MapPin } from "./MapPin";
 type Props = {
   mapData: MapType;
   src: string;
-  bounds: LatLngBoundsExpression;
+  bounds: number[][];
   imgRef: any;
   isReadOnly?: boolean;
   isViewOnly?: boolean;
@@ -55,7 +55,8 @@ export function MapImage({
   }
 
   const setDrawer = useSetAtom(drawerAtom);
-  const map = useMapEvents({
+  const map = useMap();
+  const mapEvents = useMapEvents({
     contextmenu(e: any) {
       if (!isReadOnly && !isViewOnly) {
         setContextMenu({
@@ -94,8 +95,20 @@ export function MapImage({
               },
             },
             {
-              isDisabled: !permissions?.delete_map_pins,
               id: "3",
+              icon: IconEnum.center,
+              title: "Center map",
+              onClick: () => map.setView([bounds[1][0] / 2, bounds[1][1] / 2], map.getZoom()),
+            },
+            {
+              id: "4",
+              icon: IconEnum.fit,
+              title: "Fit map to view",
+              onClick: () => map.fitBounds(bounds as LatLngBoundsExpression),
+            },
+            {
+              isDisabled: !permissions?.delete_map_pins,
+              id: "5",
               icon: IconEnum.map_pin,
               title: "Manage pins",
               onClick: () => {
@@ -117,7 +130,7 @@ export function MapImage({
   useEffect(() => {
     if ((subitem_id || center_on) && mapData && firstRender.current) {
       const pin = mapData?.map_pins?.find((map_pin) => (center_on ? map_pin.id === center_on : map_pin.id === subitem_id));
-      if (pin) map.panTo([pin.lat, pin.lng], {});
+      if (pin) mapEvents.panTo([pin.lat, pin.lng], {});
     } else if (bounds && firstRender.current) {
       // map.fitBounds(bounds);
     }
@@ -126,7 +139,7 @@ export function MapImage({
     };
   }, [subitem_id, bounds]);
 
-  if (!map || !src) return null;
+  if (!mapEvents || !src) return null;
 
   const { nonCharacterPins, characterPins }: { nonCharacterPins: MapPinType[]; characterPins: MapPinType[] } = (
     mapData?.map_pins || []
@@ -147,7 +160,7 @@ export function MapImage({
   return (
     <LayersControl position="topright">
       <LayersControl.BaseLayer checked name="Map">
-        <ImageOverlay ref={imgRef} bounds={bounds} url={src} />
+        <ImageOverlay ref={imgRef} bounds={bounds as LatLngBoundsExpression} url={src} />
       </LayersControl.BaseLayer>
       {/* Characters layer */}
       <LayersControl.Overlay checked name="Character pins">
@@ -197,7 +210,12 @@ export function MapImage({
               .map((layer) => {
                 return (
                   <LayersControl.Overlay key={layer.id + layer.title} name={layer.title}>
-                    <ImageOverlay bounds={bounds} className="leafletImageOverlayLayer" url={src} zIndex={9999} />
+                    <ImageOverlay
+                      bounds={bounds as LatLngBoundsExpression}
+                      className="leafletImageOverlayLayer"
+                      url={src}
+                      zIndex={9999}
+                    />
                   </LayersControl.Overlay>
                 );
               })

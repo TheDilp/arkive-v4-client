@@ -128,7 +128,7 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
             zoom={pin ? 1 : undefined}
             zoomSnap={0}>
             <MapImage
-              bounds={bounds as LatLngBoundsExpression}
+              bounds={bounds}
               center_on={center_on}
               imgRef={imgRef}
               isClusteringPins={!!currentMap?.cluster_pins}
