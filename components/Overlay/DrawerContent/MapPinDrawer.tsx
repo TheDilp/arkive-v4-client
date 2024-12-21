@@ -34,7 +34,7 @@ function isSaveDisabled(mapPin: Partial<MapPinType>, { exceptions }: Pick<Props,
     if (!mapPin.character_id) return true;
     return false;
   }
-  if (!mapPin.icon && !mapPin.image_id) return true;
+  if (!mapPin.icon) return true;
   return false;
 }
 
