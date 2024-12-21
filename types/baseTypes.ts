@@ -49,6 +49,7 @@ export type onChangeValue = {
   value: string | string[] | undefined;
   label?: string;
   icon?: string;
+  color?: string;
   image?: SelectOptionType["image"];
   parent_id?: string | null;
 };

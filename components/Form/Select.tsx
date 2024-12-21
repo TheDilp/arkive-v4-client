@@ -220,14 +220,18 @@ function onClick({
   index,
   setIsOpen,
   ref,
+  searchValue,
 }: Pick<SelectType, "isMultiple" | "value" | "options" | "onChange" | "name"> & {
   index: number | null;
+  searchValue: string;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   ref: MutableRefObject<ReferenceType | null>;
 }) {
   if (typeof index === "number") {
     if (isMultiple) {
-      if (Array.isArray(value) && value.includes(options[index].value)) {
+      if ((Array.isArray(value) || !value) && options[index].value === "new_tag") {
+        onChange({ name: "new_tag", label: searchValue, value: "new_tag" });
+      } else if (Array.isArray(value) && value.includes(options[index].value)) {
         const newValue = value.filter((val) => val !== options[index].value);
         onChange({ name, value: newValue });
       } else if (
@@ -291,6 +295,7 @@ export function Select({
   const [displayText, setDisplayText] = useState("");
   const [filteredItems, setFilteredItems] = useState(options);
   const [selectedItem, setSelectedItem] = useState<SelectOptionType | null>();
+  const [searchValue, setSearchValue] = useState("");
   const selectedIndex = options.findIndex((opt) => opt.value === selectedItem?.value);
   const {
     base,
@@ -394,6 +399,7 @@ export function Select({
             value,
             setIsOpen,
             ref: refs.reference,
+            searchValue,
           });
         }
       }}>
@@ -407,6 +413,8 @@ export function Select({
         {...getReferenceProps({
           onKeyDown(e) {
             if (e.key === "Enter") {
+              e.preventDefault();
+              e.stopPropagation();
               onClick({
                 isMultiple,
                 name,
@@ -416,6 +424,7 @@ export function Select({
                 value,
                 setIsOpen,
                 ref: refs.reference,
+                searchValue,
               });
             }
           },
@@ -441,7 +450,7 @@ export function Select({
               <Icon fontSize={20} icon={selectedItem.icon} />
             ) : null}
             <span className={displayItemClasses()}>
-              {options?.[0]?.color && Array.isArray(value)
+              {(options?.[0]?.color || options?.[1]?.color) && Array.isArray(value)
                 ? options
                     .filter((opt) => value.includes(opt.value))
                     .map((opt, optIdx) => (
@@ -496,14 +505,21 @@ export function Select({
                   autoFocus="off"
                   className={search()}
                   onChange={(e) => {
+                    setSearchValue(e.target.value);
                     if (e.target.value) {
-                      setFilteredItems(options.filter((opt) => opt.label.toLowerCase().includes(e.target.value.toLowerCase())));
+                      setFilteredItems(
+                        options.filter(
+                          (opt) => opt.value === "new_tag" || opt.label.toLowerCase().includes(e.target.value.toLowerCase())
+                        )
+                      );
                     } else {
                       setFilteredItems(options);
                     }
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
+                      e.preventDefault();
+                      e.stopPropagation();
                       onClick({
                         isMultiple,
                         name,
@@ -513,14 +529,20 @@ export function Select({
                         value,
                         setIsOpen,
                         ref: refs.reference,
+                        searchValue,
                       });
                     }
                   }}
                   placeholder="Search"
+                  value={searchValue}
                 />
               ) : null}
 
               {filteredItems.map((opt, i) => {
+                if (opt.value === "new_tag") {
+                  if (!searchValue || filteredItems.some((item) => item.label.toLowerCase() === searchValue.toLowerCase()))
+                    return null;
+                }
                 return (
                   <div
                     ref={(node) => {
@@ -549,6 +571,7 @@ export function Select({
                             value,
                             setIsOpen,
                             ref: refs.reference,
+                            searchValue,
                           });
                       },
                       onKeyDown: (e) => {
@@ -562,6 +585,7 @@ export function Select({
                             value,
                             setIsOpen,
                             ref: refs.reference,
+                            searchValue,
                           });
                         }
                       },

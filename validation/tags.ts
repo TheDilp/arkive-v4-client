@@ -5,7 +5,6 @@ import { InsertEntityPermissionSchema } from "./permissions";
 export const InsertTagSchema = z.object({
   data: z
     .object({
-      project_id: z.string(),
       title: z.string().transform((value) => value.trim()),
       color: z.string().transform((value) => value.trim()),
     })

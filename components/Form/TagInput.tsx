@@ -1,9 +1,11 @@
-import { useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 
+import { useCreateEntity } from "../../hooks";
 import { TagType, Variant } from "../../types";
-import { availableTagsAtom } from "../../utils";
+import { availableTagsAtom, DefaultTagColor, sortEntitiesByTitle } from "../../utils";
+import { InsertTagType } from "../../validation";
 import { Search } from "./Search";
 import { Select } from "./Select";
 
@@ -27,12 +29,15 @@ export function TagInput({
   variant,
 }: Props) {
   const { project_id } = useParams();
-  const allAvailableTags = useAtomValue(availableTagsAtom);
-
+  const [allAvailableTags, setAllAvailableTags] = useAtom(availableTagsAtom);
   const formattedAvailableTags = useMemo(
-    () => allAvailableTags.map((tag) => ({ value: tag.id, label: tag.title, color: tag.color })),
+    () =>
+      [{ label: "Add new tag + (must be unique per project)", value: "new_tag" }].concat(
+        allAvailableTags.map((tag) => ({ value: tag.id, label: tag.title, color: tag.color }))
+      ),
     [allAvailableTags]
   );
+  const { mutateAsync: createTag } = useCreateEntity<InsertTagType>("tags");
 
   return (
     <div className="flex flex-col gap-y-2">
@@ -44,19 +49,28 @@ export function TagInput({
           isTruncated={false}
           label={componentLabel || ""}
           name="tags"
-          onChange={({ value }) => {
-            if (Array.isArray(value)) {
-              const tags = allAvailableTags.filter((t) => value.includes(t.id));
-              handleChange({ name: "tags", value: tags });
-            } else if (!isMultiple && !Array.isArray(value)) {
-              if ((allAvailableTags || [])?.some((tag) => tag.id === value)) {
-                handleChange({
-                  name: "tags",
-                  value: [],
-                });
-              } else {
-                const tag = allAvailableTags.find((t) => t.id === value);
-                if (tag) handleChange({ name: "tags", value: [tag] });
+          onChange={async ({ label, value }) => {
+            // Only valid for multiple tag inputs (for now)
+            // and only returns one tag (since only one can
+            // be created at a time)
+            if (isMultiple && value === "new_tag" && !!label) {
+              const newTags: { data: TagType[] } = await createTag({ data: [{ title: label, color: DefaultTagColor }] });
+              setAllAvailableTags(allAvailableTags.concat(newTags.data).sort(sortEntitiesByTitle));
+              handleChange({ name: "tags", value: tags.concat(newTags.data[0]) });
+            } else {
+              if (Array.isArray(value)) {
+                const tags = allAvailableTags.filter((t) => value.includes(t.id));
+                handleChange({ name: "tags", value: tags });
+              } else if (!isMultiple && !Array.isArray(value)) {
+                if ((allAvailableTags || [])?.some((tag) => tag.id === value)) {
+                  handleChange({
+                    name: "tags",
+                    value: [],
+                  });
+                } else {
+                  const tag = allAvailableTags.find((t) => t.id === value);
+                  if (tag) handleChange({ name: "tags", value: [tag] });
+                }
               }
             }
           }}

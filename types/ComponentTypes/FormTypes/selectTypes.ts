@@ -21,9 +21,10 @@ export interface SelectType extends BaseFormComponentType {
   isTruncated?: boolean;
   isClearable?: boolean;
   hasSearch?: boolean;
+  hasCreateNew?: boolean;
   isExpandingToNewRow?: boolean;
   value: string | string[] | number | null | undefined;
   options: SelectOptionType[];
-  onChange: ({ name, value, label, image, icon, parent_id }: onChangeValue) => void;
+  onChange: (props: onChangeValue) => void;
   isReadOnly?: boolean;
 }
