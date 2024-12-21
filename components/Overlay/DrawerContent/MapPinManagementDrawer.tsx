@@ -13,29 +13,33 @@ import { Dropdown } from "../Dropdown";
 
 const columnHelper = createColumnHelper<MapPinType>();
 
-function getColumns(project_id: string, setDialog: Dispatch<SetStateAction<DialogAtomType>>) {
+function getColumns(setDialog: Dispatch<SetStateAction<DialogAtomType>>) {
   return [
     columnHelper.display({
       id: "icon",
-      header: "Icon",
+      header: "Image/Icon",
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center">
-          {row?.original?.character ? (
-            <Avatar image_id={row?.original?.character?.portrait_id} label={row?.original?.character?.full_name} size="sm" />
+          {row?.original?.character || row?.original?.image_id ? (
+            <Avatar
+              image_id={row?.original?.character?.portrait_id || row?.original?.image_id}
+              label={row?.original?.character?.full_name || row?.original?.title || ""}
+              size="sm"
+            />
           ) : (
             <Icon fontSize={32} icon={row?.original?.icon} />
           )}
         </div>
       ),
-      minSize: 5,
-      maxSize: 5,
+      minSize: 6.5,
+      maxSize: 6.5,
     }),
     columnHelper.display({
       id: "title",
       header: "Icon title",
       cell: ({ row }) => (
         <div className="flex max-w-full items-center justify-start">
-          <span className="truncate">{row.original?.title || row?.original?.character?.full_name || <i>No name.</i>}</span>
+          <span className="truncate">{row.original?.title || row?.original?.character?.full_name || <i>No title.</i>}</span>
         </div>
       ),
       minSize: 5,
@@ -95,6 +99,7 @@ export function MapPinManagementDrawer({ data }: { data: { map_id: string } }) {
         "doc_id",
         "icon",
         "title",
+        "image_id",
         "parent_id",
         "is_public",
         "lat",
@@ -114,7 +119,7 @@ export function MapPinManagementDrawer({ data }: { data: { map_id: string } }) {
   const [, dispatch] = useTable({});
   const setDialog = useSetAtom(dialogAtom);
   const [mapPins, setMapPins] = useState<MapPinType[]>([]);
-  const columns = getColumns(project_id as string, setDialog);
+  const columns = getColumns(setDialog);
   useLayoutEffect(() => {
     if (existingMapPins?.data) {
       setMapPins(existingMapPins?.data);

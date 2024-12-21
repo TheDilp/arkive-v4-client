@@ -192,14 +192,6 @@ export function useUpdateMapSubEntity<InsertType extends { data: { id?: string }
           timer: 5,
         });
       },
-      onSuccess: () => {
-        createNotification({
-          title: getEntityCRUDNotification(subtype, "update"),
-          variant: "success",
-          icon: IconEnum.check,
-          timer: 2,
-        });
-      },
     }
   );
 }

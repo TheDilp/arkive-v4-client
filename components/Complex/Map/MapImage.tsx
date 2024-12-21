@@ -117,7 +117,7 @@ export function MapImage({
                   data: { lat: e.latlng.lat, lng: e.latlng.lng, map_id: item_id as string },
                   title: "Manage pins",
                   type: "map_pin_management",
-                  size: "lg",
+                  size: "xl",
                 }));
               },
             },
