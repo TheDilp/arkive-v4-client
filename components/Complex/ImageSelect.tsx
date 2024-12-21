@@ -52,9 +52,10 @@ export function ImageSelect({
               manual_project_id={manual_project_id}
               name={name}
               onBrowserChange={(props) => {
-                const itemsToChange: { name: string; value: string }[] = props.map(({ value }) => ({
+                const itemsToChange = props.map(({ label, value }) => ({
                   name,
                   value,
+                  label,
                 }));
                 if (itemsToChange?.[0]) onChange(itemsToChange[0]);
               }}
