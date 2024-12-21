@@ -4,7 +4,7 @@ import ls from "localstorage-slim";
 import { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
+import { Button, createColumnHelper, Dropdown, Select, Table, TablePageLayout, TableViewHeader } from "../../components";
 import {
   useBreakpoint,
   useBulkUpdate,
@@ -352,16 +352,7 @@ export function TagView() {
 
   return (
     <TablePageLayout>
-      <div className="sticky top-0 flex h-12 w-full items-center justify-end gap-x-2">
-        <div className="w-52">
-          <Input
-            isClearable
-            name="quick_filter"
-            onChange={({ value }) => setFilter(value as string)}
-            placeholder="Quick search by title"
-            value={filter}
-          />
-        </div>
+      <TableViewHeader dispatch={dispatch} setFilter={setFilter} type="tags">
         <div className="w-32">
           <Select
             name="view"
@@ -394,7 +385,7 @@ export function TagView() {
             tooltip={isMd ? undefined : "Create new tags"}
           />
         </div>
-      </div>
+      </TableViewHeader>
       <div className="max-h-full w-full overflow-hidden">
         <Table
           columns={columns}
