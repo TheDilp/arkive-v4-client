@@ -24,7 +24,7 @@ import { tv } from "tailwind-variants";
 import { DefaultTooltipType, TooltipType, Variant } from "../../types";
 
 const defaultTooltipClasses = tv({
-  base: "z-50 select-none rounded border-none border-transparent p-1 text-sm text-white shadow break-word",
+  base: "select-none rounded border-none border-transparent p-1 text-sm text-white shadow break-word",
   variants: {
     variant: {
       primary: "bg-black",
@@ -137,7 +137,7 @@ export function Tooltip({
             tabIndex={-1}
             {...getFloatingProps({
               ref: refs.setFloating,
-              style: { ...floatingStyles, zIndex: 9999 },
+              style: { ...floatingStyles, zIndex: 99999 },
             })}>
             {typeof content === "string" ? (
               <DefaultTooltip isInline={isInline} variant={variant}>
@@ -172,7 +172,7 @@ export function Tooltip({
           tabIndex={-1}
           {...getFloatingProps({
             ref: refs.setFloating,
-            style: { ...floatingStyles, zIndex: 9999 },
+            style: { ...floatingStyles, zIndex: 99999 },
           })}>
           {typeof content === "string" ? (
             <DefaultTooltip variant={variant}>{content}</DefaultTooltip>
