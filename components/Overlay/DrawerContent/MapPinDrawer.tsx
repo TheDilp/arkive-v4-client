@@ -14,6 +14,7 @@ import {
 import { MapPinType, MapPinTypesType, TabType, UserHasPermissionsType } from "../../../types";
 import { IconEnum } from "../../../utils";
 import { InsertMapPinSchema, InsertMapPinType, UpdateMapPinSchema, UpdateMapPinType } from "../../../validation/maps/map_pins";
+import { ImageSelect } from "../../Complex";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { EntityPreview, ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, Search, Select } from "../../Form";
@@ -287,25 +288,32 @@ export function MapPinDrawer({ data, exceptions }: Props) {
                   <Checkbox name="is_public" onChange={handleChange} value={!!mapPin?.is_public} />
                 </div>
               </div>
-              <div className="w-full">
-                {!mapPin?.image_id ? (
-                  <Search
-                    imageType="images"
-                    isDisabled={!permissions?.read_assets}
-                    label="Image (replaces icon if selected)"
-                    name="image_id"
-                    onChange={handleChange}
-                    searchEntity="images"
-                    value={mapPin.image_id || ""}
-                  />
-                ) : (
-                  <ImagePreview
-                    clearAction={permissions?.read_assets ? () => handleChange({ name: "image_id", value: null }) : undefined}
-                    id={mapPin?.image_id}
-                    title={mapPin?.image?.title || ""}
-                  />
-                )}
-              </div>
+              {permissions?.read_assets ? (
+                <div className="w-full">
+                  {!mapPin?.image_id ? (
+                    <ImageSelect
+                      isIconOnly
+                      label="Map pin image (replaces icon if selected)"
+                      name="image"
+                      onChange={({ name, label, value }) =>
+                        handleChange([
+                          { name, value: { id: value, title: label } },
+                          { name: "image_id", value },
+                        ])
+                      }
+                      type="images"
+                      value={mapPin?.image?.id ?? ""}
+                    />
+                  ) : (
+                    <ImagePreview
+                      clearAction={permissions?.read_assets ? () => handleChange({ name: "image_id", value: null }) : undefined}
+                      id={mapPin?.image_id}
+                      label="Map pin image (replaces icon if selected)"
+                      title={mapPin?.image?.title || ""}
+                    />
+                  )}
+                </div>
+              ) : null}
             </div>
           )}
         </div>
@@ -371,6 +379,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
               />
             </div>
           ) : null}
+
           {!exceptions?.characterPin && !mapPin?.linked_map ? (
             <Search
               imageType="map_images"
