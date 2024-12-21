@@ -33,6 +33,10 @@
 
 	try_files {path} /index.html
 
+	header {
+        Content-Security-Policy "default-src 'self' *.thearkive.app; script-src 'self' *.thearkive.app; style-src 'self' *.thearkive.app; img-src 'self' *.thearkive.app the-arkive-v3.nyc3.cdn.digitaloceanspaces.com"
+    }
+
 	@js {
         path *.js
     }
