@@ -56,5 +56,8 @@ export function AuthWrapper() {
     );
 
   if (userStatus?.status === "authenticated") return <Outlet />;
+  if (userStatus?.status === "unauthenticated") {
+    window.location.replace("https://thearkive.app/sign-in");
+  }
   return null;
 }
