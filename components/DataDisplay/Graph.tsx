@@ -8,7 +8,6 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useParams } from "react-router-dom";
 
-import { Button, Quickbar, Spinner } from "..";
 import {
   useCreateSubEntity,
   useDeleteMany,
@@ -53,6 +52,7 @@ import {
 } from "../../utils/enums/GraphEnums";
 import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
 import { InsertEdgeType, InsertNodeType } from "../../validation";
+import { Button, Quickbar, Spinner } from "..";
 
 type Props = {
   data?: Partial<GraphType>;
