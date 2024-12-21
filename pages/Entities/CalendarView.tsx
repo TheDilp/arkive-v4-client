@@ -702,7 +702,7 @@ export function CalendarView({
               onClick={() => {
                 setDrawer((prev) => ({
                   ...prev,
-                  data: { month: date.month, year: date.year },
+                  data: { month: date.month, year: date.year, parent_id: calendar?.id },
                   title: "Create new event",
                   type: "events",
                   size: "lg",
