@@ -38,8 +38,16 @@ const DropdownClasses = tv({
   },
 });
 const DropdownItemClasses = tv({
-  base: "flex flex-nowrap group group-hover:bg-zinc-500 hover:bg-zinc-500 h-10 min-h-[2.5rem] border-zinc-600 bg-zinc-700 cursor-pointer items-center border-b last:border-0 text-left h-full w-full m-0 outline-0 text-white",
+  base: "flex flex-nowrap bg-zinc-700 group group-hover:bg-zinc-500 hover:bg-zinc-500 h-10 min-h-[2.5rem] border-zinc-600 cursor-pointer items-center border-b last:border-0 text-left h-full w-full m-0 outline-0 text-white",
   variants: {
+    variant: {
+      primary: "bg-zinc-700",
+      secondary: "bg-zinc-600",
+      info: "bg-blue-500",
+      success: "bg-success-500",
+      warning: "bg-orange-500",
+      error: "bg-red-500",
+    },
     isDisabled: {
       true: "bg-zinc-500 text-zinc-300 cursor-not-allowed hover:bg-zinc-500 group-hover:bg-zinc-500",
     },
@@ -220,6 +228,8 @@ function DropdownComponent({ allowedPlacements = [], children, items, isReferenc
                             }}
                             subItems={dropdownItem.subItems}
                             title={dropdownItem.title}
+                            tooltip={dropdownItem?.tooltip}
+                            variant={dropdownItem?.variant || "primary"}
                           />
                         </Dropdown>
                       ) : (
@@ -243,6 +253,8 @@ function DropdownComponent({ allowedPlacements = [], children, items, isReferenc
                           }}
                           subItems={dropdownItem.subItems}
                           title={dropdownItem.title}
+                          tooltip={dropdownItem?.tooltip}
+                          variant={dropdownItem?.variant || "primary"}
                         />
                       )
                     )
@@ -266,12 +278,14 @@ function DropdownItem({
   image,
   iconThickness,
   child,
+  variant = "primary",
 }: DropdownItemType) {
   const dropdownItemClasses = DropdownItemClasses({
     isDisabled,
     hasSubitems: !!subItems?.length,
     hasImage: !!image,
     hasIcon: !!icon,
+    variant,
   });
   return (
     <div
