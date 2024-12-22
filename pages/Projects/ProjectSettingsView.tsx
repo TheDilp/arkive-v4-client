@@ -13,6 +13,7 @@ import {
   Icon,
   ImageSelect,
   Input,
+  Select,
   Skeleton,
   Table,
   Tabs,
@@ -50,6 +51,7 @@ import {
   DefaultTagColor,
   dialogAtom,
   drawerAtom,
+  editorFontFamilies,
   getDefaultEntityIcon,
   getFirstLetters,
   getPluralEntityType,
@@ -502,7 +504,7 @@ export function ProjectSettingsView() {
     project_id as string,
     "projects",
     {
-      fields: ["id", "title", "image_id", "owner_id", "is_public", "description", "game_system_id"],
+      fields: ["id", "title", "image_id", "owner_id", "is_public", "description", "game_system_id", "default_project_font"],
       relations: {
         map_pin_types: true,
         character_relationship_types: true,
@@ -724,6 +726,18 @@ export function ProjectSettingsView() {
                 />
               </div>
               <hr className="border-zinc-700" />
+
+              <div className="flex flex-nowrap items-center justify-between">
+                <span>Default document font family:</span>
+                <div className="w-48">
+                  <Select
+                    name="default_project_font"
+                    onChange={handleChange}
+                    options={editorFontFamilies.map((family) => ({ label: family, value: family }))}
+                    value={(project?.default_project_font as string | undefined) || "Lato"}
+                  />
+                </div>
+              </div>
 
               <div className="flex flex-nowrap items-center justify-between">
                 <span>Public:</span>

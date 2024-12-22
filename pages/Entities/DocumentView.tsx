@@ -30,6 +30,7 @@ import {
   isProjectOwnerAtom,
   mentionPositionAtom,
   onError,
+  projectAtom,
   useNotifications,
   userAtom,
 } from "../../utils";
@@ -410,7 +411,7 @@ function DocumentViewEditor({
   const { project_id, item_id } = useParams();
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
-
+  const projectData = useAtomValue(projectAtom);
   const drawer = useAtomValue(drawerAtom);
   const mentionPosition = useAtomValue(mentionPositionAtom);
   const editorRef = useRef() as MutableRefObject<HTMLDivElement>;
@@ -549,7 +550,10 @@ function DocumentViewEditor({
           </ul>
         </div>
       )}
-      <div ref={editorRef} className={`${hasNoOutline ? "col-span-6" : "col-span-4"} h-full max-h-full overflow-hidden`}>
+      <div
+        ref={editorRef}
+        className={`${hasNoOutline ? "col-span-6" : "col-span-4"} h-full max-h-full overflow-hidden`}
+        style={{ fontFamily: projectData?.default_project_font || "Lato" }}>
         <div className="h-full w-full rounded-t bg-zinc-800">
           {mentionPosition ? (
             <div

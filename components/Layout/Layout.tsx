@@ -39,7 +39,7 @@ export function ProjectLayout() {
     project_id as string,
     "projects",
     {
-      fields: ["id", "title", "owner_id"],
+      fields: ["id", "title", "owner_id", "default_project_font"],
       relations: {
         members: true,
         feature_flags: true,

@@ -77,7 +77,7 @@ function menuBarItems({
       subItems: editorFontFamilies.map((fontFamily) => ({
         id: fontFamily,
         onClick: () => chain?.setFontFamily(fontFamily)?.run(),
-        title: fontFamily === "Lato" ? `${fontFamily} (Default)` : fontFamily,
+        title: fontFamily,
         variant: active.fontFamily({ fontFamily }) ? ("info" as Variant) : ("primary" as Variant),
       })),
     },
@@ -508,8 +508,6 @@ export function Menubar({
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const active = useActive();
-
-  // const { mutate: createPDF } = useCreatePDF();
 
   const items = useMemo(
     () =>

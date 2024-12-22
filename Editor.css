@@ -24,7 +24,7 @@
 .remirror-editor,
 .Prosemirror,
 .staticRendererContainer {
-  @apply max-w-full p-4 font-lato focus-visible:outline-none;
+  @apply max-w-full p-4 focus-visible:outline-none;
 
   a[rel] {
     @apply text-sky-300 underline !important;

@@ -1,3 +1,4 @@
+import { editorFontFamilies } from "../../utils";
 import { UserType } from "../userTypes";
 import { BlueprintInstanceType } from "./blueprintInstanceTypes";
 import { CalendarType, EventType } from "./calendarTypes";
@@ -29,6 +30,7 @@ export interface ProjectType {
   game_system_id: string | null;
   game_system?: GameSystemType;
   tags: TagType[];
+  default_project_font: (typeof editorFontFamilies)[number];
 }
 
 export type ProjectDashboardType = [

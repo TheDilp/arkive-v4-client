@@ -388,16 +388,16 @@ export const defaultSlashItems: slashMenuItem[] = [
 ];
 
 export const editorFontFamilies = [
-  "Arial",
-  "Courier New",
-  "Comic Sans",
-  "Fantasy",
-  "Garamond",
-  "Georgia",
-  "Lato",
-  "Merriweather",
-  "Tahoma",
-  "Times New Roman",
-  "Trebuchet MS",
-  "Verdana",
+  "Arial" as const,
+  "Courier New" as const,
+  "Comic Sans" as const,
+  "Fantasy" as const,
+  "Garamond" as const,
+  "Georgia" as const,
+  "Lato" as const,
+  "Merriweather" as const,
+  "Tahoma" as const,
+  "Times New Roman" as const,
+  "Trebuchet MS" as const,
+  "Verdana" as const,
 ];

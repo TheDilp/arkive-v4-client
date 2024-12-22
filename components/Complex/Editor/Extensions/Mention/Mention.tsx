@@ -145,7 +145,7 @@ function WordMentionTooltip({ id }: Pick<Props, "id">) {
   );
   return (
     <div className="h-fit min-h-[4rem] w-fit min-w-[10rem] rounded border border-zinc-600 bg-zinc-700 p-2 shadow-lg">
-      <div className="flex flex-col whitespace-pre-line font-lato font-light">
+      <div className="flex flex-col whitespace-pre-line font-light">
         {isLoading ? (
           <div className="flex h-full w-full items-center justify-center">
             <Spinner />
@@ -241,14 +241,10 @@ export function Mention({ id, project_id, title, label, alter_name, icon, parent
       (isSubEntity ? !isSubentityPaused : !isPaused) &&
       (isSubEntity ? isSubEntityFetched : isFetched)
     )
-      return (
-        <span ref={mentionRef} className="font-lato">
-          {label}
-        </span>
-      );
+      return <span ref={mentionRef}>{label}</span>;
     if (!data && !subEntityData)
       return (
-        <span ref={mentionRef} className="font-lato underline decoration-wavy">
+        <span ref={mentionRef} className="underline decoration-wavy">
           {label}
         </span>
       );
@@ -281,7 +277,7 @@ export function Mention({ id, project_id, title, label, alter_name, icon, parent
           </span>
         ) : (
           <Link
-            className="inline-flex items-center font-lato text-sm font-bold transition-colors"
+            className="inline-flex items-center text-sm font-bold transition-colors"
             to={getMentionLink(
               id as string,
               type,
