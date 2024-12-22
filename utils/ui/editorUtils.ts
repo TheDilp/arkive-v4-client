@@ -11,6 +11,7 @@ import {
   BoldExtension,
   BulletListExtension,
   DropCursorExtension,
+  FontFamilyExtension,
   GapCursorExtension,
   HardBreakExtension,
   HeadingExtension,
@@ -22,6 +23,7 @@ import {
   OrderedListExtension,
   ParagraphExtension,
   TaskListExtension,
+  TextColorExtension,
   UnderlineExtension,
 } from "remirror/extensions";
 
@@ -200,7 +202,8 @@ export function DefaultEditorExtensions(
     new GapCursorExtension({}),
     new DropCursorExtension({}),
     new TableOfContentsExtension({}),
-
+    new FontFamilyExtension(),
+    new TextColorExtension({}),
     new CustomTableExtension({
       tabKeyboardShortcuts: true,
       priority: 0,
@@ -382,4 +385,19 @@ export const defaultSlashItems: slashMenuItem[] = [
   { name: "Divider", type: "divider", icon: IconEnum.divider },
   { name: "Secret", type: "secret", icon: IconEnum.eye },
   { name: "Table", type: "table", icon: IconEnum.table },
+];
+
+export const editorFontFamilies = [
+  "Arial",
+  "Courier New",
+  "Comic Sans",
+  "Fantasy",
+  "Garamond",
+  "Georgia",
+  "Lato",
+  "Merriweather",
+  "Tahoma",
+  "Times New Roman",
+  "Trebuchet MS",
+  "Verdana",
 ];

@@ -10,6 +10,7 @@ import {
   ColorPresets,
   dialogAtom,
   drawerAtom,
+  editorFontFamilies,
   getSavingIcon,
   getSavingTooltip,
   IconEnum,
@@ -45,7 +46,7 @@ function menuBarItems({
   // createPDF: CreatePDFType;
   // webhooks: WebhookType[];
 }) {
-  const options: (DropdownItemType & { variant?: Variant; tooltip: string })[] = [
+  const options: DropdownItemType[] = [
     {
       id: "text_bold",
       icon: IconEnum.text_bold,
@@ -66,6 +67,19 @@ function menuBarItems({
       onClick: () => chain?.toggleUnderline()?.run(),
       variant: active.underline() ? ("info" as Variant) : ("primary" as Variant),
       tooltip: "Underline",
+    },
+    {
+      id: "font_family",
+      icon: IconEnum.font_family,
+      onClick: () => chain?.toggleUnderline()?.run(),
+      variant: active.underline() ? ("info" as Variant) : ("primary" as Variant),
+      tooltip: "Font",
+      subItems: editorFontFamilies.map((fontFamily) => ({
+        id: fontFamily,
+        onClick: () => chain?.setFontFamily(fontFamily)?.run(),
+        title: fontFamily === "Lato" ? `${fontFamily} (Default)` : fontFamily,
+        variant: active.fontFamily({ fontFamily }) ? ("info" as Variant) : ("primary" as Variant),
+      })),
     },
     {
       id: "heading",
