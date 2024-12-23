@@ -4,7 +4,7 @@
 [variables]
     NPM_CONFIG_UPDATE_NOTIFIER = 'false' # the update notification is relatively useless in a production environment
     NPM_CONFIG_FUND = 'false' # the fund notification is also pretty useless in a production environment
-    CADDY_VERSION = '2.7.6' # specify the caddy version to use here, without a 'v' prefix. https://github.com/caddyserver/caddy/releases
+    CADDY_VERSION = '2.8.4' # specify the caddy version to use here, without a 'v' prefix. https://github.com/caddyserver/caddy/releases
 
 # download and untar caddy
 [phases.caddy]
@@ -19,6 +19,11 @@
 [phases.fmt]
     dependsOn = ['caddy'] # make sure this phase runs after the 'caddy' phase so that we know we have caddy downloaded
     cmds = ['caddy fmt --overwrite Caddyfile'] # format the Caddyfile to fix any formatting inconsistencies
+
+# log files in the dist folder
+[phases.log_dist]
+    dependsOn = ['fmt'] # make sure this phase runs after the 'fmt' phase
+    cmds = ['ls -la arkive-v4-wiki/dist'] # list files in the 'dist' folder
 
 # copy caddy and build artifacts to a new image and start the caddy web server
 [start]
