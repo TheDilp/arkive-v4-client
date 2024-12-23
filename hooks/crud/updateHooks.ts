@@ -839,8 +839,6 @@ export function useUpdateAuthStatus() {
   const setUserStatus = useSetAtom(userStatusAtom);
 
   return useMutation(async (payload: { project_id: string | null }) => {
-    // eslint-disable-next-line no-console
-    console.info(`${baseURLS.baseServer.replace("/api/v1", "")}/auth/status/update`, baseURLS);
     const module = ls.get("module");
     const res = await fetch(`${baseURLS.baseServer.replace("/api/v1", "")}/auth/status/update`, {
       // @ts-ignore
