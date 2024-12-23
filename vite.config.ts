@@ -7,10 +7,8 @@ export default ({ mode }: { mode: any }) => {
   return defineConfig({
     define: {
       APP_VERSION: JSON.stringify(process.env.npm_package_version),
-      IS_PUBLIC: JSON.stringify(
-        process.env.npm_package_name === "arkive-v4-wiki" && loadEnv(mode, process.cwd()).VITE_IS_PUBLIC === "true"
-      ),
-      IS_GATEWAY: process.env.npm_package_name === "arkive-v4-gateway",
+      IS_PUBLIC: loadEnv(mode, process.cwd()).VITE_IS_PUBLIC === "true",
+      IS_GATEWAY: loadEnv(mode, process.cwd()).VITE_IS_GATEWAY === "true",
     },
 
     plugins: [
