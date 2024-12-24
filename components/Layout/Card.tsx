@@ -83,9 +83,11 @@ export function WikiProjectCard({
         <Avatar image_url={owner?.image} initials={getAvatarInitials(owner?.nickname || "")} label={owner?.nickname || ""} />
       </div>
 
-      <div className="pointer-events-none absolute top-[28rem] z-30 line-clamp-[18] max-h-full w-full rounded border-zinc-500 bg-black bg-opacity-95 p-4 opacity-0 transition-all duration-500 group-hover:top-0 group-hover:border group-hover:opacity-100">
-        {description}
-      </div>
+      {description ? (
+        <div className="pointer-events-none absolute top-[28rem] z-30 line-clamp-[18] max-h-full w-full rounded border-zinc-500 bg-black bg-opacity-95 p-4 opacity-0 transition-all duration-500 group-hover:top-0 group-hover:border group-hover:opacity-100">
+          {description}
+        </div>
+      ) : null}
     </Link>
   );
 }
