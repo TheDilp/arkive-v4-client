@@ -19,8 +19,6 @@ const externalThemes = diceThemeNames.reduce(
   },
   {} as Record<string, string>
 );
-// eslint-disable-next-line no-console
-console.info("IS_PUBLIC", IS_PUBLIC);
 // eslint-disable-next-line no-undef
 export const DiceRollParser = IS_PUBLIC ? null : new DiceParser();
 // eslint-disable-next-line no-undef

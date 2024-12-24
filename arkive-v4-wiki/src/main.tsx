@@ -18,8 +18,6 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
 ]);
-// eslint-disable-next-line no-console
-console.info(IS_PUBLIC);
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <RouterProvider router={router} />
