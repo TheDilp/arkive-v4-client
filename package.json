@@ -91,7 +91,8 @@
     "start": "concurrently --kill-others \"bun run start:wiki\" \"bun run start:editor\"",
     "lint": "eslint --ext ts,tsx \"src\" --fix --report-unused-disable-directives --max-warnings 0",
     "prepare": "husky install",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "prepush": "build"
   },
   "husky": {
     "pre-push": "echo test"
