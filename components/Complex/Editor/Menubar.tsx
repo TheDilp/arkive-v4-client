@@ -82,6 +82,25 @@ function menuBarItems({
       })),
     },
     {
+      id: "font_color",
+      icon: IconEnum.font_color,
+      onClick: () => chain?.toggleUnderline()?.run(),
+      variant: active.underline() ? ("info" as Variant) : ("primary" as Variant),
+      tooltip: "Text color",
+      subItems: ColorPresets.map((color) => ({
+        id: color,
+        child: (
+          <div
+            className="m-2 h-5 w-5 rounded-full"
+            style={{
+              backgroundColor: color,
+            }}
+          />
+        ),
+        onClick: () => chain?.setTextColor(color)?.run(),
+      })),
+    },
+    {
       id: "heading",
       icon: IconEnum.heading,
       onClick: undefined,
