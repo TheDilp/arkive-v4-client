@@ -504,7 +504,11 @@
       @apply text-black !important;
     }
     * {
-      @apply text-black no-underline !important;
+      @apply no-underline !important;
+
+      :not([data-text-color-mark]) {
+        @apply text-black;
+      }
     }
   }
   .remirror-editor-wrapper {
