@@ -496,7 +496,7 @@
     margin: 0;
   }
   body {
-    @apply invisible;
+    @apply invisible bg-white;
     .tableOfContentsList {
       @apply hidden;
     }
