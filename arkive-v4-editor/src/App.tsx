@@ -1,5 +1,7 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { PersistedClient, Persister, PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { del, get, set } from "idb-keyval";
 import { useSetAtom } from "jotai";
 import { useLayoutEffect } from "react";
 import { Outlet, Route, Routes } from "react-router-dom";
@@ -43,16 +45,32 @@ queryClient.setDefaultOptions({
     },
   },
 });
+
+// eslint-disable-next-line no-undef
+export function createIDBPersister(idbValidKey: IDBValidKey = "arkive-editor") {
+  return {
+    persistClient: async (client: PersistedClient) => {
+      await set(idbValidKey, client);
+    },
+    restoreClient: async () => {
+      return await get<PersistedClient>(idbValidKey);
+    },
+    removeClient: async () => {
+      await del(idbValidKey);
+    },
+  } as Persister;
+}
+
+const persister = createIDBPersister();
 export default function App() {
   const setModule = useSetAtom(moduleAtom);
-
   useLayoutEffect(() => {
     setModule("editor");
   }, []);
 
   return (
     <main className="relative h-screen max-h-screen w-screen max-w-[100%] overflow-hidden bg-black">
-      <QueryClientProvider client={queryClient}>
+      <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
         <NotificationContainer />
         <ReactQueryDevtools position="top-left" />
         <Routes>
@@ -80,7 +98,7 @@ export default function App() {
             </Route>
           </Route>
         </Routes>
-      </QueryClientProvider>
+      </PersistQueryClientProvider>
     </main>
   );
 }

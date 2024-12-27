@@ -1,5 +1,6 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
 import { compression } from "vite-plugin-compression2";
 // https://vitejs.dev/config/
 export default ({ mode }: { mode: any }) => {
@@ -9,13 +10,18 @@ export default ({ mode }: { mode: any }) => {
       IS_PUBLIC: loadEnv(mode, process.cwd()).VITE_IS_PUBLIC === "true",
       IS_GATEWAY: loadEnv(mode, process.cwd()).VITE_IS_GATEWAY === "true",
     },
-
     plugins: [
       react({
         babel: {
           parserOpts: {
             plugins: ["decorators-legacy", "classProperties"],
           },
+        },
+      }),
+      VitePWA({
+        registerType: "autoUpdate",
+        workbox: {
+          maximumFileSizeToCacheInBytes: 5 * 1024 ** 2,
         },
       }),
       compression({

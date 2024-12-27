@@ -48,15 +48,19 @@ export function AuthWrapper() {
     reset();
     updateAuthStatus({ project_id: project_id === "undefined" || !project_id ? null : project_id });
   }, [project_id]);
-  if ((!userStatus && (isUpdatingStatus || isIdle)) || (!!userStatus && !!project_id && !userStatus?.project_id))
+  console.log("ONLINE STATUS:", navigator.onLine);
+  if (
+    ((!userStatus && (isUpdatingStatus || isIdle)) || (!!userStatus && !!project_id && !userStatus?.project_id)) &&
+    navigator.onLine
+  )
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-black">
         <Spinner />
       </div>
     );
 
-  if (userStatus?.status === "authenticated") return <Outlet />;
-  if (userStatus?.status === "unauthenticated") {
+  if (userStatus?.status === "authenticated" || !navigator.onLine) return <Outlet />;
+  if (userStatus?.status === "unauthenticated" && navigator.onLine) {
     window.location.replace("https://thearkive.app/sign-in");
   }
   return null;
