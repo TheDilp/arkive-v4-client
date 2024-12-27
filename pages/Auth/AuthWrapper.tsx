@@ -45,10 +45,11 @@ export function AuthWrapper() {
   }, [loggedIn, pathname, userStatus?.status, isUpdatingStatus, isIdle]);
 
   useLayoutEffect(() => {
-    reset();
-    updateAuthStatus({ project_id: project_id === "undefined" || !project_id ? null : project_id });
+    if (navigator.onLine) {
+      reset();
+      updateAuthStatus({ project_id: project_id === "undefined" || !project_id ? null : project_id });
+    }
   }, [project_id]);
-  console.log("ONLINE STATUS:", navigator.onLine);
   if (
     ((!userStatus && (isUpdatingStatus || isIdle)) || (!!userStatus && !!project_id && !userStatus?.project_id)) &&
     navigator.onLine
