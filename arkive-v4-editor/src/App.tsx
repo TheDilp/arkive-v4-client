@@ -19,31 +19,32 @@ import {
   UserSettingsProfile,
   UserSettingsWebhooks,
 } from "../../pages";
-import { loggedInAtom, moduleAtom } from "../../utils";
+import { moduleAtom } from "../../utils";
 
 const queryClient = new QueryClient();
+
+queryClient.setDefaultOptions({
+  queries: {
+    cacheTime: 1000 * 60 * 60 * 24,
+    retry: (failureCount, error: any) => {
+      if (error.message === "UNAUTHORIZED") {
+        window.location.replace("https://thearkive.app");
+
+        return false;
+      }
+      if (failureCount <= 2) return true;
+      return false;
+    },
+    refetchOnWindowFocus: false,
+    onError: (error: any) => {
+      if (error.message === "UNAUTHORIZED") {
+        window.location.replace("https://thearkive.app");
+      }
+    },
+  },
+});
 export default function App() {
   const setModule = useSetAtom(moduleAtom);
-  const setLoggedIn = useSetAtom(loggedInAtom);
-
-  queryClient.setDefaultOptions({
-    queries: {
-      retry: (failureCount, error: any) => {
-        if (error.message === "UNAUTHORIZED") {
-          setLoggedIn(false);
-          return false;
-        }
-        if (failureCount <= 2) return true;
-        return false;
-      },
-      refetchOnWindowFocus: false,
-      onError: (error: any) => {
-        if (error.message === "UNAUTHORIZED") {
-          setLoggedIn(false);
-        }
-      },
-    },
-  });
 
   useLayoutEffect(() => {
     setModule("editor");
