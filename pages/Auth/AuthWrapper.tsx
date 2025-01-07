@@ -46,7 +46,6 @@ export function AuthWrapper() {
 
   useLayoutEffect(() => {
     // eslint-disable-next-line no-console
-    console.info(navigator.onLine);
     if (navigator.onLine) {
       reset();
       updateAuthStatus({ project_id: project_id === "undefined" || !project_id ? null : project_id });
