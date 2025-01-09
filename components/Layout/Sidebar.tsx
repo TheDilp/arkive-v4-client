@@ -1,4 +1,4 @@
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useMemo } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
@@ -9,10 +9,12 @@ import {
   currentUserPermissionsAtom,
   enabledEntitiesAtom,
   getSidebarLink,
+  IconEnum,
   isProjectOwnerAtom,
   projectFeatureFlagsAtom,
+  treeNavAtom,
 } from "../../utils";
-import { Icon, Skeleton, Tooltip } from "../";
+import { Button, Icon, Skeleton, Tooltip } from "../";
 
 const SidebarClasses = tv({
   slots: {
@@ -27,7 +29,7 @@ const SidebarClasses = tv({
 const { base, nav, list, sidebarLogo, listItem } = SidebarClasses();
 
 const SidebarItemClasses = tv({
-  base: "w-full transition-all lg:mx-0 flex justify-center w-16 ",
+  base: "w-full transition-all lg:mx-0 flex justify-center w-16 relative",
   variants: {
     isSelected: {
       true: "text-white bg-blue-400 [&>li]:hover:text-white",
@@ -52,6 +54,7 @@ export function Sidebar({ isLoading, items, isUsingPermissions }: SidebarType) {
   const userPermissions = useAtomValue(currentUserPermissionsAtom);
   const enabledEntities = useAtomValue(enabledEntitiesAtom);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
+  const setTreeNav = useSetAtom(treeNavAtom);
 
   const finalSidebarItems = useMemo(() => {
     return isUsingPermissions
@@ -96,12 +99,33 @@ export function Sidebar({ isLoading, items, isUsingPermissions }: SidebarType) {
                       isSettings: item.navigate.includes("settings"),
                       isDisabled: item?.isDisabled,
                     })}
-                    onClick={item?.onClick}
+                    onClick={() => {
+                      if (item?.onClick) {
+                        item?.onClick?.();
+                      }
+                    }}
                     to={item.onClick ? "#" : getSidebarLink(item.navigate, project_id as string, item?.isDisabled)}>
                     <Tooltip
-                      allowedPlacements={[isLg ? "right" : "top"]}
-                      content={item.tooltip}
-                      isDisabled={item.navigate === type}>
+                      allowedPlacements={item.navigate === type && isLg ? ["right-start"] : [isLg ? "right" : "top"]}
+                      content={
+                        item.navigate === type ? (
+                          <div className="[&>button]:rounded-l-none [&>button]:shadow-none">
+                            <Button
+                              customButtonColor="#60a5fa"
+                              icon={IconEnum.text_align_justify}
+                              isIconOnly
+                              onClick={() => setTreeNav((prev) => !prev)}
+                              variant="info"
+                            />
+                          </div>
+                        ) : (
+                          item.tooltip
+                        )
+                      }
+                      customOffset={{ mainAxis: item.navigate === type ? -5 : 0 }}
+                      delay={{ openDelay: 0, closeDelay: 0 }}
+                      hasArrow={item.navigate !== type}
+                      isPortal>
                       <li className={listItem()}>
                         <Icon fontSize={32} hFlip={item.navigate === "generators"} icon={item.icon} />
                       </li>
