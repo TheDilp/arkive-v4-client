@@ -21,6 +21,7 @@ export interface TooltipType {
   isInline?: boolean;
   customOffset?: { mainAxis?: number; crossAxis?: number };
   variant?: Variant;
+  hasArrow?: boolean;
 }
 
 export type DefaultTooltipType = {

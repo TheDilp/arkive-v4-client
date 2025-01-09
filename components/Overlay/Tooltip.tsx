@@ -77,6 +77,7 @@ export function Tooltip({
   arrowColor,
   passCloseTooltip,
   isInline,
+  hasArrow = true,
   variant = "primary",
 }: TooltipType) {
   const [open, setOpen] = useState(false);
@@ -150,13 +151,15 @@ export function Tooltip({
                 })}
               </OnlySoleChild>
             )}
-            <FloatingArrow
-              ref={arrowRef}
-              className="z-[9998] [&>path:first-of-type]:stroke-none"
-              context={context}
-              fill={arrowColor || getArrowColor(variant) || "black"}
-              strokeWidth={0}
-            />
+            {hasArrow ? (
+              <FloatingArrow
+                ref={arrowRef}
+                className="z-[9998] [&>path:first-of-type]:stroke-none"
+                context={context}
+                fill={arrowColor || getArrowColor(variant) || "black"}
+                strokeWidth={0}
+              />
+            ) : null}
           </div>
         </FloatingPortal>
       ) : null}
@@ -181,13 +184,15 @@ export function Tooltip({
               ...(passCloseTooltip ? { closeTooltip: () => setOpen(false) } : {}),
             })
           )}
-          <FloatingArrow
-            ref={arrowRef}
-            className="z-[9998] [&>path:first-of-type]:stroke-none"
-            context={context}
-            fill={arrowColor || getArrowColor(variant) || "black"}
-            strokeWidth={0}
-          />
+          {hasArrow ? (
+            <FloatingArrow
+              ref={arrowRef}
+              className="z-[9998] [&>path:first-of-type]:stroke-none"
+              context={context}
+              fill={arrowColor || getArrowColor(variant) || "black"}
+              strokeWidth={0}
+            />
+          ) : null}
         </div>
       ) : null}
     </>
