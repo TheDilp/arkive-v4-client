@@ -1,12 +1,15 @@
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import { createContext, useContext, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { useGetEntities } from "../../hooks";
-import { AvailableEntityType } from "../../types";
+import { useDeleteEntity, useGetEntities } from "../../hooks";
+import { AvailableEntityType, EntitiesWithFolders } from "../../types";
 import {
   AvailableIcons,
+  dialogAtom,
+  drawerAtom,
   EntitiesWithFoldersEnum,
   getDefaultEntityIcon,
   getEntityFields,
@@ -29,7 +32,7 @@ const classes = tv({
 
 const treeNavItemClasses = tv({
   slots: {
-    base: "flex flex-col py-0.5 px-1 text-sm hover:bg-zinc-700 rounded ",
+    base: "flex flex-col py-0.5 px-1 text-sm hover:bg-zinc-700 rounded border border-transparent",
     title: "flex w-full cursor-pointer items-center gap-x-1 pt-0.5 truncate",
   },
   variants: {
@@ -63,9 +66,12 @@ function TreeNavItem({
   image_id: string | null;
 }) {
   const [open, setOpen] = useState(false);
+  const setDrawer = useSetAtom(drawerAtom);
+  const setDialog = useSetAtom(dialogAtom);
+  const resetDialogAtom = useResetAtom(dialogAtom);
   const { project_id } = useParams();
   const { type } = useContext(TypeContext);
-
+  const { mutate: deleteEntity } = useDeleteEntity(type as EntitiesWithFolders, project_id as string, true);
   const { data: items } = useGetEntities(
     {
       fields: getEntityFields(type || "documents"),
@@ -101,13 +107,67 @@ function TreeNavItem({
             />
           </div>
         ) : null}
-        <div className={`flex w-full flex-nowrap items-center gap-x-1 ${is_folder && open ? "border-b border-zinc-600" : ""} `}>
+        <div
+          className={`group relative flex w-full flex-nowrap items-center gap-x-1 hover:text-blue-300 ${is_folder && open ? "border-b border-zinc-600" : ""} `}>
           {image_id ? (
             <Avatar image_id={image_id} size="2xs" />
           ) : (
             <Icon icon={is_folder ? IconEnum.folder : icon || getDefaultEntityIcon(type)} />
           )}
-          {title}
+          <span>{title}</span>
+          <div className="absolute right-0 hidden items-center bg-zinc-700 pl-2 group-hover:flex">
+            <div>
+              <Button
+                hasNoBackground
+                icon={IconEnum.edit}
+                iconSize={16}
+                isIconOnly
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setDrawer((prev) => ({
+                    ...prev,
+                    title: `Edit ${title}`,
+                    data: {
+                      id,
+                      type: type as EntitiesWithFolders,
+                    },
+                    type: is_folder ? "folder" : (type as EntitiesWithFolders),
+                  }));
+                }}
+              />
+            </div>
+            <div>
+              <Button
+                hasNoBackground
+                icon={IconEnum.trash}
+                iconSize={16}
+                isIconOnly
+                onClick={(e: Event) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setDialog((prev) => ({
+                    ...prev,
+                    title: `Arkive ${title}`,
+                    description: `Are you sure you want to arkive ${title}?`,
+                    isOverlay: true,
+                    cancel: {
+                      label: "Cancel",
+                      variant: "primary",
+                      action: resetDialogAtom,
+                    },
+                    confirm: {
+                      label: "Arkive",
+                      icon: IconEnum.trash,
+                      action: () => deleteEntity({ data: { id } }),
+                      variant: "error",
+                    },
+                  }));
+                }}
+                variant="error"
+              />
+            </div>
+          </div>
         </div>
       </Link>
       {open ? (
@@ -121,7 +181,7 @@ function TreeNavItem({
 
 function TreeNavRoot({ items }: { items: Record<string, any>[] }) {
   return (
-    <ul className="w-full px-1">
+    <ul className="flex w-full flex-col gap-y-0.5 px-1">
       {(items || []).map((item) => (
         <TreeNavItem
           key={item.id}
