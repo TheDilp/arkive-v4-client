@@ -5,7 +5,7 @@ import { ReactNode, useEffect } from "react";
 import { Navigate, Outlet, useBlocker, useLocation, useParams } from "react-router-dom";
 
 import { useBreakpoint, useGetEntities, useGetEntity, useGetUser, useToggledResetAtom } from "../../hooks";
-import { PermissionType, ProjectType, TagType } from "../../types";
+import { AvailableEntityType, PermissionType, ProjectType, TagType } from "../../types";
 import {
   availableTagsAtom,
   contextMenuAtom,
@@ -25,12 +25,13 @@ import {
   userAtom,
   userStatusAtom,
 } from "../../utils";
+import { TreeNav } from "../Layout";
 import { Dialog, Drawer, Dropdown } from "../Overlay";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
 
 export function ProjectLayout() {
-  const { project_id } = useParams();
+  const { project_id, type } = useParams();
   const { isLg } = useBreakpoint();
   const { pathname } = useLocation();
   const userStatus = useAtomValue(userStatusAtom);
@@ -182,6 +183,7 @@ export function ProjectLayout() {
     });
     return <Navigate to="/" />;
   }
+
   return (
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
       <Dialog />
@@ -193,9 +195,12 @@ export function ProjectLayout() {
 
       <div className="flex h-full w-full flex-col lg:w-[calc(100%-4rem)]">
         <Navbar isDisabled={isInitialLoading || isInitialLoadingUser} />
-        <div className="h-[calc(100%-6rem)] max-w-full overflow-hidden p-4 lg:h-[calc(100%-2rem)]">
+        <div className="flex h-[calc(100%-6rem)] max-w-full flex-nowrap overflow-hidden lg:h-[calc(100%-2rem)]">
+          <TreeNav type={type as AvailableEntityType} />
           <Drawer />
-          {isInitialLoading || isInitialLoadingUser || isInitialLoadingPermissions || !projectAtomData ? null : <Outlet />}
+          <div className="flex h-full w-full max-w-full p-4">
+            {isInitialLoading || isInitialLoadingUser || isInitialLoadingPermissions || !projectAtomData ? null : <Outlet />}
+          </div>
         </div>
         {!isLg ? (
           <Sidebar isLoading={isInitialLoading || isInitialLoadingUser} isUsingPermissions items={projectNavItems} />
