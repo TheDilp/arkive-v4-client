@@ -14,6 +14,7 @@ import {
   dialogAtom,
   Dice,
   drawerAtom,
+  EntitiesWithFoldersEnum,
   hasChangedDataAtom,
   historyAtom,
   IconEnum,
@@ -196,7 +197,9 @@ export function ProjectLayout() {
       <div className="flex h-full w-full flex-col lg:w-[calc(100%-4rem)]">
         <Navbar isDisabled={isInitialLoading || isInitialLoadingUser} />
         <div className="flex h-[calc(100%-6rem)] max-w-full flex-nowrap overflow-hidden lg:h-[calc(100%-2rem)]">
-          <TreeNav type={type as AvailableEntityType} />
+          {isLg && EntitiesWithFoldersEnum.includes(type as AvailableEntityType) ? (
+            <TreeNav type={type as AvailableEntityType} />
+          ) : null}
           <Drawer />
           <div className="flex h-full w-full max-w-full p-4">
             {isInitialLoading || isInitialLoadingUser || isInitialLoadingPermissions || !projectAtomData ? null : <Outlet />}

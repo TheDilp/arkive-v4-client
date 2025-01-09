@@ -8,6 +8,7 @@ import { PermissionCodeType, SidebarType } from "../../types";
 import {
   currentUserPermissionsAtom,
   enabledEntitiesAtom,
+  EntitiesWithFoldersEnum,
   getSidebarLink,
   IconEnum,
   isProjectOwnerAtom,
@@ -125,6 +126,7 @@ export function Sidebar({ isLoading, items, isUsingPermissions }: SidebarType) {
                       customOffset={{ mainAxis: item.navigate === type ? -5 : 0 }}
                       delay={{ openDelay: 0, closeDelay: 0 }}
                       hasArrow={item.navigate !== type}
+                      isDisabled={item.navigate === type && (!isLg || !EntitiesWithFoldersEnum.includes(type))}
                       isPortal>
                       <li className={listItem()}>
                         <Icon fontSize={32} hFlip={item.navigate === "generators"} icon={item.icon} />
