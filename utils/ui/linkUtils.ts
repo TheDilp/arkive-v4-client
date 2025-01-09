@@ -6,7 +6,8 @@ export function getEntityLink(
   name: string,
   item_id: string,
   parent_id?: string | null,
-  is_public?: boolean
+  is_public?: boolean,
+  is_folder?: boolean
 ) {
   if (IS_GATEWAY) return "#";
   if (name === "") return "#";
@@ -37,7 +38,8 @@ export function getEntityLink(
     name === "manuscripts"
   )
     link_type = name;
-  if (link_type) return `${linkRoot}/${project_id}/${link_type}/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}`;
+  if (link_type)
+    return `${linkRoot}/${project_id}/${link_type}${is_folder ? "/folder" : ""}/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}`;
   return "#";
 }
 
