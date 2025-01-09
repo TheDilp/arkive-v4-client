@@ -18,6 +18,7 @@ export const hasChangedDataAtom = atomWithReset<boolean>(false);
 export const projectFeatureFlagsAtom = atom((get) => get(projectAtom)?.feature_flags);
 export const hasEntityUpdatePermissionForEntityView = atom<boolean>(false);
 export const historyAtom = atom<{ label: string; link: string }[]>([]);
+export const treeNavAtom = atom<boolean>(true);
 export const assetsUrlsAtom = atom<{ thumbnails: Record<string, string>; images: Record<string, string> }>({
   thumbnails: {},
   images: {},
